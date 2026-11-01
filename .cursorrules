@@ -1,726 +1,1283 @@
-# =============================================================================
-# SsulDak (쓸고닦고) Full-Stack Development Rules & Architecture Specification
-# File: project_SsulDak/.cursorrules
-# Collation: utf8mb4_0900_ai_ci | DBMS: MySQL / MariaDB (InnoDB)
-# Stack: Full-Stack React (Next.js App Router / Node.js API Routes / React Native)
-# =============================================================================
+================================================================================
+  [쓸고닦고 (sseuldakgo)] 종합 아키텍처, 폴더 구조, 프로그램/화면 ID 체계,
+  데이터베이스 DDL, WEB/APP 화면 목록 및 업무 워크플로우 통합 명세서
+  (화면 ID 접두사 개정: WEB_ -> WEB- / APP_ -> APP- 전면 반영판)
+================================================================================
 
-## 1. 프로젝트 핵심 원칙 (Core Architectural Rules)
+1. 플랫폼 기본 거버넌스 및 가격 정책 체계
+--------------------------------------------------------------------------------
+1.1 고객 확정 지정가 발주 및 가격 비딩(역경매) 배제 원칙
+- 쓸고닦고 플랫폼은 용역(서비스) 간의 출혈 경쟁을 유발하는 '금액 역경매(가격 입찰/비딩)' 방식을 전면 배제합니다.
+- 고객이 청소 요청 등록 시 작업 조건, 청소 가능 일자(또는 정기 주기), 그리고 지불할 '확정 용역 대금(지정가)'을 직접 결정하여 등록합니다.
+- 용역(서비스) 회원은 고객이 제시한 확정 대금을 100% 수락하는 것을 전제로 하며, 청약 시 금액을 변경하거나 깎아서 입찰할 수 없습니다.
+- 용역 회원의 청약 경쟁 요소는 오직 '시공 가능 일정(방문 날짜 및 시간대)', '투입 인원수', '보유 장비 및 전문성 어필'로만 구성됩니다.
 
-1. **최상위 루트 디렉터리 준수**:
-   - 프로젝트 최상위 루트 디렉터리는 반드시 `project_SsulDak`이어야 한다.
-   - 모든 소스코드는 `SsulDak_Web` 및 `SsulDak_App` 하위로 엄격히 분리하여 배치한다.
+1.2 회원 구분 및 채번 표준 (USER_NO)
+- 회원 구분:
+  * 고객 (Client)  : 청소 용역을 발주하고 확정 금액을 제시하는 회원 (코드: C)
+  * 용역 (Service) : 고객 확정 금액을 수락하고 일정을 제안하여 시공하는 회원 (코드: S)
+  * 관리 (Admin)   : 플랫폼 운영, 수납 정산, 제휴사 관제 총괄 회원 (코드: A)
+- USER_NO 채번 공식:
+  USER_NO = 구분코드(1Byte) + 가입년월(YYYYMM, 6Byte) + 월별 일련번호(0-Padding 5자리, 1부터 시작)
+  * 고객 채번 예시 : C20261000001
+  * 용역 채번 예시 : S20261000001
+  * 관리 채번 예시 : A20261000001
 
-2. **역할별 3대 영역 완전 격리 (Strict Role Isolation)**:
-   - `SsulDak_Web`과 `SsulDak_App` 내부에는 각각 **`Admin(관리자)`**, **`User(사용자)`**, **`Partner(파트너)`** 3개의 최상위 도메인 폴더를 둔다.
-   - 다른 역할 간의 컴포넌트, 유틸리티, 서비스 로직, API 엔드포인트의 교차 참조(Cross-Import) 및 공유를 전면 금지한다.
+1.3 멀티 페르소나 및 동일인 자전거래 차단 규칙
+- 동일한 휴대폰 번호, 이메일, SNS 계정(카카오/네이버 등)으로 고객(C), 용역(S) 계정을 각각 독립적으로 생성 및 등록 가능.
+- 자전거래(자기 청약) 원천 차단 엔진:
+  * 고객이 등록한 발주건(ORDER_NO)에 대해 용역 회원이 청약서(TB_QUOTE_APPLY)를 제출할 때, 발주 고객의 휴대폰 번호, 이메일, SNS 연동 UID 중 하나라도 청약 용역회원과 일치하면 DB 및 API 레벨에서 즉시 차단(ERR_SELF_BID_PROHIBITED).
 
-3. **풀스택 React 기술 스택**:
-   - 프론트엔드 UI 화면과 백엔드 서버 로직 모두 **React 기반(Next.js App Router API Routes 또는 Node.js Express)**으로 개발한다.
+1.4 회원구분별 독립 홈페이지 URL
+- 고객 전용 홈 : https://sseuldakgo.kr/client/
+- 용역 전용 홈 : https://sseuldakgo.kr/service/
+- 관리 전용 홈 : https://sseuldakgo.kr/admin/
 
-4. **화면 ID - 백엔드 ID 1:1 완전 일치 및 공통화 절대 배제 원칙 (Strict Non-Sharing Rule)**:
-   - 화면 ID(예: `USER-REQ-00`, `PTNR-JOB-00`, `ADMN-REQ-01`)와 백엔드 디렉터리/엔드포인트 명칭은 **1:1로 동일하게 매핑**한다.
-   - **기능이 100% 동일하거나 유사하더라도(예: 로그인, 인증, 목록 조회, 취소 처리, 영수증 출력 등) 절대 공통 백엔드 모듈이나 단일 API로 통합하지 않는다.**
-   - 화면별 비즈니스 룰, 권한 분기, 데이터 검증 로직, 수수료 및 위약금/패널티 정책이 상이하므로 **오직 해당 화면 전용 백엔드로 독립 구현**한다.
 
-5. **플랫폼 공식 브랜드 로고 사용 원칙 (Official Branding Logo Rule)**:
-   - **공식 원본 로고 파일**: 프로젝트 루트의 `쓸고딱고 로고.png` (2816×1536 원형 심볼 로고) 및 웹/앱 에셋 경로(`public/logo.png`, `preview/logo.png`, `assets/logo.png`).
-   - **필수 준수 사항**:
-     - 모든 웹(WEB) 및 모바일 앱(APP)의 GNB 상단 바, 스플래시 화면, 푸터, 로그인/회원가입, 계약서 영수증 등에서 사용하는 브랜드 로고는 **반드시 첨부된 공식 로고 파일(`쓸고딱고 로고.png` / `logo.png`)을 사용**해야 한다.
-     - 텍스트 단독 표기나 임의의 다른 폰트 아이콘(예: 일반 빗자루/빌딩 아이콘 등)으로 로고를 대체하는 것을 엄격히 금지하며, 원형 로고 심볼(청록색 원형 바탕 + '쓸고딱고' 국문 타이틀 + 황금색 빗자루/빌딩 실루엣 + 'BUILDING CLEANING STANDARD' 영문 하단 라운드) 이미지를 일관되게 렌더링한다.
+2. 디렉터리 폴더 구성 방법 및 프로그램 ID 채번 규칙 (개정: WEB- / APP-)
+--------------------------------------------------------------------------------
+2.1 물리적 디렉터리 폴더 구성 표준
+- 최상위 루트 디렉터리는 반드시 'project_SseulDakGo'여야 합니다.
+- 웹(Web)과 앱(App) 환경을 루트 수준에서 완전 분리하며, 각 환경 내부는 3대 도메인(Client, Service, Admin)별로 엄격히 격리합니다.
+- 프론트엔드와 백엔드는 각 화면 ID별로 1:1 독립 엔드포인트 디렉터리를 가집니다.
 
----
-
-## 2. 물리적 디렉터리 구조 표준
-
-```text
-project_SsulDak/
-├── .cursorrules                             # 본 개발 지침 및 아키텍처 규칙 파일
-├── SsulDak_Web/                             # 웹(Web) 환경 풀스택 소스코드 루트
-│   ├── Admin/                               # [관리자 전용 웹]
-│   │   ├── frontend/                        # 관리자 화면 컴포넌트 ({SCREEN-ID}/index.jsx)
-│   │   └── backend/                         # 관리자 전용 1:1 독립 API (api_{SCREEN_ID_UNDER}/route.js)
-│   ├── User/                                # [사용자 전용 웹]
-│   │   ├── frontend/                        # 사용자 화면 컴포넌트
-│   │   └── backend/                         # 사용자 전용 1:1 독립 API
-│   └── Partner/                             # [파트너 전용 웹]
-│       ├── frontend/                        # 파트너 화면 컴포넌트
-│       └── backend/                         # 파트너 전용 1:1 독립 API
+project_SseulDakGo/
+├── .cursorrules                               # 최상위 개발 지침 및 아키텍처 규칙
+├── lib/
+│   └── db.ts                                  # [공통 인프라] 단일 데이터베이스 커넥션 풀(Single Connection Pool)
+├── SseulDakGo_Web/                            # 웹(Web) 환경 풀스택 소스코드 루트
+│   ├── Client/                                # [고객 전용 웹]
+│   │   ├── frontend/                          # 화면 ID별 프론트 폴더 (예: WEB-CLNT-COM-000/index.jsx)
+│   │   └── backend/                           # 1:1 독립 백엔드 API (예: api_WEB_CLNT_COM_000/route.js)
+│   ├── Service/                               # [용역 전용 웹]
+│   │   ├── frontend/                          # 화면 ID별 프론트 폴더 (예: WEB-SRVC-MAIN-000/index.jsx)
+│   │   └── backend/                           # 1:1 독립 백엔드 API (예: api_WEB_SRVC_MAIN_000/route.js)
+│   └── Admin/                                 # [관리자 전용 웹]
+│       ├── frontend/                          # 화면 ID별 프론트 폴더 (예: WEB-ADMN-DSH-000/index.jsx)
+│       └── backend/                           # 1:1 독립 백엔드 API (예: api_WEB_ADMN_DSH_000/route.js)
 │
-└── SsulDak_App/                             # 모바일 앱(App) 환경 풀스택 소스코드 루트
-    ├── Admin/                               # [관리자 전용 모바일 관제 앱]
-    │   ├── screens/                         # 관리자 모바일 화면 컴포넌트 ({SCREEN-ID}-APP/index.jsx)
-    │   └── backend/                         # 관리자 앱 전용 1:1 독립 API (api_{SCREEN_ID_UNDER}_app/route.js)
-    ├── User/                                # [사용자 전용 모바일 앱]
-    │   ├── screens/                         # 사용자 모바일 화면 컴포넌트
-    │   └── backend/                         # 사용자 앱 전용 1:1 독립 API
-    └── Partner/                             # [파트너 전용 모바일 앱]
-        ├── screens/                         # 파트너 모바일 화면 컴포넌트
-        └── backend/                         # 파트너 앱 전용 1:1 독립 API
+└── SseulDakGo_App/                            # 모바일 앱(App) 환경 풀스택 소스코드 루트
+    ├── Client/                                # [고객 전용 모바일 앱]
+    │   ├── screens/                           # 화면 ID별 프론트 스크린 (예: APP-CLNT-COM-000/index.tsx)
+    │   └── backend/                           # 1:1 독립 백엔드 API (예: api_APP_CLNT_COM_000/route.js)
+    ├── Service/                               # [용역 전용 모바일 앱]
+    │   ├── screens/                           # 화면 ID별 프론트 스크린 (예: APP-SRVC-MAIN-000/index.tsx)
+    │   └── backend/                           # 1:1 독립 백엔드 API (예: api_APP_SRVC_MAIN_000/route.js)
+    └── Admin/                                 # [관리자 전용 모바일 앱]
+        ├── screens/                           # 화면 ID별 프론트 스크린 (예: APP-ADMN-DSH-000/index.tsx)
+        └── backend/                           # 1:1 독립 백엔드 API (예: api_APP_ADMN_DSH_000/route.js)
 
-3. 핵심 비즈니스 로직 및 정책 준수 규칙 (Business Engine)
-	1	지정가 청약 및 최소 하한선 (Floor Price):
-	◦	역경매 덤핑 경쟁을 금지하며, 사용자가 플랫폼 하한선(시장 실사 단가 기반) 이상의 확정 금액을 제시한다.
-	◦	파트너는 금액 수정 없이 수락(청약) 여부만 결정한다. 
-	2	정기청소 From-To 3개월 이상 강제 락 및 중분류 동적 추가:
-	◦	계약 기간 From-To 일자를 직접 입력받으며, To - From >= 90일(3개월) 여부를 필수 검증한다 (90일 미만 선택 시 등록 차단). 
-	◦	계단, 건물주위, 지하, 지하주차장, 복도 등을 공통 코드 테이블(TB_COM_CODE - 그룹: REGULAR_CLEAN_AREA)에서 조회하여 + 버튼으로 다중 추가한다. 
-	◦	중분류별로 3개월 청소 용역 단가를 각각 입력받고, 이 합계가 파트너에게 전달되는 실제 청소 용역 대금이 된다. 
-	3	계절가전 및 입주청소 중분류 동적 추가:
-	◦	공통 코드 테이블에서 가전(에어컨, 세탁기, 냉장고 등), 입주(아파트, 오피스텔, 빌라, 사무실 등) 중분류를 조회하여 + 버튼으로 복수 추가하고 각 품목별 용역 단가를 입력받는다. 
-	4	개정 플랫폼 데이터 이용료 과금 공식:$$\text{데이터 이용료} = \max(\text{청소 용역 대금 총액} \times 3.3\%, 33,000\text{원})$$
-	◦	산출된 금액을 이용자(선결제)와 파트너(후결제)에게 각각 데이터 이용료로 부과한다. 
-	◦	실제 청소 용역 대금(100%)은 시공 현장에서 이용자가 파트너에게 직접 정산한다. 
-	5	프로모션 쿠폰, 포인트 차감 및 0원 결제 바이패스:
-	◦	이용자: 웰컴 5,000원 쿠폰, 리뷰 1,000P 등을 기준 데이터 이용료에서 즉시 차감 결제한다. 
-	◦	파트너: 신규 입점 100% 무료 쿠폰 적용 시 실 결제금액 0원(Free Pass)으로 PG 결제창 호출을 생략(바이패스)하고 시스템 내부에서 즉시 배차 확정 처리한다. 
-	◦	관리자 통제: 관리자는 프로모션 캠페인 등록 시 활성화 여부(IS_ACTIVE_YN), 사용 시작~종료일시(START_DT, END_DT), 유효일수(VALID_DAYS), 총 예산 한도를 직접 통제하며 비상 시 예산 동결(Budget Freeze)을 집행한다. 
-	6	상호 정보 공개 및 채팅방 트리거:
-	◦	이용자 선결제 + 파트너 후결제(또는 0원 패스)가 양측 모두 완료된 즉시 0507 안심번호 공개 및 1:1 실시간 상담 채팅방이 활성화된다. 
-	7	개정 환불 규정 및 선(先) 취소자 7일 정지 패널티 (개정 약관 제8조):
-	◦	이용자 선 취소:
-	▪	결제 후 7일 이내 취소 시: 기납부 데이터 이용료의 50% 환불 (50% 위약금 공제). 
-	▪	결제 후 7일 경과 후 취소 시: 100% 몰수 (환불 불가). 
-	▪	사용 쿠폰 영구 소멸 + 이용자 계정 7일간 신규 견적 요청 정지 자동 집행. 
-	▪	상대방 파트너에게는 납부액 100% 자동 환불. 
-	◦	파트너 선 취소:
-	▪	데이터 이용료 전액 몰수 + 7일간 투찰 정지. 
-	▪	피해 이용자에게 실 결제액 100% 환불 및 사용 쿠폰 원상 복원 + 3개월 안심보증 우수 대체 파트너 긴급 배차. 
-4. 데이터베이스 및 보안 표준 (Database Standard)
-	1	테이블 및 컬럼 명명:
-	◦	모든 테이블과 컬럼명은 대문자 스네이크 표기법(UPPER_SNAKE_CASE)을 준수한다.
-	2	감사 컬럼 (REG_DT, REG_ID, MOD_DT, MOD_ID) 처리 규칙:
-	◦	최초 생성(INSERT) 시: REG_ID와 MOD_ID에 로그인 사용자 식별번호(USER_NO/PTNR_NO/ADMIN_ID)를 조립하고, REG_DT와 MOD_DT에 시스템 현재 일시를 조립한다.
-	◦	데이터 수정(UPDATE) 시: REG_ID, REG_DT는 절대 변경하지 않고 MOD_ID(수정자 식별번호)와 MOD_DT(수정 일시)만 갱신하여 데이터 변경 추적을 보장한다.
-	3	비밀번호 단방향 암호화 필드 필수 적용:
-	◦	TB_USER 및 TB_PARTNER 테이블의 비밀번호 컬럼은 USER_PWD_HASH, PTNR_PWD_HASH(VARCHAR(255))와 PWD_SALT(VARCHAR(64)), PWD_CHG_DT를 사용하며 평문 저장을 엄격히 금지한다.
-	4	키 체계: 제로패딩 순번 형식(예: USER_NO -> U20261000001, CONTRACT_NO -> CNT202610210001)을 준수한다.
-	5	SQL 쿼리 ID 명명 규칙 및 독립화 원칙:
-	◦	각 서비스에서 호출하는 쿼리 ID는 화면 ID를 계승하여 {화면 ID}-SQL-{001부터 증가하는 순번} 구조로 채번한다. (예: USER-REQ-00-SQL-001, PTNR-JOB-00-SQL-001)
-	◦	동일한 쿼리라도 화면 간 절대 공유하지 않고 해당 화면 전용 백엔드에서만 독립 호출한다.
+2.2 프로그램 및 식별자 ID 구성 방법
+- 개정 화면 ID 채번 규칙:
+  * 웹(Web) 화면 : WEB-{도메인}-{업무모듈}-{순번3자리}
+  * 앱(App) 화면 : APP-{도메인}-{업무모듈}-{순번3자리}
+  * 도메인 약어  : CLNT(고객 / Client), SRVC(용역 / Service), ADMN(관리자 / Admin)
+  * 업무모듈 약어: COM(공통/메인), REQ(요청/발주), ATH(인증/가입), ORD(오더/공고), QOT(청약), JOB(시공/작업), PAY(결제), SET(설정), ALC(제휴/정산), DSP(분쟁), SYS(시스템)
+- 백엔드 프로그램 ID 및 경로 매핑 규칙:
+  * 웹 백엔드 프로그램 ID : API_WEB-{도메인}-{업무모듈}-{순번}
+  * 웹 백엔드 물리 폴더명 : api_WEB_{도메인}_{업무모듈}_{순번} (하이픈을 언더바로 치환)
+  * 앱 백엔드 프로그램 ID : API_APP-{도메인}-{업무모듈}-{순번}
+  * 앱 백엔드 물리 폴더명 : api_APP_{도메인}_{업무모듈}_{순번}
+  * 규칙: 동일한 비즈니스 로직이라도 도메인 및 화면 간 공통 모듈 공유를 전면 금지하며, 각 화면 전용 백엔드 폴더 내 route.js로 1:1 독립 구현(Strict Non-Sharing & SRP).
+
+2.3 데이터베이스 연결 및 쿼리 실행 거버넌스 (공통 lib/db.ts 원칙)
+- DB 연결 규칙:
+  * 개별 route.js 파일 내에서 `mysql.createConnection()` 또는 직접적인 DB 연결 생성을 엄격히 금지합니다.
+  * 모든 백엔드 route는 프로젝트 루트의 `lib/db.ts`에 선언된 싱글톤 커넥션 풀(`getDbPool`, `executeQuery`, `executeTransaction`)을 반드시 임포트하여 공통으로 사용합니다.
+  * DB 환경 설정(IP, 포트, 인증, 인코딩, 타임존)은 `lib/db.ts` 및 `.env.local` 한 곳에서만 관리합니다.
+- DB 접속 및 환경 표준 명세:
+  * 기본 인코딩: CHARSET=utf8mb4 / COLLATE=utf8mb4_0900_ai_ci
+  * 타임존      : +09:00 (한국 표준시 KST)
+  * DB 호스트   : 5.104.87.214 (포트: 3306)
+  * 데이터베이스 : ssuldak_db
+  * DB 계정     : ssuldak (암호: Ch72337528)
+  * 커넥션 스트링 URI: mysql://ssuldak:Ch72337528@5.104.87.214:3306/ssuldak_db
+- route.js 작성 표준 템플릿:
+  ```javascript
+  import { executeQuery, executeTransaction } from '../../../../lib/db.js';
+
+  // 1. 단일 조회 쿼리 실행
+  const userRows = await executeQuery('SELECT USER_NO, USER_NM FROM TB_USER WHERE USER_NO = ?', [userNo]);
+
+  // 2. 다중 쿼리 트랜잭션 실행
+  await executeTransaction(async (conn) => {
+    await conn.execute('UPDATE TB_ORDER_MSTR SET ORDER_STATUS = ? WHERE ORDER_NO = ?', ['CNTR_CONFIRMED', orderNo]);
+    await conn.execute('UPDATE TB_ORDER_DTL SET SERVICE_STATUS = ? WHERE ORDER_NO = ?', ['APPR_CONTRACT', orderNo]);
+  });
+  ```
+
+2.4 네이버 지도 및 주소 검색 API (NCP Maps / Geocoding) 공통 표준 규격 (lib/naver-map.ts 원칙)
+- 네이버 클라우드 플랫폼(NCP) 공식 등록 명세:
+  * Application 이름: sseuldakgo-map
+  * Client ID (X-NCP-APIGW-API-KEY-ID): 4itmbg4587
+  * Client Secret (X-NCP-APIGW-API-KEY): SZlvMagqg6q2kCfPAjsl9LHHQ93vCmzMWjqQPN2i
+  * Web 서비스 URL: https://sseuldakgo.kr
+  * Android 앱 패키지: kr.sseuldakgo.android
+  * iOS Bundle ID: kr.sseuldakgo.iOS
+- 환경 변수(.env.local):
+  ```env
+  NAVER_MAPS_APP_NAME=sseuldakgo-map
+  NAVER_MAPS_CLIENT_ID=4itmbg4587
+  NAVER_MAPS_CLIENT_SECRET=SZlvMagqg6q2kCfPAjsl9LHHQ93vCmzMWjqQPN2i
+  NAVER_MAPS_WEB_URL=https://sseuldakgo.kr
+  NAVER_MAPS_ANDROID_PACKAGE=kr.sseuldakgo.android
+  NAVER_MAPS_IOS_BUNDLE_ID=kr.sseuldakgo.iOS
+  ```
+- 공통 모듈 및 아키텍처 규칙:
+  * 네이버 지도/주소 검색의 모든 설정 및 검색 로직은 루트의 `lib/naver-map.ts` (컴파일: `lib/naver-map.js`)에서 단일 관리합니다.
+  * 개별 route.js 파일에서 네이버 API 호출 로직을 중복 구현하지 않고 `lib/naver-map.js`의 `searchNaverAddress` 또는 `NAVER_MAP_CONFIG`를 임포트하여 사용합니다.
+  * Client Secret은 절대 프론트엔드/모바일 클라이언트 브라우저 번들에 노출하지 않으며, 클라이언트는 서버 API(`/api/web/client/search_address`)를 경유하거나 Client ID(`4itmbg4587`) 기반의 네이버 공식 SDK를 사용합니다.
+  * 실시간 NCP API 장애 또는 오프라인/개발망 환경에서도 서비스가 중단되지 않도록 고양시/일산/수도권 지오코딩 스마트 폴백(Smart Fallback) 데이터베이스를 항상 유지합니다.
+- 플랫폼별 연동 표준 템플릿:
+  * 웹 프론트엔드 (Web SDK):
+    `<script src="https://oapi.map.naver.com/openapi/v3/maps.js?ncpClientId=4itmbg4587&submodules=geocoder"></script>`
+  * 백엔드 route.js:
+    ```javascript
+    import { searchNaverAddress, NAVER_MAP_CONFIG } from '../../../../lib/naver-map.js';
+
+    // 주소 검색 실행
+    const searchResult = await searchNaverAddress({ query: '마두동 801-2' });
+    ```
+  * Android 앱 (`AndroidManifest.xml`):
+    `<meta-data android:name="com.naver.maps.map.CLIENT_ID" android:value="4itmbg4587" />`
+  * iOS 앱 (`Info.plist`):
+    `<key>NMFClientId</key><string>4itmbg4587</string>`
+
+2.5 공식 브랜드 상표(로고) 에셋 보관 및 화면 출력 표준 규칙
+- 플랫폼 공식 상표(로고) 정의:
+  * 상표 엠블럼: 원형 엠블럼 (상단 한글: "쓸고딱고", 중앙: 빗자루 및 건물 라인아트 심볼, 하단 영문: "BUILDING CLEANING STANDARD")
+  * 물리 보관 및 서빙 경로:
+    1) `public/logo.png`, `public/logo.jpg` (웹 정적 서빙 및 파비콘 공통 루트)
+    2) `preview/logo.png`, `preview/logo.jpg` (로컬 프리뷰 정적 서빙 루트)
+    3) `SseulDakGo_Web/public/logo.png`, `SseulDakGo_Web/public/logo.jpg` (Web 프로덕션 서빙용)
+    4) `public/assets/sseuldakgo_trademark_logo.jpg` (상표 원본 마스터 에셋 보관소)
+- 화면(UI/UX) 구현 시 상표 출력 원칙 (MANDATORY):
+  * 웹(Web) 및 모바일 앱(App) 환경에서 상표(로고)가 노출되는 모든 화면(상단 GNB 헤더, 모달 타이틀바, 하단 푸터, 로그인/회원가입, 스플래시 등)에는 임의의 텍스트나 Material Icons 대체 아이콘(예: `verified`, `cleaning_services`)을 사용하지 않고, 반드시 위 공식 상표 이미지(`/logo.png`)를 적용하여 렌더링합니다.
+  * 표준 컴포넌트 마크업 템플릿:
+    - GNB 헤더 로고:
+      `<img src="/logo.png" alt="쓸고딱고 로고" className="w-10 h-10 rounded-full object-cover shadow-sm ring-2 ring-primary/20" />`
+    - 모달 헤더 로고 뱃지:
+      `<img src="/logo.png" alt="쓸고딱고 로고" className="w-5 h-5 rounded-full object-cover shadow-xs" />`
+    - 푸터 브랜드 마크:
+      `<img src="/logo.png" alt="쓸고딱고 로고" className="w-8 h-8 rounded-full object-cover shadow-sm ring-1 ring-white/20" />`
+  * 공식 브랜드 상표 표기 원칙:
+    - 로고 이미지 심볼 표기: "쓸고딱고" (상표법상 등록 원형 엠블럼)
+    - 플랫폼 영문 서브타이틀: "BUILDING CLEANING STANDARD"
+    - 본문 및 플랫폼 서비스 표기: "쓸고닦고 (SseulDakGo)" 및 공식 상표 "쓸고딱고" 브랜드 아이덴티티 준수.
+
+
+
+3. 청소 발주 및 서비스 중분류·일정 통제 규칙
+--------------------------------------------------------------------------------
+3.1 2계층 발주 번호 및 배타적 단일 계약 원칙
+- 고객이 청소 요청 등록 시 1개의 주발주 관리번호(ORDER_NO) 발행.
+- 주발주 하위에 3대 중분류(정기청소, 입주청소, 계절가전)가 복수로 등록될 수 있으나, 단 1개 중분류만 최종 계약 확정(APPR_CONTRACT) 가능.
+- 1개 항목 확정 즉시 동일 발주 내 나머지 중분류는 시스템에 의해 자동으로 "청약대기종료(WAIT_CLOSED)"로 일괄 마감.
+- 주발주 마스터의 상태값은 "청약계약확정(CNTR_CONFIRMED)"으로 동시 전이.
+- 발주 발행일로부터 7일간 용역 회원의 청약을 접수받으며, 기한 초과 시 만료(BID_EXPIRED) 처리.
+
+3.2 서비스별 특화 일정 제안 및 시간대 충돌 방지
+- 입주청소:
+  * 고객: 청소 가능 기간을 From ~ To 일자로 제시하고 확정 금액 지정
+  * 용역: 금액은 고객 제시액 그대로 수락하며, From ~ To 범위 내에서 특정 시공일자, 작업 구분(종일/오전/오후), 시작 시각(HH:mm), 소요 시간(N시간)을 입력하여 청약
+- 계절가전:
+  * 고객: 청소 가능 기간을 From ~ To 일자로 제시하고 확정 금액 지정
+  * 용역: 금액은 고객 제시액 그대로 수락하며, From ~ To 범위 내에서 특정 시공일자, 방문 시간대(오전/오후), 구체적 방문 시각(HH:mm)을 입력하여 청약
+- 정기청소:
+  * 고객: 90일(3개월) 의무 락 기반의 시작일~종료일, 방문 주기/요일, 월 확정 대금 지정
+  * 용역: 해당 주기 및 고객 확정 금액을 수락하고 세부 방문 시작 시간대 및 작업 계획을 제시하여 청약
+- 용역회원 일정 중복 청약 방지 로직 (Schedule Conflict Blocker):
+  * 용역회원이 특정 일자/시간대로 청약서를 제출할 때, 이미 계약 확정(APPR_CONTRACT/SVC_PROGRESS)되었거나 동일 일자·시간대에 청약 중인 건이 존재할 경우 청약서 제출 불가 처리.
+
+3.3 용역 회원 서비스 가능 지역 통제
+- 용역 회원은 활동 희망 지역을 최대 10개까지 설정 가능.
+- 등록된 지역 내에서 발생한 청소 발주 공고만 조회 및 청약 가능.
+
+3.4 사진 물리 보관 체계
+- 모든 시공 사진은 주발주번호(ORDER_NO) 하위의 서비스 종류별/시점별 폴더로 물리적 분리 저장.
+  * 정기청소: /orders/{ORDER_NO}/regular/before/, /orders/{ORDER_NO}/regular/after/
+  * 입주청소: /orders/{ORDER_NO}/movein/before/, /orders/{ORDER_NO}/movein/after/
+  * 계절가전: /orders/{ORDER_NO}/appliance/before/, /orders/{ORDER_NO}/appliance/after/
+
+
+4. 타사 플랫폼 제휴(Alliance) 및 정보 이용료 정산 거버넌스
+--------------------------------------------------------------------------------
+4.1 제휴 모델 및 수수료 배분 구조
+- 제휴 대상: 아파트 입주자 커뮤니티, 부동산 플랫폼, 건물관리 ERP, 이사 플랫폼 등.
+- 트래킹: 제휴사별 고유 제휴코드(ALLIANCE_CD) 및 유입 파라미터를 통해 계약 체결 추적.
+- 정산 기준:
+  * 고객 수납액(16,500원) 및 용역 수납액(1.65만~33만원) 체결 확정 시, 건당 고정 경비(5,000원) 공제 후 산출된 플랫폼 순익(Net Profit)의 약정 요율(%) 또는 건당 고정 정액을 제휴 수수료로 배분 적립.
+- 정산 주기: 익월 10일 정산 마감 확정 후 세금계산서 대사를 거쳐 계좌 이체 처리.
+
+
+5. 전체 데이터베이스 DDL 스크립트
+--------------------------------------------------------------------------------
+SET FOREIGN_KEY_CHECKS = 0;
+
+SET FOREIGN_KEY_CHECKS = 0;
+
+DROP TABLE IF EXISTS TB_COM_CODE_GRP;
+CREATE TABLE TB_COM_CODE_GRP (
+    GRP_CD              VARCHAR(40)     NOT NULL    COMMENT '공통 코드 그룹 코드',
+    GRP_NM              VARCHAR(100)    NOT NULL    COMMENT '공통 코드 그룹 명칭',
+    USE_YN              CHAR(1)         NOT NULL DEFAULT 'Y' COMMENT '사용 여부 (Y/N)',
+    RMK                 VARCHAR(500)    NULL        COMMENT '비고',
+    REG_DT              DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    REG_ID              VARCHAR(50)     NOT NULL DEFAULT 'SYSTEM',
+    MOD_DT              DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    MOD_ID              VARCHAR(50)     NOT NULL DEFAULT 'SYSTEM',
+    CONSTRAINT PK_TB_COM_CODE_GRP PRIMARY KEY (GRP_CD)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='공통 코드 그룹 마스터';
+
+DROP TABLE IF EXISTS TB_COM_CODE;
+CREATE TABLE TB_COM_CODE (
+    GRP_CD              VARCHAR(40)     NOT NULL    COMMENT '공통 코드 그룹 코드',
+    COM_CD              VARCHAR(40)     NOT NULL    COMMENT '공통 상세 코드',
+    COM_NM              VARCHAR(100)    NOT NULL    COMMENT '공통 코드 명칭',
+    SORT_ORD            INT             NOT NULL DEFAULT 1 COMMENT '정렬 순서',
+    USE_YN              CHAR(1)         NOT NULL DEFAULT 'Y' COMMENT '사용 여부',
+    REG_DT              DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    REG_ID              VARCHAR(50)     NOT NULL DEFAULT 'SYSTEM',
+    MOD_DT              DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    MOD_ID              VARCHAR(50)     NOT NULL DEFAULT 'SYSTEM',
+    CONSTRAINT PK_TB_COM_CODE PRIMARY KEY (GRP_CD, COM_CD),
+    CONSTRAINT FK_COM_CODE_GRP FOREIGN KEY (GRP_CD) REFERENCES TB_COM_CODE_GRP (GRP_CD) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='공통 상세 코드';
+
+INSERT INTO TB_COM_CODE_GRP (GRP_CD, GRP_NM, USE_YN, RMK) VALUES 
+('FACILITY_TYPE', '청소 요청 시설 유형', 'Y', '사무실, 상가, 학교, 급식실 등'),
+('SERVICE_SUB_ITEM', '필요 청소 서비스 세부항목', 'Y', '바닥왁스, 카페트, 의자 등 다중선택'),
+('CONTRACT_TYPE', '계약 형태 구분', 'Y', '1회성 시공 또는 정기 계약'),
+('PARKING_TYPE', '현장 주차 여건 구분', 'Y', '주차가능, 주차불가, 잘모르겠음');
+
+INSERT INTO TB_COM_CODE (GRP_CD, COM_CD, COM_NM, SORT_ORD) VALUES
+('FACILITY_TYPE', 'OFFICE', '사무실·오피스', 1),
+('FACILITY_TYPE', 'COMMERCIAL', '상가·매장', 2),
+('FACILITY_TYPE', 'SCHOOL', '학교·학원', 3),
+('FACILITY_TYPE', 'RESTAURANT', '급식실·조리실', 4),
+('FACILITY_TYPE', 'RESIDENTIAL', '주거공간(빌라/아파트)', 5),
+('SERVICE_SUB_ITEM', 'SRV_AIRCON', '에어컨 클리닝', 1),
+('SERVICE_SUB_ITEM', 'SRV_FLOOR_WAX', '바닥 왁스', 2),
+('SERVICE_SUB_ITEM', 'SRV_FLOOR_CLEAN', '바닥 청소', 3),
+('SERVICE_SUB_ITEM', 'SRV_CARPET', '카페트 청소', 4),
+('SERVICE_SUB_ITEM', 'SRV_OFFICE_CLEAN', '사무실 청소', 5),
+('SERVICE_SUB_ITEM', 'SRV_OFFICE_MOVEIN', '사무실 입주 청소', 6),
+('SERVICE_SUB_ITEM', 'SRV_SCHOOL', '학교 청소', 7),
+('SERVICE_SUB_ITEM', 'SRV_KITCHEN', '급식실/조리실 청소', 8),
+('SERVICE_SUB_ITEM', 'SRV_CHAIR', '사무실 의자 청소', 9),
+('SERVICE_SUB_ITEM', 'SRV_REGULAR', '정기 청소', 10),
+('CONTRACT_TYPE', 'ONCE', '1회성 시공', 1),
+('CONTRACT_TYPE', 'REGULAR', '정기 계약 문의', 2),
+('PARKING_TYPE', 'YES', '주차 가능', 1),
+('PARKING_TYPE', 'NO', '주차 불가능', 2),
+('PARKING_TYPE', 'UNKNOWN', '잘 모르겠음', 3);
+
+DROP TABLE IF EXISTS TB_SYS_POLICY_CONFIG;
+CREATE TABLE TB_SYS_POLICY_CONFIG (
+    POLICY_KEY          VARCHAR(50)     NOT NULL    COMMENT '정책 식별 키',
+    POLICY_NM           VARCHAR(100)    NOT NULL    COMMENT '정책 명칭',
+    POLICY_VAL          VARCHAR(255)    NOT NULL    COMMENT '설정 값',
+    DATA_TYPE           VARCHAR(20)     NOT NULL DEFAULT 'STRING',
+    POLICY_DESC         VARCHAR(500)    NULL        COMMENT '설명',
+    USE_YN              CHAR(1)         NOT NULL DEFAULT 'Y',
+    REG_DT              DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    REG_ID              VARCHAR(50)     NOT NULL DEFAULT 'SYSTEM',
+    MOD_DT              DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    MOD_ID              VARCHAR(50)     NOT NULL DEFAULT 'SYSTEM',
+    CONSTRAINT PK_TB_SYS_POLICY_CONFIG PRIMARY KEY (POLICY_KEY)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='시스템 운영 정책 파라미터';
+
+DROP TABLE IF EXISTS TB_USER;
+CREATE TABLE TB_USER (
+    USER_NO             CHAR(12)        NOT NULL    COMMENT '사용자 번호 (C/S/A + YYYYMM + 5자리)',
+    USER_ROLE_CD        CHAR(1)         NOT NULL    COMMENT '회원 구분: C(고객), S(용역), A(관리)',
+    USER_EMAIL          VARCHAR(100)    NOT NULL    COMMENT '로그인 이메일 주소',
+    USER_PWD_HASH       VARCHAR(255)    NULL        COMMENT '비밀번호 해시',
+    PWD_SALT            VARCHAR(64)     NULL        COMMENT '암호화 솔트',
+    USER_NM             VARCHAR(50)     NOT NULL    COMMENT '실명 또는 담당자명',
+    USER_TEL            VARCHAR(20)     NOT NULL    COMMENT '휴대폰 번호 (010-0000-0000)',
+    SOCIAL_PROVIDER     VARCHAR(20)     NULL        COMMENT 'KAKAO, NAVER, GOOGLE, APPLE',
+    SOCIAL_UID          VARCHAR(100)    NULL        COMMENT '소셜 고유 식별값',
+    COMPANY_NM          VARCHAR(100)    NULL        COMMENT '상호/업체명 (용역 및 법인고객)',
+    BIZ_NO              VARCHAR(20)     NULL        COMMENT '사업자등록번호 10자리 (용역회원 필수)',
+    USER_STAT_CD        VARCHAR(20)     NOT NULL DEFAULT 'NORMAL' COMMENT 'NORMAL, SUSPENDED_7D, BLOCKED, WITHDRAWN',
+    SUSPEND_EXPIRE_DT   DATETIME        NULL        COMMENT '선취소 7일 정지 만료 일시',
+    ACTIVE_STATUS_YN    CHAR(1)         NOT NULL DEFAULT 'Y' COMMENT '영업 On/Off 상태 (용역 전용)',
+    ALLIANCE_CD         VARCHAR(30)     NULL        COMMENT '유입 제휴사 코드 (제휴 가입자 트래킹)',
+    LAST_LOGIN_DT       DATETIME        NULL,
+    SIGN_IMG_URL        VARCHAR(500)    NULL        COMMENT '전자거래 서명패드 자필 전자서명 이미지 파일 웹 접근 URL', 
+    REG_DT              DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    REG_ID              VARCHAR(50)     NOT NULL DEFAULT 'SYSTEM',
+    MOD_DT              DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    MOD_ID              VARCHAR(50)     NOT NULL DEFAULT 'SYSTEM',
+    CONSTRAINT PK_TB_USER PRIMARY KEY (USER_NO),
+    CONSTRAINT UQ_ROLE_EMAIL UNIQUE (USER_ROLE_CD, USER_EMAIL),
+    INDEX IDX_VERIFY_DUP (USER_TEL, USER_EMAIL, SOCIAL_PROVIDER, SOCIAL_UID)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='통합 사용자 마스터 테이블';
+
+DROP TABLE IF EXISTS TB_SERVICE_REGION;
+CREATE TABLE TB_SERVICE_REGION (
+    REGION_SEQ          BIGINT AUTO_INCREMENT NOT NULL COMMENT '지역 설정 SEQ PK',
+    USER_NO             CHAR(12)        NOT NULL    COMMENT '용역 회원번호 (S로 시작)',
+    SIDO_CD             VARCHAR(20)     NOT NULL    COMMENT '시/도 코드',
+    SIGUNGU_CD          VARCHAR(20)     NOT NULL    COMMENT '시/군/구 코드',
+    REGION_NM           VARCHAR(100)    NOT NULL    COMMENT '지역 표기명 (예: 경기도 고양시 일산동구)',
+    SORT_ORD            INT             NOT NULL DEFAULT 1 COMMENT '우선순위 (1~10)',
+    REG_DT              DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT PK_TB_SERVICE_REGION PRIMARY KEY (REGION_SEQ),
+    CONSTRAINT FK_REGION_USER FOREIGN KEY (USER_NO) REFERENCES TB_USER (USER_NO) ON DELETE CASCADE,
+    CONSTRAINT UQ_USER_REGION UNIQUE (USER_NO, SIDO_CD, SIGUNGU_CD)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='용역 회원 서비스 가능 지역 (최대 10개)';
+
+DROP TABLE IF EXISTS TB_SERVICE_DOC;
+CREATE TABLE TB_SERVICE_DOC (
+    DOC_SEQ             BIGINT AUTO_INCREMENT NOT NULL COMMENT '서류 일련번호 PK',
+    SRVC_NO             CHAR(12)        NOT NULL    COMMENT '용역 회원 식별번호 (S로 시작)',
+    DOC_KIND_CD         VARCHAR(30)     NOT NULL    COMMENT 'BIZ_CERT(사업자등록증), INSUR_CERT(보험증권), EQUIP_PHOTO(장비)',
+    INPUT_METHOD_CD     VARCHAR(20)     NOT NULL DEFAULT 'FILE' COMMENT 'FILE: 파일업로드, CAMERA: 사진직접촬영',
+    STORAGE_PATH        VARCHAR(300)    NOT NULL    COMMENT '저장 폴더 (/uploads/service/{SRVC_NO}/biz_docs/)',
+    LOGICAL_FILE_NM     VARCHAR(200)    NOT NULL    COMMENT '업로드 원본 파일명',
+    PHYSICAL_FILE_NM    VARCHAR(200)    NOT NULL    COMMENT '서버 저장 물리 파일명',
+    FILE_EXT            VARCHAR(10)     NOT NULL    COMMENT '확장자 (PDF, JPG, PNG 등)',
+    FILE_SIZE_BYTE      BIGINT          NOT NULL    COMMENT '파일 크기 (Byte)',
+    OCR_ENGINE_CD       VARCHAR(30)     NULL        COMMENT 'OCR 엔진 (NCP_CLOVA, UPSTAGE)',
+    OCR_RAW_JSON        LONGTEXT        NULL        COMMENT 'OCR 추출 JSON 원본 응답 전문',
+    PARSED_BIZ_NO       VARCHAR(20)     NULL        COMMENT 'OCR 추출 사업자번호',
+    PARSED_CORP_NM      VARCHAR(100)    NULL        COMMENT 'OCR 추출 상호명',
+    PARSED_REP_NM       VARCHAR(50)     NULL        COMMENT 'OCR 추출 대표자명',
+    PARSED_OPEN_DT      VARCHAR(8)      NULL        COMMENT 'OCR 추출 개업일자',
+    PARSED_ADDR         VARCHAR(300)    NULL        COMMENT 'OCR 추출 사업장소재지',
+    VERIFY_YN           CHAR(1)         NOT NULL DEFAULT 'N' COMMENT '국세청/통신사 진위 대조 통과 여부',
+    VERIFY_FAIL_MSG     VARCHAR(255)    NULL        COMMENT '검증 실패 사유',
+    REG_DT              DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    REG_ID              VARCHAR(50)     NOT NULL,
+    CONSTRAINT PK_TB_SERVICE_DOC PRIMARY KEY (DOC_SEQ),
+    CONSTRAINT FK_DOC_SRVC_NO FOREIGN KEY (SRVC_NO) REFERENCES TB_USER (USER_NO) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='용역 사업자등록증 원본 및 OCR 파싱 관리 원장';
+
+DROP TABLE IF EXISTS TB_ORDER_MSTR;
+CREATE TABLE TB_ORDER_MSTR (
+    ORDER_NO            CHAR(16)        NOT NULL    COMMENT '주발주 관리번호 (ORD+YYYYMMDD+5자리)',
+    CLIENT_USER_NO      CHAR(12)        NOT NULL    COMMENT '발주 고객 회원번호 (C로 시작, FK)',
+    ORDER_STATUS        VARCHAR(20)     NOT NULL DEFAULT 'BID_OPEN' COMMENT 'ORD_REG, BID_OPEN, CNTR_CONFIRMED, SVC_PROGRESS, SVC_COMPLETED, SETTL_COMPLETED, BID_EXPIRED, ORD_CANCEL',
+    PROPOSED_PRICE      INT             NOT NULL    COMMENT '고객 확정 지정 청소 대금 (역경매 불가 고정금액)',
+    COMPANY_OR_ORG_NM   VARCHAR(100)    NULL        COMMENT '의뢰 업체·기관명',
+    CONTACT_PERSON_NM   VARCHAR(50)     NOT NULL    COMMENT '현장 담당자명',
+    CONTACT_TEL         VARCHAR(20)     NOT NULL    COMMENT '현장 담당자 연락처',
+    CONTACT_EMAIL       VARCHAR(100)    NULL        COMMENT '담당자 이메일',
+    FACILITY_TYPE_CD    VARCHAR(30)     NOT NULL DEFAULT 'OFFICE' COMMENT '시설 유형 (사무실, 상가, 학교 등)',
+    PARKING_AVAIL_CD    VARCHAR(20)     NOT NULL DEFAULT 'YES' COMMENT '주차 여부 (YES, NO, UNKNOWN)',
+    SIDO_CD             VARCHAR(20)     NOT NULL    COMMENT '시/도 코드',
+    SIGUNGU_CD          VARCHAR(20)     NOT NULL    COMMENT '시/군/구 코드',
+    ADDR_TEXT           VARCHAR(200)    NOT NULL    COMMENT '기본 현장 주소 (동/리 노출용)',
+    ADDR_DETAIL         VARCHAR(200)    NULL        COMMENT '상세 주소 (체결 후 용역에 공개)',
+    DETAIL_REQ_NOTE     TEXT            NULL        COMMENT '상세 요청사항',
+    ALLIANCE_CD         VARCHAR(30)     NULL        COMMENT '유입 제휴사 코드 (제휴 발주 트래킹)',
+    BID_EXPIRE_DT       DATETIME        NOT NULL    COMMENT '청약 만료 일시 (발주일 + 7일)',
+    CONFIRMED_DT        DATETIME        NULL        COMMENT '계약 확정 일시',
+    COMPLETED_DT        DATETIME        NULL        COMMENT '청소 완료 일시',
+    REG_DT              DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    MOD_DT              DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    CONSTRAINT PK_TB_ORDER_MSTR PRIMARY KEY (ORDER_NO),
+    CONSTRAINT FK_ORD_CLIENT FOREIGN KEY (CLIENT_USER_NO) REFERENCES TB_USER (USER_NO),
+    INDEX IDX_ORD_STATUS_EXPIRE (ORDER_STATUS, BID_EXPIRE_DT)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='주발주 마스터 테이블';
+
+DROP TABLE IF EXISTS TB_ORDER_APPLIANCE_ITEM;
+DROP TABLE IF EXISTS TB_ORDER_DTL;
+CREATE TABLE TB_ORDER_DTL (
+    ORDER_DTL_NO            CHAR(18)        NOT NULL    COMMENT '발주 상세번호 (PK: ORDER_NO 16자리 + 순번 2자리, 예: ORD202611010000101)',
+    ORDER_NO                CHAR(16)        NOT NULL    COMMENT '주발주 관리번호 (TB_ORDER_MSTR FK)',
+    CLEAN_LARGE_CD          VARCHAR(30)     NOT NULL    COMMENT '청소 대분류 코드 (REGULAR: 정기청소, MOVEIN: 입주이사, APPLIANCE: 계절가전)',
+    CLEAN_MID_CD            VARCHAR(30)     NOT NULL    COMMENT '청소 중분류 대표 코드 (APPLIANCE_ALL, AIRCON, WASHER, KITCHEN_LIVING 등)',
+    SERVICE_STATUS          VARCHAR(20)     NOT NULL DEFAULT 'WAIT_BID' COMMENT '시공 상태 (WAIT_BID: 대기, APPR_CONTRACT: 체결, WAIT_CLOSED: 마감, BID_REJECTED: 반려)',
+    CONTRACT_TYPE_CD        VARCHAR(20)     NOT NULL DEFAULT '1회성 단독 시공' COMMENT '계약 형태 (1회성 단독 시공, 정기 용역 계약)',
+    SELECTED_SRV_ITEMS      VARCHAR(500)    NULL        COMMENT '선택된 필요 서비스 코드 목록 (콤마 구분 문자열)',
+    -- 정기 및 입주청소 호환 컬럼
+    CONTRACT_TERM_DAYS      INT             NULL DEFAULT 90 COMMENT '정기청소 90일 락 일수',
+    WEEK_CLEAN_FREQ         INT             NULL DEFAULT 1  COMMENT '주간 방문 횟수 (1, 2, 3, 5회)',
+    CLEAN_DAYS_CONFIG       VARCHAR(50)     NULL        COMMENT '방문 희망 요일 (예: MON,WED,FRI)',
+    SERVICE_START_DT        DATE            NOT NULL    COMMENT '희망 작업 시작일 (From)',
+    SERVICE_END_DT          DATE            NULL        COMMENT '희망 작업 종료일 (To)',
+    SUPPLY_PYEONG           DECIMAL(5,1)    NULL        COMMENT '입주/이사청소 실평수/공급평수',
+    -- [계절가전청소 특화 마스터 컬럼]
+    APPLIANCE_TOTAL_CNT     INT             NOT NULL DEFAULT 0 COMMENT '계절가전 총 의뢰 기기 대수 합계',
+    AIRCON_TOTAL_CNT        INT             NOT NULL DEFAULT 0 COMMENT '에어컨 전체 총 대수 합계',
+    WASHER_TOTAL_CNT        INT             NOT NULL DEFAULT 0 COMMENT '세탁기 전체 총 대수 합계',
+    KITCHEN_TOTAL_CNT       INT             NOT NULL DEFAULT 0 COMMENT '주방 및 생활가전 전체 총 개수 합계',
+    WORK_TIME_SLOT          VARCHAR(50)     NULL        COMMENT '희망 작업 시간대 (예: 오전 08:00 ~ 오후 05:00, 시공사와 협의 가능)',
+    -- 배정 및 감사 컬럼
+    SELECTED_SERVICE_USER_NO CHAR(12)       NULL        COMMENT '최종 확정 배정된 시공사 회원번호 (S로 시작)',
+    REG_DT                  DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '최초 등록 일시',
+    REG_ID                  VARCHAR(50)     NOT NULL DEFAULT 'CLIENT' COMMENT '최초 등록자 식별자',
+    MOD_DT                  DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '최종 수정 일시',
+    MOD_ID                  VARCHAR(50)     NOT NULL DEFAULT 'CLIENT' COMMENT '최종 수정자 식별자',
+    CONSTRAINT PK_TB_ORDER_DTL PRIMARY KEY (ORDER_DTL_NO),
+    CONSTRAINT FK_DTL_ORD FOREIGN KEY (ORDER_NO) REFERENCES TB_ORDER_MSTR (ORDER_NO) ON DELETE CASCADE,
+    INDEX IDX_DTL_LARGE_STATUS (CLEAN_LARGE_CD, SERVICE_STATUS)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='발주 서비스 상세 및 계절가전 마스터 원장';
+-- ============================================================================
+-- [테이블 2] TB_ORDER_APPLIANCE_ITEM (계절가전 개별 품목 목록 원장)
+-- ※ 에어컨/세탁기/냉장고/후드/매트리스 대수가 늘어난 만큼 1기기당 1개 Row로 개별 분리 저장
+-- ============================================================================
+CREATE TABLE TB_ORDER_APPLIANCE_ITEM (
+    APPLIANCE_ITEM_ID       BIGINT AUTO_INCREMENT NOT NULL COMMENT '가전 개별 품목 고유 식별 일련번호 (PK)',
+    ORDER_DTL_NO            CHAR(18)        NOT NULL    COMMENT '발주 상세번호 (TB_ORDER_DTL FK)',
+    ORDER_NO                CHAR(16)        NOT NULL    COMMENT '주발주 관리번호 (TB_ORDER_MSTR FK)',
+    -- 1. 가전 분류 및 품목 종류
+    APPLIANCE_CAT_CD        VARCHAR(30)     NOT NULL    COMMENT '가전 대분류 코드 (AIRCON: 에어컨, WASHER: 세탁기, KITCHEN_LIVING: 주방·생활가전)',
+    APPLIANCE_TYPE_CD       VARCHAR(30)     NOT NULL    COMMENT '가전 품목 상세 코드 (WALL_MOUNTED: 벽걸이형, STAND: 스탠드형, CEILING_SYS: 천장형시스템, TUB_WASHER: 일반통돌이, DRUM_WASHER: 드럼세탁기, FRIDGE_STEAM: 냉장고스팀, RANGE_HOOD: 레인지후드, MATTRESS: 매트리스살균)',
+    ITEM_SEQ_NO             INT             NOT NULL DEFAULT 1 COMMENT '동일 품목 내 기기 순번 (예: 벽걸이 1호기=1, 벽걸이 2호기=2)',
+    ITEM_NM                 VARCHAR(50)     NOT NULL    COMMENT '표시 품목 명칭 (예: 벽걸이형 에어컨, 드럼 세탁기, 냉장고 스팀, 매트리스 살균)',
+    -- 2. 개별 기기별 규격 입력값 보관 (대수만큼 각각 입력된 평형 / Kg / 리터 / 구 수 / 침대크기)
+    SPEC_UNIT_CD            VARCHAR(20)     NOT NULL    COMMENT '규격 단위 코드 (PYEONG: 평형, KG: 킬로그램, LITER: 리터, BURNER_CNT: 화구 수, MATTRESS_SIZE: 매트리스 크기)',
+    SPEC_NUM_VAL            DECIMAL(7,1)    NULL        COMMENT '규격 수치 숫자값 (예: 6.0, 18.0, 15.0, 850.0, 3.0)',
+    SPEC_TEXT_VAL           VARCHAR(50)     NOT NULL    COMMENT '고객 입력 최종 규격 텍스트 (예: 6평, 18평, 15kg, 850L, 3구, 퀸(Q), 킹(K) 등)',
+    -- 3. 매트리스 전용 공통코드 매핑
+    MATTRESS_SIZE_CD        VARCHAR(20)     NULL        COMMENT '매트리스 규격 공통코드 (SINGLE, SUPER_SINGLE, DOUBLE, QUEEN, KING, SUPER_KING, CUSTOM)',
+    -- 4. 기기 부가 정보 및 현장 설치 위치
+    INSTALL_LOC_DESC        VARCHAR(100)    NULL        COMMENT '기기 설치 위치 (예: 안방, 거실, 아이방, 다용도실 등)',
+    BRAND_NM                VARCHAR(50)     NULL        COMMENT '제조사 브랜드 (선택 입력: 삼성, LG, 캐리어 등)',
+    HIGH_PRESSURE_YN        CHAR(1)         NOT NULL DEFAULT 'Y' COMMENT '냉각핀/세탁조 완전분해 고압살균 세척 여부 (Y/N)',
+    STEAM_STERILIZE_YN      CHAR(1)         NOT NULL DEFAULT 'Y' COMMENT '고온 스팀 살균 케어 여부 (Y/N)',
+    -- 5. 개별 품목 시공 진행 상태
+    ITEM_STATUS             VARCHAR(20)     NOT NULL DEFAULT 'WAIT' COMMENT '개별 기기 시공 상태 (WAIT: 대기, PROGRESS: 분해세척중, DONE: 완료)',
+    WORKER_NOTE             VARCHAR(300)    NULL        COMMENT '시공사 기사 현장 특이사항 및 세척 소견 메모',
+    -- 6. 등록 및 수정 감사 컬럼
+    REG_DT                  DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '최초 등록 일시',
+    REG_ID                  VARCHAR(50)     NOT NULL DEFAULT 'CLIENT' COMMENT '최초 등록자',
+    MOD_DT                  DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '최종 수정 일시',
+    MOD_ID                  VARCHAR(50)     NOT NULL DEFAULT 'CLIENT' COMMENT '최종 수정자',
+    CONSTRAINT PK_TB_ORDER_APPLIANCE_ITEM PRIMARY KEY (APPLIANCE_ITEM_ID),
+    CONSTRAINT FK_APPLIANCE_TO_DTL FOREIGN KEY (ORDER_DTL_NO) REFERENCES TB_ORDER_DTL (ORDER_DTL_NO) ON DELETE CASCADE,
+    CONSTRAINT FK_APPLIANCE_TO_MSTR FOREIGN KEY (ORDER_NO) REFERENCES TB_ORDER_MSTR (ORDER_NO) ON DELETE CASCADE,
+    INDEX IDX_APPLIANCE_DTL_TYPE (ORDER_DTL_NO, APPLIANCE_TYPE_CD),
+    INDEX IDX_APPLIANCE_ORD (ORDER_NO)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='계절가전 분해살균 개별 기기 품목 및 규격 목록 원장';
+DROP TABLE IF EXISTS TB_ORDER_PHOTO;
+CREATE TABLE TB_ORDER_PHOTO (
+    PHOTO_SEQ           BIGINT AUTO_INCREMENT NOT NULL COMMENT '사진 SEQ PK',
+    ORDER_NO            CHAR(16)        NOT NULL    COMMENT '주발주 관리번호 (FK)',
+    ORDER_DTL_NO        CHAR(18)        NOT NULL    COMMENT '발주 상세번호 (FK)',
+    CLEAN_LARGE_CD      VARCHAR(30)     NOT NULL    COMMENT 'REGULAR, MOVEIN, APPLIANCE',
+    PHOTO_TIMING_CD     VARCHAR(10)     NOT NULL    COMMENT 'BEFORE(작업전), AFTER(작업후)',
+    STORAGE_PATH        VARCHAR(300)    NOT NULL    COMMENT '물리 경로 (/orders/{ORDER_NO}/{서비스종류}/{before,after}/)',
+    LOGICAL_FILE_NM     VARCHAR(200)    NOT NULL    COMMENT '업로드 원본 파일명',
+    PHYSICAL_FILE_NM    VARCHAR(200)    NOT NULL    COMMENT '서버 저장 UUID 파일명',
+    FILE_EXT            VARCHAR(10)     NOT NULL    COMMENT '확장자 (JPG, PNG 등)',
+    FILE_SIZE_BYTE      BIGINT          NOT NULL    COMMENT '크기 (Byte)',
+    SORT_ORD            INT             NOT NULL DEFAULT 1,
+    DEL_YN              CHAR(1)         NOT NULL DEFAULT 'N',
+    REG_DT              DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    REG_ID              VARCHAR(50)     NOT NULL,
+    CONSTRAINT PK_TB_ORDER_PHOTO PRIMARY KEY (PHOTO_SEQ),
+    CONSTRAINT FK_PHOTO_ORD FOREIGN KEY (ORDER_NO) REFERENCES TB_ORDER_MSTR (ORDER_NO) ON DELETE CASCADE,
+    CONSTRAINT FK_PHOTO_DTL FOREIGN KEY (ORDER_DTL_NO) REFERENCES TB_ORDER_DTL (ORDER_DTL_NO) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='청소 전/후 현장 사진 메타데이터 원장';
+
+DROP TABLE IF EXISTS TB_QUOTE_APPLY;
+CREATE TABLE TB_QUOTE_APPLY (
+    APPLY_NO            CHAR(18)        NOT NULL    COMMENT '청약 번호 (APP+YYYYMMDD+5자리)',
+    ORDER_NO            CHAR(16)        NOT NULL    COMMENT '주발주 관리번호 (FK)',
+    ORDER_DTL_NO        CHAR(18)        NOT NULL    COMMENT '발주 상세번호 (FK)',
+    SERVICE_USER_NO     CHAR(12)        NOT NULL    COMMENT '청약 용역 회원번호 (S로 시작, FK)',
+    PROPOSED_DATE       DATE            NOT NULL    COMMENT '용역회원 시공 제안 일자 (From-To 범위 내)',
+    TIME_SLOT_TYPE      VARCHAR(20)     NOT NULL    COMMENT 'ALL_DAY(종일), MORNING(오전), AFTERNOON(오후)',
+    START_TIME          CHAR(5)         NOT NULL    COMMENT '시작 시각 (HH:mm)',
+    WORK_HOURS          DECIMAL(4, 1)   NOT NULL    COMMENT '예상 소요 시간 (N시간)',
+    ASSIGN_STAFF_CNT    INT             NOT NULL DEFAULT 1 COMMENT '투입 인원수',
+    APPEAL_MSG          TEXT            NOT NULL    COMMENT '작업 계획 및 장비 어필 메시지',
+    APPLY_STAT_CD       VARCHAR(20)     NOT NULL DEFAULT 'APPLIED' COMMENT 'APPLIED, ACCEPTED, REJECTED',
+    REG_DT              DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    REG_ID              VARCHAR(50)     NOT NULL,
+    MOD_DT              DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    MOD_ID              VARCHAR(50)     NOT NULL,
+    CONSTRAINT PK_TB_QUOTE_APPLY PRIMARY KEY (APPLY_NO),
+    CONSTRAINT FK_APPLY_ORD FOREIGN KEY (ORDER_NO) REFERENCES TB_ORDER_MSTR (ORDER_NO),
+    CONSTRAINT FK_APPLY_DTL FOREIGN KEY (ORDER_DTL_NO) REFERENCES TB_ORDER_DTL (ORDER_DTL_NO),
+    CONSTRAINT FK_APPLY_USER FOREIGN KEY (SERVICE_USER_NO) REFERENCES TB_USER (USER_NO),
+    INDEX IDX_SCHEDULE_CHECK (SERVICE_USER_NO, PROPOSED_DATE, START_TIME, APPLY_STAT_CD)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='용역 청약서 원장 (역경매 금액 입력 없음, 일정 및 인원 제안 전용)';
+
+DROP TABLE IF EXISTS TB_CLEAN_CONTRACT;
+CREATE TABLE TB_CLEAN_CONTRACT (
+    CONTRACT_NO         CHAR(16)        NOT NULL    COMMENT '계약 번호 (CNT+YYYYMMDD+5자리)',
+    ORDER_NO            CHAR(16)        NOT NULL    COMMENT '주발주 관리번호 (FK)',
+    ORDER_DTL_NO        CHAR(18)        NOT NULL    COMMENT '확정 중분류 상세번호 (FK)',
+    CLIENT_USER_NO      CHAR(12)        NOT NULL    COMMENT '고객 회원번호 (FK)',
+    SERVICE_USER_NO     CHAR(12)        NOT NULL    COMMENT '용역 회원번호 (FK)',
+    APPLY_NO            CHAR(18)        NOT NULL    COMMENT '채택된 청약 번호 (FK)',
+    CONFIRMED_DATE      DATE            NOT NULL    COMMENT '최종 확정 시공일',
+    CONFIRMED_TIME      CHAR(5)         NOT NULL    COMMENT '최종 확정 시작시각 (HH:mm)',
+    TOTAL_SERVICE_AMT   INT             NOT NULL    COMMENT '고객 확정 지정 용역 대금 (현장 직불)',
+    CLIENT_FEE_AMT      INT             NOT NULL DEFAULT 16500 COMMENT '고객 고정 이용료 (16,500원)',
+    SERVICE_FEE_AMT     INT             NOT NULL    COMMENT '용역 구간별 이용료 (1.65만/3.3만/11만/33만)',
+    CLIENT_PAID_YN      CHAR(1)         NOT NULL DEFAULT 'N',
+    SERVICE_PAID_YN     CHAR(1)         NOT NULL DEFAULT 'N',
+    SAFE_TEL_NO         VARCHAR(20)     NULL        COMMENT '0507 안심번호',
+    CONTRACT_STAT_CD    VARCHAR(20)     NOT NULL DEFAULT 'WAITING_PAY' COMMENT 'WAITING_PAY, CONFIRMED, IN_PROGRESS, COMPLETED, CANCELLED',
+    ALLIANCE_CD         VARCHAR(30)     NULL        COMMENT '제휴사 코드',
+    REG_DT              DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    MOD_DT              DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    CONSTRAINT PK_TB_CLEAN_CONTRACT PRIMARY KEY (CONTRACT_NO),
+    CONSTRAINT FK_CNT_ORD FOREIGN KEY (ORDER_NO) REFERENCES TB_ORDER_MSTR (ORDER_NO),
+    CONSTRAINT FK_CNT_DTL FOREIGN KEY (ORDER_DTL_NO) REFERENCES TB_ORDER_DTL (ORDER_DTL_NO),
+    CONSTRAINT FK_CNT_CLIENT FOREIGN KEY (CLIENT_USER_NO) REFERENCES TB_USER (USER_NO),
+    CONSTRAINT FK_CNT_SERVICE FOREIGN KEY (SERVICE_USER_NO) REFERENCES TB_USER (USER_NO),
+    CONSTRAINT FK_CNT_APPLY FOREIGN KEY (APPLY_NO) REFERENCES TB_QUOTE_APPLY (APPLY_NO)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='청소 체결 계약 마스터';
+
+DROP TABLE IF EXISTS TB_ALLIANCE_COMPANY;
+CREATE TABLE TB_ALLIANCE_COMPANY (
+    ALLIANCE_CD         VARCHAR(30)     NOT NULL    COMMENT '제휴사 코드 PK (예: AL_APT_01)',
+    COMPANY_NM          VARCHAR(100)    NOT NULL    COMMENT '제휴사 상호명',
+    BIZ_NO              VARCHAR(20)     NOT NULL    COMMENT '제휴사 사업자번호',
+    REP_NM              VARCHAR(50)     NOT NULL    COMMENT '대표자명',
+    SETTLE_BANK_CD      VARCHAR(20)     NOT NULL    COMMENT '정산 은행 코드',
+    SETTLE_ACNT_NO      VARCHAR(50)     NOT NULL    COMMENT '정산 계좌번호',
+    SETTLE_ACNT_HOLDER  VARCHAR(50)     NOT NULL    COMMENT '예금주명',
+    COMMISSION_TYPE_CD  VARCHAR(20)     NOT NULL DEFAULT 'RATE' COMMENT 'RATE(순익 요율%), FIXED_AMT(건당 정액)',
+    COMMISSION_VAL      DECIMAL(10, 2)  NOT NULL    COMMENT '수수료 요율(예: 15.00) 또는 건당 금액(3000)',
+    CONTRACT_START_DT   DATE            NOT NULL    COMMENT '제휴 시작일',
+    CONTRACT_END_DT     DATE            NOT NULL    COMMENT '제휴 종료일',
+    ACTIVE_YN           CHAR(1)         NOT NULL DEFAULT 'Y' COMMENT '제휴 활성 여부',
+    REG_DT              DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    REG_ID              VARCHAR(50)     NOT NULL DEFAULT 'ADMIN',
+    CONSTRAINT PK_TB_ALLIANCE_COMPANY PRIMARY KEY (ALLIANCE_CD)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='플랫폼 외부 제휴사 마스터';
+
+DROP TABLE IF EXISTS TB_ALLIANCE_SETTLE_DTL;
+CREATE TABLE TB_ALLIANCE_SETTLE_DTL (
+    SETTLE_SEQ          BIGINT AUTO_INCREMENT NOT NULL COMMENT '정산 상세 SEQ PK',
+    SETTLE_YM           CHAR(6)         NOT NULL    COMMENT '정산 마감 년월 (YYYYMM)',
+    ALLIANCE_CD         VARCHAR(30)     NOT NULL    COMMENT '제휴사 코드 (FK)',
+    CONTRACT_NO         CHAR(16)        NOT NULL    COMMENT '체결 계약번호 (FK)',
+    TOTAL_SERVICE_AMT   INT             NOT NULL    COMMENT '청소 거래 대금',
+    COLLECTED_TOTAL_FEE INT             NOT NULL    COMMENT '수납된 데이터 이용료 총액',
+    FIXED_EXPENSE_AMT   INT             NOT NULL DEFAULT 5000 COMMENT '건당 고정경비 (5,000원 공제)',
+    NET_PLATFORM_PROFIT INT             NOT NULL    COMMENT '플랫폼 순익 (이용료총액 - 5,000원)',
+    ALLIANCE_COMM_AMT   INT             NOT NULL    COMMENT '제휴사 정산 지급액 (수수료)',
+    SETTLE_STAT_CD      VARCHAR(20)     NOT NULL DEFAULT 'ACCUMULATED' COMMENT 'ACCUMULATED, CLOSED, TRANSFERRED',
+    SETTLED_DT          DATETIME        NULL        COMMENT '정산 확정 일시',
+    TRANSFERRED_DT      DATETIME        NULL        COMMENT '실제 계좌 이체 완료 일시',
+    REG_DT              DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT PK_TB_ALLIANCE_SETTLE_DTL PRIMARY KEY (SETTLE_SEQ),
+    CONSTRAINT FK_SETTLE_ALLIANCE FOREIGN KEY (ALLIANCE_CD) REFERENCES TB_ALLIANCE_COMPANY (ALLIANCE_CD),
+    CONSTRAINT FK_SETTLE_CONTRACT FOREIGN KEY (CONTRACT_NO) REFERENCES TB_CLEAN_CONTRACT (CONTRACT_NO)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='제휴사별 거래 정보 이용료 정산 내역 원장';
+
+TB_COM_CODE_GRP, TB_COM_CODE_GRP
+
+-- ==============================================================================
+-- 3. 공통 코드 그룹 마스터 (TB_COM_CODE_GRP) 데이터 일괄 등록
+-- ==============================================================================
+INSERT INTO TB_COM_CODE_GRP (GRP_CD, GRP_NM, USE_YN, RMK, REG_DT, REG_ID, MOD_DT, MOD_ID)
+VALUES 
+-- 기존 공통 코드 그룹
+('BLDG_TYPE',           '건물 및 시설 유형',            'Y', '주거용, 상업용, 공공/교육 등 청소 대상 건물 분류', NOW(), 'SYSTEM', NOW(), 'SYSTEM'),
+('CLEAN_LOC',           '청소 구역 및 위치',            'Y', '견적 및 작업 대상 물리적 세부 공간 구역 분류',     NOW(), 'SYSTEM', NOW(), 'SYSTEM'),
+('SERVICE_SUB_ITEM',    '특수/세부 시공 항목',          'Y', '바닥왁스, 카페트, 의자세척 등 추가 선택 옵션',      NOW(), 'SYSTEM', NOW(), 'SYSTEM'),
+('CONTRACT_TYPE',       '계약 형태 구분',              'Y', '1회성 시공 또는 정기 관리 계약',                 NOW(), 'SYSTEM', NOW(), 'SYSTEM'),
+('PARKING_TYPE',        '현장 주차 여건',              'Y', '작업 차량 진입 및 주차 가능 여부',               NOW(), 'SYSTEM', NOW(), 'SYSTEM'),
+('APPLIANCE_CAT',       '계절가전 대분류 구분',         'Y', '에어컨, 세탁기/건조기, 주방·생활가전 대분류',      NOW(), 'SYSTEM', NOW(), 'SYSTEM'),
+('APPLIANCE_TYPE',      '계절가전 세부 품목 목록',      'Y', '벽걸이, 스탠드, 시스템, 통돌이, 드럼, 건조기, 냉장고, 후드, 매트리스', NOW(), 'SYSTEM', NOW(), 'SYSTEM'),
+('MATTRESS_SIZE',       '매트리스 표준 규격 사이즈 목록', 'Y', '싱글부터 슈퍼킹 및 맞춤 규격 직접입력',         NOW(), 'SYSTEM', NOW(), 'SYSTEM'),
+('APPLIANCE_SPEC_UNIT', '가전 규격 측정 단위',          'Y', '평형, Kg, L, 구, 침대사이즈',                   NOW(), 'SYSTEM', NOW(), 'SYSTEM'),
+('AIRCON_PYEONG',       '에어컨 표준 평형 선택 목록',   'Y', '에어컨 평형 콤보박스 선택지 (6평~30평)',         NOW(), 'SYSTEM', NOW(), 'SYSTEM'),
+('WASHER_CAPACITY',     '세탁기/건조기 용량(Kg) 선택지', 'Y', '세탁기 및 건조기 용량 콤보박스 선택지 (10kg~25kg)', NOW(), 'SYSTEM', NOW(), 'SYSTEM');
+
+
+-- ==============================================================================
+-- 4. 공통 상세 코드 (TB_COM_CODE) 데이터 전체 일괄 등록
+-- ==============================================================================
+
+-- ------------------------------------------------------------------------------
+-- [1] BLDG_TYPE : 건물 및 시설 유형 (20개 항목)
+-- ------------------------------------------------------------------------------
+INSERT INTO TB_COM_CODE (GRP_CD, COM_CD, COM_NM, SORT_ORD, USE_YN, REG_DT, REG_ID, MOD_DT, MOD_ID)
+VALUES
+('BLDG_TYPE', 'VILLA_ROW',    '빌라 / 연립 / 다세대',       1,  'Y', NOW(), 'SYSTEM', NOW(), 'SYSTEM'),
+('BLDG_TYPE', 'APARTMENT',    '아파트',                   2,  'Y', NOW(), 'SYSTEM', NOW(), 'SYSTEM'),
+('BLDG_TYPE', 'STUDIO_ONE',   '원룸 / 다가구주택',          3,  'Y', NOW(), 'SYSTEM', NOW(), 'SYSTEM'),
+('BLDG_TYPE', 'RESID_OFFICE', '주거용 오피스텔',           4,  'Y', NOW(), 'SYSTEM', NOW(), 'SYSTEM'),
+('BLDG_TYPE', 'HOUSE_SINGLE', '단독주택 / 전원주택',       5,  'Y', NOW(), 'SYSTEM', NOW(), 'SYSTEM'),
+('BLDG_TYPE', 'HOUSE_TOWN',   '타운하우스',               6,  'Y', NOW(), 'SYSTEM', NOW(), 'SYSTEM'),
+('BLDG_TYPE', 'COMM_RETAIL',  '상가 / 일반 매장',          7,  'Y', NOW(), 'SYSTEM', NOW(), 'SYSTEM'),
+('BLDG_TYPE', 'COMM_BUILDING','근린생활시설 / 상가빌딩',     8,  'Y', NOW(), 'SYSTEM', NOW(), 'SYSTEM'),
+('BLDG_TYPE', 'BIZ_OFFICE',   '사무실 / 업무용 오피스',    9,  'Y', NOW(), 'SYSTEM', NOW(), 'SYSTEM'),
+('BLDG_TYPE', 'SHOPPING_MALL','대형 쇼핑몰 / 아울렛',     10, 'Y', NOW(), 'SYSTEM', NOW(), 'SYSTEM'),
+('BLDG_TYPE', 'ACADEMY_SCH',  '학교 / 학원 / 교육시설',    11, 'Y', NOW(), 'SYSTEM', NOW(), 'SYSTEM'),
+('BLDG_TYPE', 'KITCHEN_COMM', '급식실 / 단체조리실 / 식당', 12, 'Y', NOW(), 'SYSTEM', NOW(), 'SYSTEM'),
+('BLDG_TYPE', 'HOSPITAL_MED', '병원 / 의원 / 요양시설',    13, 'Y', NOW(), 'SYSTEM', NOW(), 'SYSTEM'),
+('BLDG_TYPE', 'RELIGION',     '종교시설 (교회, 사찰 등)', 14, 'Y', NOW(), 'SYSTEM', NOW(), 'SYSTEM'),
+('BLDG_TYPE', 'ACCOMMODATION','숙박시설 (호텔/모텔/펜션)',  15, 'Y', NOW(), 'SYSTEM', NOW(), 'SYSTEM'),
+('BLDG_TYPE', 'KNOW_INDUSTRY','지식산업센터 (아파트형공장)', 16, 'Y', NOW(), 'SYSTEM', NOW(), 'SYSTEM'),
+('BLDG_TYPE', 'FACTORY',      '공장 / 제조시설',          17, 'Y', NOW(), 'SYSTEM', NOW(), 'SYSTEM'),
+('BLDG_TYPE', 'WAREHOUSE',    '물류창고 / 보관창고',       18, 'Y', NOW(), 'SYSTEM', NOW(), 'SYSTEM'),
+('BLDG_TYPE', 'GOV_PUBLIC',   '공공기관 / 관공서',        19, 'Y', NOW(), 'SYSTEM', NOW(), 'SYSTEM'),
+('BLDG_TYPE', 'ETC_BUILDING', '기타 시설',                99, 'Y', NOW(), 'SYSTEM', NOW(), 'SYSTEM');
+
+
+-- ------------------------------------------------------------------------------
+-- [2] CLEAN_LOC : 청소 구역 및 위치 (23개 항목)
+-- ------------------------------------------------------------------------------
+INSERT INTO TB_COM_CODE (GRP_CD, COM_CD, COM_NM, SORT_ORD, USE_YN, REG_DT, REG_ID, MOD_DT, MOD_ID)
+VALUES
+('CLEAN_LOC', 'STAIRWAY',     '계단 / 핸드레일(난간)',     1,  'Y', NOW(), 'SYSTEM', NOW(), 'SYSTEM'),
+('CLEAN_LOC', 'CORRIDOR',     '복도',                     2,  'Y', NOW(), 'SYSTEM', NOW(), 'SYSTEM'),
+('CLEAN_LOC', 'ENTRANCE',     '현관 / 공동출입구 / 로비',   3,  'Y', NOW(), 'SYSTEM', NOW(), 'SYSTEM'),
+('CLEAN_LOC', 'ELEVATOR',     '승강기(엘리베이터)',        4,  'Y', NOW(), 'SYSTEM', NOW(), 'SYSTEM'),
+('CLEAN_LOC', 'ESCAPE_STAIR', '비상계단 / 방화문 구역',    5,  'Y', NOW(), 'SYSTEM', NOW(), 'SYSTEM'),
+('CLEAN_LOC', 'WINDOW_IN',    '창문 / 유리창 (내창/창틀)', 6,  'Y', NOW(), 'SYSTEM', NOW(), 'SYSTEM'),
+('CLEAN_LOC', 'WINDOW_OUT',   '외벽 유리창 (외창)',        7,  'Y', NOW(), 'SYSTEM', NOW(), 'SYSTEM'),
+('CLEAN_LOC', 'WINDOW_SCREEN','방충망 / 셔터',            8,  'Y', NOW(), 'SYSTEM', NOW(), 'SYSTEM'),
+('CLEAN_LOC', 'FLOOR_GEN',    '실내 일반 바닥 (데코/디럭스)', 9, 'Y', NOW(), 'SYSTEM', NOW(), 'SYSTEM'),
+('CLEAN_LOC', 'FLOOR_STONE',  '대리석 / 석재 바닥',        10, 'Y', NOW(), 'SYSTEM', NOW(), 'SYSTEM'),
+('CLEAN_LOC', 'FLOOR_CARPET', '카페트 바닥',              11, 'Y', NOW(), 'SYSTEM', NOW(), 'SYSTEM'),
+('CLEAN_LOC', 'WALL_CEIL',    '벽면 / 천장 / 조명갓',      12, 'Y', NOW(), 'SYSTEM', NOW(), 'SYSTEM'),
+('CLEAN_LOC', 'TOILET_PUBLIC','공용 화장실',              13, 'Y', NOW(), 'SYSTEM', NOW(), 'SYSTEM'),
+('CLEAN_LOC', 'TOILET_PRIV',  '전유부 화장실 / 욕실',      14, 'Y', NOW(), 'SYSTEM', NOW(), 'SYSTEM'),
+('CLEAN_LOC', 'PANTRY_SINK',  '탕비실 / 싱크대 구역',      15, 'Y', NOW(), 'SYSTEM', NOW(), 'SYSTEM'),
+('CLEAN_LOC', 'COMM_KITCHEN', '대형 조리실 / 주방 시설',  16, 'Y', NOW(), 'SYSTEM', NOW(), 'SYSTEM'),
+('CLEAN_LOC', 'DRAIN_PIT',    '배수구 / 트렌치 / 집수정',   17, 'Y', NOW(), 'SYSTEM', NOW(), 'SYSTEM'),
+('CLEAN_LOC', 'PARKING_IN',   '지하 주차장',              18, 'Y', NOW(), 'SYSTEM', NOW(), 'SYSTEM'),
+('CLEAN_LOC', 'PARKING_OUT',  '지상 주차장',              19, 'Y', NOW(), 'SYSTEM', NOW(), 'SYSTEM'),
+('CLEAN_LOC', 'RECYCLE_ZONE', '분리수거장 / 쓰레기 집하장', 20, 'Y', NOW(), 'SYSTEM', NOW(), 'SYSTEM'),
+('CLEAN_LOC', 'ROOFTOP',      '옥상 / 테라스',            21, 'Y', NOW(), 'SYSTEM', NOW(), 'SYSTEM'),
+('CLEAN_LOC', 'OUTDOOR_YARD', '건물 외곽 / 보도블록',      22, 'Y', NOW(), 'SYSTEM', NOW(), 'SYSTEM'),
+('CLEAN_LOC', 'ETC_LOC',      '기타 구역',                99, 'Y', NOW(), 'SYSTEM', NOW(), 'SYSTEM');
+
+
+-- ------------------------------------------------------------------------------
+-- [3] SERVICE_SUB_ITEM : 세부 시공 및 추가 옵션 (9개 항목)
+-- ------------------------------------------------------------------------------
+INSERT INTO TB_COM_CODE (GRP_CD, COM_CD, COM_NM, SORT_ORD, USE_YN, REG_DT, REG_ID, MOD_DT, MOD_ID)
+VALUES
+('SERVICE_SUB_ITEM', 'SRV_AIRCON',       '에어컨 완전분해 세척',   1,  'Y', NOW(), 'SYSTEM', NOW(), 'SYSTEM'),
+('SERVICE_SUB_ITEM', 'SRV_FLOOR_WAX',    '바닥 기계세척 및 왁스코팅',2,  'Y', NOW(), 'SYSTEM', NOW(), 'SYSTEM'),
+('SERVICE_SUB_ITEM', 'SRV_CARPET_CLEAN', '카페트 샴푸/세탁 습식',  3,  'Y', NOW(), 'SYSTEM', NOW(), 'SYSTEM'),
+('SERVICE_SUB_ITEM', 'SRV_CHAIR_SOFA',   '패브릭 의자 / 소파 세척', 4,  'Y', NOW(), 'SYSTEM', NOW(), 'SYSTEM'),
+('SERVICE_SUB_ITEM', 'SRV_HOOD_DUCT',    '주방 후드 및 닥트 기름때 제거', 5, 'Y', NOW(), 'SYSTEM', NOW(), 'SYSTEM'),
+('SERVICE_SUB_ITEM', 'SRV_MOVEIN_DEEP',  '입주 / 이사 / 준공 정밀 청소', 6, 'Y', NOW(), 'SYSTEM', NOW(), 'SYSTEM'),
+('SERVICE_SUB_ITEM', 'SRV_DISINFECT',    '실내 전체 살균 소독 / 방역', 7,  'Y', NOW(), 'SYSTEM', NOW(), 'SYSTEM'),
+('SERVICE_SUB_ITEM', 'SRV_EXT_WINDOW',   '로프 고소 외창 작업',    8,  'Y', NOW(), 'SYSTEM', NOW(), 'SYSTEM'),
+('SERVICE_SUB_ITEM', 'SRV_ETC',          '기타 특수 시공',         99, 'Y', NOW(), 'SYSTEM', NOW(), 'SYSTEM');
+
+
+-- ------------------------------------------------------------------------------
+-- [4] CONTRACT_TYPE : 계약 형태 구분 (2개 항목)
+-- ------------------------------------------------------------------------------
+INSERT INTO TB_COM_CODE (GRP_CD, COM_CD, COM_NM, SORT_ORD, USE_YN, REG_DT, REG_ID, MOD_DT, MOD_ID)
+VALUES
+('CONTRACT_TYPE', 'ONCE',    '1회성 특수/대청소', 1, 'Y', NOW(), 'SYSTEM', NOW(), 'SYSTEM'),
+('CONTRACT_TYPE', 'REGULAR', '정기 관리 계약',   2, 'Y', NOW(), 'SYSTEM', NOW(), 'SYSTEM');
+
+
+-- ------------------------------------------------------------------------------
+-- [5] PARKING_TYPE : 현장 주차 여건 구분 (4개 항목)
+-- ------------------------------------------------------------------------------
+INSERT INTO TB_COM_CODE (GRP_CD, COM_CD, COM_NM, SORT_ORD, USE_YN, REG_DT, REG_ID, MOD_DT, MOD_ID)
+VALUES
+('PARKING_TYPE', 'YES',     '무료 주차 가능',       1, 'Y', NOW(), 'SYSTEM', NOW(), 'SYSTEM'),
+('PARKING_TYPE', 'PAID',    '유료 주차장 이용 필요', 2, 'Y', NOW(), 'SYSTEM', NOW(), 'SYSTEM'),
+('PARKING_TYPE', 'NO',      '현장 주차 불가',       3, 'Y', NOW(), 'SYSTEM', NOW(), 'SYSTEM'),
+('PARKING_TYPE', 'UNKNOWN', '확인 필요 (잘 모르겠음)', 4, 'Y', NOW(), 'SYSTEM', NOW(), 'SYSTEM');
+
+
+-- ------------------------------------------------------------------------------
+-- [6] [신규] APPLIANCE_CAT : 계절가전 대분류 구분 (3개 항목)
+-- ------------------------------------------------------------------------------
+INSERT INTO TB_COM_CODE (GRP_CD, COM_CD, COM_NM, SORT_ORD, USE_YN, REG_DT, REG_ID, MOD_DT, MOD_ID)
+VALUES
+('APPLIANCE_CAT', 'AIRCON',         '에어컨 완전분해 살균세척',     1, 'Y', NOW(), 'SYSTEM', NOW(), 'SYSTEM'),
+('APPLIANCE_CAT', 'WASHER',         '세탁기·건조기 분해 살균세척',   2, 'Y', NOW(), 'SYSTEM', NOW(), 'SYSTEM'),
+('APPLIANCE_CAT', 'KITCHEN_LIVING', '주방 및 생활가전 고온스팀살균', 3, 'Y', NOW(), 'SYSTEM', NOW(), 'SYSTEM');
+
+
+-- ------------------------------------------------------------------------------
+-- [7] [신규/수정] APPLIANCE_TYPE : 계절가전 세부 품목 목록 (★건조기 포함 9개 항목)
+-- ------------------------------------------------------------------------------
+INSERT INTO TB_COM_CODE (GRP_CD, COM_CD, COM_NM, SORT_ORD, USE_YN, REG_DT, REG_ID, MOD_DT, MOD_ID)
+VALUES
+-- 1. 에어컨 군 (평형 입력 대상)
+('APPLIANCE_TYPE', 'WALL_MOUNTED', '벽걸이형 에어컨 (원룸/침실용)',    1, 'Y', NOW(), 'SYSTEM', NOW(), 'SYSTEM'),
+('APPLIANCE_TYPE', 'STAND',        '스탠드형 에어컨 (거실/매장용)',    2, 'Y', NOW(), 'SYSTEM', NOW(), 'SYSTEM'),
+('APPLIANCE_TYPE', 'CEILING_SYS',  '천장형 시스템 에어컨 (1Way/4Way)', 3, 'Y', NOW(), 'SYSTEM', NOW(), 'SYSTEM'),
+('APPLIANCE_TYPE', 'TUB_WASHER',   '일반 통돌이 세탁기',              4, 'Y', NOW(), 'SYSTEM', NOW(), 'SYSTEM'),
+('APPLIANCE_TYPE', 'DRUM_WASHER',  '드럼 세탁기 (세탁전용/일체형)',     5, 'Y', NOW(), 'SYSTEM', NOW(), 'SYSTEM'),
+('APPLIANCE_TYPE', 'DRYER',        '의류 건조기 (전기/가스 건조기)',    6, 'Y', NOW(), 'SYSTEM', NOW(), 'SYSTEM'),
+('APPLIANCE_TYPE', 'FRIDGE_STEAM', '냉장고 고온스팀 살균세척',         7, 'Y', NOW(), 'SYSTEM', NOW(), 'SYSTEM'),
+('APPLIANCE_TYPE', 'RANGE_HOOD',   '레인지후드 기름때 분해세척',       8, 'Y', NOW(), 'SYSTEM', NOW(), 'SYSTEM'),
+('APPLIANCE_TYPE', 'MATTRESS',     '매트리스 집먼지진드기 UV살균',     9, 'Y', NOW(), 'SYSTEM', NOW(), 'SYSTEM');
+
+
+-- ------------------------------------------------------------------------------
+-- [8] [신규] MATTRESS_SIZE : 매트리스 표준 규격 사이즈 목록 (7개 항목)
+-- ------------------------------------------------------------------------------
+INSERT INTO TB_COM_CODE (GRP_CD, COM_CD, COM_NM, SORT_ORD, USE_YN, REG_DT, REG_ID, MOD_DT, MOD_ID)
+VALUES
+('MATTRESS_SIZE', 'SINGLE',       '싱글 (S / 폭 100cm)',          1,  'Y', NOW(), 'SYSTEM', NOW(), 'SYSTEM'),
+('MATTRESS_SIZE', 'SUPER_SINGLE', '슈퍼싱글 (SS / 폭 110cm)',      2,  'Y', NOW(), 'SYSTEM', NOW(), 'SYSTEM'),
+('MATTRESS_SIZE', 'DOUBLE',       '더블 (D / 폭 135cm)',          3,  'Y', NOW(), 'SYSTEM', NOW(), 'SYSTEM'),
+('MATTRESS_SIZE', 'QUEEN',        '퀸 (Q / 폭 150cm)',            4,  'Y', NOW(), 'SYSTEM', NOW(), 'SYSTEM'),
+('MATTRESS_SIZE', 'KING',         '킹 (K / 폭 160cm)',            5,  'Y', NOW(), 'SYSTEM', NOW(), 'SYSTEM'),
+('MATTRESS_SIZE', 'SUPER_KING',   '슈퍼킹 / 라지킹 (170~180cm)',   6,  'Y', NOW(), 'SYSTEM', NOW(), 'SYSTEM'),
+('MATTRESS_SIZE', 'CUSTOM',       '기타 규격 (직접 크기 입력)',     99, 'Y', NOW(), 'SYSTEM', NOW(), 'SYSTEM');
+
+
+-- ------------------------------------------------------------------------------
+-- [9] [신규] APPLIANCE_SPEC_UNIT : 가전 규격 측정 단위 (5개 항목)
+-- ------------------------------------------------------------------------------
+INSERT INTO TB_COM_CODE (GRP_CD, COM_CD, COM_NM, SORT_ORD, USE_YN, REG_DT, REG_ID, MOD_DT, MOD_ID)
+VALUES
+('APPLIANCE_SPEC_UNIT', 'PYEONG',        '평형 (에어컨)',            1, 'Y', NOW(), 'SYSTEM', NOW(), 'SYSTEM'),
+('APPLIANCE_SPEC_UNIT', 'KG',            '용량 Kg (세탁기/건조기)',   2, 'Y', NOW(), 'SYSTEM', NOW(), 'SYSTEM'),
+('APPLIANCE_SPEC_UNIT', 'LITER',         '용량 L (냉장고)',          3, 'Y', NOW(), 'SYSTEM', NOW(), 'SYSTEM'),
+('APPLIANCE_SPEC_UNIT', 'BURNER_CNT',    '화구 수/구 (레인지후드)',   4, 'Y', NOW(), 'SYSTEM', NOW(), 'SYSTEM'),
+('APPLIANCE_SPEC_UNIT', 'MATTRESS_SIZE', '침대 규격 (매트리스)',     5, 'Y', NOW(), 'SYSTEM', NOW(), 'SYSTEM');
+
+
+-- ------------------------------------------------------------------------------
+-- [10] [신규] AIRCON_PYEONG : 에어컨 표준 평형 선택지 (콤보박스 선택 및 직접입력 호환)
+-- ------------------------------------------------------------------------------
+INSERT INTO TB_COM_CODE (GRP_CD, COM_CD, COM_NM, SORT_ORD, USE_YN, REG_DT, REG_ID, MOD_DT, MOD_ID)
+VALUES
+('AIRCON_PYEONG', 'PY_06',  '6평형 (원룸/소형방)',    1,  'Y', NOW(), 'SYSTEM', NOW(), 'SYSTEM'),
+('AIRCON_PYEONG', 'PY_07',  '7평형 (침실/안방)',      2,  'Y', NOW(), 'SYSTEM', NOW(), 'SYSTEM'),
+('AIRCON_PYEONG', 'PY_09',  '9평형 (큰방/원룸)',      3,  'Y', NOW(), 'SYSTEM', NOW(), 'SYSTEM'),
+('AIRCON_PYEONG', 'PY_11',  '11평형 (소형 거실)',     4,  'Y', NOW(), 'SYSTEM', NOW(), 'SYSTEM'),
+('AIRCON_PYEONG', 'PY_15',  '15평형 (거실 기본)',     5,  'Y', NOW(), 'SYSTEM', NOW(), 'SYSTEM'),
+('AIRCON_PYEONG', 'PY_17',  '17평형 (국민평수 거실)', 6,  'Y', NOW(), 'SYSTEM', NOW(), 'SYSTEM'),
+('AIRCON_PYEONG', 'PY_18',  '18평형 (거실 스탠드)',   7,  'Y', NOW(), 'SYSTEM', NOW(), 'SYSTEM'),
+('AIRCON_PYEONG', 'PY_23',  '23평형 (대형 거실)',     8,  'Y', NOW(), 'SYSTEM', NOW(), 'SYSTEM'),
+('AIRCON_PYEONG', 'PY_25',  '25평형 (대형/상가용)',   9,  'Y', NOW(), 'SYSTEM', NOW(), 'SYSTEM'),
+('AIRCON_PYEONG', 'PY_30',  '30평형 이상 (시스템/업무용)', 10, 'Y', NOW(), 'SYSTEM', NOW(), 'SYSTEM'),
+('AIRCON_PYEONG', 'CUSTOM', '직접 평형 입력',        99, 'Y', NOW(), 'SYSTEM', NOW(), 'SYSTEM');
+
+
+-- ------------------------------------------------------------------------------
+-- [11] [신규] WASHER_CAPACITY : 세탁기 및 건조기 표준 용량(Kg) 선택지
+-- ------------------------------------------------------------------------------
+INSERT INTO TB_COM_CODE (GRP_CD, COM_CD, COM_NM, SORT_ORD, USE_YN, REG_DT, REG_ID, MOD_DT, MOD_ID)
+VALUES
+('WASHER_CAPACITY', 'KG_10',  '10kg 이하 (소형)',     1,  'Y', NOW(), 'SYSTEM', NOW(), 'SYSTEM'),
+('WASHER_CAPACITY', 'KG_12',  '12kg',                2,  'Y', NOW(), 'SYSTEM', NOW(), 'SYSTEM'),
+('WASHER_CAPACITY', 'KG_14',  '14kg',                3,  'Y', NOW(), 'SYSTEM', NOW(), 'SYSTEM'),
+('WASHER_CAPACITY', 'KG_15',  '15kg (통돌이 표준)',    4,  'Y', NOW(), 'SYSTEM', NOW(), 'SYSTEM'),
+('WASHER_CAPACITY', 'KG_17',  '17kg (드럼/건조기)',   5,  'Y', NOW(), 'SYSTEM', NOW(), 'SYSTEM'),
+('WASHER_CAPACITY', 'KG_19',  '19kg',                6,  'Y', NOW(), 'SYSTEM', NOW(), 'SYSTEM'),
+('WASHER_CAPACITY', 'KG_21',  '21kg (대형 드럼)',     7,  'Y', NOW(), 'SYSTEM', NOW(), 'SYSTEM'),
+('WASHER_CAPACITY', 'KG_24',  '24kg (특대형)',        8,  'Y', NOW(), 'SYSTEM', NOW(), 'SYSTEM'),
+('WASHER_CAPACITY', 'KG_25',  '25kg 이상',           9,  'Y', NOW(), 'SYSTEM', NOW(), 'SYSTEM'),
+('WASHER_CAPACITY', 'CUSTOM', '직접 용량(Kg) 입력',    99, 'Y', NOW(), 'SYSTEM', NOW(), 'SYSTEM');
+
+
+-- 1. TB_USER 테이블에 서명 이미지 URL 컬럼 추가
+ALTER TABLE TB_USER 
+ADD COLUMN SIGN_IMG_URL VARCHAR(500) NULL 
+COMMENT '전자거래 서명패드 자필 전자서명 이미지 파일 웹 접근 URL' 
+AFTER USER_TEL;
+
+-- 2. TB_TERMS_MASTER (약관 마스터 테이블 신규 생성)
+CREATE TABLE IF NOT EXISTS TB_TERMS_MASTER (
+    TERMS_CD            VARCHAR(30)     NOT NULL    COMMENT '약관 구분 코드 (SERVICE, PRIVACY, LOCATION, FINANCE, SIGNATURE, MARKETING)',
+    TERMS_VER           VARCHAR(20)     NOT NULL    COMMENT '약관 버전 (예: v1.0)',
+    TERMS_TITLE         VARCHAR(150)    NOT NULL    COMMENT '약관 명칭',
+    TERMS_CONTENT       LONGTEXT        NOT NULL    COMMENT '약관 상세 본문 내용',
+    MANDATORY_YN        CHAR(1)         NOT NULL DEFAULT 'Y' COMMENT '필수 동의 여부 (Y: 필수, N: 선택)',
+    EFFECTIVE_DT        DATE            NOT NULL    COMMENT '약관 발효 시행 일자',
+    USE_YN              CHAR(1)         NOT NULL DEFAULT 'Y' COMMENT '현재 사용 여부 (Y/N)',
+    REG_DT              DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    REG_ID              VARCHAR(50)     NOT NULL DEFAULT 'SYSTEM',
+    MOD_DT              DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    MOD_ID              VARCHAR(50)     NOT NULL DEFAULT 'SYSTEM',
+    CONSTRAINT PK_TB_TERMS_MASTER PRIMARY KEY (TERMS_CD, TERMS_VER)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='이용약관 마스터 테이블';
+
+-- 3. TB_TERMS_AGREE_SIGN (약관별 동의 일시 및 서명 증적 관리 테이블 신규 생성)
+CREATE TABLE IF NOT EXISTS TB_TERMS_AGREE_SIGN (
+    AGREE_SEQ           BIGINT AUTO_INCREMENT NOT NULL COMMENT '동의 및 서명 이력 일련번호 PK',
+    USER_ROLE_CD        CHAR(1)         NOT NULL    COMMENT '회원 구분 (C: 고객, S: 시공사)',
+    USER_NO             CHAR(12)        NOT NULL    COMMENT '회원 식별번호 (TB_USER 외래키)',
+    TERMS_CD            VARCHAR(30)     NOT NULL    COMMENT '약관 구분 코드 (SERVICE, PRIVACY, LOCATION, FINANCE, SIGNATURE, MARKETING)',
+    TERMS_VER           VARCHAR(20)     NOT NULL DEFAULT 'v1.0' COMMENT '약관 버전',
+    AGREE_YN            CHAR(1)         NOT NULL DEFAULT 'Y' COMMENT '동의 여부 (Y: 동의, N: 미동의)',
+    AGREE_DT            DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '약관별 동의 일자 및 시간',
+    SIGN_FILE_NM        VARCHAR(255)    NULL        COMMENT '서명 PNG 파일명 (예: sign_C20261000001_1793380000000.png)',
+    SIGN_FILE_PATH      VARCHAR(500)    NULL        COMMENT '서버 상의 물리 저장 디렉토리 절대/상대 경로 (예: public/uploads/signatures/...)',
+    SIGN_FILE_URL       VARCHAR(500)    NULL        COMMENT '서명 이미지 웹 접근 URL (예: /uploads/signatures/...)',
+    CLIENT_IP           VARCHAR(50)     NULL        COMMENT '동의 당시 접속 클라이언트 IP 주소',
+    DEVICE_INFO         VARCHAR(255)    NULL        COMMENT '접속 기기 정보 (User-Agent 등)',
+    REG_DT              DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    REG_ID              VARCHAR(50)     NOT NULL    COMMENT '최초 등록자 (USER_NO)',
+    MOD_DT              DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    MOD_ID              VARCHAR(50)     NOT NULL    COMMENT '최종 수정자 (USER_NO)',
+    CONSTRAINT PK_TB_TERMS_AGREE_SIGN PRIMARY KEY (AGREE_SEQ),
+    CONSTRAINT FK_TERMS_AGREE_USER FOREIGN KEY (USER_NO) REFERENCES TB_USER (USER_NO) ON DELETE CASCADE,
+    INDEX IX_USER_TERMS_AGREE (USER_NO, TERMS_CD, TERMS_VER),
+    INDEX IX_AGREE_DT (AGREE_DT)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='회원별 약관 동의 일시 및 자필 전자서명 증적 파일 관리 테이블';
+
+-- 4. 필수 4대 약관 및 전자서명 기본 약관 시드 데이터 등록
+INSERT INTO TB_TERMS_MASTER (TERMS_CD, TERMS_VER, TERMS_TITLE, TERMS_CONTENT, MANDATORY_YN, EFFECTIVE_DT, USE_YN)
+VALUES 
+(
+  'SERVICE', 'v1.0', '서비스 통합이용약관', 
+  '제1조 (목적 및 플랫폼 매칭비 확정 규정)\n본 약관은 주식회사 쓸고닦고(이하 회사가 운영하는 O2O 주거위생 안심 매칭 서비스의 기본 이용조건을 규정합니다.\n제2조 (현장 시공비 직불 원칙 및 안심 시공 책임)\n시공 노임 및 인건비는 시공 검수 완료 후 고객이 시공 마스터에게 직접 지급함을 원칙으로 합니다.\n제3조 (역경매 및 덤핑 금지)\n플랫폼의 표준 단가 체계를 왜곡하는 불공정 덤핑 제안은 즉각적인 계정 정지 사유가 됩니다.',
+  'Y', '2026-01-01', 'Y'
+),
+(
+  'PRIVACY', 'v1.0', '개인정보 수집 및 이용 동의', 
+  '1. 수집 항목 및 보유 목적\n- 필수 수집 항목: 성명, 휴대전화번호, 이메일 주소, 서비스 시공 희망 주소지.\n2. 보유 및 파기 절차\n회원 탈퇴 시 관계 법령에 따라 전자상거래 계약 및 결제 기록은 5년간 보관 후 영구 파기합니다.',
+  'Y', '2026-01-01', 'Y'
+),
+(
+  'LOCATION', 'v1.0', '위치기반 서비스 이용약관', 
+  '제1조 (위치정보의 활용)\n회사는 신청인의 신청 주소지를 기반으로 가장 신속하게 현장 도달이 가능한 반경 5km 이내의 검증된 마스터를 매칭 후보로 제안합니다.\n제2조 (위치기반 출동 관제)\n수집된 GPS 정보는 작업 완료 24시간 후 완전히 마스킹 폐기 처리됩니다.',
+  'Y', '2026-01-01', 'Y'
+),
+(
+  'FINANCE', 'v1.0', '전자금융거래 기본약관', 
+  '제1조 (결제 대행 및 환불 방침)\n매칭 수수료(16,500원) 결제는 공인 PG사를 통해 진행되며 매칭 실패 시 100% 즉시 자동 환불됩니다.\n제2조 (3개월 안심보증 케어 연동)\n정상 완료된 거래 건에 한하여 90일간 안심보증 분쟁조정위원회의 지원을 받으실 수 있습니다.',
+  'Y', '2026-01-01', 'Y'
+),
+(
+  'SIGNATURE', 'v1.0', '전자거래 및 자필 전자서명 보증 동의', 
+  '제1조 (전자서명의 법적 효력)\n회원이 서명패드에 자필로 날인한 전자서명은 전자서명법 제3조에 의거하여 종이 문서에 날인한 자필 서명 또는 인감 날인과 동일한 법적 효력을 가집니다.\n제2조 (서명 원본의 보관)\n체결된 전자서명 이미지 파일 원본 및 메타데이터는 공증용 증적 데이터베이스에 영구 보관됩니다.',
+  'Y', '2026-01-01', 'Y'
+)
+ON DUPLICATE KEY UPDATE 
+  TERMS_TITLE = VALUES(TERMS_TITLE),
+  TERMS_CONTENT = VALUES(TERMS_CONTENT),
+  MANDATORY_YN = VALUES(MANDATORY_YN);
+
+SET FOREIGN_KEY_CHECKS = 1;
+
+
 ================================================================================
-             [SsulDak] 전체 53개 화면 ID 대 백엔드 1:1 매핑 명세표
-   (사용자 24개 / 파트너 14개 / 관리자 15개 - React 풀스택 및 1:1 독립 백엔드)
+6. WEB 화면 목록 및 기능 상세 명세서 (개정 접두사: WEB-)
 ================================================================================
 
-################################################################################
-제 1 편. 사용자 화면 1:1 매핑 명세표 (User: 24개 화면)
-################################################################################
+[고객 영역 : Domain: Client / Role: C]
+1. 화면 ID: WEB-CLNT-COM-000 | 구분: Main 화면
+   - 화면명: 고객 메인 홈
+   - URL: https://sseuldakgo.kr/client/
+   - 관련 테이블: TB_USER, TB_ORDER_MSTR, TB_ORDER_DTL, TB_COM_CODE
+   - 개요: 3대 청소 선택 카드 및 실시간 접수 피드 표출, '+ 우리 집 청소 요청 등록하기' 터치 시 등록 모달(WEB-CLNT-REQ-000) 호출.
+2. 화면 ID: WEB-CLNT-REQ-000 | 구분: Sub 화면 (모달)
+   - 화면명: 청소 서비스 신청 (청소 요청 등록)
+   - URL: /client/ (모달 오버레이)
+   - 관련 테이블: TB_ORDER_MSTR, TB_ORDER_DTL, TB_ORDER_PHOTO, TB_COM_CODE
+   - 개요: 3대 TAB([정기청소] | [입주청소] | [계절가전]), 의뢰 기본정보(업체명, 담당자명, 연락처 등), 시설유형, 주차여부, 고객 확정 지정가 입력, 비회원 작성 시 LocalStorage 임시 저장 후 로그인 모달 호출.
+3. 화면 ID: WEB-CLNT-REQ-001 | 구분: Sub 화면 (모달)
+   - 화면명: 현장 도로명 주소 검색
+   - URL: /client/ (주소 팝업)
+   - 관련 테이블: TB_COM_CODE
+   - 개요: 행안부 도로명 주소 연계 및 시도/시군구 코드 부모창 자동 매핑.
+4. 화면 ID: WEB-CLNT-ATH-000 | 구분: Sub 화면 (모달)
+   - 화면명: 고객 로그인
+   - URL: /client/ (로그인 모달)
+   - 관련 테이블: TB_USER
+   - 개요: 회원구분(고객 기본), 아이디 저장(C 구분자 보존), 소셜/이메일 로그인, 로그인 성공 시 임시 저장된 청소 요청 데이터 100% 자동 조립(Pre-fill) 복원.
+5. 화면 ID: WEB-CLNT-ATH-010 | 구분: Sub 화면 (모달)
+   - 화면명: 통합 회원가입 및 4대 약관 정독
+   - URL: /client/ (가입 모달)
+   - 관련 테이블: TB_USER, TB_TERMS_MASTER, TB_TERMS_VERSION, TB_TERMS_AGREE_SIGN
+   - 개요: 고객/용역 세그먼트 선택, PASS/SMS 본인확인, 4대 약관 전문 스크롤 100% 도달 시 동의 활성화, 가입 완료 시 채번 공식(C+YYYYMM+5자리) 적용.
+6. 화면 ID: WEB-CLNT-ATH-011 | 구분: Sub 화면 (모달)
+   - 화면명: 고객 가입 완료 환영 안내
+   - URL: /client/ (완료 팝업)
+   - 관련 테이블: TB_USER
+   - 개요: 고객 가입 축하 및 즉시 청소 요청 등록 모달 유도.
+7. 화면 ID: WEB-CLNT-ORD-000 | 구분: Main 화면
+   - 화면명: 나의 청소 신청 현황
+   - URL: https://sseuldakgo.kr/client/order/list
+   - 관련 테이블: TB_ORDER_MSTR, TB_ORDER_DTL, TB_QUOTE_APPLY, TB_USER
+   - 개요: 발주 오더 라이프사이클 목록, 7일 청약 만료 타이머 표출.
+8. 화면 ID: WEB-CLNT-ORD-001 | 구분: Sub 화면
+   - 화면명: 청소 요청 상세 및 용역 청약서 비교/선택
+   - URL: https://sseuldakgo.kr/client/order/detail
+   - 관련 테이블: TB_ORDER_MSTR, TB_ORDER_DTL, TB_QUOTE_APPLY, TB_USER
+   - 개요: 접수된 용역들의 제안 일자, 시각(HH:mm), 소요시간, 투입인원 비교 후 최적 1인 최종 선택.
+9. 화면 ID: WEB-CLNT-PAY-000 | 구분: Sub 화면 (모달)
+   - 화면명: 고객 데이터 이용료 결제 및 배타적 계약 확정
+   - URL: /client/order/payment
+   - 관련 테이블: TB_ORDER_MSTR, TB_ORDER_DTL, TB_CLEAN_CONTRACT, TB_ALLIANCE_SETTLE_DTL
+   - 개요: 16,500원 결제 승인, 주발주 CNTR_CONFIRMED, 선택 중분류 APPR_CONTRACT, 미선택 중분류 WAIT_CLOSED 일괄 자동 마감.
+10. 화면 ID: WEB-CLNT-JOB-000 | 구분: Sub 화면
+    - 화면명: 청소 시공 검수 및 현장 직불 완료 승인
+    - URL: https://sseuldakgo.kr/client/job/inspect
+    - 관련 테이블: TB_ORDER_MSTR, TB_ORDER_DTL, TB_ORDER_PHOTO, TB_CLEAN_CONTRACT
+    - 개요: 시공 전/후 사진 열람, 검수 완료 승인(SVC_COMPLETED) 및 확정 대금 현장 직불 안내.
 
-[01] USER-COM-00 : 메인 홈
-  - 지원 채널: Web [Y] / App [Y]
-  - 화면 프론트엔드 경로: SsulDak_Web/User/frontend/USER-COM-00/index.jsx
-  - 백엔드 모듈 경로    : SsulDak_Web/User/backend/api_USER_COM_00/route.js
-  - API 엔드포인트 URL  : POST /api/user/user_com_00
-  - 전용 쿼리 식별자    : USER-COM-00-SQL-001, USER-COM-00-SQL-002
-  - 상세 처리 비즈니스 로직:
-      1. 3대 청소 카테고리(정기청소, 계절가전, 입주청소) 퀵 선택 렌더링
-      2. 활성화된 웰컴 프로모션 배너 조회 및 쿠폰팩 즉시 다운로드 연동
-      3. 실시간 고객 시공 후기 및 검증된 우수 마스터 파트너 카드 목록 조회
+[용역 영역 : Domain: Service / Role: S]
+1. 화면 ID: WEB-SRVC-MAIN-000 | 구분: Main 화면
+   - 화면명: 용역 서비스 메인 홈
+   - URL: https://sseuldakgo.kr/service/
+   - 관련 테이블: TB_USER, TB_ORDER_MSTR, TB_ORDER_DTL, TB_QUOTE_APPLY
+   - 개요: 신규 발주 건수([정기 N건] | [입주 N건] | [가전 N건]), 활동 지표, 영업 On/Off 토글, 비회원 공고 탐색 지원.
+2. 화면 ID: WEB-SRVC-ATH-000 | 구분: Sub 화면 (모달)
+   - 화면명: 용역 서비스 로그인
+   - URL: /service/ (로그인 모달)
+   - 관련 테이블: TB_USER
+   - 개요: 용역 로그인, 아이디 저장(S 구분자 보존), 로그인 성공 시 임시 저장된 청약 대상 정보 자동 복원.
+3. 화면 ID: WEB-SRVC-ATH-001 | 구분: Main 화면
+   - 화면명: 사업자등록증 원본 업로드 및 OCR AI 진위 검증
+   - URL: https://sseuldakgo.kr/service/join/verify
+   - 관련 테이블: TB_USER, TB_SERVICE_DOC
+   - 개요: 원본 파일/촬영 업로드, CLOVA OCR 자동 파싱, 국세청 API 및 대표자 본인확인 3자 교차 일치 검증.
+4. 화면 ID: WEB-SRVC-ATH-002 | 구분: Main 화면
+   - 화면명: 용역 위탁계약서 및 전자서명
+   - URL: https://sseuldakgo.kr/service/join/contract
+   - 관련 테이블: TB_USER, TB_TERMS_MASTER, TB_TERMS_VERSION, TB_TERMS_AGREE_SIGN
+   - 개요: 위탁계약서 확인 및 캔버스 자필 전자서명 등록.
+5. 화면 ID: WEB-SRVC-ORD-000 | 구분: Main 화면
+   - 화면명: 실시간 청소 발주 공고 목록
+   - URL: https://sseuldakgo.kr/service/order/list
+   - 관련 테이블: TB_ORDER_MSTR, TB_ORDER_DTL, TB_SERVICE_REGION, TB_COM_CODE
+   - 개요: 용역 활동 설정 지역(최대 10개) 내 청약 접수 중(BID_OPEN)인 공고 리스트.
+6. 화면 ID: WEB-SRVC-ORD-001 | 구분: Sub 화면 (모달)
+   - 화면명: 청소 발주 상세 정보
+   - URL: /service/order/detail
+   - 관련 테이블: TB_ORDER_MSTR, TB_ORDER_DTL, TB_ORDER_PHOTO, TB_COM_CODE
+   - 개요: 고객 확정 지정 대금 확인(역경매 불가), 비회원 청약 터치 시 임시 저장 후 로그인 모달 유도.
+7. 화면 ID: WEB-SRVC-QOT-000 | 구분: Sub 화면 (모달)
+   - 화면명: 청약서 작성 및 방문 일정 제안
+   - URL: /service/order/apply
+   - 관련 테이블: TB_ORDER_MSTR, TB_ORDER_DTL, TB_QUOTE_APPLY, TB_USER
+   - 개요: 고객 확정가 100% 수락, From-To 기간 내 방문일자, 시각(HH:mm), 소요시간 입력, 자전거래 및 일정 중복 충돌 차단 검증.
+8. 화면 ID: WEB-SRVC-JOB-000 | 구분: Main 화면
+   - 화면명: 시공 작업 관리 및 캘린더
+   - URL: https://sseuldakgo.kr/service/job/schedule
+   - 관련 테이블: TB_CLEAN_CONTRACT, TB_ORDER_MSTR, TB_ORDER_DTL, TB_USER
+   - 개요: 확정 시공 캘린더, 고객 안심번호 확인, [출발하기]->[작업시작]->[결과보고].
+9. 화면 ID: WEB-SRVC-JOB-001 | 구분: Sub 화면
+   - 화면명: 시공 전/후 사진 등록 및 검수 요청
+   - URL: https://sseuldakgo.kr/service/job/report
+   - 관련 테이블: TB_ORDER_MSTR, TB_ORDER_DTL, TB_ORDER_PHOTO, TB_CLEAN_CONTRACT
+   - 개요: 서비스별 물리 폴더(/orders/{ORDER_NO}/...) 사진 업로드 및 검수 요청 전송.
+10. 화면 ID: WEB-SRVC-SET-000 | 구분: Main 화면
+    - 화면명: 용역 정산 및 활동 지역 설정
+    - URL: https://sseuldakgo.kr/service/setting/profile
+    - 관련 테이블: TB_USER, TB_SERVICE_REGION, TB_CLEAN_CONTRACT
+    - 개요: 활동 지역 설정(최대 10개 엄격 제한 통제), 직불 수령 및 이용료 납부 내역 조회.
 
---------------------------------------------------------------------------------
-[02] USER-COM-01 : 공지사항 목록
-  - 지원 채널: Web [Y] / App [Y]
-  - 화면 프론트엔드 경로: SsulDak_Web/User/frontend/USER-COM-01/index.jsx
-  - 백엔드 모듈 경로    : SsulDak_Web/User/backend/api_USER_COM_01/route.js
-  - API 엔드포인트 URL  : POST /api/user/user_com_01
-  - 전용 쿼리 식별자    : USER-COM-01-SQL-001
-  - 상세 처리 비즈니스 로직:
-      1. 서비스 정책, 3개월 안심보증 가이드, 프로모션 탭별 필터링
-      2. 공지사항 페이징 목록 조회 및 조회수 순/최신순 정렬 반환
-
---------------------------------------------------------------------------------
-[03] USER-COM-02 : 공지사항 상세
-  - 지원 채널: Web [Y] / App [Y]
-  - 화면 프론트엔드 경로: SsulDak_Web/User/frontend/USER-COM-02/index.jsx
-  - 백엔드 모듈 경로    : SsulDak_Web/User/backend/api_USER_COM_02/route.js
-  - API 엔드포인트 URL  : POST /api/user/user_com_02
-  - 전용 쿼리 식별자    : USER-COM-02-SQL-001, USER-COM-02-SQL-002
-  - 상세 처리 비즈니스 로직:
-      1. 공지사항 상세 본문 조회 및 조회수(VIEW_CNT) 1 증가 트랜잭션
-      2. 이벤트 참여형 쿠폰 다운로드 요청 시 TB_USER_COUPON 발급 검증 및 생성
-
---------------------------------------------------------------------------------
-[04] USER-ATH-00 : 로그인
-  - 지원 채널: Web [Y] / App [Y]
-  - 화면 프론트엔드 경로: SsulDak_Web/User/frontend/USER-ATH-00/index.jsx
-  - 백엔드 모듈 경로    : SsulDak_Web/User/backend/api_USER_ATH_00/route.js
-  - API 엔드포인트 URL  : POST /api/user/user_ath_00
-  - 전용 쿼리 식별자    : USER-ATH-00-SQL-001, USER-ATH-00-SQL-002
-  - 상세 처리 비즈니스 로직:
-      1. 이메일 기반 회원 조회 후 단방향 솔트 해시(USER_PWD_HASH, PWD_SALT) 대조
-      2. 카카오/네이버/애플 OAuth 2.0 소셜 간편 로그인 토큰 검증
-      3. 인증 성공 시 사용자 전용 JWT 세션 토큰 발급 및 LAST_LOGIN_DT 갱신
-
---------------------------------------------------------------------------------
-[05] USER-ATH-01 : 회원가입 방식 선택
-  - 지원 채널: Web [Y] / App [Y]
-  - 화면 프론트엔드 경로: SsulDak_Web/User/frontend/USER-ATH-01/index.jsx
-  - 백엔드 모듈 경로    : SsulDak_Web/User/backend/api_USER_ATH_01/route.js
-  - API 엔드포인트 URL  : POST /api/user/user_ath_01
-  - 전용 쿼리 식별자    : USER-ATH-01-SQL-001
-  - 상세 처리 비즈니스 로직:
-      1. 일반 이메일 가입 vs 소셜 가입 분기 라우팅
-      2. 입력된 추천인 코드(Referral Code) 유효성 및 기가입 여부 사전 검증
-      3. 필수 및 선택 약관 동의 데이터 검증
-
---------------------------------------------------------------------------------
-[06] USER-ATH-02 : 회원가입 정보 입력
-  - 지원 채널: Web [Y] / App [Y]
-  - 화면 프론트엔드 경로: SsulDak_Web/User/frontend/USER-ATH-02/index.jsx
-  - 백엔드 모듈 경로    : SsulDak_Web/User/backend/api_USER_ATH_02/route.js
-  - API 엔드포인트 URL  : POST /api/user/user_ath_02
-  - 전용 쿼리 식별자    : USER-ATH-02-SQL-001, USER-ATH-02-SQL-002, USER-ATH-02-SQL-003
-  - 상세 처리 비즈니스 로직:
-      1. 휴대폰 SMS 실명 인증번호 검증 및 자필 전자서명 이미지 파일 저장(SIGN_IMG_URL)
-      2. TB_USER 신규 회원 인서트 (USER_NO 제로패딩 자동 채번)
-      3. 가입 완료 이벤트 트리거: [웰컴 5,000원 할인 쿠폰] 즉시 자동 발급
-
---------------------------------------------------------------------------------
-[07] USER-ATH-03 : 비밀번호 찾기/재설정
-  - 지원 채널: Web [Y] / App [Y]
-  - 화면 프론트엔드 경로: SsulDak_Web/User/frontend/USER-ATH-03/index.jsx
-  - 백엔드 모듈 경로    : SsulDak_Web/User/backend/api_USER_ATH_03/route.js
-  - API 엔드포인트 URL  : POST /api/user/user_ath_03
-  - 전용 쿼리 식별자    : USER-ATH-03-SQL-001, USER-ATH-03-SQL-002
-  - 상세 처리 비즈니스 로직:
-      1. 가입 계정 및 SMS 본인확인 일치 여부 대조
-      2. 신규 비밀번호 솔트 해시 암호화 갱신(USER_PWD_HASH, PWD_SALT, PWD_CHG_DT)
-
---------------------------------------------------------------------------------
-[08] USER-REQ-00 : 청소 서비스 신청 (통합)
-  - 지원 채널: Web [Y] / App [Y]
-  - 화면 프론트엔드 경로: SsulDak_Web/User/frontend/USER-REQ-00/index.jsx
-  - 백엔드 모듈 경로    : SsulDak_Web/User/backend/api_USER_REQ_00/route.js
-  - API 엔드포인트 URL  : POST /api/user/user_req_00
-  - 전용 쿼리 식별자    : USER-REQ-00-SQL-001, USER-REQ-00-SQL-002, USER-REQ-00-SQL-003
-  - 상세 처리 비즈니스 로직:
-      1. 정기청소 계약기간 From-To 검증: To - From >= 90일(3개월) 강제 락 체크
-      2. '+' 버튼으로 동적 추가된 중분류별 용역 단가 및 수량 기반 총액 연산
-      3. 플랫폼 기준 데이터 이용료 산출: max(청소 용역 대금 총액 * 3.3%, 33,000원)
-      4. TB_CLEAN_REQ 마스터 및 하위 정기/가전/입주 슬롯 테이블 일괄 인서트
-
---------------------------------------------------------------------------------
-[09] USER-REQ-01 : 정기청소 중분류 추가 모달
-  - 지원 채널: Web [Y] / App [Y]
-  - 화면 프론트엔드 경로: SsulDak_Web/User/frontend/USER-REQ-01/index.jsx
-  - 백엔드 모듈 경로    : SsulDak_Web/User/backend/api_USER_REQ_01/route.js
-  - API 엔드포인트 URL  : POST /api/user/user_req_01
-  - 전용 쿼리 식별자    : USER-REQ-01-SQL-001
-  - 상세 처리 비즈니스 로직:
-      1. TB_COM_CODE(그룹: REGULAR_CLEAN_AREA)에서 활성화된 중분류 목록 조회
-      2. 선택된 구역(계단, 주위, 지하, 주차장, 복도)의 층수/주기 및 하한선 가이드 반환
-
---------------------------------------------------------------------------------
-[10] USER-REQ-02 : 계절가전 중분류 추가 모달
-  - 지원 채널: Web [Y] / App [Y]
-  - 화면 프론트엔드 경로: SsulDak_Web/User/frontend/USER-REQ-02/index.jsx
-  - 백엔드 모듈 경로    : SsulDak_Web/User/backend/api_USER_REQ_02/route.js
-  - API 엔드포인트 URL  : POST /api/user/user_req_02
-  - 전용 쿼리 식별자    : USER-REQ-02-SQL-001
-  - 상세 처리 비즈니스 로직:
-      1. TB_COM_CODE(그룹: APPLIANCE_CLEAN_TYPE)에서 에어컨, 세탁기 등 중분류 조회
-      2. 기종별 세부 스펙 목록 및 대당 최소 하한선 금액 검증 데이터 반환
-
---------------------------------------------------------------------------------
-[11] USER-REQ-03 : 주소 검색 팝업
-  - 지원 채널: Web [Y] / App [Y]
-  - 화면 프론트엔드 경로: SsulDak_Web/User/frontend/USER-REQ-03/index.jsx
-  - 백엔드 모듈 경로    : SsulDak_Web/User/backend/api_USER_REQ_03/route.js
-  - API 엔드포인트 URL  : POST /api/user/user_req_03
-  - 전용 쿼리 식별자    : USER-REQ-03-SQL-001
-  - 상세 처리 비즈니스 로직:
-      1. 행정안전부/카카오 도로명 주소 API 연계 프록시 검색 호출
-      2. 우편번호, 도로명 주소, 지번 정제 및 중복 제거 후 리스트 반환
-
---------------------------------------------------------------------------------
-[12] USER-REQ-04 : 현장 사진 첨부 모달
-  - 지원 채널: Web [Y] / App [Y]
-  - 화면 프론트엔드 경로: SsulDak_Web/User/frontend/USER-REQ-04/index.jsx
-  - 백엔드 모듈 경로    : SsulDak_Web/User/backend/api_USER_REQ_04/route.js
-  - API 엔드포인트 URL  : POST /api/user/user_req_04
-  - 전용 쿼리 식별자    : USER-REQ-04-SQL-001
-  - 상세 처리 비즈니스 로직:
-      1. 다중 업로드 이미지 파일 유효성 검증(최대 5장, 용량 10MB 이하, MIME 타입)
-      2. 오브젝트 스토리지 업로드 후 TB_REQ_ATTACH_PHOTO 메타데이터 인서트
-
---------------------------------------------------------------------------------
-[13] USER-QOT-00 : 수신 청약 목록 (진행 현황)
-  - 지원 채널: Web [Y] / App [Y]
-  - 화면 프론트엔드 경로: SsulDak_Web/User/frontend/USER-QOT-00/index.jsx
-  - 백엔드 모듈 경로    : SsulDak_Web/User/backend/api_USER_QOT_00/route.js
-  - API 엔드포인트 URL  : POST /api/user/user_qot_00
-  - 전용 쿼리 식별자    : USER-QOT-00-SQL-001, USER-QOT-00-SQL-002
-  - 상세 처리 비즈니스 로직:
-      1. 요청서(REQ)에 매핑된 슬롯별 파트너 응모 현황 및 견적 목록 조회
-      2. 선택된 항목만 우선 계약 진행하는 독립 분리 계약(Split Booking) 처리
-
---------------------------------------------------------------------------------
-[14] USER-QOT-01 : 파트너 프로필 확인
-  - 지원 채널: Web [Y] / App [Y]
-  - 화면 프론트엔드 경로: SsulDak_Web/User/frontend/USER-QOT-01/index.jsx
-  - 백엔드 모듈 경로    : SsulDak_Web/User/backend/api_USER_QOT_01/route.js
-  - API 엔드포인트 URL  : POST /api/user/user_qot_01
-  - 전용 쿼리 식별자    : USER-QOT-01-SQL-001, USER-QOT-01-SQL-002
-  - 상세 처리 비즈니스 로직:
-      1. 파트너 상호명, 대표자, 평점, 투입 인원수, 소요시간, 보유 장비 태그 조회
-      2. 파트너 포트폴리오(Before/After) 갤러리 및 최근 고객 시공 후기 조회
-
---------------------------------------------------------------------------------
-[15] USER-QOT-02 : 파트너 1:1 상담 채팅
-  - 지원 채널: Web [Y] / App [Y]
-  - 화면 프론트엔드 경로: SsulDak_Web/User/frontend/USER-QOT-02/index.jsx
-  - 백엔드 모듈 경로    : SsulDak_Web/User/backend/api_USER_QOT_02/route.js
-  - API 엔드포인트 URL  : POST /api/user/user_qot_02
-  - 전용 쿼리 식별자    : USER-QOT-02-SQL-001, USER-QOT-02-SQL-002
-  - 상세 처리 비즈니스 로직:
-      1. 양측 데이터 이용료 상호 결제 완료 여부 검증 (미완료 시 룸 차단)
-      2. 계약 건별 WebSocket 세션 연결, 이전 대화 목록 로드 및 메시지 송수신
-
---------------------------------------------------------------------------------
-[16] USER-CNT-00 : 예약 확정 및 결제 (개정 과금)
-  - 지원 채널: Web [Y] / App [Y]
-  - 화면 프론트엔드 경로: SsulDak_Web/User/frontend/USER-CNT-00/index.jsx
-  - 백엔드 모듈 경로    : SsulDak_Web/User/backend/api_USER_CNT_00/route.js
-  - API 엔드포인트 URL  : POST /api/user/user_cnt_00
-  - 전용 쿼리 식별자    : USER-CNT-00-SQL-001, USER-CNT-00-SQL-002, USER-CNT-00-SQL-003
-  - 상세 처리 비즈니스 로직:
-      1. 기준 이용료 max(용역총액 * 3.3%, 33,000원) 산출
-      2. 쿠폰 할인 및 포인트 차감 적용 후 최종 실 결제액 산출
-      3. PG 승인 호출 및 TB_DATA_FEE_PAY, TB_CLEAN_CONTRACT 계약 확정 트랜잭션
-
---------------------------------------------------------------------------------
-[17] USER-CNT-01 : 결제 완료 (파트너 대기)
-  - 지원 채널: Web [Y] / App [Y]
-  - 화면 프론트엔드 경로: SsulDak_Web/User/frontend/USER-CNT-01/index.jsx
-  - 백엔드 모듈 경로    : SsulDak_Web/User/backend/api_USER_CNT_01/route.js
-  - API 엔드포인트 URL  : POST /api/user/user_cnt_01
-  - 전용 쿼리 식별자    : USER-CNT-01-SQL-001
-  - 상세 처리 비즈니스 로직:
-      1. 결제 승인 영수증 데이터(정상가, 할인액, 실결제액, TID) 바인딩 반환
-      2. 매칭된 파트너에게 후결제 요청 푸시/알림톡 발송 큐(Queue) 등록
-
---------------------------------------------------------------------------------
-[18] USER-CNT-02 : 결제 실패/취소
-  - 지원 채널: Web [Y] / App [Y]
-  - 화면 프론트엔드 경로: SsulDak_Web/User/frontend/USER-CNT-02/index.jsx
-  - 백엔드 모듈 경로    : SsulDak_Web/User/backend/api_USER_CNT_02/route.js
-  - API 엔드포인트 URL  : POST /api/user/user_cnt_02
-  - 전용 쿼리 식별자    : USER-CNT-02-SQL-001
-  - 상세 처리 비즈니스 로직:
-      1. PG사 반환 오류 코드 매핑 및 실패 사유 조회
-      2. 결제 시도 시 차감되었던 TB_USER_COUPON 상태 AVAILABLE 자동 롤백 복원
-
---------------------------------------------------------------------------------
-[19] USER-HIS-00 : 청소 이용 내역
-  - 지원 채널: Web [Y] / App [Y]
-  - 화면 프론트엔드 경로: SsulDak_Web/User/frontend/USER-HIS-00/index.jsx
-  - 백엔드 모듈 경로    : SsulDak_Web/User/backend/api_USER_HIS_00/route.js
-  - API 엔드포인트 URL  : POST /api/user/user_his_00
-  - 전용 쿼리 식별자    : USER-HIS-00-SQL-001
-  - 상세 처리 비즈니스 로직:
-      1. 이용자의 진행 중인 청소 건 및 과거 완료 내역 탭별 페이징 조회
-      2. 계약별 진행 상태 뱃지 및 첫 방문 예정 일시 반환
-
---------------------------------------------------------------------------------
-[20] USER-HIS-01 : 청소 진행 상세 보기
-  - 지원 채널: Web [Y] / App [Y]
-  - 화면 프론트엔드 경로: SsulDak_Web/User/frontend/USER-HIS-01/index.jsx
-  - 백엔드 모듈 경로    : SsulDak_Web/User/backend/api_USER_HIS_01/route.js
-  - API 엔드포인트 URL  : POST /api/user/user_his_01
-  - 전용 쿼리 식별자    : USER-HIS-01-SQL-001, USER-HIS-01-SQL-002, USER-HIS-01-SQL-003
-  - 상세 처리 비즈니스 로직:
-      1. 회차별 작업 수행 이력 및 파트너 업로드 사진(최소 2장) 조회
-      2. 이용자 검수 확정 승인 처리 (24시간 미확인 시 자동 완료 연동)
-      3. 선 취소 요청 시: 7일 이내 50% 부분취소 환불 / 7일 이후 전액 몰수 및 7일 정지 집행
-
---------------------------------------------------------------------------------
-[21] USER-HIS-02 : 서비스 리뷰 작성 (프로모션)
-  - 지원 채널: Web [Y] / App [Y]
-  - 화면 프론트엔드 경로: SsulDak_Web/User/frontend/USER-HIS-02/index.jsx
-  - 백엔드 모듈 경로    : SsulDak_Web/User/backend/api_USER_HIS_02/route.js
-  - API 엔드포인트 URL  : POST /api/user/user_his_02
-  - 전용 쿼리 식별자    : USER-HIS-02-SQL-001, USER-HIS-02-SQL-002, USER-HIS-02-SQL-003
-  - 상세 처리 비즈니스 로직:
-      1. 만족도 별점(1.0~5.0), 텍스트, 시공 사진 검증 후 TB_SERVICE_REVIEW 인서트
-      2. 포토 리뷰 작성 감사 리워드 1,000P 즉시 적립 (TB_USER_POINT_LEDGER 반영)
-      3. 파트너 평균 평점(AVG_RATING) 및 리뷰 수(REVIEW_TOTAL_CNT) 재계산 갱신
-
---------------------------------------------------------------------------------
-[22] USER-MYP-00 : 이용자 마이페이지
-  - 지원 채널: Web [Y] / App [Y]
-  - 화면 프론트엔드 경로: SsulDak_Web/User/frontend/USER-MYP-00/index.jsx
-  - 백엔드 모듈 경로    : SsulDak_Web/User/backend/api_USER_MYP_00/route.js
-  - API 엔드포인트 URL  : POST /api/user/user_myp_00
-  - 전용 쿼리 식별자    : USER-MYP-00-SQL-001
-  - 상세 처리 비즈니스 로직:
-      1. 이용자 기본 프로필, 보유 쿠폰 잔여 수, 리워드 포인트 잔액 조회
-      2. 선 취소 패널티 상태(USER_STAT_CD, SUSPEND_EXPIRE_DT) 배너 정보 반환
-
---------------------------------------------------------------------------------
-[23] USER-MYP-01 : 회원 정보 수정
-  - 지원 채널: Web [Y] / App [Y]
-  - 화면 프론트엔드 경로: SsulDak_Web/User/frontend/USER-MYP-01/index.jsx
-  - 백엔드 모듈 경로    : SsulDak_Web/User/backend/api_USER_MYP_01/route.js
-  - API 엔드포인트 URL  : POST /api/user/user_myp_01
-  - 전용 쿼리 식별자    : USER-MYP-01-SQL-001, USER-MYP-01-SQL-002
-  - 상세 처리 비즈니스 로직:
-      1. 휴대폰 번호 재인증 갱신 및 마케팅 수신동의(MKT_AGREE_YN) 변경 반영
-      2. 회원 탈퇴 신청 시 진행 중인 청소 계약 존재 여부 검증 (계약 존재 시 차단)
-
---------------------------------------------------------------------------------
-[24] USER-MYP-02 : 쿠폰 / 혜택 관리
-  - 지원 채널: Web [Y] / App [Y]
-  - 화면 프론트엔드 경로: SsulDak_Web/User/frontend/USER-MYP-02/index.jsx
-  - 백엔드 모듈 경로    : SsulDak_Web/User/backend/api_USER_MYP_02/route.js
-  - API 엔드포인트 URL  : POST /api/user/user_myp_02
-  - 전용 쿼리 식별자    : USER-MYP-02-SQL-001, USER-MYP-02-SQL-002
-  - 상세 처리 비즈니스 로직:
-      1. 사용가능/사용완료/만료 쿠폰 목록 및 유효기간 조회
-      2. 16자리 프로모션 시리얼 코드 입력 시 캠페인 유효성 대조 후 쿠폰함 등록
+[관리 영역 : Domain: Admin / Role: A]
+1. 화면 ID: WEB-ADMN-DSH-000 | 구분: Main 화면
+   - 화면명: 전국 종합 관제 대시보드
+   - URL: https://sseuldakgo.kr/admin/
+   - 관련 테이블: TB_ORDER_MSTR, TB_ORDER_DTL, TB_CLEAN_CONTRACT, TB_USER
+   - 개요: 거래액, 순익, 전국 버블맵 관제, 긴급 분쟁 및 심사 큐 표출.
+2. 화면 ID: WEB-ADMN-ATH-000 | 구분: Main 화면
+   - 화면명: 관리자 보안 로그인
+   - URL: https://sseuldakgo.kr/admin/login
+   - 관련 테이블: TB_USER
+   - 개요: 사원 ID, 비밀번호 및 Google Authenticator OTP 2차 인증.
+3. 화면 ID: WEB-ADMN-ORD-000 | 구분: Main 화면
+   - 화면명: 청소 발주 및 계약 체결 관제
+   - URL: https://sseuldakgo.kr/admin/order/manage
+   - 관련 테이블: TB_ORDER_MSTR, TB_ORDER_DTL, TB_QUOTE_APPLY, TB_CLEAN_CONTRACT
+   - 개요: 발주 모니터링, 7일 만료 처리 추적, 배타적 계약 확정 검증.
+4. 화면 ID: WEB-ADMN-ALC-000 | 구분: Main 화면
+   - 화면명: 외부 플랫폼 제휴 및 정보이용료 정산 관제
+   - URL: https://sseuldakgo.kr/admin/alliance/settle
+   - 관련 테이블: TB_ALLIANCE_COMPANY, TB_ALLIANCE_SETTLE_DTL, TB_CLEAN_CONTRACT
+   - 개요: 제휴사별 유입 건수, 플랫폼 순익, 배분 수수료 정산 및 마감 확정.
+5. 화면 ID: WEB-ADMN-ALC-001 | 구분: Sub 화면 (모달)
+   - 화면명: 제휴 거래 상세 내역 및 정산 산출 근거
+   - URL: /admin/alliance/settle/detail
+   - 관련 테이블: TB_ALLIANCE_SETTLE_DTL, TB_CLEAN_CONTRACT
+   - 개요: 계약건별 정산 산출 근거 및 공제 내역 확인.
+6. 화면 ID: WEB-ADMN-PTN-000 | 구분: Main 화면
+   - 화면명: 용역 서비스 입점 심사 및 서류 검증
+   - URL: https://sseuldakgo.kr/admin/partner/audit
+   - 관련 테이블: TB_USER, TB_SERVICE_DOC
+   - 개요: 사업자등록증 OCR 파싱 결과 및 3자 검증 내역 심사 후 승인 처리.
+7. 화면 ID: WEB-ADMN-DSP-000 | 구분: Main 화면
+   - 화면명: 거래 취소 및 분쟁 중재 콘솔
+   - URL: https://sseuldakgo.kr/admin/dispute/console
+   - 관련 테이블: TB_CLEAN_CONTRACT, TB_ORDER_MSTR, TB_USER
+   - 개요: 선취소 50% 위약금 몰수/환불 및 7일 정지 집행, 안심보증 대체 배차.
+8. 화면 ID: WEB-ADMN-SYS-000 | 구분: Main 화면
+   - 화면명: 시스템 공통 코드 및 정책 설정
+   - URL: https://sseuldakgo.kr/admin/system/policy
+   - 관련 테이블: TB_COM_CODE_GRP, TB_COM_CODE, TB_SYS_POLICY_CONFIG
+   - 개요: 공통 코드, 정책 파라미터(고정비 5천원, 락 90일 등), 4대 약관 관리.
 
 
-################################################################################
-제 2 편. 파트너 화면 1:1 매핑 명세표 (Partner: 14개 화면)
-################################################################################
-
-[25] PTNR-ATH-00 : 파트너 로그인
-  - 지원 채널: Web [Y] / App [Y]
-  - 화면 프론트엔드 경로: SsulDak_Web/Partner/frontend/PTNR-ATH-00/index.jsx
-  - 백엔드 모듈 경로    : SsulDak_Web/Partner/backend/api_PTNR_ATH_00/route.js
-  - API 엔드포인트 URL  : POST /api/partner/ptnr_ath_00
-  - 전용 쿼리 식별자    : PTNR-ATH-00-SQL-001, PTNR-ATH-00-SQL-002
-  - 상세 처리 비즈니스 로직:
-      1. 파트너 사업자 계정 인증 및 비밀번호 단방향 해시(PTNR_PWD_HASH, PWD_SALT) 대조
-      2. 심사 상태(APR_STAT_CD: 승인완료, 심사대기, 반려)에 따른 라우팅 분기 반환
-      3. 인증 성공 시 파트너 전용 JWT 세션 토큰 발급
-
---------------------------------------------------------------------------------
-[26] PTNR-ATH-01 : 파트너 입점 신청 (웰컴쿠폰)
-  - 지원 채널: Web [Y] / App [Y]
-  - 화면 프론트엔드 경로: SsulDak_Web/Partner/frontend/PTNR-ATH-01/index.jsx
-  - 백엔드 모듈 경로    : SsulDak_Web/Partner/backend/api_PTNR_ATH_01/route.js
-  - API 엔드포인트 URL  : POST /api/partner/ptnr_ath_01
-  - 전용 쿼리 식별자    : PTNR-ATH-01-SQL-001, PTNR-ATH-01-SQL-002
-  - 상세 처리 비즈니스 로직:
-      1. 국세청 홈택스 사업자등록번호 진위확인 API 연계 검증
-      2. 사업자증, 자격증, 보험증권 파일 및 대표자 전자서명 이미지 스토리지 저장
-      3. TB_PARTNER 생성 (심사 상태 WAITING 설정, 관리자 최종 승인 시 100% 무료 쿠폰 발급 연계)
-
---------------------------------------------------------------------------------
-[27] PTNR-DSH-00 : 파트너 메인 대시보드
-  - 지원 채널: Web [Y] / App [Y]
-  - 화면 프론트엔드 경로: SsulDak_Web/Partner/frontend/PTNR-DSH-00/index.jsx
-  - 백엔드 모듈 경로    : SsulDak_Web/Partner/backend/api_PTNR_DSH_00/route.js
-  - API 엔드포인트 URL  : POST /api/partner/ptnr_dsh_00
-  - 전용 쿼리 식별자    : PTNR-DSH-00-SQL-001, PTNR-DSH-00-SQL-002
-  - 상세 처리 비즈니스 로직:
-      1. 활동 지역/전문 분야 기반 신규 매칭 공고 수 실시간 집계
-      2. 보유 중인 배차지원 쿠폰(첫 배차 무료 쿠폰 등) 뱃지 및 영업 On/Off 토글 상태 갱신
-      3. 오늘 예정된 청소 시공 일정 타임라인 조회
-
---------------------------------------------------------------------------------
-[28] PTNR-DSH-01 : 서비스 가능 지역/분야 설정
-  - 지원 채널: Web [Y] / App [Y]
-  - 화면 프론트엔드 경로: SsulDak_Web/Partner/frontend/PTNR-DSH-01/index.jsx
-  - 백엔드 모듈 경로    : SsulDak_Web/Partner/backend/api_PTNR_DSH_01/route.js
-  - API 엔드포인트 URL  : POST /api/partner/ptnr_dsh_01
-  - 전용 쿼리 식별자    : PTNR-DSH-01-SQL-001, PTNR-DSH-01-SQL-002
-  - 상세 처리 비즈니스 로직:
-      1. 수신 희망 카테고리(정기청소, 가전케어, 입주청소) 체크 설정 저장
-      2. 활동 가능 출장 지역(최대 5개 시/군/구) 필터 설정 저장
-
---------------------------------------------------------------------------------
-[29] PTNR-DSH-02 : 파트너 프로필 관리
-  - 지원 채널: Web [Y] / App [Y]
-  - 화면 프론트엔드 경로: SsulDak_Web/Partner/frontend/PTNR-DSH-02/index.jsx
-  - 백엔드 모듈 경로    : SsulDak_Web/Partner/backend/api_PTNR_DSH_02/route.js
-  - API 엔드포인트 URL  : POST /api/partner/ptnr_dsh_02
-  - 전용 쿼리 식별자    : PTNR-DSH-02-SQL-001, PTNR-DSH-02-SQL-002
-  - 상세 처리 비즈니스 로직:
-      1. 업체 소개글, 보유 전문 청소 장비 태그 등록 및 갱신
-      2. 시공 전/후 포트폴리오 갤러리 이미지 업로드 및 관리
-
---------------------------------------------------------------------------------
-[30] PTNR-QOT-00 : 매칭 청약 공고 목록
-  - 지원 채널: Web [Y] / App [Y]
-  - 화면 프론트엔드 경로: SsulDak_Web/Partner/frontend/PTNR-QOT-00/index.jsx
-  - 백엔드 모듈 경로    : SsulDak_Web/Partner/backend/api_PTNR_QOT_00/route.js
-  - API 엔드포인트 URL  : POST /api/partner/ptnr_qot_00
-  - 전용 쿼리 식별자    : PTNR-QOT-00-SQL-001
-  - 상세 처리 비즈니스 로직:
-      1. 설정 지역/분야에 부합하는 고객의 확정 요청서 목록 필터링 조회
-      2. 정기(From-To 일수, 중분류 합계), 가전/입주 공고 및 배차지원 태그 표출
-
---------------------------------------------------------------------------------
-[31] PTNR-QOT-01 : 고객 요청서 상세 보기
-  - 지원 채널: Web [Y] / App [Y]
-  - 화면 프론트엔드 경로: SsulDak_Web/Partner/frontend/PTNR-QOT-01/index.jsx
-  - 백엔드 모듈 경로    : SsulDak_Web/Partner/backend/api_PTNR_QOT_01/route.js
-  - API 엔드포인트 URL  : POST /api/partner/ptnr_qot_01
-  - 전용 쿼리 식별자    : PTNR-QOT-01-SQL-001, PTNR-QOT-01-SQL-002
-  - 상세 처리 비즈니스 로직:
-      1. 고객 제시 확정 용역 대금 및 세부 중분류별 단가 상세 조회 (금액 수정 불가)
-      2. 파트너 데이터 이용료 = max(용역총액 * 3.3%, 33,000원) 사전 고지 데이터 반환
-
---------------------------------------------------------------------------------
-[32] PTNR-QOT-02 : 조건 수락 및 청약서 제출
-  - 지원 채널: Web [Y] / App [Y]
-  - 화면 프론트엔드 경로: SsulDak_Web/Partner/frontend/PTNR-QOT-02/index.jsx
-  - 백엔드 모듈 경로    : SsulDak_Web/Partner/backend/api_PTNR_QOT_02/route.js
-  - API 엔드포인트 URL  : POST /api/partner/ptnr_qot_02
-  - 전용 쿼리 식별자    : PTNR-QOT-02-SQL-001, PTNR-QOT-02-SQL-002
-  - 상세 처리 비즈니스 로직:
-      1. 고객 제시 금액 변조 방지(100% 수락 조건 검증)
-      2. 투입 인원수, 소요시간, 작업 계획 메시지 검증 후 TB_QUOTE_APPLY 등록
-
---------------------------------------------------------------------------------
-[33] PTNR-JOB-00 : 예약 및 작업 관리 (개정 과금)
-  - 지원 채널: Web [Y] / App [Y]
-  - 화면 프론트엔드 경로: SsulDak_Web/Partner/frontend/PTNR-JOB-00/index.jsx
-  - 백엔드 모듈 경로    : SsulDak_Web/Partner/backend/api_PTNR_JOB_00/route.js
-  - API 엔드포인트 URL  : POST /api/partner/ptnr_job_00
-  - 전용 쿼리 식별자    : PTNR-JOB-00-SQL-001, PTNR-JOB-00-SQL-002, PTNR-JOB-00-SQL-003
-  - 상세 처리 비즈니스 로직:
-      1. 고객 선결제 완료 확인 후 파트너 이용료 = max(용역총액 * 3.3%, 33,000원) 결제 진행
-      2. 신규 입점 100% 무료 쿠폰 적용 시 실 결제 0원(Free Pass)으로 PG창 바이패스 즉시 배차 확정
-      3. 확정 즉시 고객 0507 안심번호 공개 및 1:1 상담 채팅방(TB_CHAT_ROOM) 활성화
-
---------------------------------------------------------------------------------
-[34] PTNR-JOB-01 : 작업 상태 업데이트 모달
-  - 지원 채널: Web [Y] / App [Y]
-  - 화면 프론트엔드 경로: SsulDak_Web/Partner/frontend/PTNR-JOB-01/index.jsx
-  - 백엔드 모듈 경로    : SsulDak_Web/Partner/backend/api_PTNR_JOB_01/route.js
-  - API 엔드포인트 URL  : POST /api/partner/ptnr_job_01
-  - 전용 쿼리 식별자    : PTNR-JOB-01-SQL-001, PTNR-JOB-01-SQL-002
-  - 상세 처리 비즈니스 로직:
-      1. 출발 및 작업 시작 타임스탬프 기록
-      2. 작업 완료 보고 시 시공 전/후 사진 최소 2장 필수 검증 후 검수 요청 상태 전이
-
---------------------------------------------------------------------------------
-[35] PTNR-JOB-02 : 고객 1:1 상담 채팅
-  - 지원 채널: Web [Y] / App [Y]
-  - 화면 프론트엔드 경로: SsulDak_Web/Partner/frontend/PTNR-JOB-02/index.jsx
-  - 백엔드 모듈 경로    : SsulDak_Web/Partner/backend/api_PTNR_JOB_02/route.js
-  - API 엔드포인트 URL  : POST /api/partner/ptnr_job_02
-  - 전용 쿼리 식별자    : PTNR-JOB-02-SQL-001, PTNR-JOB-02-SQL-002
-  - 상세 처리 비즈니스 로직:
-      1. 상호 결제 완료된 계약 고객과의 실시간 1:1 메시지 및 현장 사진 송수신
-      2. 공동현관 비밀번호, 주차 협의 및 확정 작업 일정 캘린더 자동 동기화
-
---------------------------------------------------------------------------------
-[36] PTNR-SET-00 : 정산 및 매출 내역
-  - 지원 채널: Web [Y] / App [Y]
-  - 화면 프론트엔드 경로: SsulDak_Web/Partner/frontend/PTNR-SET-00/index.jsx
-  - 백엔드 모듈 경로    : SsulDak_Web/Partner/backend/api_PTNR_SET_00/route.js
-  - API 엔드포인트 URL  : POST /api/partner/ptnr_set_00
-  - 전용 쿼리 식별자    : PTNR-SET-00-SQL-001
-  - 상세 처리 비즈니스 로직:
-      1. 현장에서 고객에게 직접 수령한 총 청소 대금 누적 통계 조회
-      2. 납부한 데이터 이용료 및 프로모션 쿠폰 지원을 통해 절감된 수수료(Saved Cost) 리포트
-
---------------------------------------------------------------------------------
-[37] PTNR-SET-01 : 데이터 이용료 영수증
-  - 지원 채널: Web [Y] / App [Y]
-  - 화면 프론트엔드 경로: SsulDak_Web/Partner/frontend/PTNR-SET-01/index.jsx
-  - 백엔드 모듈 경로    : SsulDak_Web/Partner/backend/api_PTNR_SET_01/route.js
-  - API 엔드포인트 URL  : POST /api/partner/ptnr_set_01
-  - 전용 쿼리 식별자    : PTNR-SET-01-SQL-001
-  - 상세 처리 비즈니스 로직:
-      1. 프로모션 쿠폰 차감 후 실제 결제 승인 금액 기준 매입전표/세금계산서 데이터 조회
-      2. 전자세금계산서 PDF 스트리밍 생성 및 다운로드
-
---------------------------------------------------------------------------------
-[38] PTNR-SET-02 : 파트너 쿠폰 / 지원 혜택함
-  - 지원 채널: Web [Y] / App [Y]
-  - 화면 프론트엔드 경로: SsulDak_Web/Partner/frontend/PTNR-SET-02/index.jsx
-  - 백엔드 모듈 경로    : SsulDak_Web/Partner/backend/api_PTNR_SET_02/route.js
-  - API 엔드포인트 URL  : POST /api/partner/ptnr_set_02
-  - 전용 쿼리 식별자    : PTNR-SET-02-SQL-001, PTNR-SET-02-SQL-002
-  - 상세 처리 비즈니스 로직:
-      1. 신규 입점 1회 무료 쿠폰, 우수 기사 50% 할인 쿠폰 보유 현황 조회
-      2. 파트너 전용 지원 바우처 코드 입력 시 유효성 검증 후 쿠폰 발급
-
-
-################################################################################
-제 3 편. 관리자 화면 1:1 매핑 명세표 (Admin: 15개 화면)
-################################################################################
-
-[39] ADMN-ATH-00 : 관리자 로그인
-  - 지원 채널: Web [Y] / App [N] (모바일 관제 웹 지원)
-  - 화면 프론트엔드 경로: SsulDak_Web/Admin/frontend/ADMN-ATH-00/index.jsx
-  - 백엔드 모듈 경로    : SsulDak_Web/Admin/backend/api_ADMN_ATH_00/route.js
-  - API 엔드포인트 URL  : POST /api/admin/admn_ath_00
-  - 전용 쿼리 식별자    : ADMN-ATH-00-SQL-001, ADMN-ATH-00-SQL-002
-  - 상세 처리 비즈니스 로직:
-      1. 관리자 사원번호 및 단방향 해시 비밀번호(ADMIN_PWD_HASH, PWD_SALT) 대조
-      2. 2차 인증 Google Authenticator OTP 6자리 코드 검증
-      3. 인증 성공 시 관리자 전용 세션 발급 및 30분 미활동 보안 만료 설정
-
---------------------------------------------------------------------------------
-[40] ADMN-DSH-00 : 어드민 메인 대시보드
-  - 지원 채널: Web [Y] / App [N]
-  - 화면 프론트엔드 경로: SsulDak_Web/Admin/frontend/ADMN-DSH-00/index.jsx
-  - 백엔드 모듈 경로    : SsulDak_Web/Admin/backend/api_ADMN_DSH_00/route.js
-  - API 엔드포인트 URL  : POST /api/admin/admn_dsh_00
-  - 전용 쿼리 식별자    : ADMN-DSH-00-SQL-001, ADMN-DSH-00-SQL-002
-  - 상세 처리 비즈니스 로직:
-      1. 플랫폼 총 청소 용역 거래액 및 max(3.3%, 33,000원) 데이터 이용료 순수납액 집계
-      2. 프로모션 마케팅 예산 소진율 및 긴급 분쟁 접수 건 실시간 관제
-
---------------------------------------------------------------------------------
-[41] ADMN-PRM-00 : 프로모션 / 쿠폰 정책 관리
-  - 지원 채널: Web [Y] / App [N]
-  - 화면 프론트엔드 경로: SsulDak_Web/Admin/frontend/ADMN-PRM-00/index.jsx
-  - 백엔드 모듈 경로    : SsulDak_Web/Admin/backend/api_ADMN_PRM_00/route.js
-  - API 엔드포인트 URL  : POST /api/admin/admn_prm_00
-  - 전용 쿼리 식별자    : ADMN-PRM-00-SQL-001, ADMN-PRM-00-SQL-002
-  - 상세 처리 비즈니스 로직:
-      1. 캠페인 등록 시 활성화 여부(IS_ACTIVE_YN), 사용 기간(START_DT, END_DT), 유효일수, 예산 등록
-      2. 긴급 시 예산 동결(Budget Freeze) 스위치로 전체 프로모션 즉시 일괄 비활성화 통제
-
---------------------------------------------------------------------------------
-[42] ADMN-PRM-01 : 쿠폰 발행/대상자 발송 모달
-  - 지원 채널: Web [Y] / App [N]
-  - 화면 프론트엔드 경로: SsulDak_Web/Admin/frontend/ADMN-PRM-01/index.jsx
-  - 백엔드 모듈 경로    : SsulDak_Web/Admin/backend/api_ADMN_PRM_01/route.js
-  - API 엔드포인트 URL  : POST /api/admin/admn_prm_01
-  - 전용 쿼리 식별자    : ADMN-PRM-01-SQL-001, ADMN-PRM-01-SQL-002
-  - 상세 처리 비즈니스 로직:
-      1. 타겟 세그먼트(휴면 고객, 우수 기사 등) 조건 추출 및 푸시 발송 큐 등록
-      2. 외부 마케팅용 16자리 프로모션 시리얼 코드 대량 생성 및 엑셀 다운로드
-
---------------------------------------------------------------------------------
-[43] ADMN-SYS-01 : 공통 코드 관리
-  - 지원 채널: Web [Y] / App [N]
-  - 화면 프론트엔드 경로: SsulDak_Web/Admin/frontend/ADMN-SYS-01/index.jsx
-  - 백엔드 모듈 경로    : SsulDak_Web/Admin/backend/api_ADMN_SYS_01/route.js
-  - API 엔드포인트 URL  : POST /api/admin/admn_sys_01
-  - 전용 쿼리 식별자    : ADMN-SYS-01-SQL-001, ADMN-SYS-01-SQL-002
-  - 상세 처리 비즈니스 로직:
-      1. 코드 그룹(TB_COM_CODE_GRP) 및 상세 코드(TB_COM_CODE) CRUD
-      2. 정기(계단, 주위, 지하, 주차장, 복도), 가전, 입주 세부 중분류 코드 동적 등록/관리
-
---------------------------------------------------------------------------------
-[44] ADMN-SYS-02 : 최소 하한선/정책 관리
-  - 지원 채널: Web [Y] / App [N]
-  - 화면 프론트엔드 경로: SsulDak_Web/Admin/frontend/ADMN-SYS-02/index.jsx
-  - 백엔드 모듈 경로    : SsulDak_Web/Admin/backend/api_ADMN_SYS_02/route.js
-  - API 엔드포인트 URL  : POST /api/admin/admn_sys_02
-  - 전용 쿼리 식별자    : ADMN-SYS-02-SQL-001, ADMN-SYS-02-SQL-002
-  - 상세 처리 비즈니스 로직:
-      1. 건물 층수/면적별 최소 하한선(Floor Price) 파라미터 제어
-      2. 정기청소 의무 락(90일/3개월), 데이터 이용료 요율(3.3%), 최저액(33,000원), 제재 기간(7일) 설정
-
---------------------------------------------------------------------------------
-[45] ADMN-SYS-03 : 공지사항 / FAQ 관리
-  - 지원 채널: Web [Y] / App [N]
-  - 화면 프론트엔드 경로: SsulDak_Web/Admin/frontend/ADMN-SYS-03/index.jsx
-  - 백엔드 모듈 경로    : SsulDak_Web/Admin/backend/api_ADMN_SYS_03/route.js
-  - API 엔드포인트 URL  : POST /api/admin/admn_sys_03
-  - 전용 쿼리 식별자    : ADMN-SYS-03-SQL-001, ADMN-SYS-03-SQL-002
-  - 상세 처리 비즈니스 로직:
-      1. 공지사항, 프로모션 이벤트 안내문, 3개월 안심보증 가이드 작성 및 수정
-      2. 모바일 메인 홈 상단 팝업 배너 스케줄링 노출 제어
-
---------------------------------------------------------------------------------
-[46] ADMN-USR-00 : 이용자 회원 관리
-  - 지원 채널: Web [Y] / App [N]
-  - 화면 프론트엔드 경로: SsulDak_Web/Admin/frontend/ADMN-USR-00/index.jsx
-  - 백엔드 모듈 경로    : SsulDak_Web/Admin/backend/api_ADMN_USR_00/route.js
-  - API 엔드포인트 URL  : POST /api/admin/admn_usr_00
-  - 전용 쿼리 식별자    : ADMN-USR-00-SQL-001
-  - 상세 처리 비즈니스 로직:
-      1. 전체 이용자 목록 조회 및 인적사항/가입일 검색
-      2. 선 취소 패널티(7일 정지) 현황 조회 및 소명 시 관리자 수동 제재 해제
-
---------------------------------------------------------------------------------
-[47] ADMN-USR-01 : 이용자 상세 정보
-  - 지원 채널: Web [Y] / App [N]
-  - 화면 프론트엔드 경로: SsulDak_Web/Admin/frontend/ADMN-USR-01/index.jsx
-  - 백엔드 모듈 경로    : SsulDak_Web/Admin/backend/api_ADMN_USR_01/route.js
-  - API 엔드포인트 URL  : POST /api/admin/admn_usr_01
-  - 전용 쿼리 식별자    : ADMN-USR-01-SQL-001, ADMN-USR-01-SQL-002
-  - 상세 처리 비즈니스 로직:
-      1. 고객 프로필, 자필 서명 이미지, 요청서 발행 및 분리 계약 체결 이력 조회
-      2. 건별 적용된 쿠폰명 및 데이터 이용료 결제/환불 원장 대조
-
---------------------------------------------------------------------------------
-[48] ADMN-PTN-00 : 파트너 회원 관리
-  - 지원 채널: Web [Y] / App [N]
-  - 화면 프론트엔드 경로: SsulDak_Web/Admin/frontend/ADMN-PTN-00/index.jsx
-  - 백엔드 모듈 경로    : SsulDak_Web/Admin/backend/api_ADMN_PTN_00/route.js
-  - API 엔드포인트 URL  : POST /api/admin/admn_ptn_00
-  - 전용 쿼리 식별자    : ADMN-PTN-00-SQL-001
-  - 상세 처리 비즈니스 로직:
-      1. 전체 파트너 목록, 입점 심사 대기 리스트, 영업 상태 조회
-      2. 선 취소로 인한 7일 투찰 정지 상태 관리 및 인센티브 쿠폰 수동 지급
-
---------------------------------------------------------------------------------
-[49] ADMN-PTN-01 : 파트너 심사 상세 모달
-  - 지원 채널: Web [Y] / App [N]
-  - 화면 프론트엔드 경로: SsulDak_Web/Admin/frontend/ADMN-PTN-01/index.jsx
-  - 백엔드 모듈 경로    : SsulDak_Web/Admin/backend/api_ADMN_PTN_01/route.js
-  - API 엔드포인트 URL  : POST /api/admin/admn_ptn_01
-  - 전용 쿼리 식별자    : ADMN-PTN-01-SQL-001, ADMN-PTN-01-SQL-002, ADMN-PTN-01-SQL-003
-  - 상세 처리 비즈니스 로직:
-      1. 사업자증, 자격증, 보험증권, 청소 장비 사진 검증 및 국세청 진위 대조
-      2. 최종 승인 처리 즉시 '신규 입점 1회 100% 무료 쿠폰' 자동 발급 트리거 실행
-
---------------------------------------------------------------------------------
-[50] ADMN-REQ-00 : 전체 청소 요청/거래 관리
-  - 지원 채널: Web [Y] / App [N]
-  - 화면 프론트엔드 경로: SsulDak_Web/Admin/frontend/ADMN-REQ-00/index.jsx
-  - 백엔드 모듈 경로    : SsulDak_Web/Admin/backend/api_ADMN_REQ_00/route.js
-  - API 엔드포인트 URL  : POST /api/admin/admn_req_00
-  - 전용 쿼리 식별자    : ADMN-REQ-00-SQL-001
-  - 상세 처리 비즈니스 로직:
-      1. 통합 요청서(REQ) 및 하위 다중 중분류 슬롯별 계약 매칭 트리뷰 제공
-      2. 항목별 분리 계약 체결 상태 및 양측 데이터 이용료 결제 현황 모니터링
-
---------------------------------------------------------------------------------
-[51] ADMN-REQ-01 : 거래 상세 및 취소/분쟁 중재
-  - 지원 채널: Web [Y] / App [N]
-  - 화면 프론트엔드 경로: SsulDak_Web/Admin/frontend/ADMN-REQ-01/index.jsx
-  - 백엔드 모듈 경로    : SsulDak_Web/Admin/backend/api_ADMN_REQ_01/route.js
-  - API 엔드포인트 URL  : POST /api/admin/admn_req_01
-  - 전용 쿼리 식별자    : ADMN-REQ-01-SQL-001, ADMN-REQ-01-SQL-002, ADMN-REQ-01-SQL-003
-  - 상세 처리 비즈니스 로직:
-      1. 선(先) 취소자 자동 판정: 이용자 선 취소 시 7일 이내 50% 환불 / 7일 이후 전액 몰수 및 7일 정지 집행
-      2. 파트너 선 취소 시: 이용료 전액 몰수 및 7일 투찰 정지 집행
-      3. 3개월 책임 안심보증: 인근 동급 우수 마스터 파트너 대체 배차 승계 중재
-
---------------------------------------------------------------------------------
-[52] ADMN-PAY-00 : 데이터 이용료 수납 관리
-  - 지원 채널: Web [Y] / App [N]
-  - 화면 프론트엔드 경로: SsulDak_Web/Admin/frontend/ADMN-PAY-00/index.jsx
-  - 백엔드 모듈 경로    : SsulDak_Web/Admin/backend/api_ADMN_PAY_00/route.js
-  - API 엔드포인트 URL  : POST /api/admin/admn_pay_00
-  - 전용 쿼리 식별자    : ADMN-PAY-00-SQL-001
-  - 상세 처리 비즈니스 로직:
-      1. max(용역총액 * 3.3%, 33,000원) 정상 수납액 vs 프로모션 할인 차감액 분리 대사
-      2. PG 실제 승인 입금액과 회사 부담 마케팅 판촉비 일치 검증 리포트
-
---------------------------------------------------------------------------------
-[53] ADMN-PAY-01 : 전자세금계산서 발행
-  - 지원 채널: Web [Y] / App [N]
-  - 화면 프론트엔드 경로: SsulDak_Web/Admin/frontend/ADMN-PAY-01/index.jsx
-  - 백엔드 모듈 경로    : SsulDak_Web/Admin/backend/api_ADMN_PAY_01/route.js
-  - API 엔드포인트 URL  : POST /api/admin/admn_pay_01
-  - 전용 쿼리 식별자    : ADMN-PAY-01-SQL-001, ADMN-PAY-01-SQL-002
-  - 상세 처리 비즈니스 로직:
-      1. 프로모션 쿠폰 할인을 제외한 실제 승인 결제 금액 기준 공급가액/부가세 산정
-      2. 국세청 홈택스 API 연계 배치(Batch) 전자세금계산서/매입전표 일괄 발행
 ================================================================================
-6. AI 에이전트(Cursor / Antigravity) 구현 가이드라인
-코드 생성 전 경로 확인:
+7. APP 화면 목록 및 기능 상세 명세서 (개정 접두사: APP-)
+================================================================================
 
-코드를 생성하기 전 반드시 대상이 SsulDak_Web인지 SsulDak_App인지, 그리고 역할이 Admin, User, Partner 중 어디에 해당하는지 상위 디렉터리를 먼저 검증한다.
+[고객 영역 : Domain: Client / Role: C]
+1. 화면 ID: APP-CLNT-COM-000 | 구분: Main 화면 (하단 탭)
+   - 화면명: 고객 모바일 홈
+   - 프론트 경로: SseulDakGo_App/Client/screens/APP-CLNT-COM-000/index.tsx
+   - 백엔드 모듈: SseulDakGo_App/Client/backend/api_APP_CLNT_COM_000/route.js
+   - 관련 테이블: TB_USER, TB_ORDER_MSTR, TB_ORDER_DTL, TB_COM_CODE
+   - 개요: 네이티브 메인 탭, 3대 청소 퀵 카드, 실시간 접수 피드, [우리 집 청소 요청 등록하기] 플로팅 CTA.
+2. 화면 ID: APP-CLNT-REQ-000 | 구분: Sub 화면 (풀스크린 모달)
+   - 화면명: 청소 서비스 신청 (청소 요청 등록)
+   - 프론트 경로: SseulDakGo_App/Client/screens/APP-CLNT-REQ-000/index.tsx
+   - 백엔드 모듈: SseulDakGo_App/Client/backend/api_APP_CLNT_REQ_000/route.js
+   - 관련 테이블: TB_ORDER_MSTR, TB_ORDER_DTL, TB_ORDER_PHOTO, TB_COM_CODE
+   - 개요: 웹과 100% 동일한 3대 TAB 입력 폼, 카메라 즉시 촬영, 고객 확정 지정가 입력, 비회원 작성 시 AsyncStorage 임시 저장 후 로그인 유도.
+3. 화면 ID: APP-CLNT-REQ-001 | 구분: Sub 화면 (모달)
+   - 화면명: 현장 도로명 주소 검색
+   - 프론트 경로: SseulDakGo_App/Client/screens/APP-CLNT-REQ-001/index.tsx
+   - 백엔드 모듈: SseulDakGo_App/Client/backend/api_APP_CLNT_REQ_001/route.js
+   - 관련 테이블: TB_COM_CODE
+   - 개요: 모바일 웹뷰 기반 도로명 주소 검색 팝업.
+4. 화면 ID: APP-CLNT-ATH-000 | 구분: Sub 화면 (모달)
+   - 화면명: 고객 모바일 로그인
+   - 프론트 경로: SseulDakGo_App/Client/screens/APP-CLNT-ATH-000/index.tsx
+   - 백엔드 모듈: SseulDakGo_App/Client/backend/api_APP_CLNT_ATH_000/route.js
+   - 관련 테이블: TB_USER
+   - 개요: 고객 로그인, 아이디 저장(C 구분자 보존), 소셜 SDK 간편 로그인, 성공 시 임시 발주 데이터 100% 자동 조립 복원.
+5. 화면 ID: APP-CLNT-ATH-010 | 구분: Sub 화면 (풀스크린 모달)
+   - 화면명: 통합 회원가입 및 4대 약관 정독
+   - 프론트 경로: SseulDakGo_App/Client/screens/APP-CLNT-ATH-010/index.tsx
+   - 백엔드 모듈: SseulDakGo_App/Client/backend/api_APP_CLNT_ATH_010/route.js
+   - 관련 테이블: TB_USER, TB_TERMS_MASTER, TB_TERMS_VERSION, TB_TERMS_AGREE_SIGN
+   - 개요: 고객/용역 선택 세그먼트, 모바일 PASS 본인확인, 4대 약관 100% 스크롤락 집행.
+6. 화면 ID: APP-CLNT-ATH-011 | 구분: Sub 화면 (모달)
+   - 화면명: 고객 가입 완료 환영 안내
+   - 프론트 경로: SseulDakGo_App/Client/screens/APP-CLNT-ATH-011/index.tsx
+   - 백엔드 모듈: SseulDakGo_App/Client/backend/api_APP_CLNT_ATH_011/route.js
+   - 관련 테이블: TB_USER
+   - 개요: 가입 환영 안내 및 청소 요청 등록 모달 즉시 연결.
+7. 화면 ID: APP-CLNT-ORD-000 | 구분: Main 화면 (하단 탭)
+   - 화면명: 나의 청소 신청 현황
+   - 프론트 경로: SseulDakGo_App/Client/screens/APP-CLNT-ORD-000/index.tsx
+   - 백엔드 모듈: SseulDakGo_App/Client/backend/api_APP_CLNT_ORD_000/route.js
+   - 관련 테이블: TB_ORDER_MSTR, TB_ORDER_DTL, TB_QUOTE_APPLY, TB_USER
+   - 개요: 발주 목록 조회 및 상태별 필터, 7일 타이머 표출.
+8. 화면 ID: APP-CLNT-ORD-001 | 구분: Sub 화면
+   - 화면명: 발주 상세 및 용역 청약서 비교/선택
+   - 프론트 경로: SseulDakGo_App/Client/screens/APP-CLNT-ORD-001/index.tsx
+   - 백엔드 모듈: SseulDakGo_App/Client/backend/api_APP_CLNT_ORD_001/route.js
+   - 관련 테이블: TB_ORDER_MSTR, TB_ORDER_DTL, TB_QUOTE_APPLY, TB_USER
+   - 개요: 용역별 제안 일자, 시각(HH:mm), 소요시간, 투입인원 비교 후 최적 1인 선택.
+9. 화면 ID: APP-CLNT-PAY-000 | 구분: Sub 화면 (모달)
+   - 화면명: 고객 데이터 이용료 결제 및 배타적 계약 확정
+   - 프론트 경로: SseulDakGo_App/Client/screens/APP-CLNT-PAY-000/index.tsx
+   - 백엔드 모듈: SseulDakGo_App/Client/backend/api_APP_CLNT_PAY_000/route.js
+   - 관련 테이블: TB_ORDER_MSTR, TB_ORDER_DTL, TB_CLEAN_CONTRACT, TB_ALLIANCE_SETTLE_DTL
+   - 개요: 16,500원 인앱 결제, 배타적 계약 체결 및 타 중분류 WAIT_CLOSED 마감.
+10. 화면 ID: APP-CLNT-JOB-000 | 구분: Sub 화면
+    - 화면명: 현장 검수 및 청소 완료 승인
+    - 프론트 경로: SseulDakGo_App/Client/screens/APP-CLNT-JOB-000/index.tsx
+    - 백엔드 모듈: SseulDakGo_App/Client/backend/api_APP_CLNT_JOB_000/route.js
+    - 관련 테이블: TB_ORDER_MSTR, TB_ORDER_DTL, TB_ORDER_PHOTO, TB_CLEAN_CONTRACT
+    - 개요: 전/후 사진 갤러리 확인, 청소 완료 승인 및 확정 대금 현장 직불 계좌 확인.
 
-단일 책임 원칙(SRP) 엄수:
+[용역 영역 : Domain: Service / Role: S]
+1. 화면 ID: APP-SRVC-MAIN-000 | 구분: Main 화면 (하단 탭)
+   - 화면명: 용역 서비스 모바일 홈
+   - 프론트 경로: SseulDakGo_App/Service/screens/APP-SRVC-MAIN-000/index.tsx
+   - 백엔드 모듈: SseulDakGo_App/Service/backend/api_APP_SRVC_MAIN_000/route.js
+   - 관련 테이블: TB_USER, TB_ORDER_MSTR, TB_ORDER_DTL, TB_QUOTE_APPLY
+   - 개요: 카테고리별 신규 건수 배너, 활동 지표, 영업 On/Off 토글, 일감 히트맵 지도.
+2. 화면 ID: APP-SRVC-ATH-000 | 구분: Sub 화면 (모달)
+   - 화면명: 용역 서비스 모바일 로그인
+   - 프론트 경로: SseulDakGo_App/Service/screens/APP-SRVC-ATH-000/index.tsx
+   - 백엔드 모듈: SseulDakGo_App/Service/backend/api_APP_SRVC_ATH_000/route.js
+   - 관련 테이블: TB_USER
+   - 개요: 용역 로그인, 아이디 저장(S 구분자 보존), 로그인 성공 시 임시 청약 데이터 자동 복원.
+3. 화면 ID: APP-SRVC-ATH-001 | 구분: Main 화면
+   - 화면명: 사업자등록증 원본 촬영/업로드 및 OCR AI 진위 검증
+   - 프론트 경로: SseulDakGo_App/Service/screens/APP-SRVC-ATH-001/index.tsx
+   - 백엔드 모듈: SseulDakGo_App/Service/backend/api_APP_SRVC_ATH_001/route.js
+   - 관련 테이블: TB_USER, TB_SERVICE_DOC
+   - 개요: 카메라 직접 촬영, CLOVA OCR 자동 파싱, 국세청 및 대표자 본인확인 3자 교차 검증.
+4. 화면 ID: APP-SRVC-ATH-002 | 구분: Main 화면
+   - 화면명: 용역 위탁계약서 및 전자서명
+   - 프론트 경로: SseulDakGo_App/Service/screens/APP-SRVC-ATH-002/index.tsx
+   - 백엔드 모듈: SseulDakGo_App/Service/backend/api_APP_SRVC_ATH_002/route.js
+   - 관련 테이블: TB_USER, TB_TERMS_MASTER, TB_TERMS_VERSION, TB_TERMS_AGREE_SIGN
+   - 개요: 모바일 터치 패드 자필 전자서명 등록.
+5. 화면 ID: APP-SRVC-ORD-000 | 구분: Main 화면 (하단 탭)
+   - 화면명: 실시간 일감 공고 목록
+   - 프론트 경로: SseulDakGo_App/Service/screens/APP-SRVC-ORD-000/index.tsx
+   - 백엔드 모듈: SseulDakGo_App/Service/backend/api_APP_SRVC_ORD_000/route.js
+   - 관련 테이블: TB_ORDER_MSTR, TB_ORDER_DTL, TB_SERVICE_REGION, TB_COM_CODE
+   - 개요: 활동 희망 지역(최대 10개) 내 청약 접수 중인 공고 리스트.
+6. 화면 ID: APP-SRVC-ORD-001 | 구분: Sub 화면 (모달)
+   - 화면명: 청소 발주 상세 정보
+   - 프론트 경로: SseulDakGo_App/Service/screens/APP-SRVC-ORD-001/index.tsx
+   - 백엔드 모듈: SseulDakGo_App/Service/backend/api_APP_SRVC_ORD_001/route.js
+   - 관련 테이블: TB_ORDER_MSTR, TB_ORDER_DTL, TB_ORDER_PHOTO, TB_COM_CODE
+   - 개요: 고객 확정 지정 대금 확인(역경매 없음), 비회원 청약 터치 시 임시 저장 후 로그인 유도.
+7. 화면 ID: APP-SRVC-QOT-000 | 구분: Sub 화면 (모달)
+   - 화면명: 청약서 작성 및 방문 일정 제안
+   - 프론트 경로: SseulDakGo_App/Service/screens/APP-SRVC-QOT-000/index.tsx
+   - 백엔드 모듈: SseulDakGo_App/Service/backend/api_APP_SRVC_QOT_000/route.js
+   - 관련 테이블: TB_ORDER_MSTR, TB_ORDER_DTL, TB_QUOTE_APPLY, TB_USER
+   - 개요: 고객 확정가 100% 수락, 방문일자/시간대(HH:mm)/소요시간 입력, 자전거래 및 일정 중복 차단 검증.
+8. 화면 ID: APP-SRVC-JOB-000 | 구분: Main 화면 (하단 탭)
+   - 화면명: 시공 작업 관리 및 캘린더
+   - 프론트 경로: SseulDakGo_App/Service/screens/APP-SRVC-JOB-000/index.tsx
+   - 백엔드 모듈: SseulDakGo_App/Service/backend/api_APP_SRVC_JOB_000/route.js
+   - 관련 테이블: TB_CLEAN_CONTRACT, TB_ORDER_MSTR, TB_ORDER_DTL, TB_USER
+   - 개요: 시공 캘린더, 고객 안심번호(0507) 원터치 통화 연결, 상태 전이 제어.
+9. 화면 ID: APP-SRVC-JOB-001 | 구분: Sub 화면
+   - 화면명: 시공 전/후 사진 촬영 및 검수 요청
+   - 프론트 경로: SseulDakGo_App/Service/screens/APP-SRVC-JOB-001/index.tsx
+   - 백엔드 모듈: SseulDakGo_App/Service/backend/api_APP_SRVC_JOB_001/route.js
+   - 관련 테이블: TB_ORDER_MSTR, TB_ORDER_DTL, TB_ORDER_PHOTO, TB_CLEAN_CONTRACT
+   - 개요: 전/후 사진 즉시 촬영 및 서버 물리 폴더 자동 저장, 푸시 알림 검수 요청.
+10. 화면 ID: APP-SRVC-SET-000 | 구분: Main 화면 (하단 탭)
+    - 화면명: 용역 정산 및 활동 지역 설정
+    - 프론트 경로: SseulDakGo_App/Service/screens/APP-SRVC-SET-000/index.tsx
+    - 백엔드 모듈: SseulDakGo_App/Service/backend/api_APP_SRVC_SET_000/route.js
+    - 관련 테이블: TB_USER, TB_SERVICE_REGION, TB_CLEAN_CONTRACT
+    - 개요: 활동 지역 설정(최대 10개 엄격 제한 통제), 직불 수령 및 이용료 납부 내역 조회.
 
-특정 화면 ID를 구현할 때는 오직 해당 화면 프론트엔드 폴더({SCREEN-ID}/)와 해당 백엔드 폴더(api_{SCREEN_ID_UNDER}/) 내에서만 파일 생성을 완결한다.
+[관리 영역 : Domain: Admin / Role: A]
+1. 화면 ID: APP-ADMN-DSH-000 | 구분: Main 화면
+   - 화면명: 모바일 종합 관제 대시보드
+   - 프론트 경로: SseulDakGo_App/Admin/screens/APP-ADMN-DSH-000/index.tsx
+   - 백엔드 모듈: SseulDakGo_App/Admin/backend/api_APP_ADMN_DSH_000/route.js
+   - 관련 테이블: TB_ORDER_MSTR, TB_ORDER_DTL, TB_CLEAN_CONTRACT, TB_USER
+   - 개요: 당일 거래액/순익 지표, 상위 5대 핫스팟 요약, 긴급 알림 뱃지 표출.
+2. 화면 ID: APP-ADMN-ATH-000 | 구분: Main 화면
+   - 화면명: 관리자 모바일 보안 로그인
+   - 프론트 경로: SseulDakGo_App/Admin/screens/APP-ADMN-ATH-000/index.tsx
+   - 백엔드 모듈: SseulDakGo_App/Admin/backend/api_APP_ADMN_ATH_000/route.js
+   - 관련 테이블: TB_USER
+   - 개요: 사원 ID, 비밀번호 및 OTP 2차 인증.
+3. 화면 ID: APP-ADMN-ORD-000 | 구분: Main 화면
+   - 화면명: 모바일 발주/계약 관제
+   - 프론트 경로: SseulDakGo_App/Admin/screens/APP-ADMN-ORD-000/index.tsx
+   - 백엔드 모듈: SseulDakGo_App/Admin/backend/api_APP_ADMN_ORD_000/route.js
+   - 관련 테이블: TB_ORDER_MSTR, TB_ORDER_DTL, TB_CLEAN_CONTRACT
+   - 개요: 7일 초과 미체결 자동 만료 추적 및 배타적 계약 확정 모니터링.
+4. 화면 ID: APP-ADMN-ALC-000 | 구분: Main 화면
+   - 화면명: 모바일 제휴사 정산 관제
+   - 프론트 경로: SseulDakGo_App/Admin/screens/APP-ADMN-ALC-000/index.tsx
+   - 백엔드 모듈: SseulDakGo_App/Admin/backend/api_APP_ADMN_ALC_000/route.js
+   - 관련 테이블: TB_ALLIANCE_COMPANY, TB_ALLIANCE_SETTLE_DTL, TB_CLEAN_CONTRACT
+   - 개요: 제휴사별 거래액, 플랫폼 순익, 배분 수수료 현황 조회.
+5. 화면 ID: APP-ADMN-PTN-000 | 구분: Main 화면
+   - 화면명: 모바일 용역 서비스 입점 심사
+   - 프론트 경로: SseulDakGo_App/Admin/screens/APP-ADMN-PTN-000/index.tsx
+   - 백엔드 모듈: SseulDakGo_App/Admin/backend/api_APP_ADMN_PTN_000/route.js
+   - 관련 테이블: TB_USER, TB_SERVICE_DOC
+   - 개요: 사업자등록증 OCR 파싱 결과 및 3자 검증 내역 확인 후 모바일 원터치 승인.
+6. 화면 ID: APP-ADMN-DSP-000 | 구분: Main 화면
+   - 화면명: 모바일 긴급 분쟁 중재
+   - 프론트 경로: SseulDakGo_App/Admin/screens/APP-ADMN-DSP-000/index.tsx
+   - 백엔드 모듈: SseulDakGo_App/Admin/backend/api_APP_ADMN_DSP_000/route.js
+   - 관련 테이블: TB_CLEAN_CONTRACT, TB_ORDER_MSTR, TB_USER
+   - 개요: 일방 취소/분쟁 실시간 푸시 수신, 선취소 위약금 집행 및 대체 배차 승계.
 
-취소 환불 로직 구현 시 주의:
 
-USER-HIS-01 및 ADMN-REQ-01 구현 시 이용자 취소 건에 대해서는 결제 후 7일 이내 50% 환불, 7일 초과 100% 몰수 연산 로직을 반드시 포함한다.
+================================================================================
+8. 전체 엔드투엔드(End-to-End) 워크플로우 (역경매 배제 및 확정가 청약)
+================================================================================
+
+8.1 비회원 고객 청소 요청 및 로컬스토리지 조립 흐름
+[비회원 고객: https://sseuldakgo.kr/client/ 또는 모바일 앱 접속]
+       │
+       ▼ [청소 요청 등록 버튼 터치]
+[고객 홈 하위 모달: 청소 요청 입력 화면 (WEB-CLNT-REQ-000 / APP-CLNT-REQ-000)]
+  * 정회원 화면과 100% 동일한 3대 TAB 레이아웃
+  * [정기청소] / [입주청소] / [계절가전] TAB 선택
+  * 청소 희망 조건 및 고객이 지불할 '확정 용역 대금(지정가)' 직접 입력
+       │
+       ▼ [청소 요청 등록 버튼 터치]
+[인증 감지: 비회원 상태 확인]
+       │
+       ├─ 입력 폼 데이터 전체를 로컬스토리지(AsyncStorage)에 직렬화 저장
+       │  (Key: SSEULDAKGO_GUEST_TEMP_REQ)
+       ▼
+[로그인 모달 호출 (WEB-CLNT-ATH-000 / APP-CLNT-ATH-000)]
+  * 회원구분: [ (●) 고객  ( ) 용역 ] 선택 라디오
+  * [아이디 저장], [로그인 상태 유지] 체크박스
+  * 이메일/비밀번호 또는 SNS 간편 로그인
+       │
+       ├─ (미가입 고객인 경우) ──> [회원가입 모달] 이동 -> 가입 완료 -> 로그인 모달 복귀
+       ▼ (로그인 성공)
+[아이디 저장 처리]:
+  * 선택된 회원구분('C') 및 이메일 로컬스토리지에 영구 보관 (다음 로그인 시 자동 채움)
+       │
+       ▼
+[로컬스토리지 검사]: SSEULDAKGO_GUEST_TEMP_REQ 데이터 존재 확인
+       │
+       ▼
+[청소 요청 모달 재호출 및 데이터 100% 자동 조립(Pre-fill)]
+  * 작성 중이던 해당 TAB 자동 활성화
+  * 고객이 조립된 조건 및 확정 금액을 확인하고 자유롭게 수정 가능
+       │
+       ▼ [최종 청소 요청 등록 터치]
+[DB 적재]:
+  * 주발주 마스터(TB_ORDER_MSTR): PROPOSED_PRICE에 고객 지정 확정가 저장, BID_OPEN (7일 만료 카운트다운 시작)
+  * 중분류 상세(TB_ORDER_DTL): WAIT_BID 상태 등록
+  * 로컬스토리지 임시 데이터 영구 삭제
+
+8.2 비회원 용역(서비스) 일감 탐색 및 확정가 청약 제출 흐름 (역경매 없음)
+[비회원 용역: https://sseuldakgo.kr/service/ 또는 모바일 앱 접속]
+  * 카테고리별 신규 등록 건수 표출: [정기청소 N건] | [입주청소 N건] | [계절가전 N건]
+  * 청약 건수, 체결 건수 대시보드 표출
+       │
+       ▼ [원하는 카테고리 신규 건수 터치]
+[공고 목록 리스트 화면 출력 (WEB-SRVC-ORD-000 / APP-SRVC-ORD-000)]
+       │
+       ▼ [특정 일감 공고 선택]
+[공고 상세 정보 모달 화면 출력 (WEB-SRVC-ORD-001 / APP-SRVC-ORD-001)]
+  * 고객이 지정한 확정 용역 대금 확인 (금액 수정/입찰 불가)
+  * 수주 시 용역 납부 데이터 이용료 구간 사전 확인
+       │
+       ▼ [청약하기 버튼 터치]
+[인증 감지: 비회원 상태 확인]
+       │
+       ├─ 선택된 청약 대상 정보(ORDER_NO, ORDER_DTL_NO) 로컬스토리지에 임시 저장
+       ▼
+[용역 로그인 모달 호출 (WEB-SRVC-ATH-000 / APP-SRVC-ATH-000)]
+  * 회원구분: [ ( ) 고객  (●) 용역 ] 자동 세팅
+  * [아이디 저장] 시 'S' 구분값과 아이디 자동 기억
+       │
+       ├─ (미가입 용역인 경우) ──> [회원가입 모달] -> 사업자등록증 OCR 및 진위 검증 -> 로그인 복귀
+       ▼ (로그인 성공)
+[로컬스토리지 청약 임시 데이터 감지]
+       │
+       ▼
+[청소 상세 정보 및 청약 입력 모달 즉시 호출 (데이터 자동 조립)]
+  * 금액 입력 필드 없음 (고객 확정가 100% 수락 동의)
+  * From-To 기간 내 방문 가능 일자 선택
+  * 오전/오후 구분, 구체적 방문 시작시각(HH:mm), 소요시간 입력
+  * 투입 인원 및 전문 장비/경력 어필 메시지 입력
+       │
+       ▼ [청약서 제출 터치]
+[백엔드 유효성 및 자전거래 검증 (API_WEB-SRVC-QOT-000 / API_APP-SRVC-QOT-000)]:
+  * [검증 1: 자전거래 차단] 발주 고객과 용역회원의 전화번호/이메일/SNS UID 일치 시 차단
+  * [검증 2: 시간대 충돌 방지] 해당 용역의 기존 체결/청약 일정과 동일 일자·시간대 겹침 시 차단
+       │
+       ▼ (검증 통과)
+[TB_QUOTE_APPLY 테이블에 청약 정보 저장 (START_TIME, WORK_HOURS 등 포함)]
+[로컬스토리지 청약 임시 데이터 영구 삭제]
+
+8.3 배타적 계약 확정 및 제휴 수수료 정산 마감 흐름
+[고객: 확정 금액으로 청약한 용역들의 일정/어필/평점 비교 후 최적 1인 선택 및 결제]
+       │
+       ▼ [트랜잭션 실행]
+1. 주발주 마스터(TB_ORDER_MSTR): 'CNTR_CONFIRMED'(청약계약확정) 전이
+2. 채택된 중분류(TB_ORDER_DTL) : 'APPR_CONTRACT'(계약확정) 전이
+3. 미선택 중분류(TB_ORDER_DTL) : 'WAIT_CLOSED'(청약대기종료) 일괄 자동 마감
+4. 계약 마스터(TB_CLEAN_CONTRACT) 생성 (고객 확정 대금 및 확정 시공일시 HH:mm 기록)
+       │
+       ▼ [제휴 유입 건인 경우 (ALLIANCE_CD 존재 시)]
+[TB_ALLIANCE_SETTLE_DTL 실시간 적재]:
+  * 고객 이용료(16,500원) + 용역 이용료 합산
+  * 건당 고정경비 5,000원 공제 -> 플랫폼 순익 산출
+  * 제휴사 약정 요율/정액 계산 후 ALLIANCE_COMM_AMT 적립 (상태: ACCUMULATED)
+       │
+       ▼ [현장 시공 완료 및 고객 검수 승인]
+[고객이 용역에게 확정 대금(100%) 현장 직접 지불]
+[주발주 마스터: 'SVC_COMPLETED' 전이]
+       │
+       ▼ [월말 관리자 정산 마감: WEB-ADMN-ALC-000 / APP-ADMN-ALC-000]
+[관리자 '정산 마감 확정' 승인]:
+  * 상태: 'CLOSED' -> 제휴사 세금계산서 수취 -> 은행 이체 실행 -> 'TRANSFERRED' 마감
+  * 주발주 마스터 최종 'SETTL_COMPLETED' 전이로 전체 라이프사이클 종료
+================================================================================

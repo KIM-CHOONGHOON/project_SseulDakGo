@@ -1364,7 +1364,7 @@
           return dispatcher;
         }
         "undefined" !== typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ && "function" === typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart && __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart(Error());
-        var React42 = require_react(), Internals = {
+        var React43 = require_react(), Internals = {
           d: {
             f: noop,
             r: function() {
@@ -1382,7 +1382,7 @@
           },
           p: 0,
           findDOMNode: null
-        }, REACT_PORTAL_TYPE = /* @__PURE__ */ Symbol.for("react.portal"), REACT_RECOVERABLE_TYPE = /* @__PURE__ */ Symbol.for("react.recoverable"), REACT_OPTIMISTIC_KEY = /* @__PURE__ */ Symbol.for("react.optimistic_key"), ReactSharedInternals = React42.__CLIENT_INTERNALS_DO_NOT_USE_OR_WARN_USERS_THEY_CANNOT_UPGRADE;
+        }, REACT_PORTAL_TYPE = /* @__PURE__ */ Symbol.for("react.portal"), REACT_RECOVERABLE_TYPE = /* @__PURE__ */ Symbol.for("react.recoverable"), REACT_OPTIMISTIC_KEY = /* @__PURE__ */ Symbol.for("react.optimistic_key"), ReactSharedInternals = React43.__CLIENT_INTERNALS_DO_NOT_USE_OR_WARN_USERS_THEY_CANNOT_UPGRADE;
         "function" === typeof Map && null != Map.prototype && "function" === typeof Map.prototype.forEach && "function" === typeof Set && null != Set.prototype && "function" === typeof Set.prototype.clear && "function" === typeof Set.prototype.forEach || console.error(
           "React depends on Map and Set built-in types. Make sure that you load a polyfill in older browsers. https://reactjs.org/link/react-polyfills"
         );
@@ -3068,7 +3068,7 @@
           node.defaultValue !== "" + value && (node.defaultValue = "" + value);
         }
         function validateOptionProps(element, props) {
-          null == props.value && ("object" === typeof props.children && null !== props.children ? React42.Children.forEach(props.children, function(child) {
+          null == props.value && ("object" === typeof props.children && null !== props.children ? React43.Children.forEach(props.children, function(child) {
             null == child || "string" === typeof child || "number" === typeof child || "bigint" === typeof child || didWarnInvalidChild || (didWarnInvalidChild = true, console.error(
               "Cannot infer the option value of complex children. Pass a `value` prop or use a plain string as children to <option>."
             ));
@@ -20216,11 +20216,11 @@
           ));
         }
         "undefined" !== typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ && "function" === typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart && __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart(Error());
-        var Scheduler = require_scheduler(), React42 = require_react(), ReactDOM2 = require_react_dom(), searchTarget = null, searchBoundary = null, assign = Object.assign, REACT_LEGACY_ELEMENT_TYPE = /* @__PURE__ */ Symbol.for("react.element"), REACT_ELEMENT_TYPE = /* @__PURE__ */ Symbol.for("react.transitional.element"), REACT_PORTAL_TYPE = /* @__PURE__ */ Symbol.for("react.portal"), REACT_FRAGMENT_TYPE = /* @__PURE__ */ Symbol.for("react.fragment"), REACT_STRICT_MODE_TYPE = /* @__PURE__ */ Symbol.for("react.strict_mode"), REACT_PROFILER_TYPE = /* @__PURE__ */ Symbol.for("react.profiler"), REACT_CONSUMER_TYPE = /* @__PURE__ */ Symbol.for("react.consumer"), REACT_CONTEXT_TYPE = /* @__PURE__ */ Symbol.for("react.context"), REACT_FORWARD_REF_TYPE = /* @__PURE__ */ Symbol.for("react.forward_ref"), REACT_SUSPENSE_TYPE = /* @__PURE__ */ Symbol.for("react.suspense"), REACT_SUSPENSE_LIST_TYPE = /* @__PURE__ */ Symbol.for("react.suspense_list"), REACT_MEMO_TYPE = /* @__PURE__ */ Symbol.for("react.memo"), REACT_LAZY_TYPE = /* @__PURE__ */ Symbol.for("react.lazy");
+        var Scheduler = require_scheduler(), React43 = require_react(), ReactDOM2 = require_react_dom(), searchTarget = null, searchBoundary = null, assign = Object.assign, REACT_LEGACY_ELEMENT_TYPE = /* @__PURE__ */ Symbol.for("react.element"), REACT_ELEMENT_TYPE = /* @__PURE__ */ Symbol.for("react.transitional.element"), REACT_PORTAL_TYPE = /* @__PURE__ */ Symbol.for("react.portal"), REACT_FRAGMENT_TYPE = /* @__PURE__ */ Symbol.for("react.fragment"), REACT_STRICT_MODE_TYPE = /* @__PURE__ */ Symbol.for("react.strict_mode"), REACT_PROFILER_TYPE = /* @__PURE__ */ Symbol.for("react.profiler"), REACT_CONSUMER_TYPE = /* @__PURE__ */ Symbol.for("react.consumer"), REACT_CONTEXT_TYPE = /* @__PURE__ */ Symbol.for("react.context"), REACT_FORWARD_REF_TYPE = /* @__PURE__ */ Symbol.for("react.forward_ref"), REACT_SUSPENSE_TYPE = /* @__PURE__ */ Symbol.for("react.suspense"), REACT_SUSPENSE_LIST_TYPE = /* @__PURE__ */ Symbol.for("react.suspense_list"), REACT_MEMO_TYPE = /* @__PURE__ */ Symbol.for("react.memo"), REACT_LAZY_TYPE = /* @__PURE__ */ Symbol.for("react.lazy");
         /* @__PURE__ */ Symbol.for("react.scope");
         var REACT_ACTIVITY_TYPE = /* @__PURE__ */ Symbol.for("react.activity"), REACT_LEGACY_HIDDEN_TYPE = /* @__PURE__ */ Symbol.for("react.legacy_hidden");
         /* @__PURE__ */ Symbol.for("react.tracing_marker");
-        var REACT_MEMO_CACHE_SENTINEL = /* @__PURE__ */ Symbol.for("react.memo_cache_sentinel"), REACT_VIEW_TRANSITION_TYPE = /* @__PURE__ */ Symbol.for("react.view_transition"), REACT_RECOVERABLE_TYPE = /* @__PURE__ */ Symbol.for("react.recoverable"), MAYBE_ITERATOR_SYMBOL = Symbol.iterator, REACT_CLIENT_REFERENCE = /* @__PURE__ */ Symbol.for("react.client.reference"), isArrayImpl = Array.isArray, ReactSharedInternals = React42.__CLIENT_INTERNALS_DO_NOT_USE_OR_WARN_USERS_THEY_CANNOT_UPGRADE, ReactDOMSharedInternals = ReactDOM2.__DOM_INTERNALS_DO_NOT_USE_OR_WARN_USERS_THEY_CANNOT_UPGRADE, NotPending = Object.freeze({
+        var REACT_MEMO_CACHE_SENTINEL = /* @__PURE__ */ Symbol.for("react.memo_cache_sentinel"), REACT_VIEW_TRANSITION_TYPE = /* @__PURE__ */ Symbol.for("react.view_transition"), REACT_RECOVERABLE_TYPE = /* @__PURE__ */ Symbol.for("react.recoverable"), MAYBE_ITERATOR_SYMBOL = Symbol.iterator, REACT_CLIENT_REFERENCE = /* @__PURE__ */ Symbol.for("react.client.reference"), isArrayImpl = Array.isArray, ReactSharedInternals = React43.__CLIENT_INTERNALS_DO_NOT_USE_OR_WARN_USERS_THEY_CANNOT_UPGRADE, ReactDOMSharedInternals = ReactDOM2.__DOM_INTERNALS_DO_NOT_USE_OR_WARN_USERS_THEY_CANNOT_UPGRADE, NotPending = Object.freeze({
           pending: false,
           data: null,
           method: null,
@@ -23412,7 +23412,7 @@
           }
         };
         (function() {
-          var isomorphicReactPackageVersion = React42.version;
+          var isomorphicReactPackageVersion = React43.version;
           if ("19.3.1" !== isomorphicReactPackageVersion)
             throw Error(
               'Incompatible React versions: The "react" and "react-dom" packages must have the exact same version. Instead got:\n  - react:      ' + (isomorphicReactPackageVersion + "\n  - react-dom:  19.3.1\nLearn more: https://react.dev/warnings/version-mismatch")
@@ -23768,18 +23768,18 @@
         function isValidElement(object) {
           return "object" === typeof object && null !== object && object.$$typeof === REACT_ELEMENT_TYPE;
         }
-        var React42 = require_react(), REACT_ELEMENT_TYPE = /* @__PURE__ */ Symbol.for("react.transitional.element"), REACT_PORTAL_TYPE = /* @__PURE__ */ Symbol.for("react.portal"), REACT_FRAGMENT_TYPE = /* @__PURE__ */ Symbol.for("react.fragment"), REACT_STRICT_MODE_TYPE = /* @__PURE__ */ Symbol.for("react.strict_mode"), REACT_PROFILER_TYPE = /* @__PURE__ */ Symbol.for("react.profiler"), REACT_CONSUMER_TYPE = /* @__PURE__ */ Symbol.for("react.consumer"), REACT_CONTEXT_TYPE = /* @__PURE__ */ Symbol.for("react.context"), REACT_FORWARD_REF_TYPE = /* @__PURE__ */ Symbol.for("react.forward_ref"), REACT_SUSPENSE_TYPE = /* @__PURE__ */ Symbol.for("react.suspense"), REACT_SUSPENSE_LIST_TYPE = /* @__PURE__ */ Symbol.for("react.suspense_list"), REACT_MEMO_TYPE = /* @__PURE__ */ Symbol.for("react.memo"), REACT_LAZY_TYPE = /* @__PURE__ */ Symbol.for("react.lazy"), REACT_ACTIVITY_TYPE = /* @__PURE__ */ Symbol.for("react.activity"), REACT_VIEW_TRANSITION_TYPE = /* @__PURE__ */ Symbol.for("react.view_transition"), REACT_CLIENT_REFERENCE = /* @__PURE__ */ Symbol.for("react.client.reference"), ReactSharedInternals = React42.__CLIENT_INTERNALS_DO_NOT_USE_OR_WARN_USERS_THEY_CANNOT_UPGRADE, hasOwnProperty = Object.prototype.hasOwnProperty, isArrayImpl = Array.isArray, createTask = console.createTask ? console.createTask : function() {
+        var React43 = require_react(), REACT_ELEMENT_TYPE = /* @__PURE__ */ Symbol.for("react.transitional.element"), REACT_PORTAL_TYPE = /* @__PURE__ */ Symbol.for("react.portal"), REACT_FRAGMENT_TYPE = /* @__PURE__ */ Symbol.for("react.fragment"), REACT_STRICT_MODE_TYPE = /* @__PURE__ */ Symbol.for("react.strict_mode"), REACT_PROFILER_TYPE = /* @__PURE__ */ Symbol.for("react.profiler"), REACT_CONSUMER_TYPE = /* @__PURE__ */ Symbol.for("react.consumer"), REACT_CONTEXT_TYPE = /* @__PURE__ */ Symbol.for("react.context"), REACT_FORWARD_REF_TYPE = /* @__PURE__ */ Symbol.for("react.forward_ref"), REACT_SUSPENSE_TYPE = /* @__PURE__ */ Symbol.for("react.suspense"), REACT_SUSPENSE_LIST_TYPE = /* @__PURE__ */ Symbol.for("react.suspense_list"), REACT_MEMO_TYPE = /* @__PURE__ */ Symbol.for("react.memo"), REACT_LAZY_TYPE = /* @__PURE__ */ Symbol.for("react.lazy"), REACT_ACTIVITY_TYPE = /* @__PURE__ */ Symbol.for("react.activity"), REACT_VIEW_TRANSITION_TYPE = /* @__PURE__ */ Symbol.for("react.view_transition"), REACT_CLIENT_REFERENCE = /* @__PURE__ */ Symbol.for("react.client.reference"), ReactSharedInternals = React43.__CLIENT_INTERNALS_DO_NOT_USE_OR_WARN_USERS_THEY_CANNOT_UPGRADE, hasOwnProperty = Object.prototype.hasOwnProperty, isArrayImpl = Array.isArray, createTask = console.createTask ? console.createTask : function() {
           return null;
         };
-        React42 = {
+        React43 = {
           react_stack_bottom_frame: function(callStackForError) {
             return callStackForError();
           }
         };
         var specialPropKeyWarningShown;
         var didWarnAboutElementRef = {};
-        var unknownOwnerDebugStack = React42.react_stack_bottom_frame.bind(
-          React42,
+        var unknownOwnerDebugStack = React43.react_stack_bottom_frame.bind(
+          React43,
           UnknownOwner
         )();
         var unknownOwnerDebugTask = createTask(getTaskName(UnknownOwner));
@@ -23836,7 +23836,7 @@
   });
 
   // preview/main.tsx
-  var import_react41 = __toESM(require_react());
+  var import_react42 = __toESM(require_react());
   var import_client = __toESM(require_client());
 
   // SsulDak_Web/User/frontend/USER-COM-00/index.tsx
@@ -25779,22 +25779,100 @@
   // SsulDak_Web/User/frontend/USER-ATH-01/index.tsx
   var import_react3 = __toESM(require_react());
   var import_jsx_runtime3 = __toESM(require_jsx_runtime());
-  function UserAth01Screen({
+  var DEFAULT_TERMS = [
+    {
+      id: "service",
+      code: "SERVICE",
+      version: "v1.0",
+      title: "\uC11C\uBE44\uC2A4 \uC774\uC6A9\uC57D\uAD00",
+      isMandatory: true,
+      content: `\uC81C1\uC870 (\uBAA9\uC801)
+\uBCF8 \uC57D\uAD00\uC740 SsulDak(\uC4F8\uACE0\uB2E6\uACE0)\uC774 \uC81C\uACF5\uD558\uB294 \uAC74\uBB3C \uCCAD\uC18C \uBC0F \uAC00\uC804 \uBD84\uD574 \uC0B4\uADE0 \uC911\uAC1C \uD50C\uB7AB\uD3FC \uC11C\uBE44\uC2A4\uC758 \uC774\uC6A9\uACFC \uAD00\uB828\uD558\uC5EC \uD68C\uC0AC\uC640 \uD68C\uC6D0\uC758 \uAD8C\uB9AC, \uC758\uBB34 \uBC0F \uCC45\uC784\uC0AC\uD56D\uC744 \uADDC\uC815\uD568\uC744 \uBAA9\uC801\uC73C\uB85C \uD569\uB2C8\uB2E4.
+
+\uC81C2\uC870 (\uACF5\uC815\uAC70\uB798 \uBC0F \uCD5C\uC800 \uD558\uD55C\uC120 \uBCF4\uC7A5)
+1. \uD68C\uC0AC\uB294 \uC2DC\uACF5 \uD488\uC9C8 \uBCF4\uC99D \uBC0F \uD30C\uD2B8\uB108 \uC0DD\uACC4 \uC548\uC815\uC744 \uC704\uD574 \uC2DC\uC7A5 \uC2E4\uC0AC \uAE30\uBC18 \uCD5C\uC800 \uD558\uD55C\uC120(Floor Price) \uC774\uC0C1\uC758 \uD655\uC815 \uCCAD\uC57D \uC81C\uB3C4\uB97C \uC5C4\uACA9\uD788 \uC900\uC218\uD569\uB2C8\uB2E4.
+2. \uBD80\uB2F9\uD55C \uB364\uD551 \uC5ED\uACBD\uB9E4\uB294 \uC77C\uCCB4 \uAE08\uC9C0\uB418\uBA70, \uC774\uC6A9\uC790\uB294 \uACF5\uC2DC\uB41C \uD45C\uC900 \uC694\uC728 \uCCB4\uACC4 \uB0B4\uC5D0\uC11C \uC2E0\uB8B0\uD560 \uC218 \uC788\uB294 \uACF5\uC778 \uCCAD\uC18C \uC11C\uBE44\uC2A4\uB97C \uC81C\uACF5\uBC1B\uC2B5\uB2C8\uB2E4.
+
+\uC81C3\uC870 (\uD68C\uC6D0\uC758 \uAD8C\uB9AC\uC640 \uC758\uBB34)
+1. \uD68C\uC6D0\uC740 \uC11C\uBE44\uC2A4 \uC2E0\uCCAD \uC2DC \uD604\uC7A5\uC758 \uD3C9\uC218, \uBD84\uD574 \uB300\uC0C1 \uAC00\uC804 \uBAA8\uB378, \uC624\uC5FC\uB3C4 \uB4F1\uC758 \uC815\uBCF4\uB97C \uC131\uC2E4\uD558\uAC8C \uAE30\uC7AC\uD574\uC57C \uD569\uB2C8\uB2E4.
+2. \uC0AC\uC2E4\uACFC \uD604\uC800\uD788 \uB2E4\uB978 \uC815\uBCF4\uB97C \uAE30\uC7AC\uD558\uC5EC \uC791\uC5C5 \uC9C0\uC5F0 \uBC0F \uCD94\uAC00 \uC790\uC7AC \uD22C\uC785\uC774 \uBC1C\uC0DD\uD560 \uACBD\uC6B0, \uC2E4\uBE44 \uC815\uC0B0 \uADDC\uC815\uC5D0 \uB530\uB77C \uD604\uC7A5 \uCD94\uAC00 \uACFC\uAE08\uC774 \uBC1C\uC0DD\uD560 \uC218 \uC788\uC2B5\uB2C8\uB2E4.
+
+\uC81C4\uC870 (\uACC4\uC57D \uCCB4\uACB0 \uBC0F \uCDE8\uC18C/\uD658\uBD88 \uADDC\uC815)
+1. \uC774\uC6A9\uC790\uAC00 \uB9C8\uC74C\uC5D0 \uB4DC\uB294 \uD30C\uD2B8\uB108 \uCCAD\uC57D\uC744 \uD655\uC815\uD558\uACE0 \uC18C\uC815\uC758 \uB370\uC774\uD130 \uC774\uC6A9\uB8CC(33,000\uC6D0 \uB4F1)\uB97C \uACB0\uC81C\uD568\uC73C\uB85C\uC368 \uC2DC\uACF5 \uACC4\uC57D\uC774 \uACF5\uC2DD \uC131\uB9BD\uB429\uB2C8\uB2E4.
+2. \uC2DC\uACF5 24\uC2DC\uAC04 \uC804 \uC77C\uBC29\uC801 \uC120 \uCDE8\uC18C \uC2DC \uCDE8\uC18C \uC218\uC218\uB8CC \uBC0F 7\uC77C\uAC04\uC758 \uC11C\uBE44\uC2A4 \uC774\uC6A9 \uC815\uC9C0 \uD328\uB110\uD2F0\uAC00 \uBD80\uACFC\uB420 \uC218 \uC788\uC2B5\uB2C8\uB2E4.
+
+\uC81C5\uC870 (\uD488\uC9C8 \uBCF4\uC99D \uBC0F \uC190\uD574\uBC30\uC0C1)
+1. \uBAA8\uB4E0 \uC815\uC2DD \uB4F1\uB85D \uD30C\uD2B8\uB108\uB294 \uC0BC\uC131\uD654\uC7AC 1\uC5B5\uC6D0 \uC601\uC5C5\uBC30\uC0C1\uCC45\uC784 \uC548\uC2EC\uBCF4\uD5D8\uC5D0 \uC758\uBB34 \uAC00\uC785\uB418\uC5B4 \uC788\uC2B5\uB2C8\uB2E4.
+2. \uC2DC\uACF5 \uC911 \uBC1C\uC0DD\uD55C \uC2DC\uC124\uBB3C \uD30C\uC190 \uBC0F \uB204\uC218 \uC0AC\uACE0\uC5D0 \uB300\uD574\uC11C\uB294 \uC804\uC561 \uBCF4\uD5D8 \uBCF4\uC0C1\uC774 \uC9C0\uC6D0\uB429\uB2C8\uB2E4.
+
+[\uBCF8 \uC57D\uAD00\uC758 \uB9C8\uC9C0\uB9C9 \uC870\uD56D\uC785\uB2C8\uB2E4. \uD655\uC778 \uBC84\uD2BC\uC744 \uB20C\uB7EC \uB3D9\uC758\uB97C \uC644\uB8CC\uD574 \uC8FC\uC138\uC694.]`
+    },
+    {
+      id: "privacy",
+      code: "PRIVACY",
+      version: "v1.0",
+      title: "\uAC1C\uC778\uC815\uBCF4 \uC218\uC9D1 \uBC0F \uC774\uC6A9 \uB3D9\uC758",
+      isMandatory: true,
+      content: `\uC81C1\uC870 (\uC218\uC9D1\uD558\uB294 \uAC1C\uC778\uC815\uBCF4 \uD56D\uBAA9)
+1. \uD544\uC218 \uD56D\uBAA9: \uC774\uBA54\uC77C \uC8FC\uC18C, \uBE44\uBC00\uBC88\uD638(\uC77C\uBC18 \uAC00\uC785 \uC2DC), \uC131\uBA85, \uD734\uB300\uD3F0 \uBC88\uD638, \uC11C\uBE44\uC2A4 \uC2E0\uCCAD \uD604\uC7A5 \uC8FC\uC18C(\uAE30\uBCF8/\uC0C1\uC138 \uC8FC\uC18C), \uC790\uD544 \uC804\uC790\uC11C\uBA85 \uC6D0\uBCF8 \uC774\uBBF8\uC9C0.
+2. \uC18C\uC15C \uC5F0\uB3D9 \uC2DC: \uC18C\uC15C \uACE0\uC720 \uC2DD\uBCC4\uC790(UID), \uC18C\uC15C \uC774\uBA54\uC77C, \uD504\uB85C\uD544 \uC774\uBBF8\uC9C0 URL.
+3. \uC11C\uBE44\uC2A4 \uC774\uC6A9 \uACFC\uC815\uC5D0\uC11C \uC790\uB3D9 \uC218\uC9D1: \uC811\uC18D IP \uC8FC\uC18C, \uBE0C\uB77C\uC6B0\uC800 User-Agent, \uC11C\uBE44\uC2A4 \uC774\uC6A9 \uC77C\uC2DC, \uC811\uC18D \uB85C\uADF8.
+
+\uC81C2\uC870 (\uAC1C\uC778\uC815\uBCF4\uC758 \uC218\uC9D1 \uBC0F \uC774\uC6A9 \uBAA9\uC801)
+1. \uD68C\uC6D0 \uC2DD\uBCC4, \uC5F0\uB839 \uD655\uC778(\uB9CC 14\uC138 \uC774\uC0C1), \uBD80\uC815 \uC774\uC6A9 \uBC29\uC9C0 \uBC0F \uACC4\uC815 \uAD00\uB9AC.
+2. \uCCAD\uC18C \uD604\uC7A5 \uB9E4\uCE6D, \uBC29\uBB38 \uACAC\uC801 \uBC0F \uC2DC\uACF5 \uACC4\uC57D\uC11C \uCCB4\uACB0, \uC548\uC2EC \uC54C\uB9BC\uD1A1 \uBC1C\uC1A1.
+3. \uC804\uC790\uC0C1\uAC70\uB798\uBC95 \uBC0F \uC804\uC790\uC11C\uBA85\uBC95\uC5D0 \uB530\uB978 \uACC4\uC57D \uBC0F \uC11C\uBA85 \uC99D\uC801\uC758 \uC548\uC804\uD55C \uBCF4\uAD00.
+
+\uC81C3\uC870 (\uAC1C\uC778\uC815\uBCF4\uC758 \uBCF4\uC720 \uBC0F \uC774\uC6A9 \uAE30\uAC04)
+1. \uC6D0\uCE59\uC801\uC73C\uB85C \uD68C\uC6D0 \uD0C8\uD1F4 \uC2DC \uC9C0\uCCB4 \uC5C6\uC774 \uD30C\uAE30\uD569\uB2C8\uB2E4.
+2. \uB2E8, \uC804\uC790\uC0C1\uAC70\uB798 \uB4F1\uC5D0\uC11C\uC758 \uC18C\uBE44\uC790\uBCF4\uD638\uC5D0 \uAD00\uD55C \uBC95\uB960 \uB4F1 \uAD00\uACC4 \uBC95\uB839\uC5D0 \uB530\uB77C \uB2E4\uC74C \uC815\uBCF4\uB294 \uBC95\uC815 \uAE30\uAC04 \uBCF4\uAD00\uD569\uB2C8\uB2E4:
+  - \uACC4\uC57D \uB610\uB294 \uCCAD\uC57D\uCCA0\uD68C \uB4F1\uC5D0 \uAD00\uD55C \uAE30\uB85D: 5\uB144
+  - \uB300\uAE08\uACB0\uC81C \uBC0F \uC7AC\uD654 \uB4F1\uC758 \uACF5\uAE09\uC5D0 \uAD00\uD55C \uAE30\uB85D: 5\uB144
+  - \uC18C\uBE44\uC790\uC758 \uBD88\uB9CC \uB610\uB294 \uBD84\uC7C1\uCC98\uB9AC\uC5D0 \uAD00\uD55C \uAE30\uB85D: 3\uB144
+  - \uC804\uC790\uC11C\uBA85 \uC99D\uC801 \uBC0F \uC57D\uAD00 \uB3D9\uC758 \uC774\uB825: 5\uB144
+
+[\uBCF8 \uAC1C\uC778\uC815\uBCF4 \uC218\uC9D1 \uBC0F \uC774\uC6A9 \uB3D9\uC758\uC11C\uC758 \uB9C8\uC9C0\uB9C9 \uC870\uD56D\uC785\uB2C8\uB2E4. \uD655\uC778 \uBC84\uD2BC\uC744 \uB20C\uB7EC \uB3D9\uC758\uB97C \uC644\uB8CC\uD574 \uC8FC\uC138\uC694.]`
+    },
+    {
+      id: "signature",
+      code: "SIGNATURE",
+      version: "v1.0",
+      title: "\uC804\uC790\uAC70\uB798 \uBC0F \uC790\uD544 \uC804\uC790\uC11C\uBA85 \uBCF4\uC99D \uB3D9\uC758",
+      isMandatory: true,
+      content: `\uC81C1\uC870 (\uC804\uC790\uC11C\uBA85\uC758 \uBC95\uC801 \uD6A8\uB825)
+1. \uD68C\uC6D0\uC774 \uC11C\uBA85\uD328\uB4DC\uC5D0 \uC790\uD544\uB85C \uB0A0\uC778\uD55C \uC804\uC790\uC11C\uBA85\uC740 \uB300\uD55C\uBBFC\uAD6D \uC804\uC790\uC11C\uBA85\uBC95 \uC81C3\uC870(\uC804\uC790\uC11C\uBA85\uC758 \uD6A8\uB825 \uB4F1)\uC5D0 \uC758\uAC70\uD558\uC5EC \uC11C\uBA85\uC790\uC758 \uC790\uD544 \uC11C\uBA85 \uB610\uB294 \uAE30\uBA85\uB0A0\uC778\uACFC \uB3D9\uC77C\uD55C \uBC95\uC801 \uD6A8\uB825\uC744 \uAC00\uC9D1\uB2C8\uB2E4.
+2. \uB4F1\uB85D\uB41C \uC11C\uBA85\uC740 \uD5A5\uD6C4 \uCCAD\uC18C \uACC4\uC57D \uD655\uC815, \uC791\uC5C5 \uC644\uB8CC \uAC80\uC218 \uD655\uC778\uC11C, \uC601\uC218\uC99D \uBC1C\uD589 \uC2DC \uD68C\uC6D0\uC758 \uB3D9\uC758 \uC758\uC0AC\uD45C\uC2DC\uB85C \uC815\uB2F9\uD558\uAC8C \uAC08\uC74C\uB429\uB2C8\uB2E4.
+
+\uC81C2\uC870 (\uC11C\uBA85 \uC6D0\uBCF8 \uD30C\uC77C \uBC0F \uBA54\uD0C0\uB370\uC774\uD130\uC758 \uBCF4\uAD00)
+1. \uD68C\uC0AC\uB294 \uD68C\uC6D0\uC774 \uB0A0\uC778\uD55C \uC790\uD544 \uC11C\uBA85 \uC774\uBBF8\uC9C0\uB97C \uBB34\uC190\uC2E4 PNG \uD30C\uC77C\uB85C \uC11C\uBC84 \uBCF4\uC548 \uC2A4\uD1A0\uB9AC\uC9C0\uC5D0 \uC554\uD638\uD654\uD558\uC5EC \uC601\uAD6C \uC6D0\uBCF8 \uBCF4\uC874\uD569\uB2C8\uB2E4.
+2. \uC57D\uAD00\uBCC4 \uC11C\uBA85 \uC774\uBBF8\uC9C0 \uD30C\uC77C\uBA85 \uBC0F \uC800\uC7A5 \uB514\uB809\uD1A0\uB9AC \uACBD\uB85C(PATH), \uC811\uC18D IP, \uC11C\uBA85 \uC77C\uC2DC\uB294 \uACF5\uC99D \uC99D\uC801 \uD14C\uC774\uBE14(TB_MEMBER_AGREE_SIGN)\uC5D0 \uC790\uB3D9 \uAE30\uB85D\uB429\uB2C8\uB2E4.
+
+[\uBCF8 \uC804\uC790\uAC70\uB798 \uBC0F \uC804\uC790\uC11C\uBA85 \uBCF4\uC99D \uB3D9\uC758\uC11C\uC758 \uB9C8\uC9C0\uB9C9 \uC870\uD56D\uC785\uB2C8\uB2E4. \uD655\uC778 \uBC84\uD2BC\uC744 \uB20C\uB7EC \uB3D9\uC758\uB97C \uC644\uB8CC\uD574 \uC8FC\uC138\uC694.]`
+    },
+    {
+      id: "marketing",
+      code: "MARKETING",
+      version: "v1.0",
+      title: "\uC774\uBCA4\uD2B8 \uBC0F \uD61C\uD0DD \uC54C\uB9BC \uB9C8\uCF00\uD305 \uC218\uC2E0 \uB3D9\uC758",
+      isMandatory: false,
+      content: `\uC81C1\uC870 (\uB9C8\uCF00\uD305 \uC815\uBCF4 \uC218\uC2E0 \uB3D9\uC758)
+1. SsulDak(\uC4F8\uACE0\uB2E6\uACE0)\uC774 \uC81C\uACF5\uD558\uB294 \uC2DC\uC98C\uBCC4 \uD2B9\uBCC4 \uD560\uC778 \uCFE0\uD3F0, \uC2E0\uADDC \uCCAD\uC18C \uC11C\uBE44\uC2A4 \uB7F0\uCE6D, \uD30C\uD2B8\uB108 \uD2B9\uAC00 \uD504\uB85C\uBAA8\uC158 \uB4F1\uC758 \uC18C\uC2DD\uC744 SMS, \uC774\uBA54\uC77C, \uC571 \uD478\uC2DC \uC54C\uB9BC\uC73C\uB85C \uC218\uC2E0\uD569\uB2C8\uB2E4.
+2. \uBCF8 \uB3D9\uC758\uB294 \uC120\uD0DD \uC0AC\uD56D\uC774\uBA70, \uB3D9\uC758\uD558\uC9C0 \uC54A\uB354\uB77C\uB3C4 \uD68C\uC6D0\uAC00\uC785 \uBC0F \uAE30\uBCF8 \uACAC\uC801 \uC911\uAC1C \uC11C\uBE44\uC2A4 \uC774\uC6A9\uC5D0\uB294 \uC5B4\uB5A0\uD55C \uBD88\uC774\uC775\uB3C4 \uC5C6\uC2B5\uB2C8\uB2E4.
+3. \uB3D9\uC758 \uD6C4\uC5D0\uB3C4 \uC5B8\uC81C\uB4E0\uC9C0 \uB9C8\uC774\uD398\uC774\uC9C0\uC5D0\uC11C \uC218\uC2E0 \uAC70\uBD80\uB85C \uBCC0\uACBD\uD560 \uC218 \uC788\uC2B5\uB2C8\uB2E4.
+
+[\uBCF8 \uB9C8\uCF00\uD305 \uC218\uC2E0 \uB3D9\uC758\uC11C\uC758 \uB9C8\uC9C0\uB9C9 \uC870\uD56D\uC785\uB2C8\uB2E4. \uD655\uC778 \uBC84\uD2BC\uC744 \uB20C\uB7EC \uB3D9\uC758\uB97C \uC644\uB8CC\uD574 \uC8FC\uC138\uC694.]`
+    }
+  ];
+  function UserAth01Modal({
+    isOpen = true,
+    onClose,
     onNavigate,
     onRegisterSuccess,
     logoSrc = "/logo.png",
-    apiEndpoint = "/api/user/user_ath_01"
+    apiEndpoint = "/api/user/user_ath_01",
+    isStandalone = false
   }) {
-    const [currentStep, setCurrentStep] = (0, import_react3.useState)("STEP1_METHOD_AND_TERMS");
     const [selectedMethod, setSelectedMethod] = (0, import_react3.useState)("email");
-    const [referralInput, setReferralInput] = (0, import_react3.useState)("");
-    const [appliedReferral, setAppliedReferral] = (0, import_react3.useState)(null);
-    const [referralFeedback, setReferralFeedback] = (0, import_react3.useState)(null);
-    const [isCheckingReferral, setIsCheckingReferral] = (0, import_react3.useState)(false);
-    const [termAge, setTermAge] = (0, import_react3.useState)(false);
-    const [termService, setTermService] = (0, import_react3.useState)(false);
-    const [termPrivacy, setTermPrivacy] = (0, import_react3.useState)(false);
-    const [termMarketing, setTermMarketing] = (0, import_react3.useState)(false);
     const [userEmail, setUserEmail] = (0, import_react3.useState)("");
     const [isEmailChecked, setIsEmailChecked] = (0, import_react3.useState)(false);
     const [emailCheckMessage, setEmailCheckMessage] = (0, import_react3.useState)(null);
@@ -25805,9 +25883,33 @@
     const [showPasswordConfirm, setShowPasswordConfirm] = (0, import_react3.useState)(false);
     const [userNm, setUserNm] = (0, import_react3.useState)("");
     const [userTel, setUserTel] = (0, import_react3.useState)("");
-    const [authCodeInput, setAuthCodeInput] = (0, import_react3.useState)("582910");
-    const [isPhoneVerified, setIsPhoneVerified] = (0, import_react3.useState)(true);
-    const [authTimerSec, setAuthTimerSec] = (0, import_react3.useState)(176);
+    const [phoneAuthCode, setPhoneAuthCode] = (0, import_react3.useState)("");
+    const [isPhoneAuthSent, setIsPhoneAuthSent] = (0, import_react3.useState)(false);
+    const [isPhoneVerified, setIsPhoneVerified] = (0, import_react3.useState)(false);
+    const [authTimerSeconds, setAuthTimerSeconds] = (0, import_react3.useState)(180);
+    const [authDevHint, setAuthDevHint] = (0, import_react3.useState)(null);
+    const [isSendingAuth, setIsSendingAuth] = (0, import_react3.useState)(false);
+    const [isVerifyingAuth, setIsVerifyingAuth] = (0, import_react3.useState)(false);
+    const [termsList, setTermsList] = (0, import_react3.useState)(DEFAULT_TERMS);
+    const [termAge, setTermAge] = (0, import_react3.useState)(false);
+    const [agreedTerms, setAgreedTerms] = (0, import_react3.useState)({
+      service: false,
+      privacy: false,
+      signature: false,
+      marketing: false
+    });
+    const [scrolledTerms, setScrolledTerms] = (0, import_react3.useState)({
+      service: false,
+      privacy: false,
+      signature: false,
+      marketing: false
+    });
+    const [readingTerm, setReadingTerm] = (0, import_react3.useState)(null);
+    const [currentScrollPercent, setCurrentScrollPercent] = (0, import_react3.useState)(0);
+    const [isCurrentModalScrolledToBottom, setIsCurrentModalScrolledToBottom] = (0, import_react3.useState)(false);
+    const termScrollContainerRef = (0, import_react3.useRef)(null);
+    const [showScrollNoticeModal, setShowScrollNoticeModal] = (0, import_react3.useState)(false);
+    const [noticeMessage, setNoticeMessage] = (0, import_react3.useState)("");
     const canvasRef = (0, import_react3.useRef)(null);
     const [hasSignature, setHasSignature] = (0, import_react3.useState)(false);
     const [isDrawing, setIsDrawing] = (0, import_react3.useState)(false);
@@ -25815,8 +25917,7 @@
     const [toastMessage, setToastMessage] = (0, import_react3.useState)(null);
     const [toastType, setToastType] = (0, import_react3.useState)("info");
     const [showSuccessModal, setShowSuccessModal] = (0, import_react3.useState)(false);
-    const [registeredUser, setRegisteredUser] = (0, import_react3.useState)(null);
-    const [activeTermModal, setActiveTermModal] = (0, import_react3.useState)(null);
+    const [registeredResult, setRegisteredResult] = (0, import_react3.useState)(null);
     const showToast = (0, import_react3.useCallback)((msg, type = "info") => {
       setToastMessage(msg);
       setToastType(type);
@@ -25825,93 +25926,69 @@
       }, 3200);
     }, []);
     (0, import_react3.useEffect)(() => {
-      const timer = setInterval(() => {
-        setAuthTimerSec((prev) => prev > 0 ? prev - 1 : 0);
-      }, 1e3);
-      return () => clearInterval(timer);
-    }, []);
-    const formatTimer = (sec) => {
-      const m = Math.floor(sec / 60).toString().padStart(2, "0");
-      const s = (sec % 60).toString().padStart(2, "0");
-      return `${m}:${s}`;
-    };
-    const isAllTermsChecked = termAge && termService && termPrivacy && termMarketing;
-    const isRequiredTermsChecked = termAge && termService && termPrivacy;
-    const handleToggleAllTerms = () => {
-      const nextVal = !isAllTermsChecked;
-      setTermAge(nextVal);
-      setTermService(nextVal);
-      setTermPrivacy(nextVal);
-      setTermMarketing(nextVal);
-    };
-    const handleSelectSocialMethod = (method) => {
-      setSelectedMethod(method);
-      if (method !== "email") {
-        setTermAge(true);
-        setTermService(true);
-        setTermPrivacy(true);
-        setTermMarketing(true);
-        showToast(`${method === "kakao" ? "\uCE74\uCE74\uC624" : method === "naver" ? "\uB124\uC774\uBC84" : "Google"} \uAC04\uD3B8 \uAC00\uC785\uC744 \uC120\uD0DD\uD558\uC168\uC2B5\uB2C8\uB2E4.`, "info");
-      }
-    };
-    const handleApplyReferral = async () => {
-      const code = referralInput.trim().toUpperCase();
-      if (code.length < 6) {
-        showToast("\uCD94\uCC9C\uC778 \uCF54\uB4DC\uB97C \uC62C\uBC14\uB974\uAC8C \uC785\uB825\uD574\uC8FC\uC138\uC694 (6~8\uC790\uB9AC).", "error");
-        return;
-      }
-      setIsCheckingReferral(true);
-      try {
-        const res = await fetch(apiEndpoint, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            actionType: "CHECK_REFERRAL",
-            recommenderCode: code
-          })
-        });
-        const data = await res.json();
-        if (data.success && data.isAvailable) {
-          setAppliedReferral(code);
-          setReferralFeedback(data.message || `\uCD94\uCC9C\uC778 \uCF54\uB4DC [${code}] \uC801\uC6A9 \uC644\uB8CC: 5,000P \uC801\uB9BD \uC608\uC57D`);
-          showToast("\uCD94\uCC9C\uC778 \uCF54\uB4DC\uAC00 \uC815\uC0C1 \uD655\uC778\uB418\uC5C8\uC2B5\uB2C8\uB2E4 (+5,000P \uD61C\uD0DD)", "success");
-        } else {
-          setReferralFeedback(null);
-          showToast(data.message || "\uC720\uD6A8\uD558\uC9C0 \uC54A\uC740 \uCD94\uCC9C\uC778 \uCF54\uB4DC\uC785\uB2C8\uB2E4.", "error");
+      const fetchTerms = async () => {
+        try {
+          const res = await fetch(apiEndpoint, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ actionType: "GET_TERMS" })
+          });
+          const data = await res.json();
+          if (data.success && Array.isArray(data.terms) && data.terms.length > 0) {
+            const mapped = data.terms.map((t) => ({
+              id: t.termsCd.toLowerCase() === "service" ? "service" : t.termsCd.toLowerCase() === "privacy" ? "privacy" : t.termsCd.toLowerCase() === "signature" ? "signature" : "marketing",
+              code: t.termsCd,
+              version: t.termsVer || "v1.0",
+              title: t.termsTitle,
+              isMandatory: t.mandatoryYn === "Y",
+              content: t.termsContent
+            }));
+            setTermsList(mapped);
+          }
+        } catch (err) {
         }
-      } catch {
-        setAppliedReferral(code);
-        setReferralFeedback(`\uCD94\uCC9C\uC778 \uCF54\uB4DC [${code}] \uC801\uC6A9 \uC644\uB8CC: 5,000P \uC801\uB9BD \uC608\uC57D`);
-        showToast("\uCD94\uCC9C\uC778 \uCF54\uB4DC\uAC00 \uC801\uC6A9\uB418\uC5C8\uC2B5\uB2C8\uB2E4 (+5,000P)", "success");
-      } finally {
-        setIsCheckingReferral(false);
+      };
+      fetchTerms();
+    }, [apiEndpoint]);
+    const handleSelectMethod = (method) => {
+      setSelectedMethod(method);
+      if (method === "kakao") {
+        setUserEmail("ssuldak_kakao@kakao.com");
+        setUserNm("\uCE74\uCE74\uC624\uD68C\uC6D0");
+        setUserTel("010-9876-5432");
+        setIsEmailChecked(true);
+        setEmailCheckMessage("\uCE74\uCE74\uC624 \uACC4\uC815 \uC778\uC99D \uC644\uB8CC (\uBE44\uBC00\uBC88\uD638 \uBD88\uD544\uC694)");
+        showToast("\uCE74\uCE74\uC624 \uAC04\uD3B8\uAC00\uC785\uC774 \uC120\uD0DD\uB418\uC5C8\uC2B5\uB2C8\uB2E4. \uBE44\uBC00\uBC88\uD638 \uC124\uC815 \uC5C6\uC774 \uAC00\uC785\uB429\uB2C8\uB2E4.", "info");
+      } else if (method === "naver") {
+        setUserEmail("ssuldak_naver@naver.com");
+        setUserNm("\uB124\uC774\uBC84\uD68C\uC6D0");
+        setUserTel("010-8765-4321");
+        setIsEmailChecked(true);
+        setEmailCheckMessage("\uB124\uC774\uBC84 \uACC4\uC815 \uC5F0\uB3D9 \uC644\uB8CC (\uBE44\uBC00\uBC88\uD638 \uBD88\uD544\uC694)");
+        showToast("\uB124\uC774\uBC84 \uAC04\uD3B8\uAC00\uC785\uC774 \uC120\uD0DD\uB418\uC5C8\uC2B5\uB2C8\uB2E4. \uBE44\uBC00\uBC88\uD638 \uC124\uC815 \uC5C6\uC774 \uAC00\uC785\uB429\uB2C8\uB2E4.", "info");
+      } else if (method === "google") {
+        setUserEmail("ssuldak_google@gmail.com");
+        setUserNm("\uAD6C\uAE00\uD68C\uC6D0");
+        setUserTel("010-7654-3210");
+        setIsEmailChecked(true);
+        setEmailCheckMessage("\uAD6C\uAE00 \uACC4\uC815 \uC5F0\uB3D9 \uC644\uB8CC (\uBE44\uBC00\uBC88\uD638 \uBD88\uD544\uC694)");
+        showToast("Google \uAC04\uD3B8\uAC00\uC785\uC774 \uC120\uD0DD\uB418\uC5C8\uC2B5\uB2C8\uB2E4. \uBE44\uBC00\uBC88\uD638 \uC124\uC815 \uC5C6\uC774 \uAC00\uC785\uB429\uB2C8\uB2E4.", "info");
+      } else {
+        if (userEmail.startsWith("ssuldak_")) {
+          setUserEmail("");
+          setUserNm("");
+          setUserTel("");
+          setIsEmailChecked(false);
+          setEmailCheckMessage(null);
+        }
+        showToast("\uC77C\uBC18 \uC774\uBA54\uC77C \uC9C1\uC811 \uC785\uB825\uC744 \uC120\uD0DD\uD558\uC168\uC2B5\uB2C8\uB2E4.", "info");
       }
-    };
-    const handleClearReferral = () => {
-      setReferralInput("");
-      setAppliedReferral(null);
-      setReferralFeedback(null);
-    };
-    const handleProceedToStep2 = () => {
-      if (!isRequiredTermsChecked) {
-        showToast("\uD544\uC218 \uC57D\uAD00\uC5D0 \uBAA8\uB450 \uB3D9\uC758\uD558\uC154\uC57C \uB2E4\uC74C \uB2E8\uACC4\uB85C \uC774\uB3D9\uD560 \uC218 \uC788\uC2B5\uB2C8\uB2E4.", "error");
-        return;
-      }
-      if (!userNm) setUserNm("\uD64D\uAE38\uB3D9");
-      if (!userTel) setUserTel("010-1234-5678");
-      if (!userEmail) setUserEmail("clean_user@ssuldak.kr");
-      setCurrentStep("STEP2_ACCOUNT_AND_SIGNATURE");
-      window.scrollTo({ top: 0, behavior: "smooth" });
     };
     const handleCheckEmailDuplicate = async () => {
       const email = userEmail.trim();
-      if (!email) {
-        showToast("\uC774\uBA54\uC77C \uC8FC\uC18C\uB97C \uC785\uB825\uD574 \uC8FC\uC138\uC694.", "error");
-        return;
-      }
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(email)) {
-        showToast("\uC62C\uBC14\uB978 \uC774\uBA54\uC77C \uD615\uC2DD\uC744 \uC785\uB825\uD574 \uC8FC\uC138\uC694 (\uC608: user@ssuldak.com).", "error");
+      if (!email || !email.includes("@")) {
+        setEmailCheckMessage("\uC62C\uBC14\uB978 \uC774\uBA54\uC77C \uD615\uC2DD\uC744 \uC785\uB825\uD574 \uC8FC\uC138\uC694.");
+        setIsEmailChecked(false);
         return;
       }
       setIsCheckingEmail(true);
@@ -25927,94 +26004,240 @@
         const data = await res.json();
         if (data.success && data.isAvailable) {
           setIsEmailChecked(true);
-          setEmailCheckMessage("\uC0AC\uC6A9 \uAC00\uB2A5\uD55C \uC774\uBA54\uC77C\uC785\uB2C8\uB2E4.");
-          showToast("\uC0AC\uC6A9 \uAC00\uB2A5\uD55C \uC774\uBA54\uC77C\uC785\uB2C8\uB2E4.", "success");
+          setEmailCheckMessage("\u2713 \uC0AC\uC6A9 \uAC00\uB2A5\uD55C \uC774\uBA54\uC77C\uC785\uB2C8\uB2E4.");
+          showToast("\uC0AC\uC6A9 \uAC00\uB2A5\uD55C \uC774\uBA54\uC77C \uC8FC\uC18C\uC785\uB2C8\uB2E4.", "success");
         } else {
           setIsEmailChecked(false);
-          setEmailCheckMessage(data.message || "\uC774\uBBF8 \uAC00\uC785\uB41C \uC774\uBA54\uC77C \uACC4\uC815\uC785\uB2C8\uB2E4.");
-          showToast(data.message || "\uC774\uBBF8 \uC0AC\uC6A9 \uC911\uC778 \uC774\uBA54\uC77C\uC785\uB2C8\uB2E4.", "error");
+          setEmailCheckMessage(data.message || "\uC774\uBBF8 \uB4F1\uB85D\uB41C \uC774\uBA54\uC77C \uACC4\uC815\uC785\uB2C8\uB2E4.");
+          showToast(data.message || "\uC774\uBBF8 \uAC00\uC785\uB41C \uC774\uBA54\uC77C\uC785\uB2C8\uB2E4.", "error");
         }
       } catch {
         setIsEmailChecked(true);
-        setEmailCheckMessage("\uC0AC\uC6A9 \uAC00\uB2A5\uD55C \uC774\uBA54\uC77C\uC785\uB2C8\uB2E4.");
-        showToast("\uC0AC\uC6A9 \uAC00\uB2A5\uD55C \uC774\uBA54\uC77C\uC785\uB2C8\uB2E4.", "success");
+        setEmailCheckMessage("\u2713 \uC0AC\uC6A9 \uAC00\uB2A5\uD55C \uC774\uBA54\uC77C\uC785\uB2C8\uB2E4. (\uD655\uC778 \uC644\uB8CC)");
+        showToast("\uC774\uBA54\uC77C \uD655\uC778\uC774 \uC644\uB8CC\uB418\uC5C8\uC2B5\uB2C8\uB2E4.", "success");
       } finally {
         setIsCheckingEmail(false);
       }
     };
-    const initCanvas = (0, import_react3.useCallback)(() => {
-      const canvas = canvasRef.current;
-      if (!canvas) return;
-      const ctx = canvas.getContext("2d");
-      if (!ctx) return;
-      const rect = canvas.getBoundingClientRect();
-      const dpr = window.devicePixelRatio || 1;
-      canvas.width = rect.width * dpr;
-      canvas.height = rect.height * dpr;
-      ctx.scale(dpr, dpr);
-      ctx.strokeStyle = "#00254a";
-      ctx.lineWidth = 2.5;
-      ctx.lineCap = "round";
-      ctx.lineJoin = "round";
-      const w = rect.width;
-      const h = rect.height;
-      ctx.beginPath();
-      ctx.moveTo(w * 0.28, h * 0.58);
-      ctx.bezierCurveTo(w * 0.32, h * 0.28, w * 0.38, h * 0.25, w * 0.42, h * 0.52);
-      ctx.bezierCurveTo(w * 0.45, h * 0.75, w * 0.48, h * 0.42, w * 0.56, h * 0.45);
-      ctx.bezierCurveTo(w * 0.62, h * 0.48, w * 0.65, h * 0.65, w * 0.72, h * 0.42);
-      ctx.stroke();
-      ctx.beginPath();
-      ctx.moveTo(w * 0.35, h * 0.68);
-      ctx.quadraticCurveTo(w * 0.52, h * 0.75, w * 0.75, h * 0.62);
-      ctx.stroke();
-      setHasSignature(true);
-    }, []);
     (0, import_react3.useEffect)(() => {
-      if (currentStep === "STEP2_ACCOUNT_AND_SIGNATURE") {
-        setTimeout(initCanvas, 150);
-        setIsEmailChecked(true);
+      if (!isPhoneAuthSent || isPhoneVerified || authTimerSeconds <= 0) return;
+      const timer = setInterval(() => {
+        setAuthTimerSeconds((prev) => {
+          if (prev <= 1) {
+            clearInterval(timer);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1e3);
+      return () => clearInterval(timer);
+    }, [isPhoneAuthSent, isPhoneVerified, authTimerSeconds]);
+    const formatTimer = (seconds) => {
+      const m = Math.floor(seconds / 60);
+      const s = seconds % 60;
+      return `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
+    };
+    const handlePhoneChange = (e) => {
+      const raw = e.target.value.replace(/[^0-9]/g, "");
+      let formatted = raw;
+      if (raw.length <= 3) {
+        formatted = raw;
+      } else if (raw.length <= 7) {
+        formatted = `${raw.slice(0, 3)}-${raw.slice(3)}`;
+      } else {
+        formatted = `${raw.slice(0, 3)}-${raw.slice(3, 7)}-${raw.slice(7, 11)}`;
       }
-    }, [currentStep, initCanvas]);
-    const getCanvasPos = (e) => {
+      setUserTel(formatted);
+      if (isPhoneVerified || isPhoneAuthSent) {
+        setIsPhoneVerified(false);
+        setIsPhoneAuthSent(false);
+        setPhoneAuthCode("");
+        setAuthDevHint(null);
+      }
+    };
+    const handleSendPhoneAuth = async () => {
+      const cleanTel = userTel.replace(/[^0-9]/g, "");
+      if (cleanTel.length < 10) {
+        showToast("\uC62C\uBC14\uB978 \uD734\uB300\uC804\uD654 \uBC88\uD638(10~11\uC790\uB9AC)\uB97C \uC785\uB825\uD574 \uC8FC\uC138\uC694.", "error");
+        return;
+      }
+      setIsSendingAuth(true);
+      try {
+        const res = await fetch(apiEndpoint, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            actionType: "SEND_PHONE_AUTH",
+            userTel: cleanTel
+          })
+        });
+        const data = await res.json();
+        if (res.ok && data.success) {
+          setIsPhoneAuthSent(true);
+          setAuthTimerSeconds(data.expireSeconds || 180);
+          if (data.devAuthCode) {
+            setAuthDevHint(`\uD14C\uC2A4\uD2B8\uC6A9 \uC218\uC2E0 \uC778\uC99D\uBC88\uD638: [${data.devAuthCode}]`);
+            setPhoneAuthCode(data.devAuthCode);
+          }
+          showToast(data.message || "\uC778\uC99D\uBC88\uD638\uAC00 \uBC1C\uC1A1\uB418\uC5C8\uC2B5\uB2C8\uB2E4. 3\uBD84 \uC774\uB0B4\uC5D0 \uC785\uB825\uD574 \uC8FC\uC138\uC694.", "success");
+        } else {
+          showToast(data.message || "\uC778\uC99D\uBC88\uD638 \uBC1C\uC1A1 \uC2E4\uD328. \uB2E4\uC2DC \uC2DC\uB3C4\uD574 \uC8FC\uC138\uC694.", "error");
+        }
+      } catch (err) {
+        showToast(err.message || "\uC778\uC99D\uBC88\uD638 \uBC1C\uC1A1 \uC911 \uB124\uD2B8\uC6CC\uD06C \uC624\uB958\uAC00 \uBC1C\uC0DD\uD588\uC2B5\uB2C8\uB2E4.", "error");
+      } finally {
+        setIsSendingAuth(false);
+      }
+    };
+    const handleVerifyPhoneAuth = async () => {
+      if (phoneAuthCode.trim().length !== 6) {
+        showToast("6\uC790\uB9AC \uC778\uC99D\uBC88\uD638\uB97C \uC815\uD655\uD788 \uC785\uB825\uD574 \uC8FC\uC138\uC694.", "error");
+        return;
+      }
+      if (authTimerSeconds <= 0) {
+        showToast("\uC778\uC99D\uBC88\uD638 \uC720\uD6A8\uC2DC\uAC04(3\uBD84)\uC774 \uB9CC\uB8CC\uB418\uC5C8\uC2B5\uB2C8\uB2E4. \uB2E4\uC2DC \uBC1C\uC1A1\uD574 \uC8FC\uC138\uC694.", "error");
+        return;
+      }
+      setIsVerifyingAuth(true);
+      try {
+        const cleanTel = userTel.replace(/[^0-9]/g, "");
+        const res = await fetch(apiEndpoint, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            actionType: "VERIFY_PHONE_AUTH",
+            userTel: cleanTel,
+            authCode: phoneAuthCode.trim()
+          })
+        });
+        const data = await res.json();
+        if (res.ok && data.success && data.isPhoneVerified) {
+          setIsPhoneVerified(true);
+          showToast("\uD734\uB300\uC804\uD654 \uBCF8\uC778\uC778\uC99D\uC774 \uC644\uB8CC\uB418\uC5C8\uC2B5\uB2C8\uB2E4!", "success");
+        } else {
+          showToast(data.message || "\uC778\uC99D\uBC88\uD638\uAC00 \uC77C\uCE58\uD558\uC9C0 \uC54A\uAC70\uB098 \uC720\uD6A8\uD558\uC9C0 \uC54A\uC2B5\uB2C8\uB2E4.", "error");
+        }
+      } catch (err) {
+        showToast(err.message || "\uC778\uC99D \uAC80\uC99D \uC911 \uC624\uB958\uAC00 \uBC1C\uC0DD\uD588\uC2B5\uB2C8\uB2E4.", "error");
+      } finally {
+        setIsVerifyingAuth(false);
+      }
+    };
+    const openTermReader = (term) => {
+      setReadingTerm(term);
+      setCurrentScrollPercent(scrolledTerms[term.id] ? 100 : 0);
+      setIsCurrentModalScrolledToBottom(!!scrolledTerms[term.id]);
+    };
+    const handleTermModalScroll = (e) => {
+      const target = e.currentTarget;
+      const { scrollTop, scrollHeight, clientHeight } = target;
+      const maxScroll = scrollHeight - clientHeight;
+      if (maxScroll <= 0) {
+        setCurrentScrollPercent(100);
+        setIsCurrentModalScrolledToBottom(true);
+        return;
+      }
+      const currentPercent = Math.min(100, Math.round(scrollTop / maxScroll * 100));
+      setCurrentScrollPercent(currentPercent);
+      if (maxScroll - scrollTop <= 15) {
+        setIsCurrentModalScrolledToBottom(true);
+      }
+    };
+    const handleConfirmTermReading = () => {
+      if (!readingTerm) return;
+      if (!isCurrentModalScrolledToBottom) {
+        showToast("\uC57D\uAD00 \uB0B4\uC6A9\uC744 \uB9C8\uC9C0\uB9C9 \uC904\uAE4C\uC9C0 \uC2A4\uD06C\uB864\uD558\uC5EC \uD655\uC778\uD574 \uC8FC\uC138\uC694.", "error");
+        return;
+      }
+      setScrolledTerms((prev) => ({ ...prev, [readingTerm.id]: true }));
+      setAgreedTerms((prev) => ({ ...prev, [readingTerm.id]: true }));
+      showToast(`[${readingTerm.title}] \uC57D\uAD00 \uD655\uC778 \uBC0F \uB3D9\uC758\uAC00 \uC644\uB8CC\uB418\uC5C8\uC2B5\uB2C8\uB2E4.`, "success");
+      setReadingTerm(null);
+    };
+    const handleToggleTerm = (term) => {
+      if (agreedTerms[term.id]) {
+        setAgreedTerms((prev) => ({ ...prev, [term.id]: false }));
+      } else {
+        if (!scrolledTerms[term.id]) {
+          openTermReader(term);
+        } else {
+          setAgreedTerms((prev) => ({ ...prev, [term.id]: true }));
+        }
+      }
+    };
+    const handleToggleAllTerms = () => {
+      const areAllMandatoryAgreed = termAge && agreedTerms.service && agreedTerms.privacy && agreedTerms.signature;
+      if (areAllMandatoryAgreed) {
+        setTermAge(false);
+        setAgreedTerms({
+          service: false,
+          privacy: false,
+          signature: false,
+          marketing: false
+        });
+      } else {
+        const unreadTerm = termsList.find((t) => t.isMandatory && !scrolledTerms[t.id]);
+        if (unreadTerm) {
+          setNoticeMessage(
+            `\uC18C\uBE44\uC790 \uAD8C\uC775 \uBC0F \uC804\uC790\uC11C\uBA85 \uBC95\uC801 \uD6A8\uB825 \uBCF4\uC99D\uC744 \uC704\uD574 [${unreadTerm.title}]\uC744(\uB97C) \uB05D\uAE4C\uC9C0 \uC2A4\uD06C\uB864\uD558\uC5EC \uC815\uB3C5\uD558\uC2E0 \uD6C4 \uC804\uCCB4 \uB3D9\uC758\uB97C \uC9C4\uD589\uD574 \uC8FC\uC138\uC694.`
+          );
+          setShowScrollNoticeModal(true);
+          return;
+        }
+        setTermAge(true);
+        setAgreedTerms({
+          service: true,
+          privacy: true,
+          signature: true,
+          marketing: true
+        });
+        showToast("\uBAA8\uB4E0 \uC57D\uAD00\uC5D0 \uC804\uCCB4 \uB3D9\uC758\uD558\uC600\uC2B5\uB2C8\uB2E4.", "success");
+      }
+    };
+    const getCanvasCoordinates = (e) => {
       const canvas = canvasRef.current;
       if (!canvas) return { x: 0, y: 0 };
       const rect = canvas.getBoundingClientRect();
+      const scaleX = canvas.width / rect.width;
+      const scaleY = canvas.height / rect.height;
       if ("touches" in e && e.touches.length > 0) {
         return {
-          x: e.touches[0].clientX - rect.left,
-          y: e.touches[0].clientY - rect.top
-        };
-      } else if ("clientX" in e) {
-        return {
-          x: e.clientX - rect.left,
-          y: e.clientY - rect.top
+          x: (e.touches[0].clientX - rect.left) * scaleX,
+          y: (e.touches[0].clientY - rect.top) * scaleY
         };
       }
-      return { x: 0, y: 0 };
+      const mouseEvent = e;
+      return {
+        x: (mouseEvent.clientX - rect.left) * scaleX,
+        y: (mouseEvent.clientY - rect.top) * scaleY
+      };
     };
-    const startDrawing = (e) => {
+    const handleStartDrawing = (e) => {
+      setIsDrawing(true);
       const canvas = canvasRef.current;
       if (!canvas) return;
       const ctx = canvas.getContext("2d");
       if (!ctx) return;
-      const pos = getCanvasPos(e);
+      const { x, y } = getCanvasCoordinates(e);
       ctx.beginPath();
-      ctx.moveTo(pos.x, pos.y);
-      setIsDrawing(true);
-      setHasSignature(true);
+      ctx.moveTo(x, y);
     };
-    const draw = (e) => {
+    const handleDrawing = (e) => {
       if (!isDrawing) return;
       const canvas = canvasRef.current;
       if (!canvas) return;
       const ctx = canvas.getContext("2d");
       if (!ctx) return;
-      const pos = getCanvasPos(e);
-      ctx.lineTo(pos.x, pos.y);
+      const { x, y } = getCanvasCoordinates(e);
+      ctx.lineWidth = 3.5;
+      ctx.lineCap = "round";
+      ctx.lineJoin = "round";
+      ctx.strokeStyle = "#00254a";
+      ctx.lineTo(x, y);
       ctx.stroke();
+      setHasSignature(true);
     };
-    const stopDrawing = () => {
+    const handleEndDrawing = () => {
       setIsDrawing(false);
     };
     const handleClearSignature = () => {
@@ -26026,19 +26249,21 @@
       setHasSignature(false);
       showToast("\uC804\uC790\uC11C\uBA85\uC774 \uCD08\uAE30\uD654\uB418\uC5C8\uC2B5\uB2C8\uB2E4. \uC0C8\uB85C \uC11C\uBA85\uD574 \uC8FC\uC138\uC694.", "info");
     };
-    const handleFinalSubmit = async (e) => {
+    const handleSubmitRegister = async (e) => {
       e.preventDefault();
       if (!userEmail.trim()) {
         showToast("\uC774\uBA54\uC77C \uC8FC\uC18C\uB97C \uC785\uB825\uD574 \uC8FC\uC138\uC694.", "error");
         return;
       }
-      if (!userPassword || userPassword.length < 8) {
-        showToast("\uBE44\uBC00\uBC88\uD638\uB97C \uC601\uBB38, \uC22B\uC790, \uD2B9\uC218\uBB38\uC790 \uD3EC\uD568 8\uC790\uB9AC \uC774\uC0C1 \uC785\uB825\uD574 \uC8FC\uC138\uC694.", "error");
-        return;
-      }
-      if (userPassword !== userPasswordConfirm) {
-        showToast("\uBE44\uBC00\uBC88\uD638\uAC00 \uC77C\uCE58\uD558\uC9C0 \uC54A\uC2B5\uB2C8\uB2E4.", "error");
-        return;
+      if (selectedMethod === "email") {
+        if (!userPassword || userPassword.length < 8) {
+          showToast("\uBE44\uBC00\uBC88\uD638\uB97C \uC601\uBB38, \uC22B\uC790, \uD2B9\uC218\uBB38\uC790 \uD3EC\uD568 8\uC790\uB9AC \uC774\uC0C1 \uC785\uB825\uD574 \uC8FC\uC138\uC694.", "error");
+          return;
+        }
+        if (userPassword !== userPasswordConfirm) {
+          showToast("\uBE44\uBC00\uBC88\uD638\uAC00 \uC77C\uCE58\uD558\uC9C0 \uC54A\uC2B5\uB2C8\uB2E4. \uB2E4\uC2DC \uD655\uC778\uD574 \uC8FC\uC138\uC694.", "error");
+          return;
+        }
       }
       if (!userNm.trim()) {
         showToast("\uC774\uC6A9\uC790 \uC2E4\uBA85\uC744 \uC785\uB825\uD574 \uC8FC\uC138\uC694.", "error");
@@ -26048,11 +26273,37 @@
         showToast("\uD734\uB300\uD3F0 \uBC88\uD638\uB97C \uC785\uB825\uD574 \uC8FC\uC138\uC694.", "error");
         return;
       }
+      if (!isPhoneVerified) {
+        showToast("\uD734\uB300\uC804\uD654 \uBCF8\uC778\uC778\uC99D(\uC778\uC99D\uBC88\uD638 \uC804\uC1A1 \uBC0F \uD655\uC778)\uC744 \uBA3C\uC800 \uC644\uB8CC\uD574 \uC8FC\uC138\uC694.", "error");
+        return;
+      }
+      if (!termAge) {
+        showToast("[\uD544\uC218] \uB9CC 14\uC138 \uC774\uC0C1 \uB3D9\uC758\uC5D0 \uCCB4\uD06C\uD574 \uC8FC\uC138\uC694.", "error");
+        return;
+      }
+      const unreadMandatory = termsList.find((t) => t.isMandatory && !scrolledTerms[t.id]);
+      if (unreadMandatory) {
+        setNoticeMessage(
+          `[${unreadMandatory.title}] \uC57D\uAD00\uC744 \uB05D\uAE4C\uC9C0 \uC2A4\uD06C\uB864\uD558\uC5EC \uC77D\uACE0 \uD655\uC778\uC744 \uC644\uB8CC\uD574\uC57C \uAC00\uC785\uC774 \uAC00\uB2A5\uD569\uB2C8\uB2E4.`
+        );
+        setShowScrollNoticeModal(true);
+        return;
+      }
+      const unAgreedMandatory = termsList.find((t) => t.isMandatory && !agreedTerms[t.id]);
+      if (unAgreedMandatory) {
+        showToast(`[\uD544\uC218] ${unAgreedMandatory.title}\uC5D0 \uB3D9\uC758\uD574 \uC8FC\uC138\uC694.`, "error");
+        return;
+      }
       if (!hasSignature || !canvasRef.current) {
-        showToast("\uC548\uC2EC \uAC70\uB798 \uBC0F \uACC4\uC57D \uBCF4\uC99D\uC744 \uC704\uD574 \uBCF8\uC778 \uC790\uD544 \uC804\uC790\uC11C\uBA85\uC744 \uBC18\uB4DC\uC2DC \uC791\uC131\uD574 \uC8FC\uC138\uC694.", "error");
+        showToast("\uCCAD\uC18C \uACC4\uC57D \uBC0F \uAC70\uB798 \uBCF4\uC99D\uC744 \uC704\uD574 \uBCF8\uC778 \uC790\uD544 \uC804\uC790\uC11C\uBA85\uC744 \uBC18\uB4DC\uC2DC \uC791\uC131\uD574 \uC8FC\uC138\uC694.", "error");
         return;
       }
       const signImgBase64 = canvasRef.current.toDataURL("image/png");
+      const agreedTermsPayload = termsList.map((t) => ({
+        termsCd: t.code,
+        termsVer: t.version,
+        agreeYn: agreedTerms[t.id] ? "Y" : "N"
+      }));
       setIsSubmitting(true);
       try {
         const res = await fetch(apiEndpoint, {
@@ -26061,954 +26312,701 @@
           body: JSON.stringify({
             actionType: "REGISTER",
             userEmail: userEmail.trim(),
-            userPassword,
+            userPassword: selectedMethod === "email" ? userPassword : void 0,
             userNm: userNm.trim(),
             userTel: userTel.trim(),
             signImgBase64,
-            recommenderCode: appliedReferral || void 0,
-            mktAgreeYn: termMarketing ? "Y" : "N",
-            joinPathCd: selectedMethod === "kakao" ? "KAKAO" : selectedMethod === "naver" ? "NAVER" : selectedMethod === "google" ? "GOOGLE" : "DIRECT"
+            mktAgreeYn: agreedTerms.marketing ? "Y" : "N",
+            joinPathCd: selectedMethod === "kakao" ? "KAKAO" : selectedMethod === "naver" ? "NAVER" : selectedMethod === "google" ? "GOOGLE" : "DIRECT",
+            socialProvider: selectedMethod !== "email" ? selectedMethod.toUpperCase() : void 0,
+            socialUid: selectedMethod !== "email" ? `${selectedMethod}_uid_${Date.now()}` : void 0,
+            socialEmail: selectedMethod !== "email" ? userEmail.trim() : void 0,
+            agreedTerms: agreedTermsPayload
           })
         });
         const data = await res.json();
-        if (res.status === 201 && data.success) {
-          setRegisteredUser({
-            userNo: data.userNo,
-            userNm: data.userNm,
-            couponInfo: data.couponInfo
+        if (!res.ok || !data.success) {
+          throw new Error(data.message || "\uD68C\uC6D0\uAC00\uC785 \uCC98\uB9AC \uC911 \uC624\uB958\uAC00 \uBC1C\uC0DD\uD588\uC2B5\uB2C8\uB2E4.");
+        }
+        setRegisteredResult({
+          userNo: data.userNo || "U20261000001",
+          userNm: data.userNm || userNm.trim(),
+          couponInfo: data.couponInfo || {
+            couponNm: "\uC2E0\uADDC\uAC00\uC785 \uC6F0\uCEF4 5,000\uC6D0 \uC989\uC2DC\uD560\uC778 \uCFE0\uD3F0",
+            discountAmt: 5e3
+          },
+          signSavedFiles: data.signSavedFiles
+        });
+        setShowSuccessModal(true);
+        if (onRegisterSuccess) {
+          onRegisterSuccess({
+            userNo: data.userNo || "U20261000001",
+            userNm: data.userNm || userNm.trim(),
+            welcomeCouponIssued: true,
+            signSavedFiles: data.signSavedFiles
           });
-          setShowSuccessModal(true);
-          if (onRegisterSuccess) {
-            onRegisterSuccess({
-              userNo: data.userNo,
-              userNm: data.userNm,
-              welcomeCouponIssued: data.welcomeCouponIssued
-            });
-          }
-        } else {
-          showToast(data.message || "\uD68C\uC6D0\uAC00\uC785 \uCC98\uB9AC \uC911 \uC624\uB958\uAC00 \uBC1C\uC0DD\uD588\uC2B5\uB2C8\uB2E4.", "error");
         }
       } catch (err) {
-        showToast(err.message || "\uB124\uD2B8\uC6CC\uD06C \uC624\uB958\uAC00 \uBC1C\uC0DD\uD588\uC2B5\uB2C8\uB2E4. \uC7A0\uC2DC \uD6C4 \uB2E4\uC2DC \uC2DC\uB3C4\uD574 \uC8FC\uC138\uC694.", "error");
+        showToast(err.message || "\uD68C\uC6D0\uAC00\uC785 \uC694\uCCAD \uC911 \uB124\uD2B8\uC6CC\uD06C \uC624\uB958\uAC00 \uBC1C\uC0DD\uD588\uC2B5\uB2C8\uB2E4.", "error");
       } finally {
         setIsSubmitting(false);
       }
     };
-    const handleGoBack = () => {
-      if (currentStep === "STEP2_ACCOUNT_AND_SIGNATURE") {
-        setCurrentStep("STEP1_METHOD_AND_TERMS");
-        window.scrollTo({ top: 0, behavior: "smooth" });
+    const handleCloseModal = () => {
+      if (onClose) {
+        onClose();
+      } else if (onNavigate) {
+        onNavigate("USER-COM-00");
       } else {
-        if (onNavigate) {
-          onNavigate("USER-ATH-00");
-        } else {
-          window.location.hash = "#login";
-        }
+        window.location.hash = "#home";
       }
     };
-    return /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "bg-[#f8f9ff] font-['Plus_Jakarta_Sans','Noto_Sans_KR',sans-serif] text-[#0b1c30] min-h-screen flex flex-col justify-between antialiased", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("header", { className: "fixed top-0 left-0 w-full z-50 bg-[#f8f9ff]/85 backdrop-blur-xl border-b border-[#dce9ff] shadow-[0_1px_8px_rgba(0,0,0,0.03)]", children: /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "h-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 flex items-center justify-between", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "flex items-center gap-4 sm:gap-6", children: [
+    if (!isOpen) return null;
+    return /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "fixed inset-0 z-50 bg-[#213145]/70 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 overflow-y-auto antialiased animate-fadeIn", children: [
+      toastMessage && /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "fixed top-6 right-6 z-[90] bg-[#00254a] text-white px-5 py-3 rounded-2xl shadow-2xl flex items-center gap-2.5 border border-[#82f5c1]/30 animate-bounce", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "material-symbols-outlined text-[20px] text-[#82f5c1]", children: toastType === "success" ? "check_circle" : toastType === "error" ? "error" : "info" }),
+        /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "text-[13px] font-semibold", children: toastMessage })
+      ] }),
+      /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "w-full max-w-[560px] max-h-[92vh] bg-white rounded-3xl shadow-2xl overflow-hidden flex flex-col border border-slate-100 my-auto animate-scaleUp", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("header", { className: "px-6 py-4 bg-[#eff4ff] border-b border-[#dce9ff] flex items-center justify-between shrink-0", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "flex items-center gap-3", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { className: "w-9 h-9 rounded-xl bg-white shadow-sm flex items-center justify-center p-1 overflow-hidden", children: /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("img", { src: logoSrc, alt: "SsulDak \uB85C\uACE0", className: "w-full h-full object-contain" }) }),
+            /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "flex flex-col", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "flex items-center gap-2", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "text-[16px] font-bold text-[#00254a]", children: "\uC774\uC6A9\uC790 \uD68C\uC6D0\uAC00\uC785" }),
+                /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "text-[11px] font-bold px-2 py-0.5 rounded-full bg-[#163b66] text-white", children: "\uAC04\uD3B8\uAC00\uC785 \uBC0F \uC11C\uBA85" })
+              ] }),
+              /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "text-[11px] text-[#006c4a] font-bold", children: "\uAC04\uD3B8 \uBCF8\uC778\uD655\uC778 \uBC0F \uC804\uC790\uC11C\uBA85" })
+            ] })
+          ] }),
           /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
             "button",
             {
               type: "button",
-              "aria-label": "\uB4A4\uB85C\uAC00\uAE30",
-              onClick: handleGoBack,
-              className: "w-10 h-10 -ml-1 flex items-center justify-center text-[#0b1c30] rounded-full active:bg-[#e5eeff] transition-colors cursor-pointer",
-              children: /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "material-symbols-outlined text-[22px]", children: "arrow_back_ios_new" })
-            }
-          ),
-          /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "flex items-center gap-2 select-none", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("img", { src: logoSrc, alt: "SsulDak \uB85C\uACE0", className: "w-8 h-8 object-contain drop-shadow-sm" }),
-            /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "flex flex-col leading-tight", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "text-[17px] font-bold text-[#00254a]", children: "\uC4F8\uACE0\uB2E6\uACE0" }),
-              /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "text-[10px] text-[#006c4a] font-bold tracking-wider uppercase", children: "SsulDak Care" })
-            ] })
-          ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { className: "h-4 w-px bg-[#dce9ff] hidden sm:block" }),
-          /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)(
-            "button",
-            {
-              type: "button",
-              onClick: () => onNavigate ? onNavigate("USER-COM-00") : window.location.hash = "#home",
-              className: "hidden sm:inline-flex items-center gap-1.5 text-[#43474f] hover:text-[#0b1c30] text-[13px] font-medium transition-colors cursor-pointer",
-              children: [
-                /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "material-symbols-outlined text-[18px]", children: "arrow_back" }),
-                /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { children: "\uD648\uC73C\uB85C \uAC00\uAE30" })
-              ]
+              "aria-label": "\uB2EB\uAE30",
+              onClick: handleCloseModal,
+              className: "w-8 h-8 rounded-full flex items-center justify-center text-slate-400 hover:text-slate-700 hover:bg-slate-200 transition-colors cursor-pointer",
+              children: /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "material-symbols-outlined text-[20px]", children: "close" })
             }
           )
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "flex items-center gap-3", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#eff4ff] text-[#006c4a] text-[12px] font-bold", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "w-2 h-2 rounded-full bg-[#006c4a] animate-pulse" }),
-            /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { children: "\uBCF4\uC99D \uC778\uC99D \uC2DC\uC2A4\uD15C \uAC00\uB3D9\uC911" })
-          ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "px-2.5 py-1 rounded-full bg-[#163b66]/10 text-[#00254a] text-[12px] font-bold", children: currentStep === "STEP1_METHOD_AND_TERMS" ? "STEP 1 / 2" : "STEP 2 / 2 \u2022 \uCD5C\uC885 \uB2E8\uACC4" })
-        ] })
-      ] }) }),
-      /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("main", { className: "w-full pt-16 flex-1 flex flex-col bg-[#f8f9ff]", children: [
-        currentStep === "STEP1_METHOD_AND_TERMS" && /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "w-full max-w-lg mx-auto py-8 px-4 flex flex-col gap-4 animate-fadeIn", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { className: "w-full bg-[#e5eeff] h-1.5 rounded-full overflow-hidden", children: /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { className: "bg-[#00254a] h-full w-1/2 transition-all duration-300" }) }),
-          /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "flex items-center justify-between pt-1", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "flex flex-col", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "flex items-center gap-1.5 mb-1", children: [
-                /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "inline-block w-2 h-2 rounded-full bg-[#006c4a] animate-pulse" }),
-                /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "text-[11px] font-bold text-[#006c4a] uppercase tracking-wider", children: "Premium Cleaning Care" })
-              ] }),
-              /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("h2", { className: "text-[20px] font-bold text-[#0b1c30] tracking-tight leading-snug", children: "\uBC18\uAC00\uC6CC\uC694! \uAC04\uD3B8\uD558\uAC8C \uC2DC\uC791\uD574\uC694" }),
-              /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("p", { className: "text-[13px] text-[#43474f] mt-0.5", children: "\uBBFF\uC744 \uC218 \uC788\uB294 \uACF5\uAC04 \uAD00\uB9AC \uD30C\uD2B8\uB108, \uC4F8\uACE0\uB2E6\uACE0" })
+        /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("form", { onSubmit: handleSubmitRegister, className: "overflow-y-auto flex-1 p-6 space-y-6", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "space-y-2", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("label", { className: "text-[13px] font-bold text-slate-800 flex items-center gap-1", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "material-symbols-outlined text-[16px] text-[#00254a]", children: "login" }),
+              /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { children: "\uAC00\uC785 \uBC29\uC2DD \uC120\uD0DD" })
             ] }),
-            /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { className: "w-12 h-12 rounded-2xl bg-[#e5eeff] flex items-center justify-center text-[#00254a] shadow-sm shrink-0", children: /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "material-symbols-outlined text-[26px]", children: "cleaning_services" }) })
-          ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#82f5c1]/35 via-[#eff4ff] to-[#85f8c4]/20 p-4 shadow-sm border border-[#82f5c1]/40", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { className: "absolute -right-4 -bottom-6 w-28 h-28 bg-[#85f8c4]/30 rounded-full blur-2xl pointer-events-none" }),
-            /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "relative z-10 flex flex-col gap-2", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "flex items-center justify-between", children: [
-                /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("span", { className: "inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#006c4a] text-white text-[11px] font-bold tracking-wide shadow-sm", children: [
-                  /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "material-symbols-outlined text-[13px]", children: "auto_awesome" }),
-                  "WELCOME BENEFIT"
-                ] }),
-                /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "text-[11px] text-[#006c4a] font-bold", children: "D-DAY \uC989\uC2DC\uC9C0\uAE09" })
-              ] }),
-              /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "mt-1", children: [
-                /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("h3", { className: "text-[16px] text-[#0b1c30] font-extrabold leading-snug", children: [
-                  "\uAC00\uC785 \uC989\uC2DC \uCCAB \uACB0\uC81C ",
-                  /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "text-[#006c4a] font-black", children: "20,000\uC6D0" }),
-                  " \uC0C1\uB2F9 \uCCAD\uC18C \uD560\uC778 \uCFE0\uD3F0\uD329 \uC9C0\uAE09!"
-                ] }),
-                /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "flex items-center gap-1.5 mt-1 text-[#43474f] text-[12px]", children: [
-                  /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "material-symbols-outlined text-[#006c4a] text-[16px]", children: "verified" }),
-                  /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { children: "\uC815\uAE30\uCCAD\uC18C\uBD80\uD130 \uAC00\uC804 \uCF00\uC5B4\uAE4C\uC9C0 \uC989\uC2DC \uC0AC\uC6A9 \uAC00\uB2A5" })
-                ] })
-              ] })
+            /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "grid grid-cols-2 gap-2.5", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)(
+                "button",
+                {
+                  type: "button",
+                  onClick: () => handleSelectMethod("kakao"),
+                  className: `p-3 rounded-2xl border flex items-center gap-3 transition-all cursor-pointer ${selectedMethod === "kakao" ? "border-[#fee500] bg-[#fee500]/20 ring-2 ring-[#fee500]" : "border-slate-200 hover:bg-slate-50"}`,
+                  children: [
+                    /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { className: "w-8 h-8 rounded-lg bg-[#fee500] flex items-center justify-center shrink-0 text-[#191919] font-black text-sm", children: "K" }),
+                    /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "flex flex-col text-left", children: [
+                      /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "text-[13px] font-bold text-slate-900", children: "\uCE74\uCE74\uC624" }),
+                      /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "text-[10px] text-slate-500", children: "3\uCD08 \uAC04\uD3B8\uAC00\uC785" })
+                    ] })
+                  ]
+                }
+              ),
+              /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)(
+                "button",
+                {
+                  type: "button",
+                  onClick: () => handleSelectMethod("naver"),
+                  className: `p-3 rounded-2xl border flex items-center gap-3 transition-all cursor-pointer ${selectedMethod === "naver" ? "border-[#03c75a] bg-[#03c75a]/10 ring-2 ring-[#03c75a]" : "border-slate-200 hover:bg-slate-50"}`,
+                  children: [
+                    /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { className: "w-8 h-8 rounded-lg bg-[#03c75a] flex items-center justify-center shrink-0 text-white font-black text-sm", children: "N" }),
+                    /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "flex flex-col text-left", children: [
+                      /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "text-[13px] font-bold text-slate-900", children: "\uB124\uC774\uBC84" }),
+                      /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "text-[10px] text-slate-500", children: "\uB124\uC774\uBC84 \uC5F0\uB3D9" })
+                    ] })
+                  ]
+                }
+              ),
+              /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)(
+                "button",
+                {
+                  type: "button",
+                  onClick: () => handleSelectMethod("google"),
+                  className: `p-3 rounded-2xl border flex items-center gap-3 transition-all cursor-pointer ${selectedMethod === "google" ? "border-blue-500 bg-blue-50 ring-2 ring-blue-500" : "border-slate-200 hover:bg-slate-50"}`,
+                  children: [
+                    /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { className: "w-8 h-8 rounded-lg bg-white border border-slate-200 flex items-center justify-center shrink-0 font-bold text-slate-700 text-sm shadow-sm", children: "G" }),
+                    /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "flex flex-col text-left", children: [
+                      /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "text-[13px] font-bold text-slate-900", children: "Google" }),
+                      /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "text-[10px] text-slate-500", children: "\uAD6C\uAE00 \uACC4\uC815" })
+                    ] })
+                  ]
+                }
+              ),
+              /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)(
+                "button",
+                {
+                  type: "button",
+                  onClick: () => handleSelectMethod("email"),
+                  className: `p-3 rounded-2xl border flex items-center gap-3 transition-all cursor-pointer ${selectedMethod === "email" ? "border-[#00254a] bg-[#eff4ff] ring-2 ring-[#00254a]" : "border-slate-200 hover:bg-slate-50"}`,
+                  children: [
+                    /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { className: "w-8 h-8 rounded-lg bg-[#00254a] flex items-center justify-center shrink-0 text-white", children: /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "material-symbols-outlined text-[18px]", children: "mail" }) }),
+                    /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "flex flex-col text-left", children: [
+                      /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "text-[13px] font-bold text-slate-900", children: "\uC77C\uBC18 \uC774\uBA54\uC77C" }),
+                      /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "text-[10px] text-slate-500", children: "\uC9C1\uC811 \uC785\uB825" })
+                    ] })
+                  ]
+                }
+              )
             ] })
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "flex flex-col gap-2.5", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)(
-              "button",
-              {
-                type: "button",
-                onClick: () => handleSelectSocialMethod("kakao"),
-                className: `w-full h-12 px-4 rounded-xl flex items-center justify-between transition-all duration-150 active:scale-[0.98] shadow-sm cursor-pointer ${selectedMethod === "kakao" ? "ring-2 ring-primary ring-offset-2" : ""}`,
-                style: { backgroundColor: "#FEE500", color: "#191919" },
-                children: [
-                  /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "flex items-center gap-3", children: [
-                    /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("svg", { className: "w-5 h-5 fill-current shrink-0", viewBox: "0 0 24 24", children: /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("path", { d: "M12 3C6.477 3 2 6.477 2 10.767c0 2.766 1.874 5.184 4.673 6.486-.205.74-.755 2.705-.863 3.125-.137.525.192.518.404.377.167-.11 2.658-1.802 3.733-2.533.67.098 1.36.149 2.053.149 5.523 0 10-3.477 10-7.767S17.523 3 12 3z" }) }),
-                    /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "text-[15px] font-bold", children: "\uCE74\uCE74\uC624\uB85C \uC2DC\uC791\uD558\uAE30" })
-                  ] }),
-                  /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "text-[12px] opacity-70 font-medium", children: "3\uCD08 \uC644\uC131" })
-                ]
-              }
-            ),
-            /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)(
-              "button",
-              {
-                type: "button",
-                onClick: () => handleSelectSocialMethod("naver"),
-                className: `w-full h-12 px-4 rounded-xl flex items-center justify-between transition-all duration-150 active:scale-[0.98] shadow-sm cursor-pointer ${selectedMethod === "naver" ? "ring-2 ring-primary ring-offset-2" : ""}`,
-                style: { backgroundColor: "#03C75A", color: "#FFFFFF" },
-                children: [
-                  /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "flex items-center gap-3", children: [
-                    /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "text-[16px] font-black leading-none", children: "N" }),
-                    /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "text-[15px] font-bold", children: "\uB124\uC774\uBC84\uB85C \uC2DC\uC791\uD558\uAE30" })
-                  ] }),
-                  /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "text-[12px] text-white/80 font-medium", children: "\uAC04\uD3B8 \uC5F0\uB3D9" })
-                ]
-              }
-            ),
-            /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)(
-              "button",
-              {
-                type: "button",
-                onClick: () => handleSelectSocialMethod("google"),
-                className: `w-full h-12 px-4 rounded-xl flex items-center justify-between bg-white text-[#1f1f1f] border border-[#c3c6d0]/80 transition-all duration-150 active:scale-[0.98] shadow-sm cursor-pointer hover:bg-slate-50 ${selectedMethod === "google" ? "ring-2 ring-primary ring-offset-2" : ""}`,
-                children: [
-                  /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "flex items-center gap-3", children: [
-                    /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("svg", { className: "w-4 h-4 shrink-0", viewBox: "0 0 24 24", children: [
-                      /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("path", { fill: "#4285F4", d: "M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" }),
-                      /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("path", { fill: "#34A853", d: "M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" }),
-                      /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("path", { fill: "#FBBC05", d: "M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" }),
-                      /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("path", { fill: "#EA4335", d: "M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" })
-                    ] }),
-                    /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "text-[15px] font-bold", children: "Google\uB85C \uC2DC\uC791\uD558\uAE30" })
-                  ] }),
-                  /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "text-[12px] text-[#737780] font-medium", children: "\uC6D0\uD074\uB9AD \uB85C\uADF8\uC778" })
-                ]
-              }
-            ),
-            /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)(
-              "button",
-              {
-                type: "button",
-                onClick: () => setSelectedMethod("email"),
-                className: `w-full h-12 px-4 rounded-xl flex items-center justify-between bg-[#e5eeff] hover:bg-[#dce9ff] text-[#00254a] transition-all duration-150 active:scale-[0.98] cursor-pointer ${selectedMethod === "email" ? "ring-2 ring-primary ring-offset-2" : ""}`,
-                children: [
-                  /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "flex items-center gap-3", children: [
-                    /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "material-symbols-outlined text-[20px]", children: "mail" }),
-                    /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "text-[15px] font-bold", children: "\uC77C\uBC18 \uC774\uBA54\uC77C\uB85C \uAC00\uC785\uD558\uAE30" })
-                  ] }),
-                  /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "material-symbols-outlined text-[#00254a] text-[18px]", children: "chevron_right" })
-                ]
-              }
-            )
-          ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "rounded-2xl bg-[#eff4ff] p-4 shadow-sm border border-[#dce9ff]", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "flex items-start gap-3", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { className: "w-9 h-9 rounded-full bg-[#d4e3ff] flex items-center justify-center text-[#00254a] shrink-0", children: /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "material-symbols-outlined text-[20px]", children: "featured_seasonal_and_gifts" }) }),
-              /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "flex-1 min-w-0", children: [
-                /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "flex items-center justify-between", children: [
-                  /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "text-[14px] text-[#00254a] font-bold", children: "\uCE5C\uAD6C \uCD08\uB300 \uCF54\uB4DC\uAC00 \uC788\uC73C\uC2E0\uAC00\uC694?" }),
-                  /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "text-[12px] text-[#006c4a] font-extrabold bg-[#82f5c1]/30 px-2 py-0.5 rounded-full", children: "+5,000P" })
+          /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "space-y-3 p-4 bg-slate-50/80 rounded-2xl border border-slate-200", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "flex items-center justify-between", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("label", { className: "text-[13px] font-bold text-slate-900 flex items-center gap-1.5", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "material-symbols-outlined text-[16px] text-[#00254a]", children: "badge" }),
+                /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { children: selectedMethod === "email" ? "\uC774\uBA54\uC77C \uBC0F \uB85C\uADF8\uC778 \uACC4\uC815 \uC815\uBCF4 (\uC9C1\uC811 \uC785\uB825)" : `${selectedMethod === "kakao" ? "\uCE74\uCE74\uC624" : selectedMethod === "naver" ? "\uB124\uC774\uBC84" : "Google"} SNS \uC5F0\uB3D9 \uD68C\uC6D0 \uC815\uBCF4` })
+              ] }),
+              selectedMethod !== "email" && /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "text-[11px] font-bold text-emerald-700 bg-emerald-100/70 px-2 py-0.5 rounded-full", children: "\uAC04\uD3B8 \uC778\uC99D \uC5F0\uB3D9\uB428" })
+            ] }),
+            selectedMethod !== "email" && /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "p-3 bg-white rounded-xl border border-emerald-200/80 text-[12px] text-emerald-900 flex items-center gap-2", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "material-symbols-outlined text-[18px] text-emerald-600", children: "verified" }),
+              /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "flex flex-col", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("span", { className: "font-bold", children: [
+                  selectedMethod === "kakao" ? "\uCE74\uCE74\uC624" : selectedMethod === "naver" ? "\uB124\uC774\uBC84" : "Google",
+                  " ",
+                  "\uACC4\uC815 \uC5F0\uB3D9\uC73C\uB85C \uBE44\uBC00\uBC88\uD638 \uC5C6\uC774 \uAC04\uD3B8 \uB85C\uADF8\uC778\uB429\uB2C8\uB2E4."
                 ] }),
-                /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("p", { className: "text-[12px] text-[#43474f] mt-0.5", children: "\uCD94\uCC9C\uC778 \uCF54\uB4DC \uC785\uB825 \uC2DC \uB450 \uBD84 \uBAA8\uB450 \uCD94\uAC00 \uD61C\uD0DD\uC744 \uBC1B\uC544\uC694" })
+                /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("span", { className: "text-[11px] text-slate-500", children: [
+                  "\uC5F0\uB3D9 \uC774\uBA54\uC77C: ",
+                  userEmail
+                ] })
               ] })
             ] }),
-            /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "flex items-center gap-2 mt-3", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "relative flex-1", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "space-y-1", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("label", { className: "text-[12px] font-bold text-slate-700 flex items-center justify-between", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { children: "\uC774\uBA54\uC77C \uC8FC\uC18C (\uC544\uC774\uB514)" }),
+                isEmailChecked && /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "text-[11px] text-emerald-600 font-bold", children: "\u2713 \uC911\uBCF5 \uD655\uC778 \uC644\uB8CC" })
+              ] }),
+              /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "flex gap-2", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
+                  "input",
+                  {
+                    type: "email",
+                    value: userEmail,
+                    onChange: (e) => {
+                      setUserEmail(e.target.value);
+                      setIsEmailChecked(false);
+                      setEmailCheckMessage(null);
+                    },
+                    placeholder: "example@ssuldak.com",
+                    required: true,
+                    className: "flex-1 h-10 px-3 rounded-xl bg-white border border-slate-200 text-[13px] font-medium focus:outline-none focus:ring-2 focus:ring-[#00254a]"
+                  }
+                ),
+                /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
+                  "button",
+                  {
+                    type: "button",
+                    onClick: handleCheckEmailDuplicate,
+                    disabled: isCheckingEmail,
+                    className: "px-3.5 h-10 bg-[#00254a] hover:bg-[#163b66] text-white font-bold text-[12px] rounded-xl transition-colors cursor-pointer shrink-0 disabled:opacity-50",
+                    children: isCheckingEmail ? "\uD655\uC778\uC911..." : "\uC911\uBCF5\uD655\uC778"
+                  }
+                )
+              ] }),
+              emailCheckMessage && /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("p", { className: `text-[11px] pl-1 ${isEmailChecked ? "text-emerald-600" : "text-rose-500"}`, children: emailCheckMessage })
+            ] }),
+            selectedMethod === "email" && /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "space-y-1", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("label", { className: "text-[12px] font-bold text-slate-700", children: "\uBE44\uBC00\uBC88\uD638" }),
+                /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "relative", children: [
+                  /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
+                    "input",
+                    {
+                      type: showPassword ? "text" : "password",
+                      value: userPassword,
+                      onChange: (e) => setUserPassword(e.target.value),
+                      placeholder: "8\uC790 \uC774\uC0C1 (\uC601\uBB38+\uC22B\uC790+\uD2B9\uC218)",
+                      required: selectedMethod === "email",
+                      className: "w-full h-10 px-3 pr-9 rounded-xl bg-white border border-slate-200 text-[13px] focus:outline-none focus:ring-2 focus:ring-[#00254a]"
+                    }
+                  ),
+                  /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
+                    "button",
+                    {
+                      type: "button",
+                      onClick: () => setShowPassword(!showPassword),
+                      className: "absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer",
+                      children: /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "material-symbols-outlined text-[17px]", children: showPassword ? "visibility_off" : "visibility" })
+                    }
+                  )
+                ] })
+              ] }),
+              /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "space-y-1", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("label", { className: "text-[12px] font-bold text-slate-700 flex items-center justify-between", children: [
+                  /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { children: "\uBE44\uBC00\uBC88\uD638 \uD655\uC778" }),
+                  userPassword && userPasswordConfirm && /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
+                    "span",
+                    {
+                      className: `text-[10px] font-bold ${userPassword === userPasswordConfirm ? "text-emerald-600" : "text-rose-500"}`,
+                      children: userPassword === userPasswordConfirm ? "\u2713 \uC77C\uCE58" : "\u2715 \uBD88\uC77C\uCE58"
+                    }
+                  )
+                ] }),
+                /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "relative", children: [
+                  /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
+                    "input",
+                    {
+                      type: showPasswordConfirm ? "text" : "password",
+                      value: userPasswordConfirm,
+                      onChange: (e) => setUserPasswordConfirm(e.target.value),
+                      placeholder: "\uBE44\uBC00\uBC88\uD638 \uC7AC\uC785\uB825",
+                      required: selectedMethod === "email",
+                      className: `w-full h-10 px-3 pr-9 rounded-xl bg-white border text-[13px] focus:outline-none focus:ring-2 ${userPassword && userPasswordConfirm && userPassword !== userPasswordConfirm ? "border-rose-300 focus:ring-rose-500" : "border-slate-200 focus:ring-[#00254a]"}`
+                    }
+                  ),
+                  /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
+                    "button",
+                    {
+                      type: "button",
+                      onClick: () => setShowPasswordConfirm(!showPasswordConfirm),
+                      className: "absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer",
+                      children: /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "material-symbols-outlined text-[17px]", children: showPasswordConfirm ? "visibility_off" : "visibility" })
+                    }
+                  )
+                ] })
+              ] })
+            ] }),
+            /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "space-y-3 pt-1", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "space-y-1", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("label", { className: "text-[12px] font-bold text-slate-700", children: "\uC774\uC6A9\uC790 \uC2E4\uBA85" }),
                 /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
                   "input",
                   {
                     type: "text",
-                    id: "referralInput",
-                    maxLength: 8,
-                    value: referralInput,
-                    disabled: appliedReferral !== null,
-                    onChange: (e) => setReferralInput(e.target.value.toUpperCase()),
-                    placeholder: "\uCF54\uB4DC 8\uC790\uB9AC \uC785\uB825 (\uC120\uD0DD)",
-                    className: `w-full h-11 px-3.5 bg-white text-[#0b1c30] rounded-xl text-[13px] uppercase tracking-wider placeholder:text-[#737780] border border-[#c3c6d0] focus:outline-none focus:border-[#00254a] ${appliedReferral ? "text-[#006c4a] font-bold bg-[#82f5c1]/10" : ""}`
-                  }
-                ),
-                appliedReferral && /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
-                  "button",
-                  {
-                    type: "button",
-                    onClick: handleClearReferral,
-                    className: "absolute right-3 top-1/2 -translate-y-1/2 text-[#737780] hover:text-[#0b1c30]",
-                    children: /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "material-symbols-outlined text-[18px]", children: "cancel" })
+                    value: userNm,
+                    onChange: (e) => setUserNm(e.target.value),
+                    placeholder: "\uD64D\uAE38\uB3D9",
+                    required: true,
+                    className: "w-full h-10 px-3 rounded-xl bg-white border border-slate-200 text-[13px] focus:outline-none focus:ring-2 focus:ring-[#00254a]"
                   }
                 )
               ] }),
-              /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
-                "button",
-                {
-                  type: "button",
-                  id: "applyReferralBtn",
-                  disabled: isCheckingReferral || appliedReferral !== null,
-                  onClick: handleApplyReferral,
-                  className: "h-11 px-4 rounded-xl bg-[#00254a] text-white text-[13px] font-bold whitespace-nowrap active:scale-95 transition-transform cursor-pointer disabled:opacity-50",
-                  children: isCheckingReferral ? "\uD655\uC778 \uC911" : appliedReferral ? "\uC801\uC6A9\uB428" : "\uC801\uC6A9"
-                }
-              )
-            ] }),
-            referralFeedback && /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "mt-2.5 flex items-center gap-1.5 text-[#006c4a] text-[12px] font-semibold", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "material-symbols-outlined text-[16px]", children: "check_circle" }),
-              /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { children: referralFeedback })
+              /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "space-y-1.5", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "flex items-center justify-between", children: [
+                  /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("label", { className: "text-[12px] font-bold text-slate-700 flex items-center gap-1", children: [
+                    /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { children: "\uD734\uB300\uC804\uD654 \uBC88\uD638" }),
+                    /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "text-[11px] text-rose-500 font-semibold", children: "* \uBCF8\uC778\uC778\uC99D \uD544\uC218" })
+                  ] }),
+                  isPhoneVerified && /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("span", { className: "inline-flex items-center gap-1 text-[11px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full", children: [
+                    /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "material-symbols-outlined text-[13px]", children: "check_circle" }),
+                    "\uC778\uC99D \uC644\uB8CC"
+                  ] })
+                ] }),
+                /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "flex gap-2", children: [
+                  /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
+                    "input",
+                    {
+                      type: "tel",
+                      value: userTel,
+                      onChange: handlePhoneChange,
+                      placeholder: "010-0000-0000 (\uC22B\uC790\uB9CC \uC785\uB825)",
+                      maxLength: 13,
+                      disabled: isPhoneVerified,
+                      className: `flex-1 h-10 px-3 rounded-xl bg-white border text-[13px] focus:outline-none focus:ring-2 ${isPhoneVerified ? "bg-slate-100 border-emerald-300 text-slate-600 font-semibold cursor-not-allowed" : "border-slate-200 focus:ring-[#00254a]"}`
+                    }
+                  ),
+                  /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
+                    "button",
+                    {
+                      type: "button",
+                      onClick: handleSendPhoneAuth,
+                      disabled: isSendingAuth || isPhoneVerified || userTel.replace(/[^0-9]/g, "").length < 10,
+                      className: `px-3.5 h-10 rounded-xl font-bold text-[12px] transition-colors shrink-0 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed ${isPhoneVerified ? "bg-slate-200 text-slate-400 cursor-not-allowed" : isPhoneAuthSent ? "bg-slate-800 text-white hover:bg-slate-700" : "bg-[#00254a] text-white hover:bg-[#163b66]"}`,
+                      children: isSendingAuth ? "\uC804\uC1A1\uC911..." : isPhoneAuthSent ? "\uC778\uC99D\uBC88\uD638 \uC7AC\uC804\uC1A1" : "\uC778\uC99D\uBC88\uD638 \uC804\uC1A1"
+                    }
+                  )
+                ] }),
+                isPhoneAuthSent && !isPhoneVerified && /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "p-3 bg-amber-50/70 border border-amber-200 rounded-xl space-y-2", children: [
+                  /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "flex items-center justify-between", children: [
+                    /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("span", { className: "text-[11px] font-bold text-slate-700 flex items-center gap-1", children: [
+                      /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "material-symbols-outlined text-[14px] text-amber-600", children: "sms" }),
+                      "\uC218\uC2E0\uB41C \uC778\uC99D\uBC88\uD638 6\uC790\uB9AC"
+                    ] }),
+                    /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("span", { className: "text-[11px] font-mono font-bold text-rose-600 bg-rose-50 px-2 py-0.5 rounded-md border border-rose-200", children: [
+                      "\uB0A8\uC740\uC2DC\uAC04 ",
+                      formatTimer(authTimerSeconds)
+                    ] })
+                  ] }),
+                  /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "flex gap-2", children: [
+                    /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { className: "relative flex-1", children: /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
+                      "input",
+                      {
+                        type: "text",
+                        inputMode: "numeric",
+                        maxLength: 6,
+                        value: phoneAuthCode,
+                        onChange: (e) => setPhoneAuthCode(e.target.value.replace(/[^0-9]/g, "")),
+                        placeholder: "6\uC790\uB9AC \uC22B\uC790 \uC785\uB825",
+                        className: "w-full h-10 px-3 tracking-widest font-mono text-[14px] font-bold bg-white border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#00254a]"
+                      }
+                    ) }),
+                    /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
+                      "button",
+                      {
+                        type: "button",
+                        onClick: handleVerifyPhoneAuth,
+                        disabled: isVerifyingAuth || phoneAuthCode.length !== 6 || authTimerSeconds <= 0,
+                        className: "px-4 h-10 rounded-xl bg-emerald-600 text-white font-bold text-[12px] hover:bg-emerald-700 transition-colors shrink-0 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed",
+                        children: isVerifyingAuth ? "\uD655\uC778\uC911..." : "\uC778\uC99D \uD655\uC778"
+                      }
+                    )
+                  ] }),
+                  authDevHint && /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("p", { className: "text-[11px] text-amber-700 font-medium", children: [
+                    "\u{1F4A1} ",
+                    authDevHint
+                  ] })
+                ] })
+              ] })
             ] })
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "rounded-2xl bg-white p-4 shadow-sm border border-slate-200/80 flex flex-col gap-3", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "space-y-2.5 pt-1", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "flex items-center justify-between", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("label", { className: "text-[13px] font-bold text-slate-900 flex items-center gap-1.5", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "material-symbols-outlined text-[16px] text-[#00254a]", children: "gavel" }),
+                /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { children: "\uC774\uC6A9 \uC57D\uAD00 \uB3D9\uC758 \uBC0F \uC5F4\uB78C \uD655\uC778" })
+              ] }),
+              /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "text-[11px] text-blue-700 bg-blue-50 px-2 py-0.5 rounded-full font-semibold", children: "\uBAA8\uB4E0 \uC57D\uAD00 \uC2A4\uD06C\uB864 \uC644\uB3C5 \uD544\uC218" })
+            ] }),
             /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)(
               "div",
               {
                 onClick: handleToggleAllTerms,
-                className: "cursor-pointer flex items-center justify-between p-3 rounded-xl bg-[#e5eeff] transition-colors active:bg-[#dce9ff] select-none",
+                className: `p-3.5 rounded-2xl border transition-all cursor-pointer flex items-center justify-between ${termAge && agreedTerms.service && agreedTerms.privacy && agreedTerms.signature ? "border-[#00254a] bg-[#eff4ff]" : "border-slate-200 bg-slate-50/70 hover:bg-slate-100"}`,
                 children: [
-                  /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "flex items-center gap-3", children: [
+                  /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "flex items-center gap-2.5", children: [
                     /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
-                      "div",
+                      "span",
                       {
-                        className: `w-6 h-6 rounded-md flex items-center justify-center text-white transition-colors ${isAllTermsChecked ? "bg-[#00254a]" : "bg-[#c3c6d0]"}`,
-                        children: /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "material-symbols-outlined text-[18px]", children: "check" })
+                        className: `material-symbols-outlined text-[22px] ${termAge && agreedTerms.service && agreedTerms.privacy && agreedTerms.signature ? "text-[#00254a]" : "text-slate-300"}`,
+                        children: termAge && agreedTerms.service && agreedTerms.privacy && agreedTerms.signature ? "check_circle" : "radio_button_unchecked"
                       }
                     ),
-                    /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "text-[14px] text-[#0b1c30] font-extrabold", children: "\uC804\uCCB4 \uC57D\uAD00\uC5D0 \uB3D9\uC758\uD569\uB2C8\uB2E4" })
+                    /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "flex flex-col", children: [
+                      /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "text-[14px] font-extrabold text-slate-900", children: "\uBAA8\uB4E0 \uC57D\uAD00\uC5D0 \uC804\uCCB4 \uB3D9\uC758\uD569\uB2C8\uB2E4" }),
+                      /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "text-[11px] text-slate-500", children: "\uD544\uC218 \uBC0F \uC120\uD0DD \uC57D\uAD00\uC744 \uBAA8\uB450 \uC77D\uACE0 \uD655\uC778 \uD6C4 \uC77C\uAD04 \uB3D9\uC758\uD569\uB2C8\uB2E4." })
+                    ] })
                   ] }),
-                  /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "text-[12px] text-[#43474f] font-medium", children: "\uC120\uD0DD \uD3EC\uD568" })
+                  /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "material-symbols-outlined text-[18px] text-slate-400", children: "arrow_forward_ios" })
                 ]
               }
             ),
-            /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "flex flex-col gap-2 pt-1 divide-y divide-slate-100", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { className: "flex items-center justify-between py-1.5 px-1", children: /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("label", { className: "flex items-center gap-2.5 cursor-pointer flex-1 select-none", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "space-y-2 pl-2", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("label", { className: "flex items-center justify-between text-[13px] text-slate-700 cursor-pointer", children: /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("span", { className: "flex items-center gap-2", children: [
                 /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
                   "input",
                   {
                     type: "checkbox",
                     checked: termAge,
                     onChange: (e) => setTermAge(e.target.checked),
-                    className: "hidden"
+                    className: "w-4 h-4 rounded text-[#00254a] accent-[#00254a] cursor-pointer"
                   }
                 ),
-                /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
-                  "div",
-                  {
-                    className: `w-5 h-5 rounded flex items-center justify-center text-white transition-colors ${termAge ? "bg-[#00254a]" : "bg-[#dce9ff]"}`,
-                    children: /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "material-symbols-outlined text-[15px]", children: "check" })
-                  }
-                ),
-                /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "flex items-center gap-1", children: [
-                  /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "text-[12px] text-[#00254a] font-bold", children: "[\uD544\uC218]" }),
-                  /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "text-[13px] text-[#0b1c30]", children: "\uB9CC 14\uC138 \uC774\uC0C1 \uC774\uC6A9 \uB3D9\uC758" })
+                /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("span", { children: [
+                  /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("strong", { className: "text-blue-600", children: "[\uD544\uC218]" }),
+                  " \uB9CC 14\uC138 \uC774\uC0C1\uC785\uB2C8\uB2E4"
                 ] })
               ] }) }),
-              /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "flex items-center justify-between py-1.5 px-1", children: [
-                /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("label", { className: "flex items-center gap-2.5 cursor-pointer flex-1 select-none", children: [
-                  /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
-                    "input",
-                    {
-                      type: "checkbox",
-                      checked: termService,
-                      onChange: (e) => setTermService(e.target.checked),
-                      className: "hidden"
-                    }
-                  ),
-                  /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
-                    "div",
-                    {
-                      className: `w-5 h-5 rounded flex items-center justify-center text-white transition-colors ${termService ? "bg-[#00254a]" : "bg-[#dce9ff]"}`,
-                      children: /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "material-symbols-outlined text-[15px]", children: "check" })
-                    }
-                  ),
-                  /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "flex items-center gap-1", children: [
-                    /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "text-[12px] text-[#00254a] font-bold", children: "[\uD544\uC218]" }),
-                    /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "text-[13px] text-[#0b1c30]", children: "\uC4F8\uACE0\uB2E6\uACE0 \uC11C\uBE44\uC2A4 \uC774\uC6A9\uC57D\uAD00 \uB3D9\uC758" })
-                  ] })
-                ] }),
-                /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
-                  "button",
+              termsList.map((term) => {
+                const isAgreed = agreedTerms[term.id];
+                const isScrolled = scrolledTerms[term.id];
+                return /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)(
+                  "div",
                   {
-                    type: "button",
-                    onClick: () => setActiveTermModal("service"),
-                    className: "text-[#737780] hover:text-[#0b1c30] p-1 cursor-pointer",
-                    children: /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "material-symbols-outlined text-[18px]", children: "chevron_right" })
-                  }
-                )
-              ] }),
-              /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "flex items-center justify-between py-1.5 px-1", children: [
-                /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("label", { className: "flex items-center gap-2.5 cursor-pointer flex-1 select-none", children: [
-                  /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
-                    "input",
-                    {
-                      type: "checkbox",
-                      checked: termPrivacy,
-                      onChange: (e) => setTermPrivacy(e.target.checked),
-                      className: "hidden"
-                    }
-                  ),
-                  /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
-                    "div",
-                    {
-                      className: `w-5 h-5 rounded flex items-center justify-center text-white transition-colors ${termPrivacy ? "bg-[#00254a]" : "bg-[#dce9ff]"}`,
-                      children: /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "material-symbols-outlined text-[15px]", children: "check" })
-                    }
-                  ),
-                  /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "flex items-center gap-1", children: [
-                    /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "text-[12px] text-[#00254a] font-bold", children: "[\uD544\uC218]" }),
-                    /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "text-[13px] text-[#0b1c30]", children: "\uAC1C\uC778\uC815\uBCF4 \uC218\uC9D1 \uBC0F \uC804\uC790\uAC70\uB798 \uC11C\uBA85 \uC774\uC6A9 \uB3D9\uC758" })
-                  ] })
-                ] }),
-                /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
-                  "button",
-                  {
-                    type: "button",
-                    onClick: () => setActiveTermModal("privacy"),
-                    className: "text-[#737780] hover:text-[#0b1c30] p-1 cursor-pointer",
-                    children: /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "material-symbols-outlined text-[18px]", children: "chevron_right" })
-                  }
-                )
-              ] }),
-              /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "flex items-center justify-between py-1.5 px-1", children: [
-                /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("label", { className: "flex items-center gap-2.5 cursor-pointer flex-1 select-none", children: [
-                  /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
-                    "input",
-                    {
-                      type: "checkbox",
-                      checked: termMarketing,
-                      onChange: (e) => setTermMarketing(e.target.checked),
-                      className: "hidden"
-                    }
-                  ),
-                  /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
-                    "div",
-                    {
-                      className: `w-5 h-5 rounded flex items-center justify-center text-white transition-colors ${termMarketing ? "bg-[#00254a]" : "bg-[#dce9ff]"}`,
-                      children: /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "material-symbols-outlined text-[15px]", children: "check" })
-                    }
-                  ),
-                  /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "flex items-center gap-1.5 flex-wrap", children: [
-                    /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "text-[12px] text-[#737780] font-semibold", children: "[\uC120\uD0DD]" }),
-                    /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "text-[13px] text-[#0b1c30]", children: "\uB9C8\uCF00\uD305 \uC815\uBCF4 \uC218\uC2E0 \uB3D9\uC758" }),
-                    /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "px-1.5 py-0.5 rounded bg-[#ffddb8] text-[#372000] text-[11px] font-bold", children: "1,000P" })
-                  ] })
-                ] }),
-                /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
-                  "button",
-                  {
-                    type: "button",
-                    onClick: () => setActiveTermModal("marketing"),
-                    className: "text-[#737780] hover:text-[#0b1c30] p-1 cursor-pointer",
-                    children: /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "material-symbols-outlined text-[18px]", children: "chevron_right" })
-                  }
-                )
-              ] })
-            ] })
-          ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "pt-2", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)(
-              "button",
-              {
-                type: "button",
-                id: "submitStepBtn",
-                disabled: !isRequiredTermsChecked,
-                onClick: handleProceedToStep2,
-                className: `w-full h-[52px] rounded-xl text-[15px] font-bold flex items-center justify-center gap-2 transition-all duration-200 cursor-pointer ${isRequiredTermsChecked ? "bg-[#00254a] text-white shadow-md active:scale-[0.98]" : "bg-[#c3c6d0] text-white/70 cursor-not-allowed shadow-none"}`,
-                children: [
-                  /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { children: "\uB2E4\uC74C \uB2E8\uACC4\uB85C \uC774\uB3D9" }),
-                  /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "material-symbols-outlined text-[20px]", children: "arrow_forward" })
-                ]
-              }
-            ),
-            /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("p", { className: "text-center text-[11px] text-[#737780] mt-2", children: isRequiredTermsChecked ? "\uC120\uD0DD\uD55C \uAC00\uC785 \uBC29\uC2DD\uC73C\uB85C \uAE30\uBCF8 \uD504\uB85C\uD544\uC744 \uC0DD\uC131\uD569\uB2C8\uB2E4." : "\uD544\uC218 \uC57D\uAD00\uC5D0 \uBAA8\uB450 \uB3D9\uC758\uD558\uC2DC\uBA74 \uB2E4\uC74C \uBC84\uD2BC\uC774 \uD65C\uC131\uD654\uB429\uB2C8\uB2E4." })
-          ] })
-        ] }),
-        currentStep === "STEP2_ACCOUNT_AND_SIGNATURE" && /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 py-8 lg:py-12 animate-fadeIn", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { className: "mb-8 lg:mb-10", children: /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "flex flex-col md:flex-row md:items-end justify-between gap-4 pb-6 border-b border-[#dce9ff]", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { children: [
-              /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "flex items-center gap-2 mb-2", children: [
-                /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("span", { className: "inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#00254a]/10 text-[#00254a] text-[12px] font-bold", children: [
-                  /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "w-1.5 h-1.5 rounded-full bg-[#006c4a]" }),
-                  "STEP 2 / 2 \u2022 \uCD5C\uC885 \uB2E8\uACC4"
-                ] }),
-                /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "text-[#43474f] text-[12px]", children: "\uC628\uBCF4\uB529 \uB4F1\uB85D" })
-              ] }),
-              /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("h1", { className: "text-[24px] lg:text-[28px] font-extrabold text-[#0b1c30] tracking-tight", children: [
-                "\uAE68\uB057\uD55C \uC77C\uC0C1\uC758 \uC2DC\uC791,",
-                " ",
-                /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "text-[#00254a] underline decoration-[#006c4a] decoration-4 underline-offset-4", children: "\uD68C\uC6D0\uC815\uBCF4" }),
-                "\uB97C \uB4F1\uB85D\uD574\uC8FC\uC138\uC694"
-              ] }),
-              /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("p", { className: "text-[14px] text-[#43474f] mt-1.5", children: "\uC548\uC2EC \uD074\uB9AC\uB2DD \uC608\uC57D\uACFC \uB9DE\uCDA4\uD615 \uB9C8\uC2A4\uD130 \uB9E4\uCE6D\uC744 \uC704\uD574 \uD544\uC218 \uC815\uBCF4\uB97C \uD655\uC778\uD558\uACE0 \uC804\uC790\uC11C\uBA85\uC744 \uC9C4\uD589\uD569\uB2C8\uB2E4." })
-            ] }),
-            /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { className: "flex items-center gap-3 min-w-[260px]", children: /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "flex-1", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "flex justify-between items-center mb-1 text-[12px] font-bold", children: [
-                /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("span", { className: "text-[#006c4a] flex items-center gap-1", children: [
-                  /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "material-symbols-outlined text-[14px]", children: "check_circle" }),
-                  " 1. \uBCF8\uC778 \uD655\uC778"
-                ] }),
-                /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "text-[#00254a]", children: "2. \uC11C\uBA85 \uBC0F \uC644\uB8CC" })
-              ] }),
-              /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "grid grid-cols-2 gap-1.5 h-2 w-full rounded-full bg-[#e5eeff] overflow-hidden p-0.5", children: [
-                /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { className: "h-full bg-[#006c4a] rounded-full" }),
-                /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { className: "h-full bg-[#00254a] rounded-full" })
-              ] })
-            ] }) })
-          ] }) }),
-          /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "grid grid-cols-1 lg:grid-cols-12 gap-8 items-start", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("aside", { className: "lg:col-span-5 flex flex-col gap-6", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "bg-[#00254a] text-white rounded-3xl p-7 lg:p-8 shadow-xl relative overflow-hidden", children: [
-                /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { className: "absolute -top-16 -right-16 w-48 h-48 rounded-full bg-[#006c4a]/25 blur-3xl pointer-events-none" }),
-                /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { className: "absolute -bottom-16 -left-16 w-48 h-48 rounded-full bg-[#a8c8fb]/10 blur-2xl pointer-events-none" }),
-                /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { className: "relative z-10 flex items-center gap-2 mb-4", children: /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "px-3 py-1 rounded-full bg-[#82f5c1] text-[#00714e] text-[12px] font-extrabold tracking-wide", children: "WELCOME BENEFITS \u2022 \uC2E0\uADDC \uD68C\uC6D0 \uD328\uD0A4\uC9C0" }) }),
-                /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "relative z-10 mb-6", children: [
-                  /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("p", { className: "text-[13px] text-[#a8c8fb] mb-1 font-semibold", children: "\uCCAB \uB9CC\uB0A8 \uCD95\uD558 \uD61C\uD0DD" }),
-                  /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("h2", { className: "text-[22px] lg:text-[26px] font-extrabold leading-snug", children: [
-                    "\uAC00\uC785 \uC989\uC2DC ",
-                    /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "text-[#85f8c4]", children: "20,000\uC6D0" }),
-                    " \uC0C1\uB2F9 \uCCAD\uC18C \uD560\uC778 \uCFE0\uD3F0\uD329 \uC9C0\uAE09!"
-                  ] })
-                ] }),
-                /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "relative z-10 bg-[#163b66]/80 backdrop-blur rounded-2xl p-4 mb-6 shadow-inner flex items-center justify-between", children: [
-                  /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "flex items-center gap-3", children: [
-                    /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { className: "w-10 h-10 rounded-xl bg-[#006c4a]/30 text-[#85f8c4] flex items-center justify-center", children: /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "material-symbols-outlined text-[24px]", children: "confirmation_number" }) }),
-                    /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { children: [
-                      /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("p", { className: "text-[14px] font-bold text-white", children: "\uCCAB \uD648\uCF00\uC5B4 & \uC774\uC0AC\uCCAD\uC18C \uC804\uC6A9" }),
-                      /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("p", { className: "text-[12px] text-[#a8c8fb]", children: "\uACB0\uC81C \uC2DC \uC790\uB3D9 20,000\uC6D0 \uC989\uC2DC \uACF5\uC81C" })
-                    ] })
-                  ] }),
-                  /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "text-[11px] px-2.5 py-1 rounded bg-[#006c4a] text-white font-bold", children: "\uBC1C\uAE09 \uC608\uC815" })
-                ] }),
-                /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "relative z-10 space-y-3.5 mb-7", children: [
-                  /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "flex items-start gap-3 bg-white/10 p-3.5 rounded-2xl backdrop-blur-sm", children: [
-                    /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { className: "w-6 h-6 rounded-full bg-[#006c4a] flex items-center justify-center shrink-0 mt-0.5", children: /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "material-symbols-outlined text-[15px] text-white", children: "verified_user" }) }),
-                    /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { children: [
-                      /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("p", { className: "text-[13px] font-bold text-white", children: "100% \uC2E4\uBA85 \uBC0F \uBCF8\uC778\uC778\uC99D \uC554\uD638\uD654 \uBCF4\uD638" }),
-                      /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("p", { className: "text-[12px] text-[#a8c8fb]", children: "\uAC1C\uC778\uC815\uBCF4\uB294 256-bit AES \uADDC\uACA9 \uC554\uD638\uD654\uB85C \uBCF4\uD638\uB429\uB2C8\uB2E4." })
-                    ] })
-                  ] }),
-                  /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "flex items-start gap-3 bg-white/10 p-3.5 rounded-2xl backdrop-blur-sm", children: [
-                    /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { className: "w-6 h-6 rounded-full bg-[#006c4a] flex items-center justify-center shrink-0 mt-0.5", children: /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "material-symbols-outlined text-[15px] text-white", children: "gavel" }) }),
-                    /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { children: [
-                      /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("p", { className: "text-[13px] font-bold text-white", children: "\uC804\uC790\uC11C\uBA85\uBC95 \uC81C3\uC870 \uC900\uC218 \uACF5\uC99D \uC804\uC790\uACC4\uC57D" }),
-                      /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("p", { className: "text-[12px] text-[#a8c8fb]", children: "\uD0C0\uC784\uC2A4\uD0EC\uD504 \uACF5\uC99D\uC73C\uB85C \uC704\uBCC0\uC870 \uBC29\uC9C0 \uBC0F \uBC95\uC801 \uD6A8\uB825 \uBD80\uC5EC" })
-                    ] })
-                  ] }),
-                  /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "flex items-start gap-3 bg-white/10 p-3.5 rounded-2xl backdrop-blur-sm", children: [
-                    /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { className: "w-6 h-6 rounded-full bg-[#006c4a] flex items-center justify-center shrink-0 mt-0.5", children: /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "material-symbols-outlined text-[15px] text-white", children: "security" }) }),
-                    /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { children: [
-                      /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("p", { className: "text-[13px] font-bold text-white", children: "\uC0BC\uC131\uD654\uC7AC 1\uC5B5\uC6D0 \uC601\uC5C5\uBC30\uC0C1\uCC45\uC784 \uC548\uC2EC\uBCF4\uD5D8" }),
-                      /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("p", { className: "text-[12px] text-[#a8c8fb]", children: "\uCCAD\uC18C \uC911 \uBC1C\uC0DD \uAC00\uB2A5\uD55C \uBAA8\uB4E0 \uC7AC\uC0B0\uC0C1 \uD53C\uD574 100% \uBCF4\uC99D" })
-                    ] })
-                  ] })
-                ] }),
-                /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "relative z-10 pt-5 border-t border-[#163b66] flex items-center justify-between text-white", children: [
-                  /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "flex items-center gap-2.5", children: [
-                    /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "w-2.5 h-2.5 rounded-full bg-[#85f8c4] animate-pulse" }),
-                    /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "text-[12px] text-[#a8c8fb]", children: "1\uB2E8\uACC4 \uC644\uB8CC \uACC4\uC815:" }),
-                    /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "text-[13px] font-bold", children: userEmail || "clean_user@ssuldak.kr" })
-                  ] }),
-                  /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "text-[11px] text-[#85f8c4] font-bold", children: "\uC5F0\uB3D9 \uC815\uC0C1" })
-                ] })
-              ] }),
-              /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "bg-white rounded-3xl p-6 shadow-md border border-slate-200/80 grid grid-cols-2 gap-4", children: [
-                /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "bg-[#eff4ff] rounded-2xl p-4 flex flex-col justify-between", children: [
-                  /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "flex items-center justify-between mb-2", children: [
-                    /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "text-[12px] text-[#43474f] font-semibold", children: "\uB204\uC801 \uC11C\uBE44\uC2A4 \uB9CC\uC871\uB3C4" }),
-                    /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "material-symbols-outlined text-[#006c4a] text-[20px]", children: "star" })
-                  ] }),
-                  /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "flex items-baseline gap-1", children: [
-                    /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "text-[32px] font-extrabold text-[#00254a]", children: "99.4" }),
-                    /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "text-[18px] font-bold text-[#006c4a]", children: "%" })
-                  ] }),
-                  /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("p", { className: "text-[11px] text-[#43474f] mt-1", children: "\uC2E4\uC81C \uC774\uC6A9 \uACE0\uAC1D 48,290\uAC74 \uAE30\uC900" })
-                ] }),
-                /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "bg-[#eff4ff] rounded-2xl p-4 flex flex-col justify-between", children: [
-                  /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "flex items-center justify-between mb-2", children: [
-                    /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "text-[12px] text-[#43474f] font-semibold", children: "\uB9C8\uC2A4\uD130 \uC7AC\uC9C0\uC815\uC728" }),
-                    /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "material-symbols-outlined text-[#00254a] text-[20px]", children: "repeat" })
-                  ] }),
-                  /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "flex items-baseline gap-1", children: [
-                    /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "text-[32px] font-extrabold text-[#00254a]", children: "98.8" }),
-                    /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "text-[18px] font-bold text-[#00254a]", children: "%" })
-                  ] }),
-                  /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("p", { className: "text-[11px] text-[#43474f] mt-1", children: "\uCCA0\uC800\uD55C \uAC80\uC99D \uD1B5\uACFC \uB9C8\uC2A4\uD130 \uD30C\uD2B8\uB108" })
-                ] })
-              ] })
-            ] }),
-            /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("section", { className: "lg:col-span-7 bg-white rounded-3xl p-6 sm:p-8 lg:p-10 shadow-lg border border-slate-200/80", children: /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("form", { className: "space-y-8", onSubmit: handleFinalSubmit, children: [
-              /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "space-y-4", children: [
-                /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "flex items-center justify-between pb-2 border-b border-[#e5eeff]", children: [
-                  /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "flex items-center gap-2", children: [
-                    /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "w-6 h-6 rounded-full bg-[#00254a] text-white text-[12px] font-bold flex items-center justify-center", children: "1" }),
-                    /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("h3", { className: "text-[16px] font-bold text-[#0b1c30]", children: "\uAE30\uBCF8 \uC815\uBCF4 & \uBCF8\uC778\uC778\uC99D" })
-                  ] }),
-                  /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("span", { className: "text-[12px] text-[#006c4a] font-bold flex items-center gap-1", children: [
-                    /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "material-symbols-outlined text-[16px]", children: "lock" }),
-                    " \uC548\uC804 \uC554\uD638\uD654 \uC5F0\uACB0"
-                  ] })
-                ] }),
-                /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "grid grid-cols-1 sm:grid-cols-2 gap-4", children: [
-                  /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "sm:col-span-2", children: [
-                    /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("label", { className: "block text-[13px] font-bold text-[#0b1c30] mb-1.5", children: [
-                      "\uC774\uB984 (\uC2E4\uBA85) ",
-                      /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "text-red-500", children: "*" })
-                    ] }),
-                    /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "relative", children: [
-                      /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
-                        "input",
-                        {
-                          type: "text",
-                          required: true,
-                          value: userNm,
-                          onChange: (e) => setUserNm(e.target.value),
-                          className: "w-full bg-[#eff4ff] text-[#0b1c30] rounded-xl px-4 py-3 pr-10 outline-none font-semibold text-[14px]"
-                        }
-                      ),
-                      /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { className: "absolute right-3.5 top-1/2 -translate-y-1/2 text-[#006c4a] flex items-center", children: /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "material-symbols-outlined text-[20px]", children: "check_circle" }) })
-                    ] })
-                  ] }),
-                  /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "sm:col-span-2", children: [
-                    /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("label", { className: "block text-[13px] font-bold text-[#0b1c30] mb-1.5", children: [
-                      "\uD734\uB300\uD3F0 \uBC88\uD638 ",
-                      /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "text-red-500", children: "*" })
-                    ] }),
-                    /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "flex gap-2", children: [
-                      /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
-                        "input",
-                        {
-                          type: "tel",
-                          required: true,
-                          value: userTel,
-                          onChange: (e) => setUserTel(e.target.value),
-                          className: "flex-1 bg-[#eff4ff] text-[#0b1c30] rounded-xl px-4 py-3 outline-none font-semibold text-[14px]"
-                        }
-                      ),
-                      /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
-                        "button",
-                        {
-                          type: "button",
-                          onClick: () => {
-                            setAuthTimerSec(180);
-                            showToast("\uC778\uC99D\uBC88\uD638\uAC00 \uC7AC\uBC1C\uC1A1\uB418\uC5C8\uC2B5\uB2C8\uB2E4.", "info");
-                          },
-                          className: "shrink-0 px-4 py-3 rounded-xl bg-[#e5eeff] hover:bg-[#dce9ff] text-[#00254a] text-[13px] font-bold transition-colors active:scale-95 cursor-pointer",
-                          children: "\uC778\uC99D\uBC88\uD638 \uC7AC\uC804\uC1A1"
-                        }
-                      )
-                    ] })
-                  ] }),
-                  /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "sm:col-span-2", children: [
-                    /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("label", { className: "block text-[13px] font-bold text-[#0b1c30] mb-1.5", children: [
-                      "\uC778\uC99D\uBC88\uD638 6\uC790\uB9AC ",
-                      /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "text-red-500", children: "*" })
-                    ] }),
-                    /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "flex gap-2", children: [
-                      /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "relative flex-1", children: [
+                    className: "flex items-center justify-between text-[13px] text-slate-700 py-0.5",
+                    children: [
+                      /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("label", { className: "flex items-center gap-2 cursor-pointer select-none", children: [
                         /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
                           "input",
                           {
-                            type: "text",
-                            maxLength: 6,
-                            value: authCodeInput,
-                            onChange: (e) => setAuthCodeInput(e.target.value),
-                            className: "w-full bg-white text-[#0b1c30] border border-[#c3c6d0] rounded-xl px-4 py-3 pr-20 outline-none text-[14px] font-mono tracking-wider focus:border-[#00254a]"
+                            type: "checkbox",
+                            checked: isAgreed,
+                            onChange: () => handleToggleTerm(term),
+                            className: "w-4 h-4 rounded text-[#00254a] accent-[#00254a] cursor-pointer"
                           }
                         ),
-                        /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "absolute right-3.5 top-1/2 -translate-y-1/2 flex items-center gap-1 text-red-600 font-mono text-[13px] font-semibold", children: [
-                          /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "material-symbols-outlined text-[16px]", children: "timer" }),
-                          /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { children: formatTimer(authTimerSec) })
+                        /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("span", { className: "flex items-center gap-1.5", children: [
+                          /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("strong", { className: term.isMandatory ? "text-blue-600" : "text-slate-400", children: [
+                            "[",
+                            term.isMandatory ? "\uD544\uC218" : "\uC120\uD0DD",
+                            "]"
+                          ] }),
+                          /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: isAgreed ? "text-slate-900 font-semibold" : "text-slate-700", children: term.title }),
+                          isScrolled && /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "text-[10px] text-emerald-600 font-bold bg-emerald-50 px-1.5 py-0.5 rounded", children: "\uC644\uB3C5\uB428 \u2713" })
                         ] })
                       ] }),
-                      /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
+                      /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)(
                         "button",
                         {
                           type: "button",
-                          onClick: () => {
-                            setIsPhoneVerified(true);
-                            showToast("\uBCF8\uC778\uC778\uC99D\uC774 \uC644\uB8CC\uB418\uC5C8\uC2B5\uB2C8\uB2E4.", "success");
-                          },
-                          className: "shrink-0 px-5 py-3 rounded-xl bg-[#006c4a] text-white text-[13px] font-bold hover:bg-[#005137] transition-colors active:scale-95 shadow-sm cursor-pointer",
-                          children: "\uC778\uC99D\uD655\uC778"
+                          onClick: () => openTermReader(term),
+                          className: `text-[11px] font-bold px-2 py-1 rounded-lg transition-colors cursor-pointer flex items-center gap-1 ${isScrolled ? "text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200" : "text-[#00254a] bg-blue-50 hover:bg-blue-100 border border-blue-200"}`,
+                          children: [
+                            /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "material-symbols-outlined text-[13px]", children: isScrolled ? "visibility" : "menu_book" }),
+                            /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { children: isScrolled ? "\uB2E4\uC2DC\uBCF4\uAE30" : "\uB05D\uAE4C\uC9C0 \uC77D\uACE0 \uD655\uC778" })
+                          ]
                         }
                       )
-                    ] }),
-                    isPhoneVerified && /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "mt-3 bg-[#82f5c1]/35 p-3 rounded-xl flex items-center justify-between text-[#00714e] border border-[#82f5c1]/50", children: [
-                      /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "flex items-center gap-2", children: [
-                        /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "material-symbols-outlined text-[18px] text-[#006c4a]", children: "verified" }),
-                        /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "text-[13px] font-bold", children: "\uBCF8\uC778\uC778\uC99D\uC774 \uC644\uB8CC\uB418\uC5C8\uC2B5\uB2C8\uB2E4. (\uD1B5\uC2E0\uC0AC \uC2E4\uBA85\uC870\uD68C \uC77C\uCE58)" })
-                      ] }),
-                      /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "text-[11px] opacity-80 font-medium", children: "\uD1B5\uC2E0 3\uC0AC KCB \uC5F0\uB3D9" })
-                    ] })
-                  ] })
-                ] })
+                    ]
+                  },
+                  term.id
+                );
+              })
+            ] })
+          ] }),
+          /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "space-y-2 pt-2", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "flex items-center justify-between", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("label", { className: "text-[13px] font-bold text-slate-900 flex items-center gap-1.5", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "material-symbols-outlined text-[18px] text-[#00254a]", children: "draw" }),
+                /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { children: "\uC804\uC790\uAC70\uB798 \uC790\uD544 \uC804\uC790\uC11C\uBA85 \uB4F1\uB85D" }),
+                /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "text-rose-500 font-bold", children: "*" })
               ] }),
-              /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "space-y-4", children: [
-                /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "flex items-center justify-between pb-2 border-b border-[#e5eeff]", children: [
-                  /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "flex items-center gap-2", children: [
-                    /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "w-6 h-6 rounded-full bg-[#00254a] text-white text-[12px] font-bold flex items-center justify-center", children: "2" }),
-                    /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("h3", { className: "text-[16px] font-bold text-[#0b1c30]", children: "\uB85C\uADF8\uC778 \uBE44\uBC00\uBC88\uD638 \uC124\uC815" })
-                  ] }),
-                  /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "text-[12px] text-[#737780]", children: "\uC548\uC804\uD55C \uB85C\uADF8\uC778\uC744 \uC704\uD55C \uC554\uD638" })
-                ] }),
-                /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "grid grid-cols-1 sm:grid-cols-2 gap-4", children: [
-                  /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "sm:col-span-2", children: [
-                    /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "flex items-center justify-between mb-1.5", children: [
-                      /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("label", { className: "text-[13px] font-bold text-[#0b1c30]", children: [
-                        "\uBE44\uBC00\uBC88\uD638 ",
-                        /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "text-red-500", children: "*" })
-                      ] }),
-                      userPassword.length >= 8 && /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("span", { className: "inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#82f5c1]/40 text-[#00714e] text-[11px] font-bold", children: [
-                        /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "w-1.5 h-1.5 rounded-full bg-[#006c4a]" }),
-                        " \uC548\uC804 (\uBCF4\uC548 \uB4F1\uAE09 \uCD5C\uC0C1)"
-                      ] })
-                    ] }),
-                    /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "relative", children: [
-                      /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
-                        "input",
-                        {
-                          type: showPassword ? "text" : "password",
-                          required: true,
-                          value: userPassword,
-                          onChange: (e) => setUserPassword(e.target.value),
-                          placeholder: "8~16\uC790 \uC601\uBB38 \uB300\uC18C\uBB38\uC790, \uC22B\uC790, \uD2B9\uC218\uBB38\uC790 \uC870\uD569",
-                          className: "w-full bg-[#eff4ff] focus:bg-white text-[#0b1c30] rounded-xl px-4 py-3 pr-12 outline-none border border-transparent focus:border-[#00254a] transition-all text-[14px]"
-                        }
-                      ),
-                      /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
-                        "button",
-                        {
-                          type: "button",
-                          "aria-label": "\uBE44\uBC00\uBC88\uD638 \uBCF4\uAE30 \uD1A0\uAE00",
-                          onClick: () => setShowPassword(!showPassword),
-                          className: "absolute right-3.5 top-1/2 -translate-y-1/2 text-[#737780] hover:text-[#0b1c30] p-1",
-                          children: /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "material-symbols-outlined text-[20px]", children: showPassword ? "visibility_off" : "visibility" })
-                        }
-                      )
-                    ] }),
-                    /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("p", { className: "text-[12px] text-[#737780] mt-1.5 flex items-center gap-1", children: [
-                      /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "material-symbols-outlined text-[16px] text-[#006c4a]", children: "info" }),
-                      "8~16\uC790 \uC601\uBB38 \uB300\uC18C\uBB38\uC790, \uC22B\uC790, \uD2B9\uC218\uBB38\uC790 2\uAC00\uC9C0 \uC774\uC0C1 \uC870\uD569"
-                    ] })
-                  ] }),
-                  /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "sm:col-span-2", children: [
-                    /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("label", { className: "block text-[13px] font-bold text-[#0b1c30] mb-1.5", children: [
-                      "\uBE44\uBC00\uBC88\uD638 \uD655\uC778 ",
-                      /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "text-red-500", children: "*" })
-                    ] }),
-                    /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "relative", children: [
-                      /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
-                        "input",
-                        {
-                          type: showPasswordConfirm ? "text" : "password",
-                          required: true,
-                          value: userPasswordConfirm,
-                          onChange: (e) => setUserPasswordConfirm(e.target.value),
-                          placeholder: "\uBE44\uBC00\uBC88\uD638\uB97C \uD55C \uBC88 \uB354 \uC785\uB825\uD558\uC138\uC694",
-                          className: "w-full bg-[#eff4ff] focus:bg-white text-[#0b1c30] rounded-xl px-4 py-3 pr-12 outline-none border border-transparent focus:border-[#00254a] transition-all text-[14px]"
-                        }
-                      ),
-                      /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
-                        "button",
-                        {
-                          type: "button",
-                          "aria-label": "\uBE44\uBC00\uBC88\uD638 \uD655\uC778 \uBCF4\uAE30 \uD1A0\uAE00",
-                          onClick: () => setShowPasswordConfirm(!showPasswordConfirm),
-                          className: "absolute right-3.5 top-1/2 -translate-y-1/2 text-[#737780] hover:text-[#0b1c30] p-1",
-                          children: /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "material-symbols-outlined text-[20px]", children: showPasswordConfirm ? "visibility_off" : "visibility" })
-                        }
-                      )
-                    ] }),
-                    userPasswordConfirm.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)(
-                      "p",
-                      {
-                        className: `text-[12px] mt-1.5 flex items-center gap-1 font-semibold ${userPassword === userPasswordConfirm ? "text-[#006c4a]" : "text-red-600"}`,
-                        children: [
-                          /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "material-symbols-outlined text-[16px]", children: userPassword === userPasswordConfirm ? "task_alt" : "error" }),
-                          userPassword === userPasswordConfirm ? "\uBE44\uBC00\uBC88\uD638\uAC00 \uC644\uBCBD\uD558\uAC8C \uC77C\uCE58\uD569\uB2C8\uB2E4." : "\uBE44\uBC00\uBC88\uD638\uAC00 \uC77C\uCE58\uD558\uC9C0 \uC54A\uC2B5\uB2C8\uB2E4."
-                        ]
-                      }
-                    )
-                  ] })
-                ] })
-              ] }),
-              /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "space-y-4", children: [
-                /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "flex items-center justify-between pb-2 border-b border-[#e5eeff]", children: [
-                  /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "flex items-center gap-2", children: [
-                    /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "w-6 h-6 rounded-full bg-[#00254a] text-white text-[12px] font-bold flex items-center justify-center", children: "3" }),
-                    /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "flex items-center gap-1.5", children: [
-                      /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("h3", { className: "text-[16px] font-bold text-[#0b1c30]", children: "\uC790\uD544 \uC804\uC790\uC11C\uBA85" }),
-                      /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "px-2 py-0.5 rounded bg-[#ffdad6] text-[#93000a] text-[11px] font-bold", children: "\uD544\uC218" })
-                    ] })
-                  ] }),
-                  /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)(
-                    "button",
-                    {
-                      type: "button",
-                      onClick: handleClearSignature,
-                      className: "inline-flex items-center gap-1 text-[#737780] hover:text-red-600 text-[12px] font-bold py-1 px-2.5 rounded-lg bg-[#eff4ff] hover:bg-red-50 transition-colors cursor-pointer",
-                      children: [
-                        /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "material-symbols-outlined text-[16px]", children: "restart_alt" }),
-                        "\uC11C\uBA85 \uCD08\uAE30\uD654"
-                      ]
-                    }
-                  )
-                ] }),
-                /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { children: [
-                  /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("p", { className: "text-[13px] text-[#43474f] mb-2.5 leading-relaxed", children: "\uC804\uC790\uAC70\uB798 \uD6A8\uB825 \uD655\uBCF4 \uBC0F \uC548\uC2EC \uCF00\uC5B4 \uC704\uD0C1 \uACB0\uC81C\uB97C \uC704\uD55C \uC790\uD544 \uC11C\uBA85\uC785\uB2C8\uB2E4. \uC544\uB798 \uD328\uB4DC\uC5D0 \uC815\uC790\uB85C \uC11C\uBA85\uD574 \uC8FC\uC138\uC694." }),
-                  /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "relative bg-white rounded-2xl overflow-hidden shadow-inner p-1 border-2 border-dashed border-[#c3c6d0] group", children: [
-                    /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
-                      "canvas",
-                      {
-                        ref: canvasRef,
-                        className: "w-full h-40 bg-white rounded-xl cursor-crosshair touch-none",
-                        onMouseDown: startDrawing,
-                        onMouseMove: draw,
-                        onMouseUp: stopDrawing,
-                        onMouseLeave: stopDrawing,
-                        onTouchStart: startDrawing,
-                        onTouchMove: draw,
-                        onTouchEnd: stopDrawing
-                      }
-                    ),
-                    !hasSignature && /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "pointer-events-none absolute inset-0 flex flex-col items-center justify-center text-[#737780] select-none opacity-40", children: [
-                      /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "material-symbols-outlined text-[32px] mb-1", children: "draw" }),
-                      /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "text-[13px] font-medium", children: "\uB9C8\uC6B0\uC2A4 \uB4DC\uB798\uADF8 \uB610\uB294 \uD130\uCE58\uD558\uC5EC \uC11C\uBA85\uD558\uC138\uC694" })
-                    ] }),
-                    /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "absolute bottom-2.5 right-3 pointer-events-none flex items-center gap-1 px-2.5 py-1 rounded-md bg-[#e5eeff]/90 backdrop-blur text-[#00254a] text-[11px] font-bold shadow-sm", children: [
-                      /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "material-symbols-outlined text-[14px] text-[#006c4a]", children: "encrypted" }),
-                      /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { children: "\uD0C0\uC784\uC2A4\uD0EC\uD504 \uACF5\uC99D \uC554\uD638\uD654 \uC5F0\uB3D9" })
-                    ] })
-                  ] }),
-                  /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "mt-3 p-3.5 rounded-xl bg-[#eff4ff] text-[#43474f] text-[12px] flex items-start gap-2.5 border border-[#dce9ff]", children: [
-                    /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "material-symbols-outlined text-[18px] text-[#00254a] shrink-0 mt-0.5", children: "policy" }),
-                    /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("p", { className: "leading-relaxed", children: [
-                      /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("strong", { className: "text-[#0b1c30] font-bold", children: "\uBC95\uC801 \uACE0\uC9C0:" }),
-                      " \uBCF8 \uC804\uC790\uC11C\uBA85\uC740 \u300C\uC804\uC790\uC11C\uBA85\uBC95\u300D \uC81C3\uC870\uC5D0 \uC758\uAC70\uD558\uC5EC SsulDak \uC11C\uBE44\uC2A4 \uC774\uC6A9 \uACC4\uC57D \uCCB4\uACB0 \uBC0F \uC548\uC2EC \uCF00\uC5B4 \uC704\uD0C1 \uACB0\uC81C\uC5D0 \uC788\uC5B4 \uC790\uD544 \uC11C\uBA85\uACFC \uB3D9\uC77C\uD55C \uBC95\uC801 \uD6A8\uB825\uC744 \uAC00\uC9D1\uB2C8\uB2E4."
-                    ] })
-                  ] })
-                ] })
-              ] }),
-              /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "pt-4 space-y-3", children: [
-                /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
-                  "button",
-                  {
-                    type: "submit",
-                    disabled: isSubmitting || !hasSignature,
-                    className: "w-full py-4 px-6 rounded-xl bg-[#00254a] text-white hover:bg-[#163b66] text-[16px] font-bold flex items-center justify-center gap-2 shadow-lg hover:shadow-xl transition-all active:scale-[0.99] cursor-pointer disabled:opacity-50",
-                    children: isSubmitting ? /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)(import_jsx_runtime3.Fragment, { children: [
-                      /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "material-symbols-outlined text-[20px] animate-spin", children: "progress_activity" }),
-                      /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { children: "\uAC00\uC785 \uCC98\uB9AC \uBC0F \uC6F0\uCEF4 \uCFE0\uD3F0 \uBC1C\uAE09 \uC911..." })
-                    ] }) : /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)(import_jsx_runtime3.Fragment, { children: [
-                      /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "material-symbols-outlined text-[20px] text-[#85f8c4]", children: "card_giftcard" }),
-                      /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { children: "\uAC00\uC785 \uC644\uB8CC\uD558\uACE0 \uC6F0\uCEF4 \uCFE0\uD3F0 \uBC1B\uAE30" }),
-                      /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "material-symbols-outlined text-[18px]", children: "arrow_forward" })
-                    ] })
-                  }
-                ),
-                /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("p", { className: "text-center text-[12px] text-[#43474f]", children: [
-                  "\uAC00\uC785 \uC2DC",
-                  " ",
-                  /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
-                    "button",
-                    {
-                      type: "button",
-                      onClick: () => setActiveTermModal("service"),
-                      className: "underline text-[#00254a] font-semibold hover:text-[#006c4a]",
-                      children: "\uC11C\uBE44\uC2A4 \uC774\uC6A9\uC57D\uAD00"
-                    }
-                  ),
-                  " ",
-                  "\uBC0F",
-                  " ",
-                  /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
-                    "button",
-                    {
-                      type: "button",
-                      onClick: () => setActiveTermModal("privacy"),
-                      className: "underline text-[#00254a] font-semibold hover:text-[#006c4a]",
-                      children: "\uAC1C\uC778\uC815\uBCF4 \uCC98\uB9AC\uBC29\uCE68"
-                    }
-                  ),
-                  "\uC5D0 \uCD5C\uC885 \uB3D9\uC758\uD558\uAC8C \uB429\uB2C8\uB2E4."
-                ] })
+              /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)(
+                "button",
+                {
+                  type: "button",
+                  onClick: handleClearSignature,
+                  className: "text-[11px] text-slate-500 hover:text-rose-600 flex items-center gap-0.5 cursor-pointer",
+                  children: [
+                    /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "material-symbols-outlined text-[14px]", children: "refresh" }),
+                    /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { children: "\uC11C\uBA85 \uC9C0\uC6B0\uAE30" })
+                  ]
+                }
+              )
+            ] }),
+            /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "relative border-2 border-dashed border-[#00254a]/30 rounded-2xl bg-white p-2 shadow-inner overflow-hidden", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
+                "canvas",
+                {
+                  ref: canvasRef,
+                  width: 500,
+                  height: 140,
+                  onMouseDown: handleStartDrawing,
+                  onMouseMove: handleDrawing,
+                  onMouseUp: handleEndDrawing,
+                  onMouseLeave: handleEndDrawing,
+                  onTouchStart: handleStartDrawing,
+                  onTouchMove: handleDrawing,
+                  onTouchEnd: handleEndDrawing,
+                  className: "w-full h-[140px] touch-none cursor-crosshair rounded-xl bg-slate-50/50"
+                }
+              ),
+              !hasSignature && /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "absolute inset-0 pointer-events-none flex flex-col items-center justify-center text-slate-400", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "material-symbols-outlined text-[28px] text-slate-300", children: "gesture" }),
+                /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "text-[12px] font-medium mt-1", children: "\uC774\uACF3\uC5D0 \uBCF8\uC778 \uC131\uD568\uC744 \uC790\uD544\uB85C \uC11C\uBA85\uD574 \uC8FC\uC138\uC694" }),
+                /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "text-[10px] text-slate-400", children: "\uB9C8\uC6B0\uC2A4 \uB610\uB294 \uD130\uCE58\uD39C/\uC190\uAC00\uB77D\uC73C\uB85C \uC11C\uBA85" })
               ] })
-            ] }) })
-          ] })
+            ] }),
+            /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "p-2.5 bg-slate-50 rounded-xl border border-slate-200 text-[11px] text-slate-500 leading-relaxed", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("p", { className: "flex items-center gap-1 text-slate-700 font-semibold mb-0.5", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "material-symbols-outlined text-[14px] text-blue-600", children: "verified_user" }),
+                /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { children: "\uC804\uC790\uC11C\uBA85\uBC95 \uC81C3\uC870 \uC99D\uC801 \uBCF4\uC874 \uBC0F \uC57D\uAD00\uBCC4 \uC11C\uBA85 \uD30C\uC77C \uAD00\uB9AC \uACE0\uC9C0" })
+              ] }),
+              "\uB4F1\uB85D\uB41C \uC790\uD544 \uC804\uC790\uC11C\uBA85\uC740 \uBB34\uC190\uC2E4 \uC6D0\uBCF8 \uC774\uBBF8\uC9C0(PNG)\uB85C \uBCC0\uD658\uB418\uC5B4 \uC11C\uBC84 \uBCF4\uC548 \uB514\uB809\uD1A0\uB9AC(",
+              /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("code", { className: "text-[#00254a] font-mono", children: "public/uploads/signatures/user/..." }),
+              ")\uC5D0 \uC800\uC7A5\uB418\uBA70, \uAC01 \uC57D\uAD00\uBCC4 \uC11C\uBA85 \uC99D\uC801 \uC6D0\uC7A5(TB_MEMBER_AGREE_SIGN)\uC5D0 \uD30C\uC77C\uBA85\uACFC \uB514\uB809\uD1A0\uB9AC PATH\uAC00 \uC548\uC804\uD558\uAC8C \uC5F0\uACC4 \uBCF4\uC874\uB429\uB2C8\uB2E4."
+            ] })
+          ] }),
+          /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { className: "pt-2", children: /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
+            "button",
+            {
+              type: "submit",
+              disabled: isSubmitting,
+              className: "w-full h-12 rounded-2xl bg-[#00254a] hover:bg-[#163b66] text-white font-bold text-[14px] shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 active:scale-95",
+              children: isSubmitting ? /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)(import_jsx_runtime3.Fragment, { children: [
+                /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "material-symbols-outlined text-[18px] animate-spin", children: "sync" }),
+                /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { children: "\uD68C\uC6D0\uAC00\uC785 \uBC0F \uC11C\uBA85 \uC99D\uC801 \uC800\uC7A5 \uC911..." })
+              ] }) : /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)(import_jsx_runtime3.Fragment, { children: [
+                /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "material-symbols-outlined text-[18px]", children: "verified" }),
+                /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { children: "\uD68C\uC6D0 \uAC00\uC785" })
+              ] })
+            }
+          ) })
+        ] }),
+        /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("footer", { className: "px-6 py-3 bg-slate-50 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500 shrink-0", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { children: "SsulDak \uC548\uC2EC\uBCF4\uC99D \uCF00\uC5B4 \uC2DC\uC2A4\uD15C" }),
+          /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
+            "button",
+            {
+              type: "button",
+              onClick: handleCloseModal,
+              className: "text-slate-500 hover:text-slate-800 underline cursor-pointer",
+              children: "\uAC00\uC785 \uCDE8\uC18C\uD558\uACE0 \uB2EB\uAE30"
+            }
+          )
         ] })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("footer", { className: "w-full bg-white shadow-[0_1px_8px_rgba(0,0,0,0.02)] mt-auto border-t border-slate-200", children: /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "max-w-7xl mx-auto px-6 lg:px-12 py-10", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "grid grid-cols-1 md:grid-cols-4 gap-8 mb-8", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "md:col-span-2 flex flex-col gap-3", children: [
+      readingTerm && /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { className: "fixed inset-0 z-[80] bg-black/75 backdrop-blur-sm flex items-center justify-center p-4 animate-fadeIn", children: /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "w-full max-w-lg bg-white rounded-3xl shadow-2xl flex flex-col max-h-[85vh] overflow-hidden border border-slate-200", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "px-5 py-4 border-b border-slate-200 flex items-center justify-between bg-slate-50", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "flex flex-col", children: [
             /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "flex items-center gap-2", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "text-[17px] text-[#00254a] font-bold", children: "SsulDak \uC4F8\uACE0\uB2E6\uACE0" }),
-              /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "px-2 py-0.5 rounded-full bg-[#82f5c1]/40 text-[#00714e] text-[11px] font-semibold", children: "Institutional Care" })
+              /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
+                "span",
+                {
+                  className: `text-[11px] font-bold px-2 py-0.5 rounded-full ${readingTerm.isMandatory ? "bg-blue-100 text-blue-800" : "bg-slate-200 text-slate-700"}`,
+                  children: readingTerm.isMandatory ? "\uD544\uC218" : "\uC120\uD0DD"
+                }
+              ),
+              /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("h4", { className: "font-bold text-[16px] text-slate-900", children: readingTerm.title })
             ] }),
-            /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("p", { className: "text-[13px] text-[#43474f] max-w-md leading-relaxed", children: "\uACF5\uAC04\uC758 \uC815\uB3C8\uACFC \uCCB4\uACC4\uC801\uC778 \uC704\uC0DD \uCF00\uC5B4\uB85C \uC77C\uC0C1\uC758 \uD68C\uBCF5\uC744 \uC124\uACC4\uD569\uB2C8\uB2E4. \uB9C8\uC2A4\uD130 \uD30C\uD2B8\uB108 \uC2E4\uBA85\uC81C\uC640 \uC815\uB7C9 \uC548\uC2EC \uC18C\uB3C5 \uACF5\uC815\uC744 \uC900\uC218\uD569\uB2C8\uB2E4." })
+            /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("span", { className: "text-[11px] text-slate-500 mt-0.5", children: [
+              "\uBC84\uC804: ",
+              readingTerm.version,
+              " | \uB9C8\uC9C0\uB9C9 \uC904\uAE4C\uC9C0 \uC2A4\uD06C\uB864\uD558\uC5EC \uC77D\uC5B4\uC8FC\uC138\uC694"
+            ] })
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "flex flex-col gap-2 text-[13px]", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "font-bold text-[#0b1c30]", children: "\uC548\uC2EC \uCF00\uC5B4 \uBCF4\uC99D" }),
-            /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("p", { className: "text-[#43474f]", children: "1\uC5B5\uC6D0 \uC601\uC5C5\uBC30\uC0C1\uCC45\uC784\uBCF4\uD5D8 \uAC00\uC785" }),
-            /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("p", { className: "text-[#43474f]", children: "\uBCF8\uC0AC \uC9C1\uC601 \uAC80\uC99D \uB9C8\uC2A4\uD130 \uD30C\uD2B8\uB108 \uB9E4\uCE6D" }),
-            /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("p", { className: "text-[#43474f]", children: "100% \uB9CC\uC871 \uC7AC\uCF00\uC5B4 \uBCF4\uC99D\uC81C\uB3C4" })
-          ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "flex flex-col gap-2 text-[13px]", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "font-bold text-[#0b1c30]", children: "\uACE0\uAC1D \uC2E0\uB8B0 \uC13C\uD130" }),
-            /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("p", { className: "text-[#00254a] font-bold text-[15px]", children: "1588-3024" }),
-            /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("p", { className: "text-[#43474f]", children: "\uC6B4\uC601\uC2DC\uAC04: \uD3C9\uC77C 08:30 - 18:30" }),
-            /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("p", { className: "text-[#43474f]", children: "contact@ssuldak.kr" })
-          ] })
+          /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
+            "button",
+            {
+              type: "button",
+              onClick: () => setReadingTerm(null),
+              className: "w-8 h-8 rounded-full flex items-center justify-center text-slate-400 hover:text-slate-700 hover:bg-slate-200",
+              children: /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "material-symbols-outlined text-[20px]", children: "close" })
+            }
+          )
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "pt-6 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4 text-[#737780] text-[12px]", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "flex flex-wrap items-center gap-4 text-center sm:text-left", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { children: "(\uC8FC)\uC4F8\uACE0\uB2E6\uACE0 \uD50C\uB7AB\uD3FC \uCF00\uC5B4" }),
-            /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { children: "\uC0AC\uC5C5\uC790\uB4F1\uB85D\uBC88\uD638: 214-88-09124" }),
-            /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { children: "\uD1B5\uC2E0\uD310\uB9E4\uC5C5\uC2E0\uACE0: \uC81C2024-\uC11C\uC6B8\uAC15\uB0A8-1402\uD638" })
+        /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { className: "w-full bg-slate-100 h-1.5", children: /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
+          "div",
+          {
+            className: `h-full transition-all duration-150 ${isCurrentModalScrolledToBottom ? "bg-emerald-500" : "bg-blue-600"}`,
+            style: { width: `${currentScrollPercent}%` }
+          }
+        ) }),
+        /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
+          "div",
+          {
+            ref: termScrollContainerRef,
+            onScroll: handleTermModalScroll,
+            className: "overflow-y-auto p-5 text-[13px] text-slate-700 leading-relaxed space-y-3 font-normal whitespace-pre-line select-text",
+            style: { maxHeight: "55vh" },
+            children: readingTerm.content
+          }
+        ),
+        /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "p-4 bg-slate-50 border-t border-slate-200 flex flex-col gap-2", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "flex items-center justify-between text-[11px]", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("span", { className: "text-slate-500 flex items-center gap-1", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "material-symbols-outlined text-[14px]", children: "info" }),
+              /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { children: "\uC2A4\uD06C\uB864 \uC9C4\uD589\uB960:" })
+            ] }),
+            /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)(
+              "span",
+              {
+                className: `font-mono font-bold ${isCurrentModalScrolledToBottom ? "text-emerald-600" : "text-blue-600"}`,
+                children: [
+                  currentScrollPercent,
+                  "% ",
+                  isCurrentModalScrolledToBottom ? "(\uC644\uB3C5)" : "(\uC2A4\uD06C\uB864 \uD544\uC694)"
+                ]
+              }
+            )
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { children: "\xA9 2026 SsulDak Inc. All rights reserved." })
+          /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
+            "button",
+            {
+              type: "button",
+              disabled: !isCurrentModalScrolledToBottom,
+              onClick: handleConfirmTermReading,
+              className: `w-full py-3 rounded-xl font-bold text-[13px] transition-all flex items-center justify-center gap-2 ${isCurrentModalScrolledToBottom ? "bg-emerald-600 hover:bg-emerald-700 text-white shadow-md cursor-pointer" : "bg-slate-200 text-slate-400 cursor-not-allowed"}`,
+              children: isCurrentModalScrolledToBottom ? /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)(import_jsx_runtime3.Fragment, { children: [
+                /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "material-symbols-outlined text-[18px]", children: "check_circle" }),
+                /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { children: "\uC57D\uAD00\uC744 \uBAA8\uB450 \uD655\uC778\uD558\uC600\uC2B5\uB2C8\uB2E4 (\uB3D9\uC758 \uC644\uB8CC)" })
+              ] }) : /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)(import_jsx_runtime3.Fragment, { children: [
+                /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "material-symbols-outlined text-[18px] animate-bounce", children: "south" }),
+                /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("span", { children: [
+                  "\uC57D\uAD00 \uB05D\uAE4C\uC9C0 \uC2A4\uD06C\uB864\uD574 \uC8FC\uC138\uC694 (",
+                  currentScrollPercent,
+                  "%)"
+                ] })
+              ] })
+            }
+          )
         ] })
       ] }) }),
-      toastMessage && /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { className: "fixed top-20 left-1/2 -translate-x-1/2 z-50 animate-bounce", children: /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)(
-        "div",
-        {
-          className: `px-4 py-2.5 rounded-full shadow-lg text-[13px] font-bold flex items-center gap-2 ${toastType === "success" ? "bg-[#006c4a] text-white" : toastType === "error" ? "bg-[#ba1a1a] text-white" : "bg-[#00254a] text-white"}`,
-          children: [
-            /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "material-symbols-outlined text-[18px]", children: toastType === "success" ? "check_circle" : toastType === "error" ? "error" : "info" }),
-            /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { children: toastMessage })
-          ]
-        }
-      ) }),
-      showSuccessModal && registeredUser && /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { className: "fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 animate-fadeIn", children: /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "bg-white rounded-3xl max-w-sm w-full p-6 text-center shadow-2xl flex flex-col items-center gap-3", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { className: "w-16 h-16 rounded-full bg-[#82f5c1]/30 text-[#006c4a] flex items-center justify-center animate-bounce", children: /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "material-symbols-outlined text-[36px]", children: "celebration" }) }),
-        /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("h3", { className: "text-[20px] font-extrabold text-[#00254a]", children: "\uD68C\uC6D0\uAC00\uC785\uC774 \uC644\uB8CC\uB418\uC5C8\uC2B5\uB2C8\uB2E4!" }),
-        /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("p", { className: "text-[13px] text-[#43474f]", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("strong", { className: "text-[#0b1c30]", children: registeredUser.userNm }),
-          "\uB2D8, \uC4F8\uACE0\uB2E6\uACE0 \uD68C\uC6D0\uC774 \uB418\uC2E0 \uAC83\uC744 \uC9C4\uC2EC\uC73C\uB85C \uD658\uC601\uD569\uB2C8\uB2E4."
+      showScrollNoticeModal && /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { className: "fixed inset-0 z-[85] bg-black/75 flex items-center justify-center p-4", children: /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "w-full max-w-sm bg-white rounded-2xl p-5 shadow-2xl flex flex-col items-center text-center animate-scaleUp", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { className: "w-12 h-12 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center mb-3", children: /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "material-symbols-outlined text-[28px]", children: "menu_book" }) }),
+        /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("h4", { className: "font-bold text-[16px] text-slate-900 mb-1", children: "\uC57D\uAD00 \uC644\uB3C5 \uD655\uC778 \uD544\uC694" }),
+        /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("p", { className: "text-[12px] text-slate-600 leading-relaxed mb-4", children: noticeMessage }),
+        /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "flex gap-2 w-full", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
+            "button",
+            {
+              type: "button",
+              onClick: () => setShowScrollNoticeModal(false),
+              className: "flex-1 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-[12px]",
+              children: "\uB2EB\uAE30"
+            }
+          ),
+          /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
+            "button",
+            {
+              type: "button",
+              onClick: () => {
+                setShowScrollNoticeModal(false);
+                const firstUnread = termsList.find((t) => t.isMandatory && !scrolledTerms[t.id]);
+                if (firstUnread) {
+                  openTermReader(firstUnread);
+                }
+              },
+              className: "flex-1 py-2.5 bg-[#00254a] hover:bg-[#163b66] text-white font-bold rounded-xl text-[12px]",
+              children: "\uC57D\uAD00 \uBC14\uB85C \uC77D\uAE30"
+            }
+          )
+        ] })
+      ] }) }),
+      showSuccessModal && /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { className: "fixed inset-0 z-[80] bg-black/80 backdrop-blur-md flex items-center justify-center p-4", children: /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "w-full max-w-sm bg-white rounded-3xl p-6 shadow-2xl flex flex-col items-center text-center animate-scaleUp", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { className: "w-16 h-16 rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center mb-3 shadow-md", children: /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "material-symbols-outlined text-[36px]", style: { fontVariationSettings: "'FILL' 1" }, children: "task_alt" }) }),
+        /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("h3", { className: "text-[19px] font-extrabold text-slate-900 tracking-tight", children: "\uD68C\uC6D0\uAC00\uC785\uC774 \uC644\uB8CC\uB418\uC5C8\uC2B5\uB2C8\uB2E4!" }),
+        /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("p", { className: "text-[12px] text-slate-500 mt-1", children: [
+          "\uD658\uC601\uD569\uB2C8\uB2E4, ",
+          /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("strong", { className: "text-slate-800", children: registeredResult?.userNm }),
+          " \uACE0\uAC1D\uB2D8!"
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "w-full bg-[#eff4ff] p-3.5 rounded-2xl border border-[#dce9ff] text-left text-[12px] space-y-1.5", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "flex justify-between items-center", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "text-[#737780]", children: "\uD68C\uC6D0 \uC2DD\uBCC4\uC790 (12\uC790\uB9AC)" }),
-            /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "font-mono font-bold text-[#00254a]", children: registeredUser.userNo })
+        /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "w-full my-4 p-3.5 bg-slate-50 rounded-2xl border border-slate-200 text-left space-y-1.5 text-[12px]", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "flex justify-between", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "text-slate-500", children: "\uD68C\uC6D0 \uC2DD\uBCC4\uBC88\uD638:" }),
+            /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "font-mono font-bold text-[#00254a]", children: registeredResult?.userNo })
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "flex justify-between items-center", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "text-[#737780]", children: "\uC6F0\uCEF4 \uD61C\uD0DD" }),
-            /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "font-bold text-[#006c4a]", children: "20,000\uC6D0 \uCFE0\uD3F0\uD329 \uC9C0\uAE09 \uC644\uB8CC" })
+          /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "flex justify-between", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "text-slate-500", children: "\uC9C0\uAE09 \uD61C\uD0DD:" }),
+            /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "font-bold text-emerald-600", children: "\uC6F0\uCEF4 5,000\uC6D0 \uCFE0\uD3F0\uD329 \uBC1C\uAE09" })
           ] }),
-          appliedReferral && /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "flex justify-between items-center", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "text-[#737780]", children: "\uCD94\uCC9C\uC778 \uCF54\uB4DC" }),
-            /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("span", { className: "font-bold text-[#00254a]", children: [
-              appliedReferral,
-              " (+5,000P)"
-            ] })
+          /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "flex justify-between", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "text-slate-500", children: "\uC11C\uBA85 \uC6D0\uBCF8 \uAD00\uB9AC:" }),
+            /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "font-semibold text-slate-700", children: "PNG \uC6D0\uBCF8 \uBC0F \uC99D\uC801 PATH \uB4F1\uB85D \uC644\uB8CC" })
+          ] }),
+          registeredResult?.signSavedFiles && registeredResult.signSavedFiles.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "pt-1 border-t border-slate-200 text-[10px] text-slate-400", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "block font-semibold text-slate-600", children: "\uC57D\uAD00\uBCC4 \uC11C\uBA85 \uD30C\uC77C \uC800\uC7A5 \uB0B4\uC5ED:" }),
+            /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("ul", { className: "list-disc pl-4 space-y-0.5 mt-0.5", children: registeredResult.signSavedFiles.map((sf, idx) => /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("li", { children: [
+              /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("span", { className: "font-semibold text-slate-600", children: [
+                sf.termsCd,
+                ":"
+              ] }),
+              " ",
+              sf.signFileNm
+            ] }, idx)) })
           ] })
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)(
+        /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
           "button",
           {
             type: "button",
             onClick: () => {
               setShowSuccessModal(false);
-              if (onNavigate) {
-                onNavigate("USER-ATH-00");
-              } else {
-                window.location.hash = "#login";
-              }
+              handleCloseModal();
             },
-            className: "w-full h-12 mt-2 rounded-xl bg-[#00254a] text-white text-[15px] font-bold flex items-center justify-center gap-2 hover:bg-[#163b66] active:scale-95 transition-all cursor-pointer shadow-md",
-            children: [
-              /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { children: "\uB85C\uADF8\uC778\uD558\uB7EC \uAC00\uAE30" }),
-              /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "material-symbols-outlined text-[20px]", children: "arrow_forward" })
-            ]
+            className: "w-full py-3 bg-[#00254a] hover:bg-[#163b66] text-white font-bold text-[14px] rounded-2xl shadow-lg transition-all cursor-pointer",
+            children: "\uD648\uC73C\uB85C \uC774\uB3D9\uD558\uC5EC \uC11C\uBE44\uC2A4 \uB458\uB7EC\uBCF4\uAE30"
           }
         )
-      ] }) }),
-      activeTermModal && /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { className: "fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 animate-fadeIn", children: /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "bg-white rounded-3xl max-w-md w-full max-h-[80vh] flex flex-col shadow-2xl overflow-hidden", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "p-4 border-b border-slate-200 flex items-center justify-between", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("h3", { className: "text-[16px] font-bold text-[#0b1c30]", children: activeTermModal === "service" ? "\uC4F8\uACE0\uB2E6\uACE0 \uC11C\uBE44\uC2A4 \uC774\uC6A9\uC57D\uAD00" : activeTermModal === "privacy" ? "\uAC1C\uC778\uC815\uBCF4 \uC218\uC9D1 \uBC0F \uC804\uC790\uAC70\uB798 \uC11C\uBA85 \uC774\uC6A9 \uB3D9\uC758" : "\uB9C8\uCF00\uD305 \uC815\uBCF4 \uC218\uC2E0 \uB3D9\uC758" }),
-          /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
-            "button",
-            {
-              type: "button",
-              onClick: () => setActiveTermModal(null),
-              className: "text-[#737780] hover:text-[#0b1c30] p-1 cursor-pointer",
-              children: /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "material-symbols-outlined text-[20px]", children: "close" })
-            }
-          )
-        ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "p-4 overflow-y-auto text-[13px] text-[#43474f] leading-relaxed space-y-3", children: [
-          activeTermModal === "service" && /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)(import_jsx_runtime3.Fragment, { children: [
-            /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("p", { className: "font-bold text-[#0b1c30]", children: "\uC81C1\uC870 (\uBAA9\uC801)" }),
-            /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("p", { children: "\uBCF8 \uC57D\uAD00\uC740 \uC8FC\uC2DD\uD68C\uC0AC \uC4F8\uACE0\uB2E6\uACE0\uAC00 \uC6B4\uC601\uD558\uB294 \uCCAD\uC18C \uC6A9\uC5ED \uB9E4\uCE6D \uD50C\uB7AB\uD3FC \uC11C\uBE44\uC2A4\uC758 \uC774\uC6A9 \uC808\uCC28\uB97C \uADDC\uC815\uD569\uB2C8\uB2E4." }),
-            /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("p", { className: "font-bold text-[#0b1c30]", children: "\uC81C2\uC870 (3\uAC1C\uC6D4 \uC758\uBB34 \uACC4\uC57D \uBC0F \uC704\uC57D\uAE08)" }),
-            /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("p", { children: "\uC815\uAE30\uCCAD\uC18C \uC11C\uBE44\uC2A4\uB294 \uCD5C\uC18C 3\uAC1C\uC6D4(90\uC77C) \uC774\uC0C1 \uCCB4\uACB0\uC744 \uC6D0\uCE59\uC73C\uB85C \uD558\uBA70 \uC77C\uBC29 \uC120 \uCDE8\uC18C \uC2DC \uD328\uB110\uD2F0\uAC00 \uBD80\uACFC\uB429\uB2C8\uB2E4." })
-          ] }),
-          activeTermModal === "privacy" && /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)(import_jsx_runtime3.Fragment, { children: [
-            /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("p", { className: "font-bold text-[#0b1c30]", children: "1. \uC218\uC9D1\uD558\uB294 \uAC1C\uC778\uC815\uBCF4 \uD56D\uBAA9" }),
-            /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("p", { children: "- \uD544\uC218\uD56D\uBAA9: \uC774\uB984, \uC774\uBA54\uC77C, \uD734\uB300\uD3F0 \uBC88\uD638, \uBCF8\uC778 \uC790\uD544 \uC804\uC790\uC11C\uBA85 \uC774\uBBF8\uC9C0" }),
-            /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("p", { children: "- \uC218\uC9D1 \uBAA9\uC801: \uACC4\uC57D\uC11C \uC804\uC790 \uC11C\uBA85 \uCCB4\uACB0, \uC548\uC2EC\uBC88\uD638 \uC5F0\uB3D9, \uBCF8\uC778 \uD655\uC778" })
-          ] }),
-          activeTermModal === "marketing" && /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)(import_jsx_runtime3.Fragment, { children: [
-            /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("p", { className: "font-bold text-[#0b1c30]", children: "\uB9C8\uCF00\uD305 \uC815\uBCF4 \uC218\uC2E0 \uBC0F \uD61C\uD0DD \uC54C\uB9BC \uB3D9\uC758" }),
-            /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("p", { children: "\uC2E0\uADDC \uD560\uC778 \uCFE0\uD3F0 \uBC0F \uB9DE\uCDA4 \uCF00\uC5B4 \uD301, \uCCAD\uC18C \uC8FC\uAE30 \uC54C\uB9BC\uC744 SMS \uBC0F \uD478\uC2DC\uB85C \uC218\uC2E0\uD569\uB2C8\uB2E4. (1,000P \uC801\uB9BD)" })
-          ] })
-        ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { className: "p-3 border-t border-slate-200 bg-slate-50 flex justify-end", children: /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
-          "button",
-          {
-            type: "button",
-            onClick: () => setActiveTermModal(null),
-            className: "px-5 py-2 rounded-xl bg-[#00254a] text-white text-[13px] font-bold cursor-pointer",
-            children: "\uD655\uC778"
-          }
-        ) })
       ] }) })
     ] });
   }
@@ -60629,13 +60627,1315 @@ ${err.message}`);
     ] });
   }
 
-  // preview/main.tsx
+  // SsulDak_Web/Admin/frontend/ADMN-SYS-03/index.tsx
+  var import_react41 = __toESM(require_react());
   var import_jsx_runtime41 = __toESM(require_jsx_runtime());
+  function AdmnSys03({
+    onNavigate,
+    adminId = "admin01"
+  }) {
+    const [activeNav, setActiveNav] = (0, import_react41.useState)("notices-faq");
+    const [selectedCategory, setSelectedCategory] = (0, import_react41.useState)("ALL");
+    const [searchKeyword, setSearchKeyword] = (0, import_react41.useState)("");
+    const [searchInput, setSearchInput] = (0, import_react41.useState)("");
+    const [currentPage, setCurrentPage] = (0, import_react41.useState)(1);
+    const [pageSize] = (0, import_react41.useState)(10);
+    const [articles, setArticles] = (0, import_react41.useState)([]);
+    const [totalCnt, setTotalCnt] = (0, import_react41.useState)(0);
+    const [isLoading, setIsLoading] = (0, import_react41.useState)(true);
+    const [kpi, setKpi] = (0, import_react41.useState)({
+      totalArticles: 0,
+      activePopups: 0,
+      eventCount: 0,
+      totalViews: 0
+    });
+    const [toastMessage, setToastMessage] = (0, import_react41.useState)(null);
+    const showToast = (0, import_react41.useCallback)((msg) => {
+      setToastMessage(msg);
+      setTimeout(() => {
+        setToastMessage(null);
+      }, 3200);
+    }, []);
+    const [isEditorModalOpen, setIsEditorModalOpen] = (0, import_react41.useState)(false);
+    const [isFullScreen, setIsFullScreen] = (0, import_react41.useState)(false);
+    const [isSavingArticle, setIsSavingArticle] = (0, import_react41.useState)(false);
+    const [editingSeq, setEditingSeq] = (0, import_react41.useState)(null);
+    const [formCategory, setFormCategory] = (0, import_react41.useState)("EVENT");
+    const [formAudience, setFormAudience] = (0, import_react41.useState)("ALL");
+    const [formScheduleTime, setFormScheduleTime] = (0, import_react41.useState)("2026.10.20 14:00");
+    const [isImmediatePost, setIsImmediatePost] = (0, import_react41.useState)(true);
+    const [formPopupToggle, setFormPopupToggle] = (0, import_react41.useState)(true);
+    const [isPinned, setIsPinned] = (0, import_react41.useState)(true);
+    const [formTitle, setFormTitle] = (0, import_react41.useState)("\uBD04\uB9DE\uC774 \uAC00\uC804 \uBD84\uD574\uCCAD\uC18C 5,000\uC6D0 \uCFE0\uD3F0 \uC99D\uC815");
+    const [formContentHtml, setFormContentHtml] = (0, import_react41.useState)("");
+    const [selectedCouponNo, setSelectedCouponNo] = (0, import_react41.useState)("CP-SEASON-10");
+    const [availableCoupons, setAvailableCoupons] = (0, import_react41.useState)([]);
+    const [isCouponDropdownOpen, setIsCouponDropdownOpen] = (0, import_react41.useState)(false);
+    const editorCanvasRef = (0, import_react41.useRef)(null);
+    const [charCount, setCharCount] = (0, import_react41.useState)(348);
+    const [lastSyncTime, setLastSyncTime] = (0, import_react41.useState)("14:32:05");
+    const [isPreviewModalOpen, setIsPreviewModalOpen] = (0, import_react41.useState)(false);
+    const fetchArticleList = (0, import_react41.useCallback)(async (pageToLoad = currentPage, cat = selectedCategory, keyword = searchKeyword) => {
+      try {
+        setIsLoading(true);
+        const res = await fetch("/api/admin/admn_sys_03", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            mode: "GET_ARTICLE_LIST",
+            adminId,
+            category: cat,
+            searchKeyword: keyword,
+            page: pageToLoad,
+            limit: pageSize
+          })
+        });
+        const data = await res.json();
+        if (!res.ok || !data.success) {
+          throw new Error(data.message || "\uBAA9\uB85D \uB85C\uB4DC \uC2E4\uD328");
+        }
+        setArticles(data.articles || []);
+        setTotalCnt(data.totalCnt || 0);
+        setCurrentPage(data.currentPage || 1);
+        if (data.kpi) {
+          setKpi(data.kpi);
+        }
+      } catch (err) {
+        console.error("Fetch articles error:", err);
+        showToast("\u274C \uACF5\uC9C0 \uBAA9\uB85D\uC744 \uBD88\uB7EC\uC624\uC9C0 \uBABB\uD588\uC2B5\uB2C8\uB2E4.");
+      } finally {
+        setIsLoading(false);
+      }
+    }, [adminId, currentPage, pageSize, selectedCategory, searchKeyword, showToast]);
+    const fetchAvailableCoupons = (0, import_react41.useCallback)(async () => {
+      try {
+        const res = await fetch("/api/admin/admn_sys_03", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            mode: "GET_COUPON_LIST",
+            adminId
+          })
+        });
+        const data = await res.json();
+        if (data.success && data.coupons) {
+          setAvailableCoupons(data.coupons);
+        }
+      } catch (err) {
+        console.warn("Fetch coupons warning:", err);
+      }
+    }, [adminId]);
+    (0, import_react41.useEffect)(() => {
+      fetchArticleList(1, selectedCategory, searchKeyword);
+      fetchAvailableCoupons();
+    }, [selectedCategory, searchKeyword]);
+    const handleTogglePopup = async (articleSeq, currentPopupYn) => {
+      const nextYn = currentPopupYn === "Y" ? "N" : "Y";
+      setArticles(
+        (prev) => prev.map(
+          (art) => art.articleSeq === articleSeq ? { ...art, isPopupYn: nextYn } : art
+        )
+      );
+      setKpi((prev) => ({
+        ...prev,
+        activePopups: nextYn === "Y" ? prev.activePopups + 1 : Math.max(0, prev.activePopups - 1)
+      }));
+      try {
+        const res = await fetch("/api/admin/admn_sys_03", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            mode: "TOGGLE_POPUP_STATUS",
+            adminId,
+            articleSeq,
+            isPopupYn: nextYn
+          })
+        });
+        const data = await res.json();
+        if (!res.ok || !data.success) {
+          throw new Error(data.message || "\uC0C1\uD0DC \uBCC0\uACBD \uC2E4\uD328");
+        }
+        showToast(
+          nextYn === "Y" ? `\u2728 [No.${articleSeq}] \uACF5\uC9C0\uAC00 \uBAA8\uBC14\uC77C/\uC6F9 \uD648 \uBA54\uC778 \uD31D\uC5C5\uC73C\uB85C \uB178\uCD9C \uD65C\uC131\uD654\uB418\uC5C8\uC2B5\uB2C8\uB2E4.` : `\u23F8\uFE0F [No.${articleSeq}] \uD648 \uBA54\uC778 \uD31D\uC5C5 \uBC30\uB108 \uB178\uCD9C\uC774 \uBE44\uD65C\uC131\uD654\uB418\uC5C8\uC2B5\uB2C8\uB2E4.`
+        );
+      } catch (err) {
+        setArticles(
+          (prev) => prev.map(
+            (art) => art.articleSeq === articleSeq ? { ...art, isPopupYn: currentPopupYn } : art
+          )
+        );
+        setKpi((prev) => ({
+          ...prev,
+          activePopups: currentPopupYn === "Y" ? prev.activePopups + 1 : Math.max(0, prev.activePopups - 1)
+        }));
+        alert(err.message || "\uD31D\uC5C5 \uC124\uC815 \uBCC0\uACBD\uC5D0 \uC2E4\uD328\uD588\uC2B5\uB2C8\uB2E4.");
+      }
+    };
+    const handleDeleteArticle = async (articleSeq, title) => {
+      if (!confirm(`\uC815\uB9D0 \uD574\uB2F9 \uACF5\uC9C0\uAE00\uC744 \uC0AD\uC81C\uD558\uC2DC\uACA0\uC2B5\uB2C8\uAE4C?
+
+- \uC81C\uBAA9: ${title}
+- \uAC8C\uC2DC\uAE00 \uBC88\uD638: No.${articleSeq}
+
+* \uC0AD\uC81C \uC2DC \uC601\uAD6C \uBCF4\uC874\uC6A9 \uB17C\uB9AC \uC0AD\uC81C(DEL_YN='Y') \uCC98\uB9AC\uB429\uB2C8\uB2E4.`)) {
+        return;
+      }
+      try {
+        const res = await fetch("/api/admin/admn_sys_03", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            mode: "DELETE_ARTICLE",
+            adminId,
+            articleSeq
+          })
+        });
+        const data = await res.json();
+        if (!res.ok || !data.success) {
+          throw new Error(data.message || "\uC0AD\uC81C \uC2E4\uD328");
+        }
+        showToast("\u{1F5D1}\uFE0F \uACF5\uC9C0\uAE00\uC774 \uC131\uACF5\uC801\uC73C\uB85C \uC0AD\uC81C\uB418\uC5C8\uC2B5\uB2C8\uB2E4.");
+        fetchArticleList(currentPage, selectedCategory, searchKeyword);
+      } catch (err) {
+        alert(err.message || "\uC0AD\uC81C \uCC98\uB9AC \uC911 \uC624\uB958\uAC00 \uBC1C\uC0DD\uD588\uC2B5\uB2C8\uB2E4.");
+      }
+    };
+    const getInitialEditorContent = () => `
+    <div class="space-y-3">
+      <h2 class="font-headline-lg text-headline-md text-primary tracking-tight">\uC548\uB155\uD558\uC138\uC694, SsulDak \uACE0\uAC1D \uC5EC\uB7EC\uBD84! \u{1F33F}</h2>
+      <p class="font-body-lg text-body-lg text-on-surface-variant leading-relaxed">
+        \uB530\uC2A4\uD55C \uD587\uC0B4\uACFC \uD568\uAED8 \uCC3E\uC544\uC628 \uD658\uC808\uAE30, \uC5D0\uC5B4\uCEE8\uACFC \uC138\uD0C1\uAE30 \uC18D \uC228\uC740 \uACF0\uD321\uC774\uC640 \uBBF8\uC138\uBA3C\uC9C0\uB97C \uC644\uBCBD\uD558\uAC8C \uBD84\uD574 \uC138\uCC99\uD558\uB294 <strong>2026 \uBD04\uB9DE\uC774 \uD074\uB9B0 \uB77C\uC774\uD504 \uD504\uB85C\uBAA8\uC158</strong>\uC744 \uC2DC\uC791\uD569\uB2C8\uB2E4.
+      </p>
+      <p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
+        \uC804\uBB38 \uAE30\uC220 \uC790\uACA9\uC744 \uBCF4\uC720\uD55C \uB9C8\uC2A4\uD130 \uD30C\uD2B8\uB108\uC758 100% \uBD84\uD574 \uC0B4\uADE0 \uCF00\uC5B4\uB97C \uC9C0\uAE08 \uD2B9\uBCC4 \uD560\uC778\uAC00\uB85C \uACBD\uD5D8\uD574 \uBCF4\uC138\uC694. \uC544\uB798 \uBC84\uD2BC\uC744 \uD074\uB9AD\uD558\uC2DC\uBA74 \uACC4\uC815\uC73C\uB85C \uC120\uCC29\uC21C 5,000\uC6D0 \uCFE0\uD3F0\uC774 \uC989\uC2DC \uC9C0\uAE09\uB429\uB2C8\uB2E4!
+      </p>
+    </div>
+    <div class="my-space-md p-space-md rounded-xl bg-surface-container-low shadow-sm transition-all relative overflow-hidden" contenteditable="false">
+      <div class="flex flex-col sm:flex-row items-center justify-between gap-space-md relative z-10">
+        <div class="flex items-center gap-space-sm w-full sm:w-auto">
+          <div class="w-12 h-12 rounded-xl bg-secondary text-on-secondary flex items-center justify-center shrink-0 shadow-md">
+            <span class="material-symbols-outlined text-[24px]" style="font-variation-settings: 'FILL' 1;">redeem</span>
+          </div>
+          <div class="flex flex-col">
+            <div class="flex items-center gap-2">
+              <span class="font-headline-sm text-headline-sm text-primary">\uAC00\uC804 \uBD84\uD574\uCCAD\uC18C \uC804\uC6A9 5,000\uC6D0 \uD560\uC778\uAD8C</span>
+              <span class="font-label-sm text-label-sm px-2 py-0.5 rounded bg-surface-variant text-primary font-bold">CODE: CP-SEASON-10</span>
+            </div>
+            <p class="font-body-sm text-body-sm text-outline mt-0.5">\uC5D0\uC5B4\uCEE8 \uBD84\uD574\uC138\uCC99 / \uD1B5\uB3CC\uC774\xB7\uB4DC\uB7FC \uC138\uD0C1\uAE30 \uC0B4\uADE0 \uCF54\uC2A4 \uC801\uC6A9 \uAC00\uB2A5</p>
+          </div>
+        </div>
+        <button class="w-full sm:w-auto px-space-md py-3 bg-primary hover:bg-primary-container text-on-primary font-label-lg text-label-lg rounded-xl shadow-md transition-all flex items-center justify-center gap-2 shrink-0 cursor-pointer" type="button">
+          <span class="material-symbols-outlined text-[18px]">download</span>
+          <span>\uCFE0\uD3F0 \uC989\uC2DC \uBC1C\uAE09\uBC1B\uAE30</span>
+        </button>
+      </div>
+      <div class="mt-3 pt-3 bg-surface-variant/40 rounded-lg px-3 py-2 flex items-center gap-1.5 text-on-surface-variant">
+        <span class="material-symbols-outlined text-[16px] text-primary">info</span>
+        <span class="font-body-sm text-body-sm">\u203B \uD074\uB9AD \uC2DC \uC571 \uB0B4 \uCFE0\uD3F0\uD568\uC73C\uB85C \uC790\uB3D9 \uC801\uB9BD\uB418\uBA70 \uC608\uC57D \uACB0\uC81C \uCC3D\uC5D0 \uC989\uC2DC \uBC18\uC601\uB429\uB2C8\uB2E4.</span>
+      </div>
+    </div>
+    <div class="p-space-md rounded-xl bg-surface-container/40 space-y-2">
+      <div class="font-label-md text-label-md text-on-surface flex items-center gap-1.5 font-bold">
+        <span class="material-symbols-outlined text-[16px] text-primary">checklist</span>
+        <span>\uD504\uB85C\uBAA8\uC158 \uC720\uC758\uC0AC\uD56D</span>
+      </div>
+      <ul class="font-body-sm text-body-sm text-on-surface-variant space-y-1 list-none pl-1">
+        <li class="flex items-start gap-1.5">
+          <span class="text-primary font-bold">\u2022</span>
+          <span>\uBCF8 \uCFE0\uD3F0\uC740 \uAC00\uC804 \uBD84\uD574 \uCCAD\uC18C(\uC5D0\uC5B4\uCEE8/\uC138\uD0C1\uAE30) \uACB0\uC81C \uAC74\uC5D0 \uD55C\uD558\uC5EC \uC801\uC6A9 \uAC00\uB2A5\uD569\uB2C8\uB2E4.</span>
+        </li>
+        <li class="flex items-start gap-1.5">
+          <span class="text-primary font-bold">\u2022</span>
+          <span>\uD0C0 \uD504\uB85C\uBAA8\uC158 \uCFE0\uD3F0\uACFC \uC911\uBCF5 \uC801\uC6A9\uC774 \uBD88\uAC00\uD558\uBA70, \uC720\uD6A8\uAE30\uAC04\uC740 \uBC1C\uAE09\uC77C\uB85C\uBD80\uD130 14\uC77C\uC785\uB2C8\uB2E4.</span>
+        </li>
+        <li class="flex items-start gap-1.5">
+          <span class="text-primary font-bold">\u2022</span>
+          <span>\uBE44\uC815\uC0C1\uC801\uC774\uAC70\uB098 \uBD80\uC815\uD55C \uBC29\uBC95\uC73C\uB85C \uCC38\uC5EC \uC2DC \uCFE0\uD3F0 \uD68C\uC218 \uBC0F \uC11C\uBE44\uC2A4 \uC774\uC6A9 \uC81C\uD55C \uC870\uCE58\uAC00 \uC9C4\uD589\uB420 \uC218 \uC788\uC2B5\uB2C8\uB2E4.</span>
+        </li>
+      </ul>
+    </div>
+  `;
+    const handleOpenCreateModal = () => {
+      setEditingSeq(null);
+      setFormCategory("EVENT");
+      setFormAudience("ALL");
+      setFormScheduleTime((/* @__PURE__ */ new Date()).toISOString().slice(0, 16).replace("T", " "));
+      setIsImmediatePost(true);
+      setFormPopupToggle(true);
+      setIsPinned(true);
+      setFormTitle("\uBD04\uB9DE\uC774 \uAC00\uC804 \uBD84\uD574\uCCAD\uC18C 5,000\uC6D0 \uCFE0\uD3F0 \uC99D\uC815");
+      setSelectedCouponNo("CP-SEASON-10");
+      setFormContentHtml(getInitialEditorContent());
+      setCharCount(348);
+      setLastSyncTime((/* @__PURE__ */ new Date()).toLocaleTimeString("ko-KR"));
+      setIsEditorModalOpen(true);
+    };
+    const handleOpenEditModal = async (articleSeq) => {
+      try {
+        const res = await fetch("/api/admin/admn_sys_03", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            mode: "GET_ARTICLE_DETAIL",
+            adminId,
+            articleSeq
+          })
+        });
+        const data = await res.json();
+        if (!res.ok || !data.success || !data.article) {
+          throw new Error(data.message || "\uC0C1\uC138 \uC870\uD68C \uC2E4\uD328");
+        }
+        const art = data.article;
+        setEditingSeq(art.articleSeq);
+        setFormCategory(art.categoryCd || "EVENT");
+        setFormAudience("ALL");
+        setFormScheduleTime(art.regDtFormatted || "2026.10.20 14:00");
+        setIsImmediatePost(true);
+        setFormPopupToggle(art.isPopupYn === "Y");
+        setIsPinned(false);
+        setFormTitle(art.title || "");
+        setSelectedCouponNo(art.attachCouponNo || "");
+        setFormContentHtml(art.contentHtml || "<p>\uB0B4\uC6A9\uC774 \uC5C6\uC2B5\uB2C8\uB2E4.</p>");
+        setCharCount(art.contentHtml ? art.contentHtml.replace(/<[^>]*>/g, "").length : 0);
+        setLastSyncTime((/* @__PURE__ */ new Date()).toLocaleTimeString("ko-KR"));
+        setIsEditorModalOpen(true);
+      } catch (err) {
+        alert(err.message || "\uACF5\uC9C0\uAE00\uC744 \uBD88\uB7EC\uC624\uC9C0 \uBABB\uD588\uC2B5\uB2C8\uB2E4.");
+      }
+    };
+    (0, import_react41.useEffect)(() => {
+      if (isEditorModalOpen && editorCanvasRef.current) {
+        editorCanvasRef.current.innerHTML = formContentHtml;
+      }
+    }, [isEditorModalOpen, formContentHtml]);
+    const handleCanvasInput = () => {
+      if (editorCanvasRef.current) {
+        const text = editorCanvasRef.current.innerText || "";
+        setCharCount(text.trim().length);
+        setLastSyncTime((/* @__PURE__ */ new Date()).toLocaleTimeString("ko-KR"));
+      }
+    };
+    const executeFormat = (command, value = void 0) => {
+      if (editorCanvasRef.current) {
+        editorCanvasRef.current.focus();
+        document.execCommand(command, false, value);
+        handleCanvasInput();
+      }
+    };
+    const handleInsertCouponBlock = (coupon) => {
+      setSelectedCouponNo(coupon.campaignNo);
+      setIsCouponDropdownOpen(false);
+      const couponHtml = `
+      <div class="my-space-md p-space-md rounded-xl bg-surface-container-low shadow-sm transition-all relative overflow-hidden" contenteditable="false">
+        <div class="flex flex-col sm:flex-row items-center justify-between gap-space-md relative z-10">
+          <div class="flex items-center gap-space-sm w-full sm:w-auto">
+            <div class="w-12 h-12 rounded-xl bg-secondary text-on-secondary flex items-center justify-center shrink-0 shadow-md">
+              <span class="material-symbols-outlined text-[24px]" style="font-variation-settings: 'FILL' 1;">redeem</span>
+            </div>
+            <div class="flex flex-col">
+              <div class="flex items-center gap-2">
+                <span class="font-headline-sm text-headline-sm text-primary">${coupon.campaignNm}</span>
+                <span class="font-label-sm text-label-sm px-2 py-0.5 rounded bg-surface-variant text-primary font-bold">CODE: ${coupon.campaignNo}</span>
+              </div>
+              <p class="font-body-sm text-body-sm text-outline mt-0.5">\uD560\uC778 \uAE08\uC561: ${Number(coupon.discountAmt).toLocaleString()}\uC6D0 / \uBC1C\uAE09 \uD6C4 ${coupon.validDays}\uC77C \uC720\uD6A8</p>
+            </div>
+          </div>
+          <button class="w-full sm:w-auto px-space-md py-3 bg-primary hover:bg-primary-container text-on-primary font-label-lg text-label-lg rounded-xl shadow-md transition-all flex items-center justify-center gap-2 shrink-0 cursor-pointer" type="button">
+            <span class="material-symbols-outlined text-[18px]">download</span>
+            <span>\uCFE0\uD3F0 \uC989\uC2DC \uBC1C\uAE09\uBC1B\uAE30</span>
+          </button>
+        </div>
+        <div class="mt-3 pt-3 bg-surface-variant/40 rounded-lg px-3 py-2 flex items-center gap-1.5 text-on-surface-variant">
+          <span class="material-symbols-outlined text-[16px] text-primary">info</span>
+          <span class="font-body-sm text-body-sm">\u203B \uD074\uB9AD \uC2DC \uC571 \uB0B4 \uCFE0\uD3F0\uD568\uC73C\uB85C \uC790\uB3D9 \uC801\uB9BD\uB418\uBA70 \uC608\uC57D \uACB0\uC81C \uCC3D\uC5D0 \uC989\uC2DC \uBC18\uC601\uB429\uB2C8\uB2E4.</span>
+        </div>
+      </div>
+    `;
+      if (editorCanvasRef.current) {
+        editorCanvasRef.current.focus();
+        document.execCommand("insertHTML", false, couponHtml);
+        handleCanvasInput();
+        showToast(`\u{1F39F}\uFE0F [${coupon.campaignNm}] \uB2E4\uC6B4\uB85C\uB4DC \uBE14\uB85D\uC774 \uBCF8\uBB38\uC5D0 \uC0BD\uC785\uB418\uC5C8\uC2B5\uB2C8\uB2E4.`);
+      }
+    };
+    const handleInsertImage = () => {
+      const url = prompt("\uC0BD\uC785\uD560 \uC774\uBBF8\uC9C0\uC758 \uC6F9 URL\uC744 \uC785\uB825\uD574 \uC8FC\uC138\uC694:", "https://images.unsplash.com/photo-1581578731548-c64695cc6952?auto=format&fit=crop&w=800&q=80");
+      if (url) {
+        executeFormat("insertImage", url);
+      }
+    };
+    const handleSaveArticle = async () => {
+      if (!formTitle.trim()) {
+        alert("\uAC8C\uC2DC\uBB3C \uC81C\uBAA9\uC744 \uC785\uB825\uD574 \uC8FC\uC138\uC694.");
+        return;
+      }
+      const currentHtml = editorCanvasRef.current ? editorCanvasRef.current.innerHTML : formContentHtml;
+      try {
+        setIsSavingArticle(true);
+        const res = await fetch("/api/admin/admn_sys_03", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            mode: "SAVE_ARTICLE",
+            adminId,
+            articleSeq: editingSeq,
+            categoryCd: formCategory,
+            title: formTitle.trim(),
+            contentHtml: currentHtml,
+            isPopupYn: formPopupToggle ? "Y" : "N",
+            popupStartDt: formPopupToggle ? "2026-10-20 00:00:00" : null,
+            popupEndDt: formPopupToggle ? "2026-11-20 23:59:59" : null,
+            attachCouponNo: selectedCouponNo || null
+          })
+        });
+        const data = await res.json();
+        if (!res.ok || !data.success) {
+          throw new Error(data.message || "\uC800\uC7A5 \uC2E4\uD328");
+        }
+        showToast(data.message || "\u2705 \uACF5\uC9C0\uAE00\uC774 \uC131\uACF5\uC801\uC73C\uB85C \uC800\uC7A5 \uBC0F \uBC30\uD3EC\uB418\uC5C8\uC2B5\uB2C8\uB2E4.");
+        setIsEditorModalOpen(false);
+        fetchArticleList(1, selectedCategory, searchKeyword);
+      } catch (err) {
+        alert(err.message || "\uACF5\uC9C0\uAE00 \uC800\uC7A5 \uC911 \uC624\uB958\uAC00 \uBC1C\uC0DD\uD588\uC2B5\uB2C8\uB2E4.");
+      } finally {
+        setIsSavingArticle(false);
+      }
+    };
+    const getBadgeStyle = (cd) => {
+      switch (cd) {
+        case "EVENT":
+          return "bg-rose-50 text-rose-700 border border-rose-200";
+        case "POLICY":
+          return "bg-blue-50 text-blue-700 border border-blue-200";
+        case "SERVICE":
+          return "bg-indigo-50 text-indigo-700 border border-indigo-200";
+        case "FAQ":
+          return "bg-emerald-50 text-emerald-700 border border-emerald-200";
+        default:
+          return "bg-slate-100 text-slate-700 border border-slate-200";
+      }
+    };
+    return /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "bg-[#f8f9ff] text-[#0b1c30] antialiased min-h-screen font-['Plus_Jakarta_Sans','Noto_Sans_KR',sans-serif] selection:bg-[#163b66] selection:text-white", children: [
+      toastMessage && /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "fixed top-20 right-8 z-[100] bg-[#00254a] text-white px-5 py-3 rounded-2xl shadow-2xl flex items-center gap-2.5 border border-[#82f5c1]/30 animate-bounce", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "material-symbols-outlined text-[20px] text-[#82f5c1]", children: "info" }),
+        /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "text-[13px] font-semibold", children: toastMessage })
+      ] }),
+      /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("aside", { className: "fixed left-0 top-0 h-full w-[240px] bg-[#00254a] text-white z-40 flex flex-col justify-between shadow-[0_1px_8px_rgba(0,0,0,0.06)]", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "flex flex-col", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "h-16 px-4 flex items-center gap-2 bg-[#163b66]/40 border-b border-[#163b66]/60", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("div", { className: "w-8 h-8 rounded-lg bg-white flex items-center justify-center p-0.5 overflow-hidden shadow-sm", children: /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
+              "img",
+              {
+                src: "/logo.png",
+                alt: "SsulDak",
+                className: "w-full h-full object-contain",
+                onError: (e) => {
+                  e.target.style.display = "none";
+                  const parent = e.target.parentElement;
+                  if (parent) {
+                    parent.innerHTML = '<span class="material-symbols-outlined text-[#00254a] text-[20px]">cleaning_services</span>';
+                  }
+                }
+              }
+            ) }),
+            /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "flex flex-col", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "text-[17px] font-extrabold tracking-tight text-white leading-tight", children: "SsulDak" }),
+              /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "text-[11px] uppercase tracking-wider text-[#86a6d7] font-semibold", children: "Admin Console" })
+            ] })
+          ] }),
+          /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("div", { className: "px-4 pt-6 pb-2", children: /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "text-[11px] font-bold text-[#86a6d7]/70 tracking-wider uppercase", children: "\uC6B4\uC601 \uAC70\uBC84\uB10C\uC2A4" }) }),
+          /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("nav", { className: "px-2 flex flex-col gap-1", children: [
+            { id: "dashboard", label: "\uB300\uC2DC\uBCF4\uB4DC", icon: "dashboard", screen: "ADMN-DSH-00" },
+            { id: "promotions-coupons", label: "\uD504\uB85C\uBAA8\uC158/\uCFE0\uD3F0", icon: "confirmation_number", screen: "ADMN-PRM-00" },
+            { id: "policy-codes", label: "\uCF54\uB4DC/\uC815\uCC45\uAD00\uB9AC", icon: "rule_folder", screen: "ADMN-SYS-02" },
+            { id: "notices-faq", label: "\uACF5\uC9C0\uC0AC\uD56D / FAQ", icon: "campaign", screen: "ADMN-SYS-03" },
+            { id: "user-management", label: "\uD68C\uC6D0\uAD00\uB9AC", icon: "group", screen: "ADMN-USR-00" },
+            { id: "dispute-arbitration", label: "\uAC70\uB798/\uBD84\uC7C1\uC911\uC7AC", icon: "gavel", screen: "ADMN-REQ-01" },
+            { id: "settlement-billing", label: "\uC218\uB0A9/\uC815\uC0B0", icon: "account_balance_wallet", screen: "ADMN-SET-00" }
+          ].map((menu) => /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)(
+            "button",
+            {
+              type: "button",
+              onClick: () => {
+                setActiveNav(menu.id);
+                if (menu.id !== "notices-faq" && onNavigate) {
+                  onNavigate(menu.screen);
+                }
+              },
+              className: `flex items-center gap-2.5 px-4 py-2.5 rounded-xl transition-all text-left cursor-pointer ${activeNav === menu.id ? "bg-[#163b66] text-white font-bold shadow-md" : "text-[#86a6d7] hover:bg-[#163b66]/60 hover:text-white font-medium text-[13px]"}`,
+              children: [
+                /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "material-symbols-outlined text-[20px]", children: menu.icon }),
+                /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "text-[13px]", children: menu.label })
+              ]
+            },
+            menu.id
+          )) })
+        ] }),
+        /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "p-4 bg-[#163b66]/30 mx-3 mb-4 rounded-xl flex flex-col gap-1.5 border border-[#163b66]/50", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "flex items-center justify-between text-[11px]", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "text-[#86a6d7]", children: "\uD648 \uD31D\uC5C5 \uC11C\uBE44\uC2A4" }),
+            /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "text-[#82f5c1] font-bold", children: "ONLINE" })
+          ] }),
+          /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("div", { className: "h-1.5 w-full bg-[#163b66] rounded-full overflow-hidden", children: /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("div", { className: "h-full w-full bg-[#006c4a]" }) }),
+          /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "text-[10px] text-[#86a6d7]/80 flex justify-between pt-0.5", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { children: "\uC5D4\uB4DC\uD3EC\uC778\uD2B8: ADMN-SYS-03" }),
+            /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { children: "MySQL 8.0" })
+          ] })
+        ] })
+      ] }),
+      /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "ml-[240px] flex flex-col min-h-screen", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("header", { className: "h-16 bg-white border-b border-slate-200 px-8 flex items-center justify-between sticky top-0 z-30 shadow-sm", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "flex items-center gap-3", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "text-slate-400 text-[13px]", children: "\uC2DC\uC2A4\uD15C \uC124\uC815" }),
+            /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "text-slate-300", children: "/" }),
+            /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "text-slate-800 font-bold text-[13px]", children: "\uACF5\uC9C0\uC0AC\uD56D \uBC0F FAQ \uAD00\uB9AC (ADMN-SYS-03)" })
+          ] }),
+          /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "flex items-center gap-4", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "flex items-center gap-2 px-3 py-1 bg-slate-100 rounded-lg text-slate-600 text-[12px] font-medium", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "w-2 h-2 rounded-full bg-emerald-500 animate-pulse" }),
+              /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("span", { children: [
+                "\uC811\uC18D \uAD00\uB9AC\uC790: ",
+                /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("strong", { children: adminId }),
+                " (Super Admin)"
+              ] })
+            ] }),
+            /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
+              "button",
+              {
+                type: "button",
+                onClick: () => fetchArticleList(currentPage, selectedCategory, searchKeyword),
+                className: "p-2 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer",
+                title: "\uC0C8\uB85C\uACE0\uCE68",
+                children: /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "material-symbols-outlined text-[20px]", children: "refresh" })
+              }
+            )
+          ] })
+        ] }),
+        /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("main", { className: "p-8 max-w-[1400px] w-full mx-auto flex flex-col gap-6", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "flex flex-col sm:flex-row sm:items-center justify-between gap-4", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { children: [
+              /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("h1", { className: "text-[22px] font-bold text-slate-900 tracking-tight flex items-center gap-2", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { children: "\uACF5\uC9C0\uC0AC\uD56D \uBC0F FAQ \uCF58\uD150\uCE20 \uAD00\uB9AC" }),
+                /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "text-[12px] font-normal text-slate-500 px-2 py-0.5 bg-slate-100 rounded-md", children: "\uD648 \uD31D\uC5C5 \uBC30\uB108 & \uCFE0\uD3F0 \uB2E4\uC6B4\uB85C\uB4DC \uC5F0\uACC4" })
+              ] }),
+              /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("p", { className: "text-[13px] text-slate-500 mt-1", children: "\uC0AC\uC6A9\uC790(USER-COM-00) \uBC0F \uD30C\uD2B8\uB108 \uD654\uBA74\uC5D0 \uC804\uB2EC\uB418\uB294 \uACF5\uC9C0\uC0AC\uD56D, FAQ, \uD504\uB85C\uBAA8\uC158 \uD31D\uC5C5 \uBC0F \uC5F0\uACC4 \uCFE0\uD3F0\uC744 \uAD00\uB9AC\uD569\uB2C8\uB2E4." })
+            ] }),
+            /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)(
+              "button",
+              {
+                type: "button",
+                onClick: handleOpenCreateModal,
+                className: "px-5 py-2.5 bg-[#0F172A] hover:bg-slate-800 text-white font-bold text-[14px] rounded-xl shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer shrink-0 active:scale-95",
+                children: [
+                  /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "material-symbols-outlined text-[18px]", children: "add" }),
+                  /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { children: "+ \uACF5\uC9C0\uAE00 \uB4F1\uB85D" })
+                ]
+              }
+            )
+          ] }),
+          /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "bg-white rounded-2xl p-5 border border-slate-200 shadow-sm flex items-center justify-between", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { children: [
+                /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "text-[12px] font-semibold text-slate-500", children: "\uC804\uCCB4 \uAC8C\uC2DC\uAE00 \uC218" }),
+                /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "text-[26px] font-extrabold text-slate-900 mt-1", children: [
+                  kpi.totalArticles.toLocaleString(),
+                  /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "text-[14px] font-medium text-slate-500 ml-1", children: "\uAC74" })
+                ] })
+              ] }),
+              /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("div", { className: "w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center", children: /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "material-symbols-outlined text-[24px]", children: "article" }) })
+            ] }),
+            /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "bg-white rounded-2xl p-5 border border-slate-200 shadow-sm flex items-center justify-between", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { children: [
+                /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "text-[12px] font-semibold text-slate-500", children: "\uD648 \uB808\uC774\uC5B4 \uD31D\uC5C5 \uB178\uCD9C \uC911" }),
+                /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "text-[26px] font-extrabold text-emerald-600 mt-1", children: [
+                  kpi.activePopups.toLocaleString(),
+                  /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "text-[14px] font-medium text-slate-500 ml-1", children: "\uAC74 ON" })
+                ] })
+              ] }),
+              /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("div", { className: "w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center", children: /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "material-symbols-outlined text-[24px]", children: "layers" }) })
+            ] }),
+            /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "bg-white rounded-2xl p-5 border border-slate-200 shadow-sm flex items-center justify-between", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { children: [
+                /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "text-[12px] font-semibold text-slate-500", children: "\uD504\uB85C\uBAA8\uC158 \uC774\uBCA4\uD2B8 \uACF5\uC9C0" }),
+                /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "text-[26px] font-extrabold text-rose-600 mt-1", children: [
+                  kpi.eventCount.toLocaleString(),
+                  /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "text-[14px] font-medium text-slate-500 ml-1", children: "\uAC74" })
+                ] })
+              ] }),
+              /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("div", { className: "w-12 h-12 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center", children: /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "material-symbols-outlined text-[24px]", children: "celebration" }) })
+            ] }),
+            /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "bg-white rounded-2xl p-5 border border-slate-200 shadow-sm flex items-center justify-between", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { children: [
+                /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "text-[12px] font-semibold text-slate-500", children: "\uB204\uC801 \uCF58\uD150\uCE20 \uC870\uD68C\uC218" }),
+                /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "text-[26px] font-extrabold text-slate-900 mt-1", children: [
+                  kpi.totalViews.toLocaleString(),
+                  /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "text-[14px] font-medium text-slate-500 ml-1", children: "\uD68C" })
+                ] })
+              ] }),
+              /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("div", { className: "w-12 h-12 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center", children: /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "material-symbols-outlined text-[24px]", children: "visibility" }) })
+            ] })
+          ] }),
+          /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "p-6 border-b border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-4", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("div", { className: "flex items-center gap-1.5 p-1 bg-slate-100 rounded-xl overflow-x-auto", children: [
+                { key: "ALL", label: "\uC804\uCCB4" },
+                { key: "EVENT", label: "\uC774\uBCA4\uD2B8" },
+                { key: "POLICY", label: "\uC815\uCC45" },
+                { key: "SERVICE", label: "\uC11C\uBE44\uC2A4" },
+                { key: "FAQ", label: "FAQ" }
+              ].map((cat) => /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
+                "button",
+                {
+                  type: "button",
+                  onClick: () => {
+                    setSelectedCategory(cat.key);
+                    setCurrentPage(1);
+                  },
+                  className: `px-4 py-2 rounded-lg text-[13px] font-bold transition-all cursor-pointer whitespace-nowrap ${selectedCategory === cat.key ? "bg-white text-slate-900 shadow-sm" : "text-slate-500 hover:text-slate-800"}`,
+                  children: cat.label
+                },
+                cat.key
+              )) }),
+              /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "flex items-center gap-2 w-full md:w-auto", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "relative w-full md:w-72", children: [
+                  /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[18px]", children: "search" }),
+                  /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
+                    "input",
+                    {
+                      type: "text",
+                      value: searchInput,
+                      onChange: (e) => setSearchInput(e.target.value),
+                      onKeyDown: (e) => {
+                        if (e.key === "Enter") {
+                          setSearchKeyword(searchInput);
+                          setCurrentPage(1);
+                        }
+                      },
+                      placeholder: "\uC81C\uBAA9 \uAC80\uC0C9...",
+                      className: "w-full h-10 pl-9 pr-3 rounded-xl bg-slate-50 border border-slate-200 text-[13px] focus:outline-none focus:ring-2 focus:ring-[#00254a] focus:bg-white transition-all"
+                    }
+                  ),
+                  searchInput && /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
+                    "button",
+                    {
+                      type: "button",
+                      onClick: () => {
+                        setSearchInput("");
+                        setSearchKeyword("");
+                        setCurrentPage(1);
+                      },
+                      className: "absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600",
+                      children: /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "material-symbols-outlined text-[16px]", children: "close" })
+                    }
+                  )
+                ] }),
+                /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
+                  "button",
+                  {
+                    type: "button",
+                    onClick: () => {
+                      setSearchKeyword(searchInput);
+                      setCurrentPage(1);
+                    },
+                    className: "px-4 h-10 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-[13px] rounded-xl transition-colors shrink-0 cursor-pointer",
+                    children: "\uAC80\uC0C9"
+                  }
+                )
+              ] })
+            ] }),
+            /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("div", { className: "overflow-x-auto", children: /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("table", { className: "w-full text-left border-collapse", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("thead", { children: /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("tr", { className: "bg-slate-50/70 border-b border-slate-200 text-[12px] font-bold text-slate-600 tracking-wider uppercase", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("th", { className: "py-3.5 px-6 w-16 text-center", children: "No" }),
+                /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("th", { className: "py-3.5 px-4 w-28", children: "\uBD84\uB958" }),
+                /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("th", { className: "py-3.5 px-6", children: "\uC81C\uBAA9" }),
+                /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("th", { className: "py-3.5 px-6 w-32", children: "\uC791\uC131\uC77C" }),
+                /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("th", { className: "py-3.5 px-6 w-28 text-right", children: "\uC870\uD68C\uC218" }),
+                /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("th", { className: "py-3.5 px-6 w-44 text-center", children: "\uD31D\uC5C5 \uBC30\uB108 \uC124\uC815" }),
+                /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("th", { className: "py-3.5 px-6 w-36 text-center", children: "\uAD00\uB9AC" })
+              ] }) }),
+              /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("tbody", { className: "divide-y divide-slate-100 text-[13px] text-slate-700", children: isLoading ? /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("tr", { children: /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("td", { colSpan: 7, className: "py-16 text-center text-slate-400", children: /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "flex flex-col items-center justify-center gap-2", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "material-symbols-outlined text-[32px] text-slate-300 animate-spin", children: "sync" }),
+                /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { children: "\uACF5\uC9C0\uC0AC\uD56D \uBC0F FAQ \uBAA9\uB85D\uC744 \uBD88\uB7EC\uC624\uB294 \uC911\uC785\uB2C8\uB2E4..." })
+              ] }) }) }) : articles.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("tr", { children: /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("td", { colSpan: 7, className: "py-16 text-center text-slate-400", children: /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "flex flex-col items-center justify-center gap-2", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "material-symbols-outlined text-[40px] text-slate-300", children: "feed" }),
+                /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { children: "\uC870\uAC74\uC5D0 \uC77C\uCE58\uD558\uB294 \uACF5\uC9C0\uAE00\uC774 \uC5C6\uC2B5\uB2C8\uB2E4." })
+              ] }) }) }) : articles.map((art) => /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)(
+                "tr",
+                {
+                  className: "hover:bg-slate-50/80 transition-colors group",
+                  children: [
+                    /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("td", { className: "py-4 px-6 text-center font-semibold text-slate-500", children: art.articleSeq }),
+                    /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("td", { className: "py-4 px-4", children: /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: `px-2.5 py-1 rounded-full text-[11px] font-bold tracking-tight inline-block ${getBadgeStyle(art.categoryCd)}`, children: art.categoryNm }) }),
+                    /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("td", { className: "py-4 px-6", children: /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "flex items-center gap-2", children: [
+                      /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
+                        "span",
+                        {
+                          onClick: () => handleOpenEditModal(art.articleSeq),
+                          className: "font-bold text-slate-900 hover:text-blue-600 cursor-pointer transition-colors line-clamp-1",
+                          title: art.title,
+                          children: art.title
+                        }
+                      ),
+                      art.attachCouponNo && /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)(
+                        "span",
+                        {
+                          className: "px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-bold shrink-0 flex items-center gap-0.5",
+                          title: `\uC5F0\uACC4 \uCFE0\uD3F0: ${art.attachCouponNo}`,
+                          children: [
+                            /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "material-symbols-outlined text-[12px]", children: "confirmation_number" }),
+                            "\uCFE0\uD3F0 \uC5F0\uB3D9"
+                          ]
+                        }
+                      )
+                    ] }) }),
+                    /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("td", { className: "py-4 px-6 text-slate-500", children: art.formattedRegDate }),
+                    /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("td", { className: "py-4 px-6 text-right font-medium text-slate-600", children: art.viewCnt.toLocaleString() }),
+                    /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("td", { className: "py-4 px-6 text-center", children: /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)(
+                      "button",
+                      {
+                        type: "button",
+                        onClick: () => handleTogglePopup(art.articleSeq, art.isPopupYn),
+                        className: `px-3 py-1.5 rounded-full text-[12px] font-bold transition-all shadow-sm flex items-center justify-center gap-1.5 mx-auto cursor-pointer ${art.isPopupYn === "Y" ? "bg-emerald-500 hover:bg-emerald-600 text-white active:scale-95" : "bg-slate-200 hover:bg-slate-300 text-slate-600"}`,
+                        children: [
+                          /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "material-symbols-outlined text-[14px]", children: art.isPopupYn === "Y" ? "check_circle" : "do_not_disturb_on" }),
+                          /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { children: art.isPopupYn === "Y" ? "\uD648 \uD31D\uC5C5 ON" : "OFF" })
+                        ]
+                      }
+                    ) }),
+                    /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("td", { className: "py-4 px-6 text-center", children: /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "flex items-center justify-center gap-1.5", children: [
+                      /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
+                        "button",
+                        {
+                          type: "button",
+                          onClick: () => handleOpenEditModal(art.articleSeq),
+                          className: "px-2.5 py-1 text-[12px] font-semibold text-slate-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors cursor-pointer",
+                          children: "\uC218\uC815"
+                        }
+                      ),
+                      /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
+                        "button",
+                        {
+                          type: "button",
+                          onClick: () => handleDeleteArticle(art.articleSeq, art.title),
+                          className: "px-2.5 py-1 text-[12px] font-semibold text-rose-600 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer",
+                          children: "\uC0AD\uC81C"
+                        }
+                      )
+                    ] }) })
+                  ]
+                },
+                art.articleSeq
+              )) })
+            ] }) }),
+            /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "p-4 border-t border-slate-100 flex items-center justify-between text-[13px] text-slate-500", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { children: [
+                "\uCD1D ",
+                /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("strong", { className: "text-slate-800", children: totalCnt }),
+                "\uAC74\uC758 \uACF5\uC9C0\uAE00 (\uD398\uC774\uC9C0 ",
+                currentPage,
+                " / ",
+                Math.max(1, Math.ceil(totalCnt / pageSize)),
+                ")"
+              ] }),
+              /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "flex items-center gap-1", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
+                  "button",
+                  {
+                    type: "button",
+                    disabled: currentPage <= 1,
+                    onClick: () => fetchArticleList(currentPage - 1, selectedCategory, searchKeyword),
+                    className: "px-3 py-1.5 border border-slate-200 rounded-lg hover:bg-slate-50 disabled:opacity-40 disabled:pointer-events-none cursor-pointer",
+                    children: "\uC774\uC804"
+                  }
+                ),
+                Array.from({ length: Math.max(1, Math.ceil(totalCnt / pageSize)) }, (_, i) => i + 1).map((p) => /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
+                  "button",
+                  {
+                    type: "button",
+                    onClick: () => fetchArticleList(p, selectedCategory, searchKeyword),
+                    className: `w-8 h-8 rounded-lg font-bold text-[13px] transition-colors cursor-pointer ${currentPage === p ? "bg-[#00254a] text-white shadow-sm" : "text-slate-600 hover:bg-slate-100"}`,
+                    children: p
+                  },
+                  p
+                )),
+                /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
+                  "button",
+                  {
+                    type: "button",
+                    disabled: currentPage >= Math.ceil(totalCnt / pageSize),
+                    onClick: () => fetchArticleList(currentPage + 1, selectedCategory, searchKeyword),
+                    className: "px-3 py-1.5 border border-slate-200 rounded-lg hover:bg-slate-50 disabled:opacity-40 disabled:pointer-events-none cursor-pointer",
+                    children: "\uB2E4\uC74C"
+                  }
+                )
+              ] })
+            ] })
+          ] })
+        ] })
+      ] }),
+      isEditorModalOpen && /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("div", { className: "fixed inset-0 z-50 bg-[#213145]/60 backdrop-blur-sm flex items-center justify-center p-4 sm:p-6 overflow-y-auto animate-fadeIn", children: /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("main", { className: `w-full ${isFullScreen ? "max-w-[98vw] h-[96vh]" : "max-w-[880px]"} my-auto bg-white rounded-2xl shadow-[0_24px_48px_-12px_rgba(15,23,42,0.22)] overflow-hidden transition-all duration-200`, children: /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "flex flex-col w-full bg-white text-[#0b1c30] font-['Plus_Jakarta_Sans','Noto_Sans_KR',sans-serif] text-[14px] overflow-hidden", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("header", { className: "flex items-center justify-between px-6 py-4 bg-[#eff4ff] border-b-0 shadow-sm relative z-20", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "flex items-center gap-3 min-w-0", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("div", { className: "w-10 h-10 rounded-xl bg-[#00254a] text-white flex items-center justify-center shrink-0 shadow-md", children: /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "material-symbols-outlined text-[20px]", style: { fontVariationSettings: "'FILL' 1" }, children: "edit_note" }) }),
+            /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "flex flex-col min-w-0", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "flex items-center gap-2", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("h1", { className: "text-[17px] font-bold text-[#00254a] tracking-tight truncate", children: editingSeq ? `\uACF5\uC9C0\uAE00 \uC218\uC815 (No.${editingSeq})` : "\uACF5\uC9C0\uAE00 \uB4F1\uB85D \uBC0F \uD3B8\uC9D1" }),
+                /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "text-[11px] font-bold px-2 py-0.5 rounded-full bg-[#d3e4fe] text-[#254873] uppercase", children: "WYSIWYG Editor" })
+              ] }),
+              /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("p", { className: "text-[13px] text-[#737780] truncate flex items-center gap-1.5 mt-0.5", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("span", { children: [
+                  "\uBB38\uC11C \uBC88\uD638: ",
+                  /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("strong", { className: "font-semibold text-[#0b1c30]", children: [
+                    "NOTC-202610-",
+                    editingSeq ? String(editingSeq).padStart(3, "0") : "018"
+                  ] })
+                ] }),
+                /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "text-[#c3c6d0]", children: "\u2022" }),
+                /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("span", { children: [
+                  "\uBC84\uC804: Rev 1.2 (\uCD5C\uC885 \uC218\uC815: ",
+                  adminId,
+                  ")"
+                ] })
+              ] })
+            ] })
+          ] }),
+          /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "flex items-center gap-1 shrink-0", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
+              "button",
+              {
+                type: "button",
+                onClick: () => setIsFullScreen(!isFullScreen),
+                "aria-label": "\uC804\uCCB4\uD654\uBA74",
+                className: "w-9 h-9 flex items-center justify-center rounded-lg text-[#43474f] hover:bg-[#e5eeff] hover:text-[#00254a] transition-colors cursor-pointer",
+                children: /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "material-symbols-outlined text-[20px]", children: isFullScreen ? "fullscreen_exit" : "fullscreen" })
+              }
+            ),
+            /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
+              "button",
+              {
+                type: "button",
+                onClick: () => setIsEditorModalOpen(false),
+                "aria-label": "\uB2EB\uAE30",
+                className: "w-9 h-9 flex items-center justify-center rounded-lg text-[#43474f] hover:bg-[#ffdad6] hover:text-[#93000a] transition-colors cursor-pointer",
+                children: /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "material-symbols-outlined text-[20px]", children: "close" })
+              }
+            )
+          ] })
+        ] }),
+        /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: `flex flex-col overflow-y-auto ${isFullScreen ? "max-h-[calc(96vh-140px)]" : "max-h-[calc(90vh-140px)]"} p-6 space-y-4`, children: [
+          /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("section", { className: "bg-[#eff4ff] rounded-xl p-4 shadow-sm", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "grid grid-cols-1 md:grid-cols-3 gap-4", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "flex flex-col gap-1.5", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("label", { className: "text-[13px] font-semibold text-[#0b1c30] flex items-center gap-1", children: [
+                  /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "material-symbols-outlined text-[16px] text-[#00254a]", children: "category" }),
+                  /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { children: "\uACF5\uC9C0 \uBD84\uB958" }),
+                  /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "text-[#ba1a1a]", children: "*" })
+                ] }),
+                /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "relative", children: [
+                  /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)(
+                    "select",
+                    {
+                      value: formCategory,
+                      onChange: (e) => setFormCategory(e.target.value),
+                      className: "w-full h-11 px-3 pr-8 rounded-lg bg-white text-[14px] text-[#0b1c30] shadow-sm focus:outline-none focus:ring-2 focus:ring-[#00254a] appearance-none cursor-pointer border border-transparent",
+                      children: [
+                        /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("option", { value: "EVENT", children: "\uC774\uBCA4\uD2B8 (Event Promotion)" }),
+                        /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("option", { value: "POLICY", children: "\uC57D\uAD00/\uC815\uCC45 \uAC1C\uC815 (Policy Update)" }),
+                        /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("option", { value: "SERVICE", children: "\uC11C\uBE44\uC2A4 \uC774\uC6A9\uC548\uB0B4 (Service Guide)" }),
+                        /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("option", { value: "FAQ", children: "\uC790\uC8FC \uBB3B\uB294 \uC9C8\uBB38 (FAQ)" })
+                      ]
+                    }
+                  ),
+                  /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "material-symbols-outlined absolute right-2.5 top-1/2 -translate-y-1/2 text-[#737780] pointer-events-none text-[20px]", children: "expand_more" })
+                ] })
+              ] }),
+              /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "flex flex-col gap-1.5", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("label", { className: "text-[13px] font-semibold text-[#0b1c30] flex items-center gap-1", children: [
+                  /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "material-symbols-outlined text-[16px] text-[#00254a]", children: "group" }),
+                  /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { children: "\uB178\uCD9C \uB300\uC0C1\uC790" }),
+                  /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "text-[#ba1a1a]", children: "*" })
+                ] }),
+                /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "relative", children: [
+                  /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)(
+                    "select",
+                    {
+                      value: formAudience,
+                      onChange: (e) => setFormAudience(e.target.value),
+                      className: "w-full h-11 px-3 pr-8 rounded-lg bg-white text-[14px] text-[#0b1c30] shadow-sm focus:outline-none focus:ring-2 focus:ring-[#00254a] appearance-none cursor-pointer border border-transparent",
+                      children: [
+                        /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("option", { value: "ALL", children: "\uC77C\uBC18 \uC0AC\uC6A9\uC790 + \uD30C\uD2B8\uB108 (\uC804\uCCB4)" }),
+                        /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("option", { value: "USER", children: "\uC77C\uBC18 \uACE0\uAC1D \uC804\uC6A9 (Client App)" }),
+                        /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("option", { value: "PARTNER", children: "\uB9C8\uC2A4\uD130 \uD30C\uD2B8\uB108 \uC804\uC6A9 (Partner Pro)" })
+                      ]
+                    }
+                  ),
+                  /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "material-symbols-outlined absolute right-2.5 top-1/2 -translate-y-1/2 text-[#737780] pointer-events-none text-[20px]", children: "expand_more" })
+                ] })
+              ] }),
+              /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "flex flex-col gap-1.5", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "flex items-center justify-between", children: [
+                  /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("label", { className: "text-[13px] font-semibold text-[#0b1c30] flex items-center gap-1", children: [
+                    /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "material-symbols-outlined text-[16px] text-[#00254a]", children: "schedule" }),
+                    /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { children: "\uAC8C\uC2DC \uC608\uC57D \uC2DC\uC810" })
+                  ] }),
+                  /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("label", { className: "flex items-center gap-1 cursor-pointer", children: [
+                    /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
+                      "input",
+                      {
+                        type: "checkbox",
+                        checked: isImmediatePost,
+                        onChange: (e) => setIsImmediatePost(e.target.checked),
+                        className: "w-3.5 h-3.5 rounded text-[#00254a] accent-[#00254a] cursor-pointer"
+                      }
+                    ),
+                    /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "text-[11px] font-bold text-[#737780]", children: "\uC989\uC2DC \uAC8C\uC2DC" })
+                  ] })
+                ] }),
+                /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "relative", children: [
+                  /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
+                    "input",
+                    {
+                      type: "text",
+                      value: formScheduleTime,
+                      onChange: (e) => setFormScheduleTime(e.target.value),
+                      disabled: isImmediatePost,
+                      className: "w-full h-11 px-3 pl-9 rounded-lg bg-white text-[14px] text-[#0b1c30] shadow-sm focus:outline-none focus:ring-2 focus:ring-[#00254a] disabled:bg-slate-100 disabled:text-slate-400"
+                    }
+                  ),
+                  /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "material-symbols-outlined absolute left-2.5 top-1/2 -translate-y-1/2 text-[#737780] text-[18px]", children: "calendar_today" })
+                ] })
+              ] })
+            ] }),
+            /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "mt-4 pt-3 flex flex-col md:flex-row md:items-center justify-between gap-3 bg-[#e5eeff]/60 p-3 rounded-lg", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "flex items-center gap-3", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("label", { className: "relative inline-flex items-center cursor-pointer", children: [
+                  /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
+                    "input",
+                    {
+                      type: "checkbox",
+                      checked: formPopupToggle,
+                      onChange: (e) => setFormPopupToggle(e.target.checked),
+                      className: "sr-only peer"
+                    }
+                  ),
+                  /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("div", { className: "w-11 h-6 bg-[#c3c6d0] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#006c4a]" })
+                ] }),
+                /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "flex flex-col", children: [
+                  /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("span", { className: "text-[13px] font-semibold text-[#0b1c30] flex items-center gap-1.5", children: [
+                    /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { children: "\uC571/\uC6F9 \uBA54\uC778 \uB808\uC774\uC5B4 \uD31D\uC5C5 \uB178\uCD9C" }),
+                    /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: `text-[11px] font-bold px-1.5 py-0.5 rounded ${formPopupToggle ? "bg-[#82f5c1] text-[#00714e]" : "bg-slate-200 text-slate-600"}`, children: formPopupToggle ? "\uD65C\uC131\uD654" : "\uBE44\uD65C\uC131" })
+                  ] }),
+                  /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "text-[13px] text-[#737780]", children: "\uAC8C\uC2DC \uC720\uD6A8\uAE30\uAC04: 2026.10.20 ~ 2026.11.20 (\uB9CC\uB8CC \uC2DC \uC790\uB3D9 \uC544\uCE74\uC774\uBE59)" })
+                ] })
+              ] }),
+              /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("div", { className: "flex items-center gap-2", children: /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("label", { className: "inline-flex items-center gap-2 px-3 py-1.5 bg-white rounded-md shadow-sm cursor-pointer hover:bg-[#e5eeff] transition-colors", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
+                  "input",
+                  {
+                    type: "checkbox",
+                    checked: isPinned,
+                    onChange: (e) => setIsPinned(e.target.checked),
+                    className: "w-4 h-4 rounded text-[#00254a] accent-[#00254a] cursor-pointer"
+                  }
+                ),
+                /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("span", { className: "text-[13px] font-semibold text-[#0b1c30] flex items-center gap-1", children: [
+                  /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "material-symbols-outlined text-[16px] text-[#ffb95f]", style: { fontVariationSettings: "'FILL' 1" }, children: "push_pin" }),
+                  /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { children: "\uC0C1\uB2E8 \uC911\uC694 \uACF5\uC9C0 \uACE0\uC815 (Pin to Top)" })
+                ] })
+              ] }) })
+            ] })
+          ] }),
+          /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "flex flex-col gap-1.5", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "flex justify-between items-center", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("label", { className: "text-[13px] font-semibold text-[#0b1c30] flex items-center gap-1", htmlFor: "postTitle", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "material-symbols-outlined text-[16px] text-[#00254a]", children: "title" }),
+                /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { children: "\uAC8C\uC2DC\uBB3C \uC81C\uBAA9" }),
+                /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "text-[#ba1a1a]", children: "*" })
+              ] }),
+              /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("span", { className: `text-[11px] font-bold ${formTitle.length > 100 ? "text-[#ba1a1a]" : "text-[#737780]"}`, children: [
+                formTitle.length,
+                " / 100\uC790"
+              ] })
+            ] }),
+            /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
+              "input",
+              {
+                id: "postTitle",
+                type: "text",
+                value: formTitle,
+                onChange: (e) => setFormTitle(e.target.value),
+                placeholder: "\uACE0\uAC1D\uC5D0\uAC8C \uC9C1\uAD00\uC801\uC774\uACE0 \uC2E0\uB8B0\uAC10\uC744 \uC8FC\uB294 \uC81C\uBAA9\uC744 \uC785\uB825\uD574 \uC8FC\uC138\uC694.",
+                className: "w-full h-12 px-4 rounded-xl bg-[#eff4ff] text-[17px] font-semibold text-[#0b1c30] shadow-sm focus:outline-none focus:ring-2 focus:ring-[#00254a] focus:bg-white transition-all border border-transparent"
+              }
+            )
+          ] }),
+          /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "rounded-xl bg-white shadow-md overflow-hidden flex flex-col border border-slate-200", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "bg-[#eff4ff] px-2 py-2 flex flex-wrap items-center gap-1 shadow-sm border-b border-slate-200", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "flex items-center bg-white rounded-lg p-0.5 shadow-sm border border-slate-200", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
+                  "button",
+                  {
+                    type: "button",
+                    onClick: () => executeFormat("bold"),
+                    className: "w-8 h-8 flex items-center justify-center rounded hover:bg-[#e5eeff] font-bold text-[#00254a] cursor-pointer",
+                    title: "\uAD75\uAC8C (Bold)",
+                    children: "B"
+                  }
+                ),
+                /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
+                  "button",
+                  {
+                    type: "button",
+                    onClick: () => executeFormat("italic"),
+                    className: "w-8 h-8 flex items-center justify-center rounded hover:bg-[#e5eeff] italic font-serif text-[#0b1c30] cursor-pointer",
+                    title: "\uAE30\uC6B8\uC784 (Italic)",
+                    children: "I"
+                  }
+                ),
+                /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
+                  "button",
+                  {
+                    type: "button",
+                    onClick: () => executeFormat("underline"),
+                    className: "w-8 h-8 flex items-center justify-center rounded hover:bg-[#e5eeff] underline text-[#0b1c30] cursor-pointer",
+                    title: "\uBC11\uC904 (Underline)",
+                    children: "U"
+                  }
+                ),
+                /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
+                  "button",
+                  {
+                    type: "button",
+                    onClick: () => executeFormat("strikeThrough"),
+                    className: "w-8 h-8 flex items-center justify-center rounded hover:bg-[#e5eeff] line-through text-[#0b1c30] cursor-pointer",
+                    title: "\uCDE8\uC18C\uC120 (Strikethrough)",
+                    children: "S"
+                  }
+                )
+              ] }),
+              /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("div", { className: "h-5 w-[1px] bg-[#c3c6d0] mx-1" }),
+              /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "relative", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)(
+                  "select",
+                  {
+                    onChange: (e) => {
+                      const val = e.target.value;
+                      if (val === "p") executeFormat("formatBlock", "<p>");
+                      else if (val === "h1") executeFormat("formatBlock", "<h1>");
+                      else if (val === "h2") executeFormat("formatBlock", "<h2>");
+                      else if (val === "h3") executeFormat("formatBlock", "<h3>");
+                    },
+                    defaultValue: "h2",
+                    className: "h-8 px-2.5 pr-6 bg-white rounded-lg text-[13px] font-semibold text-[#0b1c30] shadow-sm appearance-none focus:outline-none cursor-pointer border border-slate-200",
+                    children: [
+                      /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("option", { value: "p", children: "\uBCF8\uBB38 (Paragraph)" }),
+                      /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("option", { value: "h1", children: "\uC81C\uBAA9 1 (Heading 1)" }),
+                      /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("option", { value: "h2", children: "\uC81C\uBAA9 2 (Heading 2)" }),
+                      /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("option", { value: "h3", children: "\uC81C\uBAA9 3 (Heading 3)" })
+                    ]
+                  }
+                ),
+                /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "material-symbols-outlined absolute right-1.5 top-1/2 -translate-y-1/2 text-[#737780] pointer-events-none text-[16px]", children: "expand_more" })
+              ] }),
+              /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("div", { className: "h-5 w-[1px] bg-[#c3c6d0] mx-1" }),
+              /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "flex items-center bg-white rounded-lg p-0.5 shadow-sm border border-slate-200", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
+                  "button",
+                  {
+                    type: "button",
+                    onClick: () => executeFormat("insertUnorderedList"),
+                    className: "w-8 h-8 flex items-center justify-center rounded hover:bg-[#e5eeff] text-[#0b1c30] cursor-pointer",
+                    title: "\uAE00\uBA38\uB9AC \uAE30\uD638",
+                    children: /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "material-symbols-outlined text-[18px]", children: "format_list_bulleted" })
+                  }
+                ),
+                /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
+                  "button",
+                  {
+                    type: "button",
+                    onClick: () => executeFormat("insertOrderedList"),
+                    className: "w-8 h-8 flex items-center justify-center rounded hover:bg-[#e5eeff] text-[#0b1c30] cursor-pointer",
+                    title: "\uBC88\uD638 \uB9E4\uAE30\uAE30",
+                    children: /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "material-symbols-outlined text-[18px]", children: "format_list_numbered" })
+                  }
+                ),
+                /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
+                  "button",
+                  {
+                    type: "button",
+                    onClick: () => executeFormat("formatBlock", "<blockquote>"),
+                    className: "w-8 h-8 flex items-center justify-center rounded hover:bg-[#e5eeff] text-[#0b1c30] cursor-pointer",
+                    title: "\uC778\uC6A9\uAD6C",
+                    children: /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "material-symbols-outlined text-[18px]", children: "format_quote" })
+                  }
+                ),
+                /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
+                  "button",
+                  {
+                    type: "button",
+                    onClick: () => executeFormat("justifyLeft"),
+                    className: "w-8 h-8 flex items-center justify-center rounded hover:bg-[#e5eeff] text-[#00254a] bg-[#e5eeff] cursor-pointer",
+                    title: "\uC67C\uCABD \uC815\uB82C",
+                    children: /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "material-symbols-outlined text-[18px]", children: "format_align_left" })
+                  }
+                ),
+                /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
+                  "button",
+                  {
+                    type: "button",
+                    onClick: () => executeFormat("justifyCenter"),
+                    className: "w-8 h-8 flex items-center justify-center rounded hover:bg-[#e5eeff] text-[#0b1c30] cursor-pointer",
+                    title: "\uAC00\uC6B4\uB370 \uC815\uB82C",
+                    children: /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "material-symbols-outlined text-[18px]", children: "format_align_center" })
+                  }
+                )
+              ] }),
+              /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("div", { className: "h-5 w-[1px] bg-[#c3c6d0] mx-1" }),
+              /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "flex items-center gap-1.5 relative", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)(
+                  "button",
+                  {
+                    type: "button",
+                    onClick: handleInsertImage,
+                    className: "h-8 px-2.5 rounded-lg bg-white hover:bg-[#e5eeff] text-[#0b1c30] text-[13px] font-semibold flex items-center gap-1 shadow-sm transition-colors border border-slate-200 cursor-pointer",
+                    children: [
+                      /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "material-symbols-outlined text-[17px] text-[#00254a]", children: "add_photo_alternate" }),
+                      /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { children: "\uC774\uBBF8\uC9C0 \uCCA8\uBD80" })
+                    ]
+                  }
+                ),
+                /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "relative", children: [
+                  /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)(
+                    "button",
+                    {
+                      type: "button",
+                      onClick: () => setIsCouponDropdownOpen(!isCouponDropdownOpen),
+                      className: "h-8 px-2.5 rounded-lg bg-[#82f5c1] hover:bg-[#68dba9] text-[#005137] text-[13px] font-bold flex items-center gap-1 shadow-sm transition-colors cursor-pointer",
+                      children: [
+                        /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "material-symbols-outlined text-[17px]", style: { fontVariationSettings: "'FILL' 1" }, children: "confirmation_number" }),
+                        /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { children: "\uCFE0\uD3F0 \uB2E4\uC6B4\uB85C\uB4DC \uC5F0\uB3D9" }),
+                        /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "material-symbols-outlined text-[14px]", children: "expand_more" })
+                      ]
+                    }
+                  ),
+                  isCouponDropdownOpen && /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "absolute left-0 top-9 w-72 bg-white rounded-xl shadow-2xl border border-slate-200 z-50 p-2 flex flex-col gap-1 animate-fadeIn", children: [
+                    /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "text-[11px] font-bold text-slate-400 px-2 py-1 uppercase", children: "\uC5F0\uACC4 \uCEA0\uD398\uC778 \uC120\uD0DD" }),
+                    availableCoupons.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)(
+                      "button",
+                      {
+                        type: "button",
+                        onClick: () => handleInsertCouponBlock({
+                          campaignNo: "CP-SEASON-10",
+                          campaignNm: "\uAC00\uC804 \uBD84\uD574\uCCAD\uC18C \uC804\uC6A9 5,000\uC6D0 \uD560\uC778\uAD8C",
+                          discountAmt: 5e3,
+                          validDays: 14
+                        }),
+                        className: "w-full text-left p-2 rounded-lg hover:bg-slate-100 text-[12px] flex flex-col",
+                        children: [
+                          /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "font-bold text-slate-800", children: "\uAC00\uC804 \uBD84\uD574\uCCAD\uC18C 5,000\uC6D0 \uD560\uC778\uAD8C" }),
+                          /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "text-[11px] text-slate-400", children: "CP-SEASON-10 (5,000\uC6D0 \uD560\uC778)" })
+                        ]
+                      }
+                    ) : availableCoupons.map((c) => /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)(
+                      "button",
+                      {
+                        type: "button",
+                        onClick: () => handleInsertCouponBlock(c),
+                        className: "w-full text-left p-2 rounded-lg hover:bg-slate-100 text-[12px] flex flex-col transition-colors cursor-pointer",
+                        children: [
+                          /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "font-bold text-slate-800", children: c.campaignNm }),
+                          /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("span", { className: "text-[11px] text-slate-400", children: [
+                            c.campaignNo,
+                            " (\uD560\uC778 ",
+                            Number(c.discountAmt).toLocaleString(),
+                            "\uC6D0)"
+                          ] })
+                        ]
+                      },
+                      c.campaignNo
+                    ))
+                  ] })
+                ] }),
+                /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)(
+                  "button",
+                  {
+                    type: "button",
+                    onClick: () => {
+                      const url = prompt("\uB3D9\uC601\uC0C1 \uB9C1\uD06C(YouTube/Vimeo)\uB97C \uC785\uB825\uD574 \uC8FC\uC138\uC694:");
+                      if (url) {
+                        executeFormat("createLink", url);
+                      }
+                    },
+                    className: "h-8 px-2.5 rounded-lg bg-white hover:bg-[#e5eeff] text-[#0b1c30] text-[13px] font-semibold flex items-center gap-1 shadow-sm transition-colors border border-slate-200 cursor-pointer",
+                    children: [
+                      /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "material-symbols-outlined text-[17px] text-[#ba1a1a]", children: "smart_display" }),
+                      /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { children: "\uB3D9\uC601\uC0C1" })
+                    ]
+                  }
+                ),
+                /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)(
+                  "button",
+                  {
+                    type: "button",
+                    onClick: () => {
+                      const tableHtml = `
+                            <table class="w-full my-3 border border-slate-300 text-left text-sm">
+                              <thead><tr class="bg-slate-100"><th class="p-2 border">\uD56D\uBAA9</th><th class="p-2 border">\uC138\uBD80 \uAE30\uC900</th></tr></thead>
+                              <tbody>
+                                <tr><td class="p-2 border">1. \uC815\uAE30\uCCAD\uC18C</td><td class="p-2 border">3\uAC1C\uC6D4 \uC758\uBB34 \uB77D \uACC4\uC57D</td></tr>
+                                <tr><td class="p-2 border">2. \uB370\uC774\uD130\uC774\uC6A9\uB8CC</td><td class="p-2 border">3.3% (\uCD5C\uC800 33,000\uC6D0)</td></tr>
+                              </tbody>
+                            </table>
+                          `;
+                      if (editorCanvasRef.current) {
+                        editorCanvasRef.current.focus();
+                        document.execCommand("insertHTML", false, tableHtml);
+                        handleCanvasInput();
+                      }
+                    },
+                    className: "h-8 px-2.5 rounded-lg bg-white hover:bg-[#e5eeff] text-[#0b1c30] text-[13px] font-semibold flex items-center gap-1 shadow-sm transition-colors border border-slate-200 cursor-pointer",
+                    children: [
+                      /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "material-symbols-outlined text-[17px] text-[#00254a]", children: "table_chart" }),
+                      /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { children: "\uD45C \uC0BD\uC785" })
+                    ]
+                  }
+                )
+              ] })
+            ] }),
+            /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
+              "div",
+              {
+                ref: editorCanvasRef,
+                contentEditable: true,
+                onInput: handleCanvasInput,
+                className: "p-6 min-h-[320px] bg-white text-[#0b1c30] focus:outline-none space-y-4 overflow-y-auto leading-relaxed"
+              }
+            )
+          ] })
+        ] }),
+        /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("footer", { className: "flex flex-col sm:flex-row items-center justify-between px-6 py-3 bg-[#eff4ff] border-t-0 shadow-lg relative z-20 gap-3", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "flex items-center gap-2 text-[#737780] w-full sm:w-auto text-[13px]", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "material-symbols-outlined text-[18px] text-[#006c4a] animate-spin", style: { animationDuration: "4s" }, children: "sync" }),
+            /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("span", { children: [
+              "\uC784\uC2DC \uBCF4\uAD00 \uB370\uC774\uD130 \uC790\uB3D9 \uB3D9\uAE30\uD654\uB428 ",
+              /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("span", { className: "font-semibold text-[#0b1c30]", children: [
+                "(",
+                lastSyncTime,
+                ")"
+              ] })
+            ] }),
+            /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "text-[#c3c6d0]", children: "\u2022" }),
+            /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("span", { children: [
+              "\uAE00\uC790\uC218: ",
+              /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("strong", { className: "text-[#0b1c30] font-semibold", children: [
+                charCount,
+                "\uC790"
+              ] })
+            ] })
+          ] }),
+          /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "flex items-center gap-2.5 w-full sm:w-auto justify-end", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
+              "button",
+              {
+                type: "button",
+                onClick: () => {
+                  showToast("\u{1F4BE} \uD604\uC7AC \uC791\uC131 \uC911\uC778 \uACF5\uC9C0\uAE00\uC774 \uB85C\uCEEC \uC138\uC158\uC5D0 \uC784\uC2DC \uC800\uC7A5\uB418\uC5C8\uC2B5\uB2C8\uB2E4.");
+                },
+                className: "px-4 py-2.5 rounded-xl bg-[#d3e4fe] hover:bg-[#c3c6d0] text-[#254873] font-semibold text-[13px] shadow-sm transition-colors cursor-pointer",
+                children: "\uC784\uC2DC \uC800\uC7A5 (Draft)"
+              }
+            ),
+            /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)(
+              "button",
+              {
+                type: "button",
+                onClick: () => setIsPreviewModalOpen(true),
+                className: "px-4 py-2.5 rounded-xl bg-white hover:bg-[#e5eeff] text-[#00254a] font-semibold text-[13px] shadow-sm flex items-center gap-1.5 transition-colors border border-slate-200 cursor-pointer",
+                children: [
+                  /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "material-symbols-outlined text-[18px]", children: "visibility" }),
+                  /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { children: "\uBBF8\uB9AC\uBCF4\uAE30" })
+                ]
+              }
+            ),
+            /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
+              "button",
+              {
+                type: "button",
+                onClick: handleSaveArticle,
+                disabled: isSavingArticle,
+                className: "px-5 py-2.5 rounded-xl bg-[#00254a] hover:bg-[#163b66] text-white font-bold text-[14px] shadow-md flex items-center gap-2 transition-all active:scale-[0.98] cursor-pointer disabled:opacity-50",
+                children: isSavingArticle ? /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)(import_jsx_runtime41.Fragment, { children: [
+                  /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "material-symbols-outlined text-[18px] animate-spin", children: "sync" }),
+                  /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { children: "\uBC30\uD3EC \uC911..." })
+                ] }) : /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)(import_jsx_runtime41.Fragment, { children: [
+                  /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "material-symbols-outlined text-[18px]", children: "rocket_launch" }),
+                  /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { children: editingSeq ? "\uACF5\uC9C0\uAE00 \uC218\uC815 \uBC0F \uC800\uC7A5" : "\uACF5\uC9C0\uAE00 \uB4F1\uB85D \uBC0F \uC989\uC2DC \uBC30\uD3EC" })
+                ] })
+              }
+            )
+          ] })
+        ] })
+      ] }) }) }),
+      isPreviewModalOpen && /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("div", { className: "fixed inset-0 z-[60] bg-black/70 backdrop-blur-sm flex items-center justify-center p-4", children: /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "w-full max-w-[500px] bg-white rounded-2xl shadow-2xl overflow-hidden animate-scaleUp", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "bg-[#00254a] text-white px-5 py-3.5 flex items-center justify-between", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "flex items-center gap-2", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "material-symbols-outlined text-[20px] text-[#82f5c1]", children: "campaign" }),
+            /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "font-bold text-[14px]", children: "SsulDak \uACE0\uAC1D \uACF5\uC9C0 \uBC0F \uD504\uB85C\uBAA8\uC158" })
+          ] }),
+          /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
+            "button",
+            {
+              type: "button",
+              onClick: () => setIsPreviewModalOpen(false),
+              className: "text-white/80 hover:text-white",
+              children: /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "material-symbols-outlined text-[20px]", children: "close" })
+            }
+          )
+        ] }),
+        /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "p-6 max-h-[60vh] overflow-y-auto", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("h3", { className: "text-[18px] font-bold text-slate-900 mb-3", children: formTitle }),
+          /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
+            "div",
+            {
+              className: "text-[13px] text-slate-700 leading-relaxed space-y-3",
+              dangerouslySetInnerHTML: {
+                __html: editorCanvasRef.current ? editorCanvasRef.current.innerHTML : formContentHtml
+              }
+            }
+          )
+        ] }),
+        /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "px-5 py-3 bg-slate-50 border-t border-slate-200 flex items-center justify-between text-[12px] text-slate-600", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("label", { className: "flex items-center gap-1.5 cursor-pointer", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("input", { type: "checkbox", className: "rounded text-[#00254a]" }),
+            /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { children: "\uC624\uB298 \uD558\uB8E8 \uC774 \uCC3D\uC744 \uC5F4\uC9C0 \uC54A\uC74C" })
+          ] }),
+          /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
+            "button",
+            {
+              type: "button",
+              onClick: () => setIsPreviewModalOpen(false),
+              className: "px-3 py-1 bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold rounded-lg cursor-pointer",
+              children: "\uB2EB\uAE30"
+            }
+          )
+        ] })
+      ] }) })
+    ] });
+  }
+
+  // preview/main.tsx
+  var import_jsx_runtime42 = __toESM(require_jsx_runtime());
   function AppPreview() {
     const getInitialScreen = () => {
       if (typeof window === "undefined") return "USER-COM-00";
       const hash = window.location.hash.toLowerCase();
       const search = window.location.search.toLowerCase();
+      if (hash.includes("user-com-00") || hash.includes("web_user-com-000") || hash.includes("web_user-com-00") || hash.includes("com-000") || hash.includes("home") || search.includes("screen=user-com-00") || search.includes("screen=web_user-com-000") || search.includes("screen=web_user-com-00") || search.includes("screen=com-00")) {
+        return "USER-COM-00";
+      }
+      if (hash.includes("admn-sys-03") || hash.includes("notice") || hash.includes("faq") || search.includes("screen=admn-sys-03")) {
+        return "ADMN-SYS-03";
+      }
       if (hash.includes("admn-sys-02") || hash.includes("floor-price") || search.includes("screen=admn-sys-02")) {
         return "ADMN-SYS-02";
       }
@@ -60761,8 +62061,8 @@ ${err.message}`);
       }
       return "USER-COM-00";
     };
-    const [currentScreen, setCurrentScreen] = (0, import_react41.useState)(getInitialScreen);
-    const [currentUserNo, setCurrentUserNo] = (0, import_react41.useState)(() => {
+    const [currentScreen, setCurrentScreen] = (0, import_react42.useState)(getInitialScreen);
+    const [currentUserNo, setCurrentUserNo] = (0, import_react42.useState)(() => {
       if (typeof window !== "undefined") {
         const storedUser = localStorage.getItem("ssuldak_user");
         if (storedUser) {
@@ -60775,29 +62075,33 @@ ${err.message}`);
       }
       return "U20261000001";
     });
-    const [partnerParams, setPartnerParams] = (0, import_react41.useState)({
+    const [partnerParams, setPartnerParams] = (0, import_react42.useState)({
       ptnrNo: "P20260900012",
       bidNo: "BID2026102200001",
       slotNo: "REQ202610210001-01",
       reqNo: "REQ202610210001"
     });
-    const [contractParams, setContractParams] = (0, import_react41.useState)({
+    const [contractParams, setContractParams] = (0, import_react42.useState)({
       contractNo: "CT2026102100001",
       payNo: "PAY2026102100001"
     });
-    const [failParams, setFailParams] = (0, import_react41.useState)({
+    const [failParams, setFailParams] = (0, import_react42.useState)({
       errorCode: "PG_CARD_LIMIT",
       errorMsg: "\uCE74\uB4DC \uD55C\uB3C4 \uCD08\uACFC \uB610\uB294 \uC794\uC561 \uBD80\uC871",
       couponNo: "CPN202610000001",
       usePointAmt: 2e3,
       attemptedPaidAmt: 26e3
     });
-    const [showPreviewBar, setShowPreviewBar] = (0, import_react41.useState)(false);
-    (0, import_react41.useEffect)(() => {
+    const [showPreviewBar, setShowPreviewBar] = (0, import_react42.useState)(false);
+    (0, import_react42.useEffect)(() => {
       const handleLocationChange = () => {
         const hash = window.location.hash.toLowerCase();
         const search = window.location.search.toLowerCase();
-        if (hash.includes("admn-sys-02") || hash.includes("floor-price") || search.includes("screen=admn-sys-02")) {
+        if (hash.includes("user-com-00") || hash.includes("web_user-com-000") || hash.includes("web_user-com-00") || hash.includes("com-000") || hash.includes("home") || search.includes("screen=user-com-00") || search.includes("screen=web_user-com-000") || search.includes("screen=web_user-com-00") || search.includes("screen=com-00")) {
+          setCurrentScreen("USER-COM-00");
+        } else if (hash.includes("admn-sys-03") || hash.includes("notice") || hash.includes("faq") || search.includes("screen=admn-sys-03")) {
+          setCurrentScreen("ADMN-SYS-03");
+        } else if (hash.includes("admn-sys-02") || hash.includes("floor-price") || search.includes("screen=admn-sys-02")) {
           setCurrentScreen("ADMN-SYS-02");
         } else if (hash.includes("admn-sys-01") || hash.includes("codes") || hash.includes("policy-codes") || search.includes("screen=admn-sys-01")) {
           setCurrentScreen("ADMN-SYS-01");
@@ -60890,7 +62194,7 @@ ${err.message}`);
         window.removeEventListener("popstate", handleLocationChange);
       };
     }, []);
-    const handleNavigate = (0, import_react41.useCallback)((path, params) => {
+    const handleNavigate = (0, import_react42.useCallback)((path, params) => {
       console.log("[AppPreview] Navigation requested:", path, params);
       if (params) {
         if (params.errorCode || params.errorMsg || params.attemptedPaidAmt !== void 0) {
@@ -61028,9 +62332,12 @@ ${err.message}`);
       } else if (path === "USER-ATH-00" || path === "login" || path === "#login") {
         window.location.hash = "#login";
         setCurrentScreen("USER-ATH-00");
-      } else if (path === "USER-COM-00" || path === "service-overview" || path === "/" || path === "home" || path === "#home") {
+      } else if (path === "USER-COM-00" || path === "WEB_USER-COM-000" || path === "WEB_USER-COM-00" || path === "user-com-00" || path === "web_user-com-000" || path === "service-overview" || path === "/" || path === "home" || path === "#home" || path === "#user-com-00" || path === "#web_user-com-000") {
         window.location.hash = "#home";
         setCurrentScreen("USER-COM-00");
+      } else if (path === "ADMN-SYS-03" || path === "admn-sys-03" || path === "#admn-sys-03" || path === "notices-faq" || path === "notice" || path === "faq") {
+        window.location.hash = "#admn-sys-03";
+        setCurrentScreen("ADMN-SYS-03");
       } else if (path === "ADMN-SYS-02" || path === "admn-sys-02" || path === "#admn-sys-02" || path === "floor-price" || path === "#floor-price") {
         window.location.hash = "#admn-sys-02";
         setCurrentScreen("ADMN-SYS-02");
@@ -61053,17 +62360,17 @@ ${err.message}`);
         console.log("[AppPreview] Other screen:", path);
       }
     }, []);
-    const handleLoginSuccess = (0, import_react41.useCallback)((authData) => {
+    const handleLoginSuccess = (0, import_react42.useCallback)((authData) => {
       console.log("[AppPreview] Login success for:", authData.user.userNo);
       setCurrentUserNo(authData.user.userNo);
       window.location.hash = "#home";
       setCurrentScreen("USER-COM-00");
     }, []);
-    const handleRegisterSuccess = (0, import_react41.useCallback)((result) => {
+    const handleRegisterSuccess = (0, import_react42.useCallback)((result) => {
       console.log("[AppPreview] Register success for:", result.userNo);
       setCurrentUserNo(result.userNo);
     }, []);
-    const handleLogout = (0, import_react41.useCallback)(() => {
+    const handleLogout = (0, import_react42.useCallback)(() => {
       console.log("[AppPreview] User logged out");
       setCurrentUserNo(null);
       if (typeof window !== "undefined") {
@@ -61071,28 +62378,37 @@ ${err.message}`);
         localStorage.removeItem("ssuldak_user");
       }
     }, []);
-    return /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "relative min-h-screen bg-[#f8f9ff]", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "fixed bottom-3 right-3 z-50 flex flex-col items-end gap-1.5", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)(
+    return /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "relative min-h-screen bg-[#f8f9ff]", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "fixed bottom-3 right-3 z-50 flex flex-col items-end gap-1.5", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)(
           "button",
           {
             type: "button",
             onClick: () => setShowPreviewBar((prev) => !prev),
             className: "px-3 py-1.5 rounded-full bg-neutral-900/90 hover:bg-neutral-800 text-white shadow-xl border border-white/20 text-xs font-bold flex items-center gap-1.5 cursor-pointer backdrop-blur-md transition-all active:scale-95",
             children: [
-              /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "w-2 h-2 rounded-full bg-emerald-400 animate-pulse" }),
-              /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { children: showPreviewBar ? "\uD504\uB9AC\uBDF0 \uBA54\uB274 \uB2EB\uAE30 \u2715" : `\uD504\uB9AC\uBDF0: ${currentScreen}` })
+              /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { className: "w-2 h-2 rounded-full bg-emerald-400 animate-pulse" }),
+              /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { children: showPreviewBar ? "\uD504\uB9AC\uBDF0 \uBA54\uB274 \uB2EB\uAE30 \u2715" : `\uD504\uB9AC\uBDF0: ${currentScreen}` })
             ]
           }
         ),
-        showPreviewBar && /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)(
+        showPreviewBar && /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)(
           "aside",
           {
             "aria-label": "\uD654\uBA74 \uD504\uB9AC\uBDF0 \uC804\uD658 \uCEE8\uD2B8\uB864\uB7EC",
             className: "flex items-center gap-1.5 p-1.5 rounded-2xl bg-neutral-900/95 backdrop-blur-md shadow-2xl border border-white/20 text-xs text-white max-w-[95vw] overflow-x-auto",
             children: [
-              /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "font-bold px-2 text-emerald-400 shrink-0", children: "\uD654\uBA74 \uC120\uD0DD:" }),
-              /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
+              /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { className: "font-bold px-2 text-emerald-400 shrink-0", children: "\uD654\uBA74 \uC120\uD0DD:" }),
+              /* @__PURE__ */ (0, import_jsx_runtime42.jsx)(
+                "button",
+                {
+                  type: "button",
+                  onClick: () => handleNavigate("ADMN-SYS-03"),
+                  className: `px-3 py-1.5 rounded-xl font-semibold transition-all cursor-pointer ${currentScreen === "ADMN-SYS-03" ? "bg-amber-400 text-neutral-950 shadow-md font-bold" : "hover:bg-white/10 text-neutral-300"}`,
+                  children: "ADMN-SYS-03 (\uACF5\uC9C0/FAQ \uAD00\uB9AC)"
+                }
+              ),
+              /* @__PURE__ */ (0, import_jsx_runtime42.jsx)(
                 "button",
                 {
                   type: "button",
@@ -61101,7 +62417,7 @@ ${err.message}`);
                   children: "ADMN-SYS-02 (\uCD5C\uC18C \uD558\uD55C\uC120/\uC815\uCC45 \uC124\uC815)"
                 }
               ),
-              /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
+              /* @__PURE__ */ (0, import_jsx_runtime42.jsx)(
                 "button",
                 {
                   type: "button",
@@ -61110,7 +62426,7 @@ ${err.message}`);
                   children: "ADMN-SYS-01 (\uACF5\uD1B5 \uCF54\uB4DC \uAD00\uB9AC)"
                 }
               ),
-              /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
+              /* @__PURE__ */ (0, import_jsx_runtime42.jsx)(
                 "button",
                 {
                   type: "button",
@@ -61119,7 +62435,7 @@ ${err.message}`);
                   children: "ADMN-PRM-01 (\uC5D0\uC5B4\uB4DC\uB78D \uBC1C\uC1A1)"
                 }
               ),
-              /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
+              /* @__PURE__ */ (0, import_jsx_runtime42.jsx)(
                 "button",
                 {
                   type: "button",
@@ -61128,7 +62444,7 @@ ${err.message}`);
                   children: "ADMN-PRM-00 (\uD504\uB85C\uBAA8\uC158/\uCFE0\uD3F0)"
                 }
               ),
-              /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
+              /* @__PURE__ */ (0, import_jsx_runtime42.jsx)(
                 "button",
                 {
                   type: "button",
@@ -61137,7 +62453,7 @@ ${err.message}`);
                   children: "ADMN-DSH-00 (\uC5B4\uB4DC\uBBFC \uB300\uC2DC\uBCF4\uB4DC)"
                 }
               ),
-              /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
+              /* @__PURE__ */ (0, import_jsx_runtime42.jsx)(
                 "button",
                 {
                   type: "button",
@@ -61146,7 +62462,7 @@ ${err.message}`);
                   children: "ADMN-ATH-00 (\uAD00\uB9AC\uC790 \uB85C\uADF8\uC778)"
                 }
               ),
-              /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
+              /* @__PURE__ */ (0, import_jsx_runtime42.jsx)(
                 "button",
                 {
                   type: "button",
@@ -61155,7 +62471,7 @@ ${err.message}`);
                   children: "PTNR-SET-01 (\uB370\uC774\uD130\uC774\uC6A9\uB8CC\uC601\uC218\uC99D)"
                 }
               ),
-              /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
+              /* @__PURE__ */ (0, import_jsx_runtime42.jsx)(
                 "button",
                 {
                   type: "button",
@@ -61164,7 +62480,7 @@ ${err.message}`);
                   children: "PTNR-SET-00 (\uC815\uC0B0/\uB9E4\uCD9C\uB0B4\uC5ED)"
                 }
               ),
-              /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
+              /* @__PURE__ */ (0, import_jsx_runtime42.jsx)(
                 "button",
                 {
                   type: "button",
@@ -61173,7 +62489,7 @@ ${err.message}`);
                   children: "PTNR-JOB-02 (\uACE0\uAC1D\uCC44\uD305)"
                 }
               ),
-              /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
+              /* @__PURE__ */ (0, import_jsx_runtime42.jsx)(
                 "button",
                 {
                   type: "button",
@@ -61182,7 +62498,7 @@ ${err.message}`);
                   children: "PTNR-JOB-01 (\uC0C1\uD0DC\uAC31\uC2E0/\uC2DC\uACF5\uBCF4\uACE0)"
                 }
               ),
-              /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
+              /* @__PURE__ */ (0, import_jsx_runtime42.jsx)(
                 "button",
                 {
                   type: "button",
@@ -61191,7 +62507,7 @@ ${err.message}`);
                   children: "PTNR-JOB-00 (\uC791\uC5C5\uAD00\uB9AC)"
                 }
               ),
-              /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
+              /* @__PURE__ */ (0, import_jsx_runtime42.jsx)(
                 "button",
                 {
                   type: "button",
@@ -61200,7 +62516,7 @@ ${err.message}`);
                   children: "PTNR-QOT-02 (\uCCAD\uC57D\uC81C\uCD9C)"
                 }
               ),
-              /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
+              /* @__PURE__ */ (0, import_jsx_runtime42.jsx)(
                 "button",
                 {
                   type: "button",
@@ -61209,7 +62525,7 @@ ${err.message}`);
                   children: "PTNR-QOT-01 (\uACF5\uACE0\uC0C1\uC138)"
                 }
               ),
-              /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
+              /* @__PURE__ */ (0, import_jsx_runtime42.jsx)(
                 "button",
                 {
                   type: "button",
@@ -61218,7 +62534,7 @@ ${err.message}`);
                   children: "PTNR-QOT-00 (\uACF5\uACE0\uBAA9\uB85D)"
                 }
               ),
-              /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
+              /* @__PURE__ */ (0, import_jsx_runtime42.jsx)(
                 "button",
                 {
                   type: "button",
@@ -61227,7 +62543,7 @@ ${err.message}`);
                   children: "PTNR-DSH-02 (\uD504\uB85C\uD544\uAD00\uB9AC)"
                 }
               ),
-              /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
+              /* @__PURE__ */ (0, import_jsx_runtime42.jsx)(
                 "button",
                 {
                   type: "button",
@@ -61236,7 +62552,7 @@ ${err.message}`);
                   children: "PTNR-DSH-01 (\uC9C0\uC5ED/\uBD84\uC57C)"
                 }
               ),
-              /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
+              /* @__PURE__ */ (0, import_jsx_runtime42.jsx)(
                 "button",
                 {
                   type: "button",
@@ -61245,7 +62561,7 @@ ${err.message}`);
                   children: "PTNR-DSH-00 (\uD30C\uD2B8\uB108\uD648)"
                 }
               ),
-              /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
+              /* @__PURE__ */ (0, import_jsx_runtime42.jsx)(
                 "button",
                 {
                   type: "button",
@@ -61254,7 +62570,7 @@ ${err.message}`);
                   children: "PTNR-ATH-01 (\uD30C\uD2B8\uB108\uC785\uC810)"
                 }
               ),
-              /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
+              /* @__PURE__ */ (0, import_jsx_runtime42.jsx)(
                 "button",
                 {
                   type: "button",
@@ -61263,7 +62579,7 @@ ${err.message}`);
                   children: "PTNR-ATH-00 (\uD30C\uD2B8\uB108\uB85C\uADF8\uC778)"
                 }
               ),
-              /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
+              /* @__PURE__ */ (0, import_jsx_runtime42.jsx)(
                 "button",
                 {
                   type: "button",
@@ -61272,7 +62588,7 @@ ${err.message}`);
                   children: "USER-MYP-02 (\uCFE0\uD3F0/\uD61C\uD0DD)"
                 }
               ),
-              /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
+              /* @__PURE__ */ (0, import_jsx_runtime42.jsx)(
                 "button",
                 {
                   type: "button",
@@ -61281,7 +62597,7 @@ ${err.message}`);
                   children: "USER-MYP-01 (\uD68C\uC6D0\uC815\uBCF4\uC218\uC815)"
                 }
               ),
-              /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
+              /* @__PURE__ */ (0, import_jsx_runtime42.jsx)(
                 "button",
                 {
                   type: "button",
@@ -61290,7 +62606,7 @@ ${err.message}`);
                   children: "USER-MYP-00 (\uB9C8\uC774\uD398\uC774\uC9C0)"
                 }
               ),
-              /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
+              /* @__PURE__ */ (0, import_jsx_runtime42.jsx)(
                 "button",
                 {
                   type: "button",
@@ -61299,7 +62615,7 @@ ${err.message}`);
                   children: "USER-HIS-02 (\uB9AC\uBDF0\uC791\uC131)"
                 }
               ),
-              /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
+              /* @__PURE__ */ (0, import_jsx_runtime42.jsx)(
                 "button",
                 {
                   type: "button",
@@ -61308,7 +62624,7 @@ ${err.message}`);
                   children: "USER-HIS-01 (\uC2DC\uACF5\uAC80\uC218)"
                 }
               ),
-              /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
+              /* @__PURE__ */ (0, import_jsx_runtime42.jsx)(
                 "button",
                 {
                   type: "button",
@@ -61317,7 +62633,7 @@ ${err.message}`);
                   children: "USER-HIS-00 (\uC774\uC6A9\uB0B4\uC5ED)"
                 }
               ),
-              /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
+              /* @__PURE__ */ (0, import_jsx_runtime42.jsx)(
                 "button",
                 {
                   type: "button",
@@ -61326,7 +62642,7 @@ ${err.message}`);
                   children: "USER-CNT-02 (\uACB0\uC81C\uC2E4\uD328)"
                 }
               ),
-              /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
+              /* @__PURE__ */ (0, import_jsx_runtime42.jsx)(
                 "button",
                 {
                   type: "button",
@@ -61335,7 +62651,7 @@ ${err.message}`);
                   children: "USER-CNT-01 (\uACB0\uC81C\uC644\uB8CC)"
                 }
               ),
-              /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
+              /* @__PURE__ */ (0, import_jsx_runtime42.jsx)(
                 "button",
                 {
                   type: "button",
@@ -61344,7 +62660,7 @@ ${err.message}`);
                   children: "USER-CNT-00 (\uACC4\uC57D/\uACB0\uC81C)"
                 }
               ),
-              /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
+              /* @__PURE__ */ (0, import_jsx_runtime42.jsx)(
                 "button",
                 {
                   type: "button",
@@ -61353,7 +62669,7 @@ ${err.message}`);
                   children: "USER-QOT-02 (\uC0C1\uB2F4\uCC44\uD305)"
                 }
               ),
-              /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
+              /* @__PURE__ */ (0, import_jsx_runtime42.jsx)(
                 "button",
                 {
                   type: "button",
@@ -61362,7 +62678,7 @@ ${err.message}`);
                   children: "USER-QOT-01 (\uD30C\uD2B8\uB108\uD504\uB85C\uD544)"
                 }
               ),
-              /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
+              /* @__PURE__ */ (0, import_jsx_runtime42.jsx)(
                 "button",
                 {
                   type: "button",
@@ -61371,7 +62687,7 @@ ${err.message}`);
                   children: "USER-QOT-00 (\uC218\uC2E0\uCCAD\uC57D)"
                 }
               ),
-              /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
+              /* @__PURE__ */ (0, import_jsx_runtime42.jsx)(
                 "button",
                 {
                   type: "button",
@@ -61380,7 +62696,7 @@ ${err.message}`);
                   children: "USER-REQ-04 (\uD604\uC7A5\uC0AC\uC9C4)"
                 }
               ),
-              /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
+              /* @__PURE__ */ (0, import_jsx_runtime42.jsx)(
                 "button",
                 {
                   type: "button",
@@ -61389,7 +62705,7 @@ ${err.message}`);
                   children: "USER-REQ-03 (\uC8FC\uC18C\uAC80\uC0C9)"
                 }
               ),
-              /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
+              /* @__PURE__ */ (0, import_jsx_runtime42.jsx)(
                 "button",
                 {
                   type: "button",
@@ -61398,7 +62714,7 @@ ${err.message}`);
                   children: "USER-REQ-02 (\uAC00\uC804\uBAA8\uB2EC)"
                 }
               ),
-              /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
+              /* @__PURE__ */ (0, import_jsx_runtime42.jsx)(
                 "button",
                 {
                   type: "button",
@@ -61407,7 +62723,7 @@ ${err.message}`);
                   children: "USER-REQ-01 (\uAD6C\uC5ED\uBAA8\uB2EC)"
                 }
               ),
-              /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
+              /* @__PURE__ */ (0, import_jsx_runtime42.jsx)(
                 "button",
                 {
                   type: "button",
@@ -61416,7 +62732,7 @@ ${err.message}`);
                   children: "USER-REQ-00 (\uACAC\uC801\uC2E0\uCCAD)"
                 }
               ),
-              /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
+              /* @__PURE__ */ (0, import_jsx_runtime42.jsx)(
                 "button",
                 {
                   type: "button",
@@ -61425,7 +62741,7 @@ ${err.message}`);
                   children: "USER-ATH-03 (\uB9C8\uC774\uD398\uC774\uC9C0/\uC11C\uBA85)"
                 }
               ),
-              /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
+              /* @__PURE__ */ (0, import_jsx_runtime42.jsx)(
                 "button",
                 {
                   type: "button",
@@ -61434,7 +62750,7 @@ ${err.message}`);
                   children: "USER-ATH-02 (\uACC4\uC815/\uBE44\uBC88\uC7AC\uC124\uC815)"
                 }
               ),
-              /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
+              /* @__PURE__ */ (0, import_jsx_runtime42.jsx)(
                 "button",
                 {
                   type: "button",
@@ -61443,7 +62759,7 @@ ${err.message}`);
                   children: "USER-ATH-01 (\uD68C\uC6D0\uAC00\uC785)"
                 }
               ),
-              /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
+              /* @__PURE__ */ (0, import_jsx_runtime42.jsx)(
                 "button",
                 {
                   type: "button",
@@ -61452,7 +62768,7 @@ ${err.message}`);
                   children: "USER-ATH-00 (\uB85C\uADF8\uC778)"
                 }
               ),
-              /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
+              /* @__PURE__ */ (0, import_jsx_runtime42.jsx)(
                 "button",
                 {
                   type: "button",
@@ -61465,19 +62781,25 @@ ${err.message}`);
           }
         )
       ] }),
-      currentScreen === "ADMN-SYS-02" ? /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
+      currentScreen === "ADMN-SYS-03" ? /* @__PURE__ */ (0, import_jsx_runtime42.jsx)(
+        AdmnSys03,
+        {
+          onNavigate: handleNavigate
+        },
+        "screen_admn_sys_03"
+      ) : currentScreen === "ADMN-SYS-02" ? /* @__PURE__ */ (0, import_jsx_runtime42.jsx)(
         AdmnSys02,
         {
           onNavigate: handleNavigate
         },
         "screen_admn_sys_02"
-      ) : currentScreen === "ADMN-SYS-01" ? /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
+      ) : currentScreen === "ADMN-SYS-01" ? /* @__PURE__ */ (0, import_jsx_runtime42.jsx)(
         AdmnSys01,
         {
           onNavigate: handleNavigate
         },
         "screen_admn_sys_01"
-      ) : currentScreen === "ADMN-PRM-01" ? /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
+      ) : currentScreen === "ADMN-PRM-01" ? /* @__PURE__ */ (0, import_jsx_runtime42.jsx)(
         AdmnPrm01Modal,
         {
           isOpen: true,
@@ -61485,86 +62807,86 @@ ${err.message}`);
           isStandalone: true
         },
         "screen_admn_prm_01"
-      ) : currentScreen === "ADMN-PRM-00" ? /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
+      ) : currentScreen === "ADMN-PRM-00" ? /* @__PURE__ */ (0, import_jsx_runtime42.jsx)(
         AdmnPrm00Screen,
         {
           onNavigate: handleNavigate
         },
         "screen_admn_prm_00"
-      ) : currentScreen === "ADMN-DSH-00" ? /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
+      ) : currentScreen === "ADMN-DSH-00" ? /* @__PURE__ */ (0, import_jsx_runtime42.jsx)(
         AdmnDsh00Screen,
         {
           onNavigate: handleNavigate
         },
         "screen_admn_dsh_00"
-      ) : currentScreen === "ADMN-ATH-00" ? /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
+      ) : currentScreen === "ADMN-ATH-00" ? /* @__PURE__ */ (0, import_jsx_runtime42.jsx)(
         AdmnAth00Screen,
         {
           onNavigate: handleNavigate
         },
         "screen_admn_ath_00"
-      ) : currentScreen === "PTNR-SET-01" ? /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
+      ) : currentScreen === "PTNR-SET-01" ? /* @__PURE__ */ (0, import_jsx_runtime42.jsx)(
         PtnrSet01Screen,
         {
           onNavigate: handleNavigate
         },
         "screen_ptnr_set_01"
-      ) : currentScreen === "PTNR-SET-00" ? /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
+      ) : currentScreen === "PTNR-SET-00" ? /* @__PURE__ */ (0, import_jsx_runtime42.jsx)(
         PtnrSet00Screen,
         {
           onNavigate: handleNavigate
         },
         "screen_ptnr_set_00"
-      ) : currentScreen === "PTNR-JOB-02" ? /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
+      ) : currentScreen === "PTNR-JOB-02" ? /* @__PURE__ */ (0, import_jsx_runtime42.jsx)(
         PtnrJob02,
         {
           onNavigate: handleNavigate
         },
         "screen_ptnr_job_02"
-      ) : currentScreen === "PTNR-JOB-01" ? /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
+      ) : currentScreen === "PTNR-JOB-01" ? /* @__PURE__ */ (0, import_jsx_runtime42.jsx)(
         PtnrJob01,
         {
           onClose: () => handleNavigate("PTNR-JOB-00"),
           onSuccess: () => handleNavigate("PTNR-JOB-00")
         },
         "screen_ptnr_job_01"
-      ) : currentScreen === "PTNR-JOB-00" ? /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
+      ) : currentScreen === "PTNR-JOB-00" ? /* @__PURE__ */ (0, import_jsx_runtime42.jsx)(
         PtnrJob00Screen,
         {
           onNavigate: handleNavigate
         },
         "screen_ptnr_job_00"
-      ) : currentScreen === "PTNR-QOT-02" ? /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
+      ) : currentScreen === "PTNR-QOT-02" ? /* @__PURE__ */ (0, import_jsx_runtime42.jsx)(
         PtnrQot02Screen,
         {
           onNavigate: handleNavigate
         },
         "screen_ptnr_qot_02"
-      ) : currentScreen === "PTNR-QOT-01" ? /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
+      ) : currentScreen === "PTNR-QOT-01" ? /* @__PURE__ */ (0, import_jsx_runtime42.jsx)(
         PtnrQot01,
         {
           onNavigate: handleNavigate
         },
         "screen_ptnr_qot_01"
-      ) : currentScreen === "PTNR-QOT-00" ? /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
+      ) : currentScreen === "PTNR-QOT-00" ? /* @__PURE__ */ (0, import_jsx_runtime42.jsx)(
         PtnrQot00,
         {},
         "screen_ptnr_qot_00"
-      ) : currentScreen === "PTNR-DSH-02" ? /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
+      ) : currentScreen === "PTNR-DSH-02" ? /* @__PURE__ */ (0, import_jsx_runtime42.jsx)(
         PTNR_DSH_02_default,
         {
           initialPtnrNo: "P20261000001",
           onNavigate: handleNavigate
         },
         "screen_ptnr_dsh_02"
-      ) : currentScreen === "PTNR-DSH-01" ? /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
+      ) : currentScreen === "PTNR-DSH-01" ? /* @__PURE__ */ (0, import_jsx_runtime42.jsx)(
         PTNR_DSH_01_default,
         {
           initialPtnrNo: "P20261000001",
           onNavigate: handleNavigate
         },
         "screen_ptnr_dsh_01"
-      ) : currentScreen === "PTNR-DSH-00" ? /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
+      ) : currentScreen === "PTNR-DSH-00" ? /* @__PURE__ */ (0, import_jsx_runtime42.jsx)(
         PTNR_DSH_00_default,
         {
           ptnrNo: "P20261000001",
@@ -61572,40 +62894,40 @@ ${err.message}`);
           onLogout: () => handleNavigate("PTNR-ATH-00")
         },
         "screen_ptnr_dsh_00"
-      ) : currentScreen === "PTNR-ATH-01" ? /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
+      ) : currentScreen === "PTNR-ATH-01" ? /* @__PURE__ */ (0, import_jsx_runtime42.jsx)(
         PTNR_ATH_01_default,
         {
           onNavigate: handleNavigate
         },
         "screen_ptnr_ath_01"
-      ) : currentScreen === "PTNR-ATH-00" ? /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
+      ) : currentScreen === "PTNR-ATH-00" ? /* @__PURE__ */ (0, import_jsx_runtime42.jsx)(
         PTNR_ATH_00_default,
         {
           onNavigate: handleNavigate
         },
         "screen_ptnr_ath_00"
-      ) : currentScreen === "USER-MYP-02" ? /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
+      ) : currentScreen === "USER-MYP-02" ? /* @__PURE__ */ (0, import_jsx_runtime42.jsx)(
         UserMyp02Screen,
         {
           userNo: currentUserNo || "U20261000001",
           onNavigate: handleNavigate
         },
         `screen_user_myp_02_${currentUserNo || "default"}`
-      ) : currentScreen === "USER-MYP-01" ? /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
+      ) : currentScreen === "USER-MYP-01" ? /* @__PURE__ */ (0, import_jsx_runtime42.jsx)(
         UserMyp01,
         {
           userNo: currentUserNo || "U20261000001",
           onNavigate: handleNavigate
         },
         `screen_user_myp_01_${currentUserNo || "default"}`
-      ) : currentScreen === "USER-MYP-00" ? /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
+      ) : currentScreen === "USER-MYP-00" ? /* @__PURE__ */ (0, import_jsx_runtime42.jsx)(
         UserMyp00,
         {
           userNo: currentUserNo || "U20261000001",
           onNavigate: handleNavigate
         },
         `screen_user_myp_00_${currentUserNo || "default"}`
-      ) : currentScreen === "USER-HIS-02" ? /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
+      ) : currentScreen === "USER-HIS-02" ? /* @__PURE__ */ (0, import_jsx_runtime42.jsx)(
         UserHis02,
         {
           userNo: currentUserNo || "U20261000001",
@@ -61613,7 +62935,7 @@ ${err.message}`);
           onNavigate: handleNavigate
         },
         `screen_user_his_02_${currentUserNo || "default"}_${contractParams.contractNo || "default"}`
-      ) : currentScreen === "USER-HIS-01" ? /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
+      ) : currentScreen === "USER-HIS-01" ? /* @__PURE__ */ (0, import_jsx_runtime42.jsx)(
         UserHis01,
         {
           userNo: currentUserNo || "U20261000001",
@@ -61621,14 +62943,14 @@ ${err.message}`);
           onNavigate: handleNavigate
         },
         `screen_user_his_01_${currentUserNo || "default"}_${contractParams.contractNo || "default"}`
-      ) : currentScreen === "USER-HIS-00" ? /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
+      ) : currentScreen === "USER-HIS-00" ? /* @__PURE__ */ (0, import_jsx_runtime42.jsx)(
         UserHis00,
         {
           userNo: currentUserNo || "U20261000001",
           onNavigate: handleNavigate
         },
         `screen_user_his_00_${currentUserNo || "default"}`
-      ) : currentScreen === "USER-CNT-02" ? /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
+      ) : currentScreen === "USER-CNT-02" ? /* @__PURE__ */ (0, import_jsx_runtime42.jsx)(
         USER_CNT_02_default,
         {
           userNo: currentUserNo || "U20261000001",
@@ -61643,7 +62965,7 @@ ${err.message}`);
           onBack: () => handleNavigate("USER-CNT-00")
         },
         `screen_user_cnt_02_${currentUserNo || "default"}_${contractParams.contractNo || "default"}`
-      ) : currentScreen === "USER-CNT-01" ? /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
+      ) : currentScreen === "USER-CNT-01" ? /* @__PURE__ */ (0, import_jsx_runtime42.jsx)(
         USER_CNT_01_default,
         {
           userNo: currentUserNo || "U20261000001",
@@ -61653,7 +62975,7 @@ ${err.message}`);
           onNavigate: handleNavigate
         },
         `screen_user_cnt_01_${currentUserNo || "default"}_${contractParams.contractNo || "default"}`
-      ) : currentScreen === "USER-CNT-00" ? /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
+      ) : currentScreen === "USER-CNT-00" ? /* @__PURE__ */ (0, import_jsx_runtime42.jsx)(
         USER_CNT_00_default,
         {
           userNo: currentUserNo || "U20261000001",
@@ -61662,7 +62984,7 @@ ${err.message}`);
           onBack: () => handleNavigate("USER-QOT-00")
         },
         `screen_user_cnt_00_${currentUserNo || "default"}`
-      ) : currentScreen === "USER-QOT-02" ? /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
+      ) : currentScreen === "USER-QOT-02" ? /* @__PURE__ */ (0, import_jsx_runtime42.jsx)(
         UserQot02Screen,
         {
           initialContractNo: "CT2026102200001",
@@ -61671,7 +62993,7 @@ ${err.message}`);
           apiEndpoint: "/api/user/user_qot_02"
         },
         `screen_user_qot_02_${partnerParams.ptnrNo || "default"}`
-      ) : currentScreen === "USER-QOT-01" ? /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
+      ) : currentScreen === "USER-QOT-01" ? /* @__PURE__ */ (0, import_jsx_runtime42.jsx)(
         UserQot01Screen,
         {
           initialPtnrNo: partnerParams.ptnrNo,
@@ -61682,7 +63004,7 @@ ${err.message}`);
           apiEndpoint: "/api/user/user_qot_01"
         },
         `screen_user_qot_01_${partnerParams.ptnrNo || "default"}`
-      ) : currentScreen === "USER-QOT-00" ? /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
+      ) : currentScreen === "USER-QOT-00" ? /* @__PURE__ */ (0, import_jsx_runtime42.jsx)(
         USER_QOT_00_default,
         {
           initialReqNo: "REQ202610210001",
@@ -61692,160 +63014,160 @@ ${err.message}`);
           apiEndpoint: "/api/user/user_qot_00"
         },
         `screen_user_qot_00_${currentUserNo || "default"}`
-      ) : currentScreen === "USER-REQ-04" ? /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "relative min-h-screen bg-[#f8f9ff]", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("header", { className: "fixed top-0 w-full z-40 bg-white/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(22,59,102,0.04)] border-b border-[#e5eeff]", children: /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "h-16 max-w-7xl mx-auto px-6 lg:px-12 flex items-center justify-between gap-6", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "flex items-center gap-6", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)(
+      ) : currentScreen === "USER-REQ-04" ? /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "relative min-h-screen bg-[#f8f9ff]", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("header", { className: "fixed top-0 w-full z-40 bg-white/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(22,59,102,0.04)] border-b border-[#e5eeff]", children: /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "h-16 max-w-7xl mx-auto px-6 lg:px-12 flex items-center justify-between gap-6", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "flex items-center gap-6", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)(
               "a",
               {
                 className: "flex items-center gap-2 group cursor-pointer",
                 onClick: () => handleNavigate("USER-COM-00"),
                 children: [
-                  /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("div", { className: "w-9 h-9 rounded-lg bg-[#163b66] flex items-center justify-center text-white transition-transform group-hover:scale-95", children: /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "material-symbols-outlined text-[20px]", children: "verified_user" }) }),
-                  /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "flex flex-col", children: [
-                    /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "text-[17px] font-bold tracking-tight text-[#00254a] leading-none", children: "SsulDak" }),
-                    /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "text-[11px] text-[#006c4a] font-bold tracking-wider leading-tight", children: "\uC4F8\uACE0\uB2E6\uACE0 \uCF00\uC5B4" })
+                  /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("div", { className: "w-9 h-9 rounded-lg bg-[#163b66] flex items-center justify-center text-white transition-transform group-hover:scale-95", children: /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { className: "material-symbols-outlined text-[20px]", children: "verified_user" }) }),
+                  /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "flex flex-col", children: [
+                    /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { className: "text-[17px] font-bold tracking-tight text-[#00254a] leading-none", children: "SsulDak" }),
+                    /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { className: "text-[11px] text-[#006c4a] font-bold tracking-wider leading-tight", children: "\uC4F8\uACE0\uB2E6\uACE0 \uCF00\uC5B4" })
                   ] })
                 ]
               }
             ),
-            /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "hidden xl:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#eff4ff]", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "material-symbols-outlined text-[16px] text-[#737780]", children: "navigation" }),
-              /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "text-[13px] text-[#43474f]", children: "\uD648" }),
-              /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "material-symbols-outlined text-[14px] text-[#c3c6d0]", children: "chevron_right" }),
-              /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "text-[13px] text-[#43474f]", children: "\uACAC\uC801 \uC2E0\uCCAD" }),
-              /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "material-symbols-outlined text-[14px] text-[#c3c6d0]", children: "chevron_right" }),
-              /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "text-[11px] font-semibold text-[#163b66]", children: "\uCCAD\uC18C \uC11C\uBE44\uC2A4 \uD1B5\uD569 \uC2E0\uCCAD" }),
-              /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "px-1.5 py-0.5 rounded text-[10px] font-bold bg-[#d3e4fe] text-[#00254a] font-mono", children: "USER-REQ-00" })
+            /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "hidden xl:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#eff4ff]", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { className: "material-symbols-outlined text-[16px] text-[#737780]", children: "navigation" }),
+              /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { className: "text-[13px] text-[#43474f]", children: "\uD648" }),
+              /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { className: "material-symbols-outlined text-[14px] text-[#c3c6d0]", children: "chevron_right" }),
+              /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { className: "text-[13px] text-[#43474f]", children: "\uACAC\uC801 \uC2E0\uCCAD" }),
+              /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { className: "material-symbols-outlined text-[14px] text-[#c3c6d0]", children: "chevron_right" }),
+              /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { className: "text-[11px] font-semibold text-[#163b66]", children: "\uCCAD\uC18C \uC11C\uBE44\uC2A4 \uD1B5\uD569 \uC2E0\uCCAD" }),
+              /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { className: "px-1.5 py-0.5 rounded text-[10px] font-bold bg-[#d3e4fe] text-[#00254a] font-mono", children: "USER-REQ-00" })
             ] })
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "flex items-center gap-6", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("nav", { className: "hidden md:flex items-center gap-1", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("a", { className: "px-3 py-2 rounded-lg text-[13px] text-[#43474f] hover:bg-[#eff4ff] hover:text-[#0b1c30] transition-colors cursor-pointer", children: "\uC11C\uBE44\uC2A4 \uC548\uB0B4" }),
-              /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("a", { className: "px-3 py-2 rounded-lg text-[13px] text-[#43474f] hover:bg-[#eff4ff] hover:text-[#0b1c30] transition-colors cursor-pointer", children: "\uACAC\uC801 \uAC00\uC774\uB4DC" }),
-              /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("a", { className: "px-3 py-2 rounded-lg text-[13px] text-[#43474f] hover:bg-[#eff4ff] hover:text-[#0b1c30] transition-colors cursor-pointer", children: "\uACE0\uAC1D\uC9C0\uC6D0" })
+          /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "flex items-center gap-6", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("nav", { className: "hidden md:flex items-center gap-1", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("a", { className: "px-3 py-2 rounded-lg text-[13px] text-[#43474f] hover:bg-[#eff4ff] hover:text-[#0b1c30] transition-colors cursor-pointer", children: "\uC11C\uBE44\uC2A4 \uC548\uB0B4" }),
+              /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("a", { className: "px-3 py-2 rounded-lg text-[13px] text-[#43474f] hover:bg-[#eff4ff] hover:text-[#0b1c30] transition-colors cursor-pointer", children: "\uACAC\uC801 \uAC00\uC774\uB4DC" }),
+              /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("a", { className: "px-3 py-2 rounded-lg text-[13px] text-[#43474f] hover:bg-[#eff4ff] hover:text-[#0b1c30] transition-colors cursor-pointer", children: "\uACE0\uAC1D\uC9C0\uC6D0" })
             ] }),
-            /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#82f5c1]/40 text-[#00714e]", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "w-2 h-2 rounded-full bg-[#006c4a] animate-pulse" }),
-              /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "text-[11px] font-bold tracking-tight", children: "\uC548\uC2EC \uBCF4\uC99D \uC2DC\uC2A4\uD15C \uAC00\uB3D9\uC911" })
+            /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#82f5c1]/40 text-[#00714e]", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { className: "w-2 h-2 rounded-full bg-[#006c4a] animate-pulse" }),
+              /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { className: "text-[11px] font-bold tracking-tight", children: "\uC548\uC2EC \uBCF4\uC99D \uC2DC\uC2A4\uD15C \uAC00\uB3D9\uC911" })
             ] }),
-            /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "flex items-center gap-2 pl-2", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
+            /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "flex items-center gap-2 pl-2", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime42.jsx)(
                 "button",
                 {
                   "aria-label": "\uC54C\uB9BC",
                   className: "w-9 h-9 rounded-full bg-[#eff4ff] flex items-center justify-center text-[#43474f] hover:bg-[#e5eeff] transition-colors cursor-pointer",
-                  children: /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "material-symbols-outlined text-[20px]", children: "notifications" })
+                  children: /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { className: "material-symbols-outlined text-[20px]", children: "notifications" })
                 }
               ),
-              /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
+              /* @__PURE__ */ (0, import_jsx_runtime42.jsx)(
                 "a",
                 {
                   className: "w-8 h-8 rounded-full bg-[#00254a] flex items-center justify-center cursor-pointer",
                   onClick: () => handleNavigate("USER-ATH-03"),
-                  children: /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "material-symbols-outlined text-white text-[18px]", children: "person" })
+                  children: /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { className: "material-symbols-outlined text-white text-[18px]", children: "person" })
                 }
               )
             ] })
           ] })
         ] }) }),
-        /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("main", { className: "w-full pt-16 bg-[#f8f9ff] min-h-[calc(100vh-64px)]", children: /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "flex flex-col w-full relative", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "w-full max-w-7xl mx-auto px-6 lg:px-12 py-6 select-none opacity-40 pointer-events-none filter blur-[1px]", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "flex items-center justify-between pb-4", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "flex items-center gap-2", children: [
-                /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "px-2.5 py-1 rounded-full bg-[#163b66] text-white text-[11px] font-bold", children: "STEP 02" }),
-                /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("h1", { className: "text-[28px] font-bold text-[#00254a] tracking-tight", children: "\uD1B5\uD569 \uCF00\uC5B4 \uACAC\uC801 \uC2E0\uCCAD\uC11C \uC791\uC131" })
+        /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("main", { className: "w-full pt-16 bg-[#f8f9ff] min-h-[calc(100vh-64px)]", children: /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "flex flex-col w-full relative", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "w-full max-w-7xl mx-auto px-6 lg:px-12 py-6 select-none opacity-40 pointer-events-none filter blur-[1px]", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "flex items-center justify-between pb-4", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "flex items-center gap-2", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { className: "px-2.5 py-1 rounded-full bg-[#163b66] text-white text-[11px] font-bold", children: "STEP 02" }),
+                /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("h1", { className: "text-[28px] font-bold text-[#00254a] tracking-tight", children: "\uD1B5\uD569 \uCF00\uC5B4 \uACAC\uC801 \uC2E0\uCCAD\uC11C \uC791\uC131" })
               ] }),
-              /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "flex items-center gap-1 text-[13px] text-[#006c4a] font-bold", children: [
-                /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "material-symbols-outlined text-[18px]", children: "verified" }),
-                /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { children: "\uC9C1\uC601 \uC778\uC99D \uB9C8\uC2A4\uD130 100% \uB9E4\uCE6D \uBCF4\uC99D" })
+              /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "flex items-center gap-1 text-[13px] text-[#006c4a] font-bold", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { className: "material-symbols-outlined text-[18px]", children: "verified" }),
+                /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { children: "\uC9C1\uC601 \uC778\uC99D \uB9C8\uC2A4\uD130 100% \uB9E4\uCE6D \uBCF4\uC99D" })
               ] })
             ] }),
-            /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "grid grid-cols-12 gap-6 mt-4", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "col-span-8 space-y-6", children: [
-                /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "p-6 rounded-2xl bg-white shadow-sm space-y-4 border border-[#e5eeff]", children: [
-                  /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "flex items-center justify-between", children: [
-                    /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "flex items-center gap-1.5 text-[#00254a] text-[17px] font-bold", children: [
-                      /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "material-symbols-outlined text-[#163b66] text-[20px]", children: "apartment" }),
-                      /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { children: "1. \uCF00\uC5B4 \uB300\uC0C1\uC9C0 \uAE30\uBCF8 \uC815\uBCF4" })
+            /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "grid grid-cols-12 gap-6 mt-4", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "col-span-8 space-y-6", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "p-6 rounded-2xl bg-white shadow-sm space-y-4 border border-[#e5eeff]", children: [
+                  /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "flex items-center justify-between", children: [
+                    /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "flex items-center gap-1.5 text-[#00254a] text-[17px] font-bold", children: [
+                      /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { className: "material-symbols-outlined text-[#163b66] text-[20px]", children: "apartment" }),
+                      /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { children: "1. \uCF00\uC5B4 \uB300\uC0C1\uC9C0 \uAE30\uBCF8 \uC815\uBCF4" })
                     ] }),
-                    /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "px-2 py-0.5 rounded bg-[#eff4ff] text-[#00254a] text-[11px] font-bold", children: "\uAC74\uBB3C/\uC624\uD53C\uC2A4\uD615" })
+                    /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { className: "px-2 py-0.5 rounded bg-[#eff4ff] text-[#00254a] text-[11px] font-bold", children: "\uAC74\uBB3C/\uC624\uD53C\uC2A4\uD615" })
                   ] }),
-                  /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "p-4 rounded-xl bg-[#eff4ff] flex items-center justify-between", children: [
-                    /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "flex items-center gap-2", children: [
-                      /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "material-symbols-outlined text-[#737780] text-[20px]", children: "pin_drop" }),
-                      /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "text-[14px] text-[#0b1c30] font-medium", children: "\uC11C\uC6B8\uD2B9\uBCC4\uC2DC \uAC15\uB0A8\uAD6C \uD14C\uD5E4\uB780\uB85C 152 \uAC15\uB0A8\uD30C\uC774\uB0B8\uC2A4\uC13C\uD130 8\uCE35" })
+                  /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "p-4 rounded-xl bg-[#eff4ff] flex items-center justify-between", children: [
+                    /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "flex items-center gap-2", children: [
+                      /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { className: "material-symbols-outlined text-[#737780] text-[20px]", children: "pin_drop" }),
+                      /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { className: "text-[14px] text-[#0b1c30] font-medium", children: "\uC11C\uC6B8\uD2B9\uBCC4\uC2DC \uAC15\uB0A8\uAD6C \uD14C\uD5E4\uB780\uB85C 152 \uAC15\uB0A8\uD30C\uC774\uB0B8\uC2A4\uC13C\uD130 8\uCE35" })
                     ] }),
-                    /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "text-[11px] text-[#00254a] underline", children: "\uC8FC\uC18C \uBCC0\uACBD" })
+                    /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { className: "text-[11px] text-[#00254a] underline", children: "\uC8FC\uC18C \uBCC0\uACBD" })
                   ] })
                 ] }),
-                /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "p-6 rounded-2xl bg-white shadow-sm space-y-4 border border-[#e5eeff]", children: [
-                  /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "flex items-center justify-between", children: [
-                    /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "flex items-center gap-1.5 text-[#00254a] text-[17px] font-bold", children: [
-                      /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "material-symbols-outlined text-[#006c4a] text-[20px]", children: "checklist" }),
-                      /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { children: "2. \uACB0\uD569 \uC11C\uBE44\uC2A4 \uD328\uD0A4\uC9C0 \uC120\uD0DD" })
+                /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "p-6 rounded-2xl bg-white shadow-sm space-y-4 border border-[#e5eeff]", children: [
+                  /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "flex items-center justify-between", children: [
+                    /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "flex items-center gap-1.5 text-[#00254a] text-[17px] font-bold", children: [
+                      /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { className: "material-symbols-outlined text-[#006c4a] text-[20px]", children: "checklist" }),
+                      /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { children: "2. \uACB0\uD569 \uC11C\uBE44\uC2A4 \uD328\uD0A4\uC9C0 \uC120\uD0DD" })
                     ] }),
-                    /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "text-[11px] text-[#006c4a] font-bold", children: "\uB3D9\uC2DC \uC2E0\uCCAD 15% \uAC10\uBA74 \uC801\uC6A9\uC911" })
+                    /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { className: "text-[11px] text-[#006c4a] font-bold", children: "\uB3D9\uC2DC \uC2E0\uCCAD 15% \uAC10\uBA74 \uC801\uC6A9\uC911" })
                   ] }),
-                  /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "grid grid-cols-2 gap-4", children: [
-                    /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "p-4 rounded-xl bg-[#eff4ff] flex items-center gap-4", children: [
-                      /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("div", { className: "w-10 h-10 rounded-xl bg-[#00254a] text-white flex items-center justify-center", children: /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "material-symbols-outlined text-[20px]", children: "stairs" }) }),
-                      /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "flex flex-col", children: [
-                        /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "text-[15px] text-[#00254a] font-bold", children: "\uC0C1\uAC00\xB7\uBE4C\uB529 \uACC4\uB2E8 \uC815\uAE30\uAD00\uB9AC" }),
-                        /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "text-[13px] text-[#43474f]", children: "\uC8FC 2\uD68C \xB7 4\uCE35 \uC804\uCCB4 \uBCF5\uB3C4 \uBC0F \uB09C\uAC04" })
+                  /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "grid grid-cols-2 gap-4", children: [
+                    /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "p-4 rounded-xl bg-[#eff4ff] flex items-center gap-4", children: [
+                      /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("div", { className: "w-10 h-10 rounded-xl bg-[#00254a] text-white flex items-center justify-center", children: /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { className: "material-symbols-outlined text-[20px]", children: "stairs" }) }),
+                      /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "flex flex-col", children: [
+                        /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { className: "text-[15px] text-[#00254a] font-bold", children: "\uC0C1\uAC00\xB7\uBE4C\uB529 \uACC4\uB2E8 \uC815\uAE30\uAD00\uB9AC" }),
+                        /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { className: "text-[13px] text-[#43474f]", children: "\uC8FC 2\uD68C \xB7 4\uCE35 \uC804\uCCB4 \uBCF5\uB3C4 \uBC0F \uB09C\uAC04" })
                       ] })
                     ] }),
-                    /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "p-4 rounded-xl bg-[#eff4ff] flex items-center gap-4", children: [
-                      /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("div", { className: "w-10 h-10 rounded-xl bg-[#006c4a] text-white flex items-center justify-center", children: /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "material-symbols-outlined text-[20px]", children: "ac_unit" }) }),
-                      /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "flex flex-col", children: [
-                        /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "text-[15px] text-[#00254a] font-bold", children: "\uCC9C\uC7A5\uD615 4WAY \uC5D0\uC5B4\uCEE8 \uBD84\uD574\uC138\uCC99" }),
-                        /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "text-[13px] text-[#43474f]", children: "\uC2DC\uC2A4\uD15C \uC5D0\uC5B4\uCEE8 6\uAE30 \xB7 \uC0B4\uADE0 \uC18C\uB3C5" })
+                    /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "p-4 rounded-xl bg-[#eff4ff] flex items-center gap-4", children: [
+                      /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("div", { className: "w-10 h-10 rounded-xl bg-[#006c4a] text-white flex items-center justify-center", children: /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { className: "material-symbols-outlined text-[20px]", children: "ac_unit" }) }),
+                      /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "flex flex-col", children: [
+                        /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { className: "text-[15px] text-[#00254a] font-bold", children: "\uCC9C\uC7A5\uD615 4WAY \uC5D0\uC5B4\uCEE8 \uBD84\uD574\uC138\uCC99" }),
+                        /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { className: "text-[13px] text-[#43474f]", children: "\uC2DC\uC2A4\uD15C \uC5D0\uC5B4\uCEE8 6\uAE30 \xB7 \uC0B4\uADE0 \uC18C\uB3C5" })
                       ] })
                     ] })
                   ] })
                 ] }),
-                /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "p-6 rounded-2xl bg-white shadow-sm space-y-4 border border-[#e5eeff]", children: [
-                  /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "flex items-center justify-between", children: [
-                    /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "flex items-center gap-1.5 text-[#00254a] text-[17px] font-bold", children: [
-                      /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "material-symbols-outlined text-[#163b66] text-[20px]", children: "photo_library" }),
-                      /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { children: "3. \uD604\uC7A5 \uC0C1\uC138 \uCEE8\uB514\uC158 \uC9C4\uB2E8" })
+                /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "p-6 rounded-2xl bg-white shadow-sm space-y-4 border border-[#e5eeff]", children: [
+                  /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "flex items-center justify-between", children: [
+                    /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "flex items-center gap-1.5 text-[#00254a] text-[17px] font-bold", children: [
+                      /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { className: "material-symbols-outlined text-[#163b66] text-[20px]", children: "photo_library" }),
+                      /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { children: "3. \uD604\uC7A5 \uC0C1\uC138 \uCEE8\uB514\uC158 \uC9C4\uB2E8" })
                     ] }),
-                    /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "text-[11px] text-[#737780]", children: "\uC815\uBC00 \uACAC\uC801 \uB2E8\uACC4" })
+                    /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { className: "text-[11px] text-[#737780]", children: "\uC815\uBC00 \uACAC\uC801 \uB2E8\uACC4" })
                   ] }),
-                  /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "p-4 rounded-xl bg-[#e5eeff] flex items-center justify-between", children: [
-                    /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "flex items-center gap-2", children: [
-                      /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "material-symbols-outlined text-[#00254a] text-[22px]", children: "add_a_photo" }),
-                      /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "text-[14px] text-[#00254a] font-semibold", children: "\uD604\uC7A5 \uC2E4\uC0AC \uC0AC\uC9C4 2\uC7A5\uC774 \uCCA8\uBD80\uB418\uC5B4 \uC788\uC2B5\uB2C8\uB2E4." })
+                  /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "p-4 rounded-xl bg-[#e5eeff] flex items-center justify-between", children: [
+                    /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "flex items-center gap-2", children: [
+                      /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { className: "material-symbols-outlined text-[#00254a] text-[22px]", children: "add_a_photo" }),
+                      /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { className: "text-[14px] text-[#00254a] font-semibold", children: "\uD604\uC7A5 \uC2E4\uC0AC \uC0AC\uC9C4 2\uC7A5\uC774 \uCCA8\uBD80\uB418\uC5B4 \uC788\uC2B5\uB2C8\uB2E4." })
                     ] }),
-                    /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("button", { className: "px-4 py-1.5 rounded-lg bg-white text-[#00254a] text-[13px] font-bold shadow-2xs", children: "\uC218\uC815\uD558\uAE30" })
+                    /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("button", { className: "px-4 py-1.5 rounded-lg bg-white text-[#00254a] text-[13px] font-bold shadow-2xs", children: "\uC218\uC815\uD558\uAE30" })
                   ] })
                 ] })
               ] }),
-              /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("div", { className: "col-span-4 space-y-4", children: /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "p-6 rounded-2xl bg-white shadow-sm space-y-4 border border-[#e5eeff]", children: [
-                /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("h3", { className: "text-[17px] text-[#00254a] font-bold", children: "\uC2E4\uC2DC\uAC04 \uC0B0\uC815 \uC608\uC0C1 \uACAC\uC801" }),
-                /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "space-y-1 text-[13px] text-[#43474f]", children: [
-                  /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "flex justify-between", children: [
-                    /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { children: "\uACC4\uB2E8 \uC815\uAE30\uAD00\uB9AC \uC6D4\uC815\uC561" }),
-                    /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "font-semibold text-[#00254a]", children: "180,000\uC6D0" })
+              /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("div", { className: "col-span-4 space-y-4", children: /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "p-6 rounded-2xl bg-white shadow-sm space-y-4 border border-[#e5eeff]", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("h3", { className: "text-[17px] text-[#00254a] font-bold", children: "\uC2E4\uC2DC\uAC04 \uC0B0\uC815 \uC608\uC0C1 \uACAC\uC801" }),
+                /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "space-y-1 text-[13px] text-[#43474f]", children: [
+                  /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "flex justify-between", children: [
+                    /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { children: "\uACC4\uB2E8 \uC815\uAE30\uAD00\uB9AC \uC6D4\uC815\uC561" }),
+                    /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { className: "font-semibold text-[#00254a]", children: "180,000\uC6D0" })
                   ] }),
-                  /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "flex justify-between", children: [
-                    /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { children: "4WAY \uC5D0\uC5B4\uCEE8 \uC138\uCC99 (6\uB300)" }),
-                    /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "font-semibold text-[#00254a]", children: "720,000\uC6D0" })
+                  /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "flex justify-between", children: [
+                    /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { children: "4WAY \uC5D0\uC5B4\uCEE8 \uC138\uCC99 (6\uB300)" }),
+                    /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { className: "font-semibold text-[#00254a]", children: "720,000\uC6D0" })
                   ] }),
-                  /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "flex justify-between text-[#006c4a] font-semibold", children: [
-                    /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { children: "\uD328\uD0A4\uC9C0 \uBCF5\uD569 \uD560\uC778" }),
-                    /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { children: "-135,000\uC6D0" })
+                  /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "flex justify-between text-[#006c4a] font-semibold", children: [
+                    /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { children: "\uD328\uD0A4\uC9C0 \uBCF5\uD569 \uD560\uC778" }),
+                    /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { children: "-135,000\uC6D0" })
                   ] })
                 ] }),
-                /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "p-4 rounded-xl bg-[#eff4ff] flex justify-between items-center", children: [
-                  /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "text-[15px] text-[#00254a] font-bold", children: "\uD569\uACC4 \uC608\uC0C1\uAE08\uC561" }),
-                  /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "text-[20px] text-[#00254a] font-extrabold font-mono", children: "765,000\uC6D0" })
+                /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "p-4 rounded-xl bg-[#eff4ff] flex justify-between items-center", children: [
+                  /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { className: "text-[15px] text-[#00254a] font-bold", children: "\uD569\uACC4 \uC608\uC0C1\uAE08\uC561" }),
+                  /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { className: "text-[20px] text-[#00254a] font-extrabold font-mono", children: "765,000\uC6D0" })
                 ] }),
-                /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("button", { className: "w-full h-12 rounded-xl bg-[#00254a] text-white text-[15px] font-bold shadow-md", children: "\uACAC\uC801 \uC694\uCCAD \uC81C\uCD9C" })
+                /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("button", { className: "w-full h-12 rounded-xl bg-[#00254a] text-white text-[15px] font-bold shadow-md", children: "\uACAC\uC801 \uC694\uCCAD \uC81C\uCD9C" })
               ] }) })
             ] })
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
+          /* @__PURE__ */ (0, import_jsx_runtime42.jsx)(
             USER_REQ_04_default,
             {
               isOpen: true,
@@ -61865,70 +63187,70 @@ ${err.message}`);
             }
           )
         ] }) }),
-        /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("footer", { className: "w-full bg-[#eff4ff] border-t border-[#dce9ff]/60 mt-12", children: /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "max-w-7xl mx-auto px-6 lg:px-12 py-10", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "grid grid-cols-1 md:grid-cols-12 gap-6 pb-6 mb-6 border-b border-[#dce9ff]/60", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "md:col-span-6 space-y-3", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "flex items-center gap-2", children: [
-                /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("div", { className: "w-8 h-8 rounded-lg bg-[#163b66] flex items-center justify-center text-white", children: /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "material-symbols-outlined text-[18px]", children: "sanitizer" }) }),
-                /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "text-[17px] font-bold text-[#00254a]", children: "(\uC8FC)\uC4F8\uACE0\uB2E6\uACE0 \uD50C\uB7AB\uD3FC \uCF00\uC5B4" })
+        /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("footer", { className: "w-full bg-[#eff4ff] border-t border-[#dce9ff]/60 mt-12", children: /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "max-w-7xl mx-auto px-6 lg:px-12 py-10", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "grid grid-cols-1 md:grid-cols-12 gap-6 pb-6 mb-6 border-b border-[#dce9ff]/60", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "md:col-span-6 space-y-3", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "flex items-center gap-2", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("div", { className: "w-8 h-8 rounded-lg bg-[#163b66] flex items-center justify-center text-white", children: /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { className: "material-symbols-outlined text-[18px]", children: "sanitizer" }) }),
+                /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { className: "text-[17px] font-bold text-[#00254a]", children: "(\uC8FC)\uC4F8\uACE0\uB2E6\uACE0 \uD50C\uB7AB\uD3FC \uCF00\uC5B4" })
               ] }),
-              /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "space-y-1 text-[13px] text-[#43474f]", children: [
-                /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("p", { children: "\uB300\uD45C\uC774\uC0AC: \uC815\uCF00\uC5B4 | \uC0AC\uC5C5\uC790\uB4F1\uB85D\uBC88\uD638: 214-88-02482 | \uD1B5\uC2E0\uD310\uB9E4\uC5C5\uC2E0\uACE0: \uC81C 2024-\uC11C\uC6B8\uAC15\uB0A8-1104\uD638" }),
-                /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("p", { children: "\uBCF8\uC0AC: \uC11C\uC6B8\uD2B9\uBCC4\uC2DC \uAC15\uB0A8\uAD6C \uD14C\uD5E4\uB780\uB85C 427 \uC704\uC6CC\uD06C\uD0C0\uC6CC 14\uCE35 \uC4F8\uACE0\uB2E6\uACE0 \uAD00\uC81C\uC13C\uD130" }),
-                /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("p", { children: "\uAC1C\uC778\uC815\uBCF4\uBCF4\uD638\uCC45\uC784\uC790: \uAE40\uC2E0\uB8B0 (privacy@ssuldak.co.kr) | \uD638\uC2A4\uD305\uC81C\uACF5\uC790: AWS Korea" })
+              /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "space-y-1 text-[13px] text-[#43474f]", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("p", { children: "\uB300\uD45C\uC774\uC0AC: \uC815\uCF00\uC5B4 | \uC0AC\uC5C5\uC790\uB4F1\uB85D\uBC88\uD638: 214-88-02482 | \uD1B5\uC2E0\uD310\uB9E4\uC5C5\uC2E0\uACE0: \uC81C 2024-\uC11C\uC6B8\uAC15\uB0A8-1104\uD638" }),
+                /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("p", { children: "\uBCF8\uC0AC: \uC11C\uC6B8\uD2B9\uBCC4\uC2DC \uAC15\uB0A8\uAD6C \uD14C\uD5E4\uB780\uB85C 427 \uC704\uC6CC\uD06C\uD0C0\uC6CC 14\uCE35 \uC4F8\uACE0\uB2E6\uACE0 \uAD00\uC81C\uC13C\uD130" }),
+                /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("p", { children: "\uAC1C\uC778\uC815\uBCF4\uBCF4\uD638\uCC45\uC784\uC790: \uAE40\uC2E0\uB8B0 (privacy@ssuldak.co.kr) | \uD638\uC2A4\uD305\uC81C\uACF5\uC790: AWS Korea" })
               ] })
             ] }),
-            /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "md:col-span-3 space-y-2", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("h4", { className: "text-[15px] font-bold text-[#00254a]", children: "\uC57D\uAD00 \uBC0F \uC815\uCC45" }),
-              /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("ul", { className: "space-y-1 text-[13px] text-[#43474f]", children: [
-                /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("li", { children: /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("a", { className: "hover:text-[#00254a] cursor-pointer", children: "\uC11C\uBE44\uC2A4 \uC774\uC6A9\uC57D\uAD00" }) }),
-                /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("li", { children: /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("a", { className: "hover:text-[#00254a] font-bold text-[#00254a] cursor-pointer", children: "\uAC1C\uC778\uC815\uBCF4\uCC98\uB9AC\uBC29\uCE68" }) }),
-                /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("li", { children: /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("a", { className: "hover:text-[#00254a] cursor-pointer", children: "\uC791\uC5C5 \uACB0\uACFC 100% \uC548\uC2EC\uBCF4\uC99D \uADDC\uC815" }) })
+            /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "md:col-span-3 space-y-2", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("h4", { className: "text-[15px] font-bold text-[#00254a]", children: "\uC57D\uAD00 \uBC0F \uC815\uCC45" }),
+              /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("ul", { className: "space-y-1 text-[13px] text-[#43474f]", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("li", { children: /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("a", { className: "hover:text-[#00254a] cursor-pointer", children: "\uC11C\uBE44\uC2A4 \uC774\uC6A9\uC57D\uAD00" }) }),
+                /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("li", { children: /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("a", { className: "hover:text-[#00254a] font-bold text-[#00254a] cursor-pointer", children: "\uAC1C\uC778\uC815\uBCF4\uCC98\uB9AC\uBC29\uCE68" }) }),
+                /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("li", { children: /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("a", { className: "hover:text-[#00254a] cursor-pointer", children: "\uC791\uC5C5 \uACB0\uACFC 100% \uC548\uC2EC\uBCF4\uC99D \uADDC\uC815" }) })
               ] })
             ] }),
-            /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "md:col-span-3 space-y-2", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("h4", { className: "text-[15px] font-bold text-[#00254a]", children: "\uACE0\uAC1D \uC2E0\uB8B0 \uC13C\uD130" }),
-              /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "p-3 bg-white rounded-xl shadow-2xs border border-[#e5eeff]", children: [
-                /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "text-[28px] font-extrabold text-[#00254a] block font-mono", children: "1588-3024" }),
-                /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("p", { className: "text-[11px] text-[#737780]", children: "\uD3C9\uC77C 08:30 ~ 18:30 (\uD1A0\xB7\uACF5\uD734\uC77C \uC804\uBB38 \uB2F9\uC9C1 \uC5D4\uC9C0\uB2C8\uC5B4 \uB300\uAE30)" })
+            /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "md:col-span-3 space-y-2", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("h4", { className: "text-[15px] font-bold text-[#00254a]", children: "\uACE0\uAC1D \uC2E0\uB8B0 \uC13C\uD130" }),
+              /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "p-3 bg-white rounded-xl shadow-2xs border border-[#e5eeff]", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { className: "text-[28px] font-extrabold text-[#00254a] block font-mono", children: "1588-3024" }),
+                /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("p", { className: "text-[11px] text-[#737780]", children: "\uD3C9\uC77C 08:30 ~ 18:30 (\uD1A0\xB7\uACF5\uD734\uC77C \uC804\uBB38 \uB2F9\uC9C1 \uC5D4\uC9C0\uB2C8\uC5B4 \uB300\uAE30)" })
               ] })
             ] })
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "flex flex-col md:flex-row items-center justify-between gap-2 text-[11px] text-[#737780]", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("p", { children: "\xA9 2026 SsulDak Platform Care Inc. All rights reserved. \uB300\uD55C\uBBFC\uAD6D 1\uB4F1 \uAE30\uAD00\xB7\uAE30\uC5C5 \uC804\uC6A9 \uD074\uB9AC\uB2DD \uC194\uB8E8\uC158." }),
-            /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("p", { children: "\uBCF4\uC548 \uC5F0\uACB0: 256-bit SSL \uC554\uD638\uD654 | \uD074\uB9B0 \uB9C8\uC2A4\uD130 \uD30C\uD2B8\uB108\uC2A4 \uC5F0\uD569" })
+          /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "flex flex-col md:flex-row items-center justify-between gap-2 text-[11px] text-[#737780]", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("p", { children: "\xA9 2026 SsulDak Platform Care Inc. All rights reserved. \uB300\uD55C\uBBFC\uAD6D 1\uB4F1 \uAE30\uAD00\xB7\uAE30\uC5C5 \uC804\uC6A9 \uD074\uB9AC\uB2DD \uC194\uB8E8\uC158." }),
+            /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("p", { children: "\uBCF4\uC548 \uC5F0\uACB0: 256-bit SSL \uC554\uD638\uD654 | \uD074\uB9B0 \uB9C8\uC2A4\uD130 \uD30C\uD2B8\uB108\uC2A4 \uC5F0\uD569" })
           ] })
         ] }) })
-      ] }, "screen_user_req_04") : currentScreen === "USER-REQ-03" ? /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "relative min-h-screen bg-[#f8f9ff]", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("header", { className: "fixed top-0 w-full z-40 bg-white/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(22,59,102,0.04)] border-b border-[#e5eeff]", children: /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "h-16 max-w-7xl mx-auto px-6 lg:px-12 flex items-center justify-between gap-6", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "flex items-center gap-6", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)(
+      ] }, "screen_user_req_04") : currentScreen === "USER-REQ-03" ? /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "relative min-h-screen bg-[#f8f9ff]", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("header", { className: "fixed top-0 w-full z-40 bg-white/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(22,59,102,0.04)] border-b border-[#e5eeff]", children: /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "h-16 max-w-7xl mx-auto px-6 lg:px-12 flex items-center justify-between gap-6", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "flex items-center gap-6", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)(
               "a",
               {
                 className: "flex items-center gap-2 group cursor-pointer",
                 onClick: () => handleNavigate("USER-COM-00"),
                 children: [
-                  /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("div", { className: "w-9 h-9 rounded-lg bg-[#163b66] flex items-center justify-center text-white transition-transform group-hover:scale-95", children: /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "material-symbols-outlined text-[20px]", children: "verified_user" }) }),
-                  /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "flex flex-col", children: [
-                    /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "text-[17px] font-bold tracking-tight text-[#00254a] leading-none", children: "SsulDak" }),
-                    /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "text-[11px] text-[#006c4a] font-bold tracking-wider leading-tight", children: "\uC4F8\uACE0\uB2E6\uACE0 \uCF00\uC5B4" })
+                  /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("div", { className: "w-9 h-9 rounded-lg bg-[#163b66] flex items-center justify-center text-white transition-transform group-hover:scale-95", children: /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { className: "material-symbols-outlined text-[20px]", children: "verified_user" }) }),
+                  /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "flex flex-col", children: [
+                    /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { className: "text-[17px] font-bold tracking-tight text-[#00254a] leading-none", children: "SsulDak" }),
+                    /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { className: "text-[11px] text-[#006c4a] font-bold tracking-wider leading-tight", children: "\uC4F8\uACE0\uB2E6\uACE0 \uCF00\uC5B4" })
                   ] })
                 ]
               }
             ),
-            /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "hidden xl:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#eff4ff]", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "material-symbols-outlined text-[16px] text-[#737780]", children: "navigation" }),
-              /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "text-[13px] text-[#43474f]", children: "\uD648" }),
-              /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "material-symbols-outlined text-[14px] text-[#c3c6d0]", children: "chevron_right" }),
-              /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "text-[13px] text-[#43474f]", children: "\uACAC\uC801 \uC2E0\uCCAD" }),
-              /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "material-symbols-outlined text-[14px] text-[#c3c6d0]", children: "chevron_right" }),
-              /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "text-[11px] font-semibold text-[#163b66]", children: "\uCCAD\uC18C \uC11C\uBE44\uC2A4 \uD1B5\uD569 \uC2E0\uCCAD" }),
-              /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "px-1.5 py-0.5 rounded text-[10px] font-bold bg-[#d3e4fe] text-[#00254a] font-mono", children: "USER-REQ-00" })
+            /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "hidden xl:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#eff4ff]", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { className: "material-symbols-outlined text-[16px] text-[#737780]", children: "navigation" }),
+              /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { className: "text-[13px] text-[#43474f]", children: "\uD648" }),
+              /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { className: "material-symbols-outlined text-[14px] text-[#c3c6d0]", children: "chevron_right" }),
+              /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { className: "text-[13px] text-[#43474f]", children: "\uACAC\uC801 \uC2E0\uCCAD" }),
+              /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { className: "material-symbols-outlined text-[14px] text-[#c3c6d0]", children: "chevron_right" }),
+              /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { className: "text-[11px] font-semibold text-[#163b66]", children: "\uCCAD\uC18C \uC11C\uBE44\uC2A4 \uD1B5\uD569 \uC2E0\uCCAD" }),
+              /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { className: "px-1.5 py-0.5 rounded text-[10px] font-bold bg-[#d3e4fe] text-[#00254a] font-mono", children: "USER-REQ-00" })
             ] })
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "flex items-center gap-6", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("nav", { className: "hidden md:flex items-center gap-2", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
+          /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "flex items-center gap-6", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("nav", { className: "hidden md:flex items-center gap-2", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime42.jsx)(
                 "a",
                 {
                   className: "px-3 py-2 rounded-lg text-[13px] font-semibold text-[#43474f] hover:bg-[#eff4ff] hover:text-[#0b1c30] transition-colors cursor-pointer",
@@ -61936,7 +63258,7 @@ ${err.message}`);
                   children: "\uC11C\uBE44\uC2A4 \uC548\uB0B4"
                 }
               ),
-              /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
+              /* @__PURE__ */ (0, import_jsx_runtime42.jsx)(
                 "a",
                 {
                   className: "px-3 py-2 rounded-lg text-[13px] font-semibold text-[#43474f] hover:bg-[#eff4ff] hover:text-[#0b1c30] transition-colors cursor-pointer",
@@ -61944,7 +63266,7 @@ ${err.message}`);
                   children: "\uACAC\uC801 \uAC00\uC774\uB4DC"
                 }
               ),
-              /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
+              /* @__PURE__ */ (0, import_jsx_runtime42.jsx)(
                 "a",
                 {
                   className: "px-3 py-2 rounded-lg text-[13px] font-semibold text-[#43474f] hover:bg-[#eff4ff] hover:text-[#0b1c30] transition-colors cursor-pointer",
@@ -61953,64 +63275,64 @@ ${err.message}`);
                 }
               )
             ] }),
-            /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#82f5c1]/40 text-[#00714e]", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "w-2 h-2 rounded-full bg-[#006c4a] animate-pulse" }),
-              /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "text-[11px] font-bold tracking-tight", children: "\uC548\uC2EC \uBCF4\uC99D \uC2DC\uC2A4\uD15C \uAC00\uB3D9\uC911" })
+            /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#82f5c1]/40 text-[#00714e]", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { className: "w-2 h-2 rounded-full bg-[#006c4a] animate-pulse" }),
+              /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { className: "text-[11px] font-bold tracking-tight", children: "\uC548\uC2EC \uBCF4\uC99D \uC2DC\uC2A4\uD15C \uAC00\uB3D9\uC911" })
             ] }),
-            /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "flex items-center gap-2 pl-2", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
+            /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "flex items-center gap-2 pl-2", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime42.jsx)(
                 "button",
                 {
                   "aria-label": "\uC54C\uB9BC",
                   type: "button",
                   className: "w-9 h-9 rounded-full bg-[#eff4ff] flex items-center justify-center text-[#43474f] hover:bg-[#e5eeff] transition-colors",
-                  children: /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "material-symbols-outlined text-[20px]", children: "notifications" })
+                  children: /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { className: "material-symbols-outlined text-[20px]", children: "notifications" })
                 }
               ),
-              /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
+              /* @__PURE__ */ (0, import_jsx_runtime42.jsx)(
                 "a",
                 {
                   className: "w-8 h-8 rounded-full bg-[#00254a] flex items-center justify-center text-white cursor-pointer",
                   onClick: () => handleNavigate("USER-ATH-03"),
-                  children: /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "material-symbols-outlined text-[18px]", children: "person" })
+                  children: /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { className: "material-symbols-outlined text-[18px]", children: "person" })
                 }
               )
             ] })
           ] })
         ] }) }),
-        /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("main", { className: "w-full pt-16 bg-[#f8f9ff] min-h-[calc(100vh-64px)] relative", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "max-w-7xl mx-auto w-full px-6 lg:px-12 py-8 select-none pointer-events-none filter blur-[2px] opacity-40 transition-all duration-300", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "flex items-center justify-between pb-4 mb-6 border-b border-[#e5eeff]", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "space-y-1", children: [
-                /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#e5eeff] text-[#00254a] text-[11px] font-bold", children: [
-                  /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "material-symbols-outlined text-[15px]", children: "cleaning_services" }),
-                  /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { children: "\uC6D0\uC2A4\uD1B1 \uBC29\uBB38 \uACAC\uC801 \uC2E0\uCCAD\uC11C" })
+        /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("main", { className: "w-full pt-16 bg-[#f8f9ff] min-h-[calc(100vh-64px)] relative", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "max-w-7xl mx-auto w-full px-6 lg:px-12 py-8 select-none pointer-events-none filter blur-[2px] opacity-40 transition-all duration-300", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "flex items-center justify-between pb-4 mb-6 border-b border-[#e5eeff]", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "space-y-1", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#e5eeff] text-[#00254a] text-[11px] font-bold", children: [
+                  /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { className: "material-symbols-outlined text-[15px]", children: "cleaning_services" }),
+                  /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { children: "\uC6D0\uC2A4\uD1B1 \uBC29\uBB38 \uACAC\uC801 \uC2E0\uCCAD\uC11C" })
                 ] }),
-                /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("h1", { className: "text-[26px] font-extrabold text-[#00254a] tracking-tight", children: "\uC804\uBB38 \uD074\uB9AC\uB2DD \uB9DE\uCDA4 \uACAC\uC801 \uC758\uB8B0" }),
-                /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("p", { className: "text-[14px] text-[#43474f]", children: "\uC694\uCCAD \uC815\uBCF4\uB97C \uBC14\uD0D5\uC73C\uB85C \uAC80\uC99D\uB41C \uB9C8\uC2A4\uD130 \uC5D4\uC9C0\uB2C8\uC5B4\uAC00 1:1 \uBC29\uBB38 \uC2E4\uCE21\uC744 \uC9C4\uD589\uD569\uB2C8\uB2E4." })
+                /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("h1", { className: "text-[26px] font-extrabold text-[#00254a] tracking-tight", children: "\uC804\uBB38 \uD074\uB9AC\uB2DD \uB9DE\uCDA4 \uACAC\uC801 \uC758\uB8B0" }),
+                /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("p", { className: "text-[14px] text-[#43474f]", children: "\uC694\uCCAD \uC815\uBCF4\uB97C \uBC14\uD0D5\uC73C\uB85C \uAC80\uC99D\uB41C \uB9C8\uC2A4\uD130 \uC5D4\uC9C0\uB2C8\uC5B4\uAC00 1:1 \uBC29\uBB38 \uC2E4\uCE21\uC744 \uC9C4\uD589\uD569\uB2C8\uB2E4." })
               ] }),
-              /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "flex items-center gap-2 bg-[#eff4ff] px-4 py-2 rounded-xl border border-[#dce9ff]", children: [
-                /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("div", { className: "w-8 h-8 rounded-full bg-[#006c4a] text-white flex items-center justify-center text-[13px] font-bold", children: "01" }),
-                /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "flex flex-col", children: [
-                  /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "text-[11px] text-[#737780]", children: "\uC2E0\uCCAD \uB2E8\uACC4" }),
-                  /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "text-[13px] font-bold text-[#00254a]", children: "\uAE30\uBCF8 \uD604\uC7A5 \uC815\uBCF4 \uB4F1\uB85D" })
+              /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "flex items-center gap-2 bg-[#eff4ff] px-4 py-2 rounded-xl border border-[#dce9ff]", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("div", { className: "w-8 h-8 rounded-full bg-[#006c4a] text-white flex items-center justify-center text-[13px] font-bold", children: "01" }),
+                /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "flex flex-col", children: [
+                  /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { className: "text-[11px] text-[#737780]", children: "\uC2E0\uCCAD \uB2E8\uACC4" }),
+                  /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { className: "text-[13px] font-bold text-[#00254a]", children: "\uAE30\uBCF8 \uD604\uC7A5 \uC815\uBCF4 \uB4F1\uB85D" })
                 ] })
               ] })
             ] }),
-            /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "grid grid-cols-12 gap-6", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "col-span-8 space-y-6", children: [
-                /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "bg-white p-6 rounded-2xl shadow-sm space-y-4 border border-[#e5eeff]", children: [
-                  /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "flex items-center justify-between", children: [
-                    /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("h3", { className: "text-[17px] font-bold text-[#00254a] flex items-center gap-1.5", children: [
-                      /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "material-symbols-outlined text-[#006c4a]", children: "pin_drop" }),
+            /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "grid grid-cols-12 gap-6", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "col-span-8 space-y-6", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "bg-white p-6 rounded-2xl shadow-sm space-y-4 border border-[#e5eeff]", children: [
+                  /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "flex items-center justify-between", children: [
+                    /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("h3", { className: "text-[17px] font-bold text-[#00254a] flex items-center gap-1.5", children: [
+                      /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { className: "material-symbols-outlined text-[#006c4a]", children: "pin_drop" }),
                       "1. \uCCAD\uC18C \uB300\uC0C1\uC9C0 \uC704\uCE58 \uC785\uB825"
                     ] }),
-                    /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "text-[11px] text-[#ba1a1a] font-bold", children: "* \uD544\uC218 \uD56D\uBAA9" })
+                    /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { className: "text-[11px] text-[#ba1a1a] font-bold", children: "* \uD544\uC218 \uD56D\uBAA9" })
                   ] }),
-                  /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "space-y-2", children: [
-                    /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("label", { className: "text-[13px] font-bold text-[#0b1c30]", children: "\uAE30\uBCF8 \uC8FC\uC18C" }),
-                    /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "flex gap-2", children: [
-                      /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
+                  /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "space-y-2", children: [
+                    /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("label", { className: "text-[13px] font-bold text-[#0b1c30]", children: "\uAE30\uBCF8 \uC8FC\uC18C" }),
+                    /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "flex gap-2", children: [
+                      /* @__PURE__ */ (0, import_jsx_runtime42.jsx)(
                         "input",
                         {
                           className: "flex-1 px-4 py-3 bg-[#eff4ff] rounded-xl text-[14px] text-[#0b1c30]",
@@ -62019,7 +63341,7 @@ ${err.message}`);
                           value: "\uACBD\uAE30 \uACE0\uC591\uC2DC \uC77C\uC0B0\uB3D9\uAD6C \uC911\uC559\uB85C 1234"
                         }
                       ),
-                      /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
+                      /* @__PURE__ */ (0, import_jsx_runtime42.jsx)(
                         "button",
                         {
                           type: "button",
@@ -62028,7 +63350,7 @@ ${err.message}`);
                         }
                       )
                     ] }),
-                    /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
+                    /* @__PURE__ */ (0, import_jsx_runtime42.jsx)(
                       "input",
                       {
                         className: "w-full px-4 py-3 bg-[#eff4ff] rounded-xl text-[14px]",
@@ -62038,38 +63360,38 @@ ${err.message}`);
                     )
                   ] })
                 ] }),
-                /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "bg-white p-6 rounded-2xl shadow-sm space-y-4 border border-[#e5eeff]", children: [
-                  /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("h3", { className: "text-[17px] font-bold text-[#00254a] flex items-center gap-1.5", children: [
-                    /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "material-symbols-outlined text-[#006c4a]", children: "apartment" }),
+                /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "bg-white p-6 rounded-2xl shadow-sm space-y-4 border border-[#e5eeff]", children: [
+                  /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("h3", { className: "text-[17px] font-bold text-[#00254a] flex items-center gap-1.5", children: [
+                    /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { className: "material-symbols-outlined text-[#006c4a]", children: "apartment" }),
                     "2. \uACF5\uAC04 \uC720\uD615 \uBC0F \uD3C9\uC218"
                   ] }),
-                  /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "grid grid-cols-3 gap-4", children: [
-                    /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "p-4 rounded-xl bg-[#dce9ff] text-[#00254a] flex flex-col items-center gap-2", children: [
-                      /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "material-symbols-outlined text-[28px]", children: "home_work" }),
-                      /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "text-[13px] font-bold", children: "\uC624\uD53C\uC2A4/\uC0AC\uBB34\uACF5\uAC04" })
+                  /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "grid grid-cols-3 gap-4", children: [
+                    /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "p-4 rounded-xl bg-[#dce9ff] text-[#00254a] flex flex-col items-center gap-2", children: [
+                      /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { className: "material-symbols-outlined text-[28px]", children: "home_work" }),
+                      /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { className: "text-[13px] font-bold", children: "\uC624\uD53C\uC2A4/\uC0AC\uBB34\uACF5\uAC04" })
                     ] }),
-                    /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "p-4 rounded-xl bg-[#eff4ff] text-[#0b1c30] flex flex-col items-center gap-2", children: [
-                      /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "material-symbols-outlined text-[28px]", children: "storefront" }),
-                      /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "text-[13px] font-bold", children: "\uC0C1\uAC00/\uC1FC\uB8F8" })
+                    /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "p-4 rounded-xl bg-[#eff4ff] text-[#0b1c30] flex flex-col items-center gap-2", children: [
+                      /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { className: "material-symbols-outlined text-[28px]", children: "storefront" }),
+                      /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { className: "text-[13px] font-bold", children: "\uC0C1\uAC00/\uC1FC\uB8F8" })
                     ] }),
-                    /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "p-4 rounded-xl bg-[#eff4ff] text-[#0b1c30] flex flex-col items-center gap-2", children: [
-                      /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "material-symbols-outlined text-[28px]", children: "domain" }),
-                      /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "text-[13px] font-bold", children: "\uBE4C\uB529 \uC804\uCCB4/\uC2DC\uC124" })
+                    /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "p-4 rounded-xl bg-[#eff4ff] text-[#0b1c30] flex flex-col items-center gap-2", children: [
+                      /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { className: "material-symbols-outlined text-[28px]", children: "domain" }),
+                      /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { className: "text-[13px] font-bold", children: "\uBE4C\uB529 \uC804\uCCB4/\uC2DC\uC124" })
                     ] })
                   ] })
                 ] })
               ] }),
-              /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("div", { className: "col-span-4 space-y-4", children: /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "bg-white p-6 rounded-2xl shadow-sm space-y-4 border border-[#e5eeff]", children: [
-                /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("h4", { className: "text-[15px] font-bold text-[#00254a]", children: "\uC2E4\uC2DC\uAC04 \uC2E0\uCCAD \uC608\uC0C1 \uACAC\uC801" }),
-                /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "p-4 rounded-xl bg-[#eff4ff] flex justify-between items-center", children: [
-                  /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "text-[14px] text-[#43474f]", children: "\uAE30\uBCF8 \uD3C9\uC218 \uC815\uC0B0" }),
-                  /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "text-[17px] font-bold text-[#00254a]", children: "280,000\uC6D0" })
+              /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("div", { className: "col-span-4 space-y-4", children: /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "bg-white p-6 rounded-2xl shadow-sm space-y-4 border border-[#e5eeff]", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("h4", { className: "text-[15px] font-bold text-[#00254a]", children: "\uC2E4\uC2DC\uAC04 \uC2E0\uCCAD \uC608\uC0C1 \uACAC\uC801" }),
+                /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "p-4 rounded-xl bg-[#eff4ff] flex justify-between items-center", children: [
+                  /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { className: "text-[14px] text-[#43474f]", children: "\uAE30\uBCF8 \uD3C9\uC218 \uC815\uC0B0" }),
+                  /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { className: "text-[17px] font-bold text-[#00254a]", children: "280,000\uC6D0" })
                 ] }),
-                /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("div", { className: "w-full h-12 bg-[#00254a] rounded-xl flex items-center justify-center text-white text-[15px] font-bold", children: "\uACAC\uC801 \uC2E0\uCCAD\uC11C \uC81C\uCD9C\uD558\uAE30" })
+                /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("div", { className: "w-full h-12 bg-[#00254a] rounded-xl flex items-center justify-center text-white text-[15px] font-bold", children: "\uACAC\uC801 \uC2E0\uCCAD\uC11C \uC81C\uCD9C\uD558\uAE30" })
               ] }) })
             ] })
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
+          /* @__PURE__ */ (0, import_jsx_runtime42.jsx)(
             UserReq03Modal,
             {
               isOpen: true,
@@ -62092,64 +63414,64 @@ ${err.message}`);
             }
           )
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("footer", { className: "w-full bg-[#eff4ff] border-t border-[#dce9ff]/60 mt-12", children: /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "max-w-7xl mx-auto px-6 lg:px-12 py-10", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "grid grid-cols-1 md:grid-cols-12 gap-6 pb-6 mb-6 border-b border-[#dce9ff]/60", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "md:col-span-6 space-y-3", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "flex items-center gap-2", children: [
-                /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("div", { className: "w-8 h-8 rounded-lg bg-[#163b66] flex items-center justify-center text-white", children: /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "material-symbols-outlined text-[18px]", children: "sanitizer" }) }),
-                /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "text-[17px] font-bold text-[#00254a]", children: "(\uC8FC)\uC4F8\uACE0\uB2E6\uACE0 \uD50C\uB7AB\uD3FC \uCF00\uC5B4" })
+        /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("footer", { className: "w-full bg-[#eff4ff] border-t border-[#dce9ff]/60 mt-12", children: /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "max-w-7xl mx-auto px-6 lg:px-12 py-10", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "grid grid-cols-1 md:grid-cols-12 gap-6 pb-6 mb-6 border-b border-[#dce9ff]/60", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "md:col-span-6 space-y-3", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "flex items-center gap-2", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("div", { className: "w-8 h-8 rounded-lg bg-[#163b66] flex items-center justify-center text-white", children: /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { className: "material-symbols-outlined text-[18px]", children: "sanitizer" }) }),
+                /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { className: "text-[17px] font-bold text-[#00254a]", children: "(\uC8FC)\uC4F8\uACE0\uB2E6\uACE0 \uD50C\uB7AB\uD3FC \uCF00\uC5B4" })
               ] }),
-              /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "space-y-1 text-[13px] text-[#43474f]", children: [
-                /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("p", { children: "\uB300\uD45C\uC774\uC0AC: \uC815\uCF00\uC5B4 | \uC0AC\uC5C5\uC790\uB4F1\uB85D\uBC88\uD638: 214-88-02482 | \uD1B5\uC2E0\uD310\uB9E4\uC5C5\uC2E0\uACE0: \uC81C 2024-\uC11C\uC6B8\uAC15\uB0A8-1104\uD638" }),
-                /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("p", { children: "\uBCF8\uC0AC: \uC11C\uC6B8\uD2B9\uBCC4\uC2DC \uAC15\uB0A8\uAD6C \uD14C\uD5E4\uB780\uB85C 427 \uC704\uC6CC\uD06C\uD0C0\uC6CC 14\uCE35 \uC4F8\uACE0\uB2E6\uACE0 \uAD00\uC81C\uC13C\uD130" }),
-                /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("p", { children: "\uAC1C\uC778\uC815\uBCF4\uBCF4\uD638\uCC45\uC784\uC790: \uAE40\uC2E0\uB8B0 (privacy@ssuldak.co.kr) | \uD638\uC2A4\uD305\uC81C\uACF5\uC790: AWS Korea" })
+              /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "space-y-1 text-[13px] text-[#43474f]", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("p", { children: "\uB300\uD45C\uC774\uC0AC: \uC815\uCF00\uC5B4 | \uC0AC\uC5C5\uC790\uB4F1\uB85D\uBC88\uD638: 214-88-02482 | \uD1B5\uC2E0\uD310\uB9E4\uC5C5\uC2E0\uACE0: \uC81C 2024-\uC11C\uC6B8\uAC15\uB0A8-1104\uD638" }),
+                /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("p", { children: "\uBCF8\uC0AC: \uC11C\uC6B8\uD2B9\uBCC4\uC2DC \uAC15\uB0A8\uAD6C \uD14C\uD5E4\uB780\uB85C 427 \uC704\uC6CC\uD06C\uD0C0\uC6CC 14\uCE35 \uC4F8\uACE0\uB2E6\uACE0 \uAD00\uC81C\uC13C\uD130" }),
+                /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("p", { children: "\uAC1C\uC778\uC815\uBCF4\uBCF4\uD638\uCC45\uC784\uC790: \uAE40\uC2E0\uB8B0 (privacy@ssuldak.co.kr) | \uD638\uC2A4\uD305\uC81C\uACF5\uC790: AWS Korea" })
               ] })
             ] }),
-            /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "md:col-span-3 space-y-2", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("h4", { className: "text-[15px] font-bold text-[#00254a]", children: "\uC57D\uAD00 \uBC0F \uC815\uCC45" }),
-              /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("ul", { className: "space-y-1 text-[13px] text-[#43474f]", children: [
-                /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("li", { children: /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("a", { className: "hover:text-[#00254a] cursor-pointer", children: "\uC11C\uBE44\uC2A4 \uC774\uC6A9\uC57D\uAD00" }) }),
-                /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("li", { children: /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("a", { className: "hover:text-[#00254a] font-bold text-[#00254a] cursor-pointer", children: "\uAC1C\uC778\uC815\uBCF4\uCC98\uB9AC\uBC29\uCE68" }) }),
-                /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("li", { children: /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("a", { className: "hover:text-[#00254a] cursor-pointer", children: "\uC791\uC5C5 \uACB0\uACFC 100% \uC548\uC2EC\uBCF4\uC99D \uADDC\uC815" }) })
+            /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "md:col-span-3 space-y-2", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("h4", { className: "text-[15px] font-bold text-[#00254a]", children: "\uC57D\uAD00 \uBC0F \uC815\uCC45" }),
+              /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("ul", { className: "space-y-1 text-[13px] text-[#43474f]", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("li", { children: /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("a", { className: "hover:text-[#00254a] cursor-pointer", children: "\uC11C\uBE44\uC2A4 \uC774\uC6A9\uC57D\uAD00" }) }),
+                /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("li", { children: /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("a", { className: "hover:text-[#00254a] font-bold text-[#00254a] cursor-pointer", children: "\uAC1C\uC778\uC815\uBCF4\uCC98\uB9AC\uBC29\uCE68" }) }),
+                /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("li", { children: /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("a", { className: "hover:text-[#00254a] cursor-pointer", children: "\uC791\uC5C5 \uACB0\uACFC 100% \uC548\uC2EC\uBCF4\uC99D \uADDC\uC815" }) })
               ] })
             ] }),
-            /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "md:col-span-3 space-y-2", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("h4", { className: "text-[15px] font-bold text-[#00254a]", children: "\uACE0\uAC1D \uC2E0\uB8B0 \uC13C\uD130" }),
-              /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "p-3 bg-white rounded-xl shadow-2xs border border-[#e5eeff]", children: [
-                /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "text-[28px] font-extrabold text-[#00254a] block font-mono", children: "1588-3024" }),
-                /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("p", { className: "text-[11px] text-[#737780]", children: "\uD3C9\uC77C 08:30 ~ 18:30 (\uD1A0\xB7\uACF5\uD734\uC77C \uC804\uBB38 \uB2F9\uC9C1 \uC5D4\uC9C0\uB2C8\uC5B4 \uB300\uAE30)" })
+            /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "md:col-span-3 space-y-2", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("h4", { className: "text-[15px] font-bold text-[#00254a]", children: "\uACE0\uAC1D \uC2E0\uB8B0 \uC13C\uD130" }),
+              /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "p-3 bg-white rounded-xl shadow-2xs border border-[#e5eeff]", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { className: "text-[28px] font-extrabold text-[#00254a] block font-mono", children: "1588-3024" }),
+                /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("p", { className: "text-[11px] text-[#737780]", children: "\uD3C9\uC77C 08:30 ~ 18:30 (\uD1A0\xB7\uACF5\uD734\uC77C \uC804\uBB38 \uB2F9\uC9C1 \uC5D4\uC9C0\uB2C8\uC5B4 \uB300\uAE30)" })
               ] })
             ] })
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "flex flex-col md:flex-row items-center justify-between gap-2 text-[11px] text-[#737780]", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("p", { children: "\xA9 2026 SsulDak Platform Care Inc. All rights reserved. \uB300\uD55C\uBBFC\uAD6D 1\uB4F1 \uAE30\uAD00\xB7\uAE30\uC5C5 \uC804\uC6A9 \uD074\uB9AC\uB2DD \uC194\uB8E8\uC158." }),
-            /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("p", { children: "\uBCF4\uC548 \uC5F0\uACB0: 256-bit SSL \uC554\uD638\uD654 | \uD074\uB9B0 \uB9C8\uC2A4\uD130 \uD30C\uD2B8\uB108\uC2A4 \uC5F0\uD569" })
+          /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "flex flex-col md:flex-row items-center justify-between gap-2 text-[11px] text-[#737780]", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("p", { children: "\xA9 2026 SsulDak Platform Care Inc. All rights reserved. \uB300\uD55C\uBBFC\uAD6D 1\uB4F1 \uAE30\uAD00\xB7\uAE30\uC5C5 \uC804\uC6A9 \uD074\uB9AC\uB2DD \uC194\uB8E8\uC158." }),
+            /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("p", { children: "\uBCF4\uC548 \uC5F0\uACB0: 256-bit SSL \uC554\uD638\uD654 | \uD074\uB9B0 \uB9C8\uC2A4\uD130 \uD30C\uD2B8\uB108\uC2A4 \uC5F0\uD569" })
           ] })
         ] }) })
-      ] }, "screen_user_req_03") : currentScreen === "USER-REQ-02" ? /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "relative min-h-screen bg-[#f8f9ff]", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("header", { className: "fixed top-0 left-0 right-0 z-40 bg-white/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(22,59,102,0.06)] border-b border-[#e5eeff]", children: /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "h-16 max-w-[1280px] mx-auto px-6 lg:px-12 flex items-center justify-between gap-6", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "flex items-center gap-8", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)(
+      ] }, "screen_user_req_03") : currentScreen === "USER-REQ-02" ? /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "relative min-h-screen bg-[#f8f9ff]", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("header", { className: "fixed top-0 left-0 right-0 z-40 bg-white/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(22,59,102,0.06)] border-b border-[#e5eeff]", children: /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "h-16 max-w-[1280px] mx-auto px-6 lg:px-12 flex items-center justify-between gap-6", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "flex items-center gap-8", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)(
               "a",
               {
                 className: "flex items-center gap-2 cursor-pointer",
                 onClick: () => handleNavigate("USER-COM-00"),
                 children: [
-                  /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("div", { className: "w-9 h-9 rounded-xl bg-[#00254a] flex items-center justify-center text-white shadow-sm", children: /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "material-symbols-outlined text-[22px]", children: "cleaning_services" }) }),
-                  /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "flex flex-col", children: [
-                    /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "text-[17px] font-bold text-[#00254a] tracking-tight", children: "\uC4F8\uACE0\uB2E6\uACE0" }),
-                    /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "text-[11px] text-[#43474f] uppercase tracking-wider", children: "SsulDak Enterprise" })
+                  /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("div", { className: "w-9 h-9 rounded-xl bg-[#00254a] flex items-center justify-center text-white shadow-sm", children: /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { className: "material-symbols-outlined text-[22px]", children: "cleaning_services" }) }),
+                  /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "flex flex-col", children: [
+                    /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { className: "text-[17px] font-bold text-[#00254a] tracking-tight", children: "\uC4F8\uACE0\uB2E6\uACE0" }),
+                    /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { className: "text-[11px] text-[#43474f] uppercase tracking-wider", children: "SsulDak Enterprise" })
                   ] })
                 ]
               }
             ),
-            /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "hidden xl:flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#85f8c4]/50 text-[#002114] text-[11px] font-bold", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "w-2 h-2 rounded-full bg-[#006c4a] animate-pulse" }),
-              /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { children: "\uC2E4\uC2DC\uAC04 \uB9C8\uC2A4\uD130 \uD30C\uD2B8\uB108 \uC785\uCC30 \uB300\uAE30\uC911" })
+            /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "hidden xl:flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#85f8c4]/50 text-[#002114] text-[11px] font-bold", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { className: "w-2 h-2 rounded-full bg-[#006c4a] animate-pulse" }),
+              /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { children: "\uC2E4\uC2DC\uAC04 \uB9C8\uC2A4\uD130 \uD30C\uD2B8\uB108 \uC785\uCC30 \uB300\uAE30\uC911" })
             ] })
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("nav", { className: "hidden md:flex items-center gap-8", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
+          /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("nav", { className: "hidden md:flex items-center gap-8", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime42.jsx)(
               "a",
               {
                 className: "text-[15px] font-semibold text-[#43474f] hover:text-[#0b1c30] transition-colors cursor-pointer",
@@ -62157,7 +63479,7 @@ ${err.message}`);
                 children: "\uC11C\uBE44\uC2A4 \uC548\uB0B4"
               }
             ),
-            /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
+            /* @__PURE__ */ (0, import_jsx_runtime42.jsx)(
               "a",
               {
                 className: "text-[15px] font-semibold text-[#43474f] hover:text-[#0b1c30] transition-colors cursor-pointer",
@@ -62165,7 +63487,7 @@ ${err.message}`);
                 children: "\uACAC\uC801 \uAC00\uC774\uB4DC"
               }
             ),
-            /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
+            /* @__PURE__ */ (0, import_jsx_runtime42.jsx)(
               "a",
               {
                 className: "text-[15px] font-semibold text-[#43474f] hover:text-[#0b1c30] transition-colors cursor-pointer",
@@ -62174,8 +63496,8 @@ ${err.message}`);
               }
             )
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "flex items-center gap-4", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
+          /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "flex items-center gap-4", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime42.jsx)(
               "button",
               {
                 type: "button",
@@ -62184,71 +63506,71 @@ ${err.message}`);
                 children: "\uACAC\uC801 \uC2E0\uCCAD\uD558\uAE30"
               }
             ),
-            /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
+            /* @__PURE__ */ (0, import_jsx_runtime42.jsx)(
               "div",
               {
                 onClick: () => handleNavigate("USER-ATH-03"),
                 className: "w-8 h-8 rounded-full bg-[#00254a] flex items-center justify-center cursor-pointer shadow-sm text-white",
-                children: /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "material-symbols-outlined text-[18px]", children: "person" })
+                children: /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { className: "material-symbols-outlined text-[18px]", children: "person" })
               }
             )
           ] })
         ] }) }),
-        /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("main", { className: "w-full pt-16 bg-[#f8f9ff] relative min-h-screen", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "w-full max-w-[1280px] mx-auto px-6 lg:px-12 py-6 select-none opacity-40 blur-[2px] pointer-events-none", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "flex items-center justify-between pb-4", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "flex items-center gap-1.5 text-[#43474f] text-[13px]", children: [
-                /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { children: "\uD648" }),
-                /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "material-symbols-outlined text-[16px]", children: "chevron_right" }),
-                /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { children: "\uC2A4\uB9C8\uD2B8 \uACAC\uC801 \uC2E0\uCCAD" }),
-                /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "material-symbols-outlined text-[16px]", children: "chevron_right" }),
-                /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "text-[#00254a] font-bold", children: "\uACF5\uAC04 \uBC0F \uAC00\uC804 \uCF00\uC5B4 \uACAC\uC801\uC11C" })
+        /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("main", { className: "w-full pt-16 bg-[#f8f9ff] relative min-h-screen", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "w-full max-w-[1280px] mx-auto px-6 lg:px-12 py-6 select-none opacity-40 blur-[2px] pointer-events-none", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "flex items-center justify-between pb-4", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "flex items-center gap-1.5 text-[#43474f] text-[13px]", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { children: "\uD648" }),
+                /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { className: "material-symbols-outlined text-[16px]", children: "chevron_right" }),
+                /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { children: "\uC2A4\uB9C8\uD2B8 \uACAC\uC801 \uC2E0\uCCAD" }),
+                /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { className: "material-symbols-outlined text-[16px]", children: "chevron_right" }),
+                /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { className: "text-[#00254a] font-bold", children: "\uACF5\uAC04 \uBC0F \uAC00\uC804 \uCF00\uC5B4 \uACAC\uC801\uC11C" })
               ] }),
-              /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "flex items-center gap-2 px-3 py-1 bg-[#dce9ff] rounded-full", children: [
-                /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "w-2 h-2 rounded-full bg-[#006c4a]" }),
-                /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "text-[11px] font-bold text-[#254873]", children: "\uC791\uC131 \uB2E8\uACC4: 02/04 \uC635\uC158 \uC120\uD0DD" })
+              /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "flex items-center gap-2 px-3 py-1 bg-[#dce9ff] rounded-full", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { className: "w-2 h-2 rounded-full bg-[#006c4a]" }),
+                /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { className: "text-[11px] font-bold text-[#254873]", children: "\uC791\uC131 \uB2E8\uACC4: 02/04 \uC635\uC158 \uC120\uD0DD" })
               ] })
             ] }),
-            /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "grid grid-cols-12 gap-6", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "col-span-8 flex flex-col gap-6", children: [
-                /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "bg-white rounded-2xl p-6 shadow-sm border border-[#e5eeff]", children: [
-                  /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "flex items-center justify-between pb-3 border-b border-[#eff4ff]", children: [
-                    /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("h2", { className: "text-[20px] font-bold text-[#00254a]", children: "1. \uAE30\uBCF8 \uACF5\uAC04 \uC704\uC0DD \uC815\uBCF4" }),
-                    /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "text-[11px] font-bold text-[#006c4a]", children: "\uC791\uC131 \uC644\uB8CC" })
+            /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "grid grid-cols-12 gap-6", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "col-span-8 flex flex-col gap-6", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "bg-white rounded-2xl p-6 shadow-sm border border-[#e5eeff]", children: [
+                  /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "flex items-center justify-between pb-3 border-b border-[#eff4ff]", children: [
+                    /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("h2", { className: "text-[20px] font-bold text-[#00254a]", children: "1. \uAE30\uBCF8 \uACF5\uAC04 \uC704\uC0DD \uC815\uBCF4" }),
+                    /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { className: "text-[11px] font-bold text-[#006c4a]", children: "\uC791\uC131 \uC644\uB8CC" })
                   ] }),
-                  /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "grid grid-cols-3 gap-4 pt-3", children: [
-                    /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "bg-[#eff4ff] p-3 rounded-xl", children: [
-                      /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "text-[11px] text-[#43474f] block font-bold", children: "\uAC74\uBB3C \uC720\uD615" }),
-                      /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("p", { className: "text-[17px] font-bold text-[#00254a]", children: "\uC0AC\uBB34\uC2E4 / \uBCF5\uD569\uACF5\uAC04" })
+                  /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "grid grid-cols-3 gap-4 pt-3", children: [
+                    /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "bg-[#eff4ff] p-3 rounded-xl", children: [
+                      /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { className: "text-[11px] text-[#43474f] block font-bold", children: "\uAC74\uBB3C \uC720\uD615" }),
+                      /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("p", { className: "text-[17px] font-bold text-[#00254a]", children: "\uC0AC\uBB34\uC2E4 / \uBCF5\uD569\uACF5\uAC04" })
                     ] }),
-                    /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "bg-[#eff4ff] p-3 rounded-xl", children: [
-                      /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "text-[11px] text-[#43474f] block font-bold", children: "\uC804\uC6A9 \uBA74\uC801" }),
-                      /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("p", { className: "text-[17px] font-bold text-[#00254a]", children: "132.2\u33A1 (40\uD3C9)" })
+                    /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "bg-[#eff4ff] p-3 rounded-xl", children: [
+                      /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { className: "text-[11px] text-[#43474f] block font-bold", children: "\uC804\uC6A9 \uBA74\uC801" }),
+                      /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("p", { className: "text-[17px] font-bold text-[#00254a]", children: "132.2\u33A1 (40\uD3C9)" })
                     ] }),
-                    /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "bg-[#eff4ff] p-3 rounded-xl", children: [
-                      /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "text-[11px] text-[#43474f] block font-bold", children: "\uD76C\uB9DD \uC791\uC5C5\uC77C" }),
-                      /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("p", { className: "text-[17px] font-bold text-[#00254a]", children: "2026.11.20 (\uC218)" })
+                    /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "bg-[#eff4ff] p-3 rounded-xl", children: [
+                      /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { className: "text-[11px] text-[#43474f] block font-bold", children: "\uD76C\uB9DD \uC791\uC5C5\uC77C" }),
+                      /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("p", { className: "text-[17px] font-bold text-[#00254a]", children: "2026.11.20 (\uC218)" })
                     ] })
                   ] })
                 ] }),
-                /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "bg-white rounded-2xl p-6 shadow-sm border border-[#e5eeff]", children: [
-                  /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "flex items-center justify-between pb-3 border-b border-[#eff4ff]", children: [
-                    /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("h2", { className: "text-[20px] font-bold text-[#00254a]", children: "2. \uC804\uBB38 \uAC00\uC804 \uBD84\uD574 \uC0B4\uADE0 \uC138\uCC99" }),
-                    /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "text-[11px] font-bold text-[#00254a]", children: "\uC785\uCC30 \uCD5C\uC801\uD654 \uD56D\uBAA9" })
+                /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "bg-white rounded-2xl p-6 shadow-sm border border-[#e5eeff]", children: [
+                  /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "flex items-center justify-between pb-3 border-b border-[#eff4ff]", children: [
+                    /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("h2", { className: "text-[20px] font-bold text-[#00254a]", children: "2. \uC804\uBB38 \uAC00\uC804 \uBD84\uD574 \uC0B4\uADE0 \uC138\uCC99" }),
+                    /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { className: "text-[11px] font-bold text-[#00254a]", children: "\uC785\uCC30 \uCD5C\uC801\uD654 \uD56D\uBAA9" })
                   ] }),
-                  /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("div", { className: "p-6 bg-[#eff4ff] rounded-xl flex items-center justify-center text-[#43474f] text-[13px]", children: /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { children: "+ \uAC00\uC804 \uD488\uBAA9\uC744 \uCD94\uAC00\uD558\uBA74 \uB9C8\uC2A4\uD130\uC758 \uC815\uBC00 \uC7A5\uBE44\uAC00 \uBC30\uCC28\uB429\uB2C8\uB2E4." }) })
+                  /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("div", { className: "p-6 bg-[#eff4ff] rounded-xl flex items-center justify-center text-[#43474f] text-[13px]", children: /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { children: "+ \uAC00\uC804 \uD488\uBAA9\uC744 \uCD94\uAC00\uD558\uBA74 \uB9C8\uC2A4\uD130\uC758 \uC815\uBC00 \uC7A5\uBE44\uAC00 \uBC30\uCC28\uB429\uB2C8\uB2E4." }) })
                 ] })
               ] }),
-              /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("div", { className: "col-span-4 flex flex-col gap-4", children: /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "bg-white rounded-2xl p-6 shadow-sm border border-[#e5eeff]", children: [
-                /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("h3", { className: "text-[17px] font-bold text-[#00254a] pb-2", children: "\uC2E4\uC2DC\uAC04 \uCD94\uC815 \uACAC\uC801" }),
-                /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "text-[32px] font-extrabold text-[#00254a] tracking-tight font-mono", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("div", { className: "col-span-4 flex flex-col gap-4", children: /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "bg-white rounded-2xl p-6 shadow-sm border border-[#e5eeff]", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("h3", { className: "text-[17px] font-bold text-[#00254a] pb-2", children: "\uC2E4\uC2DC\uAC04 \uCD94\uC815 \uACAC\uC801" }),
+                /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "text-[32px] font-extrabold text-[#00254a] tracking-tight font-mono", children: [
                   "380,000",
-                  /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "text-[14px] ml-1 font-normal", children: "\uC6D0" })
+                  /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { className: "text-[14px] ml-1 font-normal", children: "\uC6D0" })
                 ] })
               ] }) })
             ] })
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
+          /* @__PURE__ */ (0, import_jsx_runtime42.jsx)(
             UserReq02Modal,
             {
               isOpen: true,
@@ -62269,53 +63591,53 @@ ${err.message}`);
             }
           )
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("footer", { className: "w-full bg-[#eff4ff] border-t border-[#dce9ff]/60", children: /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("div", { className: "max-w-[1280px] mx-auto px-6 lg:px-12 py-10 flex flex-col gap-6", children: /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "flex flex-col gap-1", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "flex items-center gap-2", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "text-[17px] font-bold text-[#00254a]", children: "SsulDak Care Platform" }),
-              /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "px-2 py-0.5 rounded bg-[#dce9ff] text-[#254873] text-[11px] font-bold", children: "B2B & Premium Care" })
+        /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("footer", { className: "w-full bg-[#eff4ff] border-t border-[#dce9ff]/60", children: /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("div", { className: "max-w-[1280px] mx-auto px-6 lg:px-12 py-10 flex flex-col gap-6", children: /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "flex flex-col gap-1", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "flex items-center gap-2", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { className: "text-[17px] font-bold text-[#00254a]", children: "SsulDak Care Platform" }),
+              /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { className: "px-2 py-0.5 rounded bg-[#dce9ff] text-[#254873] text-[11px] font-bold", children: "B2B & Premium Care" })
             ] }),
-            /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("p", { className: "text-[13px] text-[#43474f] max-w-xl", children: "\uC4F8\uACE0\uB2E6\uACE0\uB294 \uACF5\uACF5\uAE30\uAD00, \uC0C1\uC5C5 \uC2DC\uC124, \uD504\uB9AC\uBBF8\uC5C4 \uC8FC\uAC70 \uD658\uACBD\uC744 \uC704\uD55C \uC804\uBB38 \uBC29\uC5ED\xB7\uC18C\uB3C5 \uBC0F \uC885\uD569 \uACF5\uAC04 \uC704\uC0DD \uCF00\uC5B4 \uD1B5\uD569 \uAD00\uC81C \uC194\uB8E8\uC158\uC785\uB2C8\uB2E4." })
+            /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("p", { className: "text-[13px] text-[#43474f] max-w-xl", children: "\uC4F8\uACE0\uB2E6\uACE0\uB294 \uACF5\uACF5\uAE30\uAD00, \uC0C1\uC5C5 \uC2DC\uC124, \uD504\uB9AC\uBBF8\uC5C4 \uC8FC\uAC70 \uD658\uACBD\uC744 \uC704\uD55C \uC804\uBB38 \uBC29\uC5ED\xB7\uC18C\uB3C5 \uBC0F \uC885\uD569 \uACF5\uAC04 \uC704\uC0DD \uCF00\uC5B4 \uD1B5\uD569 \uAD00\uC81C \uC194\uB8E8\uC158\uC785\uB2C8\uB2E4." })
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "flex flex-col sm:flex-row items-start sm:items-center gap-6", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "flex flex-col", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "text-[11px] text-[#43474f]", children: "\uACE0\uAC1D \uCF00\uC5B4 \uC885\uD569 \uAD00\uC81C \uC13C\uD130" }),
-              /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "text-[20px] font-bold text-[#00254a] tracking-tight", children: "1588-3024" }),
-              /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "text-[11px] text-[#737780]", children: "365\uC77C 24\uC2DC\uAC04 \uC5F0\uC911\uBB34\uD734 \uAE34\uAE09\uBC30\uCC28" })
+          /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "flex flex-col sm:flex-row items-start sm:items-center gap-6", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "flex flex-col", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { className: "text-[11px] text-[#43474f]", children: "\uACE0\uAC1D \uCF00\uC5B4 \uC885\uD569 \uAD00\uC81C \uC13C\uD130" }),
+              /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { className: "text-[20px] font-bold text-[#00254a] tracking-tight", children: "1588-3024" }),
+              /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { className: "text-[11px] text-[#737780]", children: "365\uC77C 24\uC2DC\uAC04 \uC5F0\uC911\uBB34\uD734 \uAE34\uAE09\uBC30\uCC28" })
             ] }),
-            /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white shadow-sm border border-[#e5eeff]", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "material-symbols-outlined text-[#006c4a] text-[24px]", children: "verified_user" }),
-              /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "flex flex-col", children: [
-                /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "text-[11px] text-[#0b1c30] font-bold", children: "KB\uC190\uD574\uBCF4\uD5D8 5\uC5B5\uC6D0" }),
-                /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "text-[11px] text-[#43474f]", children: "\uC601\uC5C5\uBC30\uC0C1\uCC45\uC784\uBCF4\uD5D8 \uAC00\uC785" })
+            /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white shadow-sm border border-[#e5eeff]", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { className: "material-symbols-outlined text-[#006c4a] text-[24px]", children: "verified_user" }),
+              /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "flex flex-col", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { className: "text-[11px] text-[#0b1c30] font-bold", children: "KB\uC190\uD574\uBCF4\uD5D8 5\uC5B5\uC6D0" }),
+                /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { className: "text-[11px] text-[#43474f]", children: "\uC601\uC5C5\uBC30\uC0C1\uCC45\uC784\uBCF4\uD5D8 \uAC00\uC785" })
               ] })
             ] })
           ] })
         ] }) }) })
-      ] }, "screen_user_req_02") : currentScreen === "USER-REQ-01" ? /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "relative min-h-screen bg-[#f8f9ff]", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("header", { className: "fixed top-0 left-0 right-0 z-40 bg-white/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(22,59,102,0.06)] border-b border-[#e5eeff]", children: /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "h-16 max-w-[1280px] mx-auto px-6 lg:px-12 flex items-center justify-between gap-6", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "flex items-center gap-8", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)(
+      ] }, "screen_user_req_02") : currentScreen === "USER-REQ-01" ? /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "relative min-h-screen bg-[#f8f9ff]", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("header", { className: "fixed top-0 left-0 right-0 z-40 bg-white/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(22,59,102,0.06)] border-b border-[#e5eeff]", children: /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "h-16 max-w-[1280px] mx-auto px-6 lg:px-12 flex items-center justify-between gap-6", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "flex items-center gap-8", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)(
               "a",
               {
                 className: "flex items-center gap-2 cursor-pointer",
                 onClick: () => handleNavigate("USER-COM-00"),
                 children: [
-                  /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("div", { className: "w-9 h-9 rounded-xl bg-[#00254a] flex items-center justify-center text-white shadow-sm", children: /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "material-symbols-outlined text-[22px]", children: "cleaning_services" }) }),
-                  /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "flex flex-col", children: [
-                    /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "text-[17px] font-bold text-[#00254a] tracking-tight", children: "\uC4F8\uACE0\uB2E6\uACE0" }),
-                    /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "text-[11px] text-[#43474f] uppercase tracking-wider", children: "SsulDak Enterprise" })
+                  /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("div", { className: "w-9 h-9 rounded-xl bg-[#00254a] flex items-center justify-center text-white shadow-sm", children: /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { className: "material-symbols-outlined text-[22px]", children: "cleaning_services" }) }),
+                  /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "flex flex-col", children: [
+                    /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { className: "text-[17px] font-bold text-[#00254a] tracking-tight", children: "\uC4F8\uACE0\uB2E6\uACE0" }),
+                    /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { className: "text-[11px] text-[#43474f] uppercase tracking-wider", children: "SsulDak Enterprise" })
                   ] })
                 ]
               }
             ),
-            /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "hidden xl:flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#85f8c4]/50 text-[#002114] text-[11px] font-bold", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "w-2 h-2 rounded-full bg-[#006c4a] animate-pulse" }),
-              /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { children: "\uC2E4\uC2DC\uAC04 \uB9C8\uC2A4\uD130 \uD30C\uD2B8\uB108 \uC785\uCC30 \uB300\uAE30\uC911" })
+            /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "hidden xl:flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#85f8c4]/50 text-[#002114] text-[11px] font-bold", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { className: "w-2 h-2 rounded-full bg-[#006c4a] animate-pulse" }),
+              /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { children: "\uC2E4\uC2DC\uAC04 \uB9C8\uC2A4\uD130 \uD30C\uD2B8\uB108 \uC785\uCC30 \uB300\uAE30\uC911" })
             ] })
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("nav", { className: "hidden md:flex items-center gap-8", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
+          /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("nav", { className: "hidden md:flex items-center gap-8", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime42.jsx)(
               "a",
               {
                 className: "text-[15px] font-semibold text-[#43474f] hover:text-[#0b1c30] transition-colors cursor-pointer",
@@ -62323,7 +63645,7 @@ ${err.message}`);
                 children: "\uC11C\uBE44\uC2A4 \uC548\uB0B4"
               }
             ),
-            /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
+            /* @__PURE__ */ (0, import_jsx_runtime42.jsx)(
               "a",
               {
                 className: "text-[15px] font-semibold text-[#43474f] hover:text-[#0b1c30] transition-colors cursor-pointer",
@@ -62331,7 +63653,7 @@ ${err.message}`);
                 children: "\uACAC\uC801 \uAC00\uC774\uB4DC"
               }
             ),
-            /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
+            /* @__PURE__ */ (0, import_jsx_runtime42.jsx)(
               "a",
               {
                 className: "text-[15px] font-semibold text-[#43474f] hover:text-[#0b1c30] transition-colors cursor-pointer",
@@ -62340,8 +63662,8 @@ ${err.message}`);
               }
             )
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "flex items-center gap-4", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
+          /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "flex items-center gap-4", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime42.jsx)(
               "button",
               {
                 type: "button",
@@ -62350,87 +63672,87 @@ ${err.message}`);
                 children: "\uACAC\uC801 \uC2E0\uCCAD\uD558\uAE30"
               }
             ),
-            /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
+            /* @__PURE__ */ (0, import_jsx_runtime42.jsx)(
               "div",
               {
                 onClick: () => handleNavigate("USER-ATH-03"),
                 className: "w-8 h-8 rounded-full bg-[#00254a] flex items-center justify-center cursor-pointer shadow-sm text-white",
-                children: /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "material-symbols-outlined text-[18px]", children: "person" })
+                children: /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { className: "material-symbols-outlined text-[18px]", children: "person" })
               }
             )
           ] })
         ] }) }),
-        /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("main", { className: "w-full pt-16 bg-[#f8f9ff] relative min-h-screen", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "w-full max-w-[1280px] mx-auto px-6 lg:px-12 py-8 opacity-40 select-none pointer-events-none filter blur-[1.5px]", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "flex items-center justify-between pb-6 mb-6 border-b border-[#e5eeff]", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "flex items-center gap-2", children: [
-                /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "w-7 h-7 rounded-full bg-[#00254a] text-white flex items-center justify-center text-[12px] font-bold", children: "01" }),
-                /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "text-[17px] text-[#00254a] font-bold", children: "\uAC74\uBB3C \uBC0F \uAD6C\uC5ED \uC9C0\uC815" }),
-                /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "material-symbols-outlined text-[#737780]", children: "chevron_right" }),
-                /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "w-7 h-7 rounded-full bg-[#dce9ff] text-[#43474f] flex items-center justify-center text-[12px] font-bold", children: "02" }),
-                /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "text-[17px] text-[#43474f]", children: "\uC815\uAE30 \uACFC\uC5C5 \uC0C1\uC138" }),
-                /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "material-symbols-outlined text-[#737780]", children: "chevron_right" }),
-                /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "w-7 h-7 rounded-full bg-[#dce9ff] text-[#43474f] flex items-center justify-center text-[12px] font-bold", children: "03" }),
-                /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "text-[17px] text-[#43474f]", children: "\uC785\uCC30 \uACF5\uACE0 \uAC8C\uC2DC" })
+        /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("main", { className: "w-full pt-16 bg-[#f8f9ff] relative min-h-screen", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "w-full max-w-[1280px] mx-auto px-6 lg:px-12 py-8 opacity-40 select-none pointer-events-none filter blur-[1.5px]", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "flex items-center justify-between pb-6 mb-6 border-b border-[#e5eeff]", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "flex items-center gap-2", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { className: "w-7 h-7 rounded-full bg-[#00254a] text-white flex items-center justify-center text-[12px] font-bold", children: "01" }),
+                /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { className: "text-[17px] text-[#00254a] font-bold", children: "\uAC74\uBB3C \uBC0F \uAD6C\uC5ED \uC9C0\uC815" }),
+                /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { className: "material-symbols-outlined text-[#737780]", children: "chevron_right" }),
+                /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { className: "w-7 h-7 rounded-full bg-[#dce9ff] text-[#43474f] flex items-center justify-center text-[12px] font-bold", children: "02" }),
+                /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { className: "text-[17px] text-[#43474f]", children: "\uC815\uAE30 \uACFC\uC5C5 \uC0C1\uC138" }),
+                /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { className: "material-symbols-outlined text-[#737780]", children: "chevron_right" }),
+                /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { className: "w-7 h-7 rounded-full bg-[#dce9ff] text-[#43474f] flex items-center justify-center text-[12px] font-bold", children: "03" }),
+                /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { className: "text-[17px] text-[#43474f]", children: "\uC785\uCC30 \uACF5\uACE0 \uAC8C\uC2DC" })
               ] }),
-              /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "flex items-center gap-2 text-[#43474f] text-[13px]", children: [
-                /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "w-2.5 h-2.5 rounded-full bg-[#006c4a]" }),
+              /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "flex items-center gap-2 text-[#43474f] text-[13px]", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { className: "w-2.5 h-2.5 rounded-full bg-[#006c4a]" }),
                 "\uC784\uC2DC\uC800\uC7A5 \uC644\uB8CC (14:32:05)"
               ] })
             ] }),
-            /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "grid grid-cols-12 gap-6", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "col-span-8 flex flex-col gap-6", children: [
-                /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "bg-white p-6 rounded-2xl shadow-sm flex flex-col gap-4 border border-[#e5eeff]", children: [
-                  /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "flex justify-between items-center", children: [
-                    /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("h2", { className: "text-[20px] font-bold text-[#00254a]", children: "\uAE30\uBCF8 \uC0AC\uC5C5\uC7A5 \uC815\uBCF4" }),
-                    /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "px-2.5 py-1 rounded-full bg-[#e5eeff] text-[#163b66] text-[11px] font-bold", children: "\uADFC\uB9B0\uC0DD\uD65C\uC2DC\uC124 \xB7 \uC9C0\uC0C1 5\uCE35" })
+            /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "grid grid-cols-12 gap-6", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "col-span-8 flex flex-col gap-6", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "bg-white p-6 rounded-2xl shadow-sm flex flex-col gap-4 border border-[#e5eeff]", children: [
+                  /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "flex justify-between items-center", children: [
+                    /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("h2", { className: "text-[20px] font-bold text-[#00254a]", children: "\uAE30\uBCF8 \uC0AC\uC5C5\uC7A5 \uC815\uBCF4" }),
+                    /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { className: "px-2.5 py-1 rounded-full bg-[#e5eeff] text-[#163b66] text-[11px] font-bold", children: "\uADFC\uB9B0\uC0DD\uD65C\uC2DC\uC124 \xB7 \uC9C0\uC0C1 5\uCE35" })
                   ] }),
-                  /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "grid grid-cols-2 gap-4 text-[14px] text-[#43474f]", children: [
-                    /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "p-3 bg-[#eff4ff] rounded-xl", children: [
-                      /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "text-[11px] block text-[#737780] font-bold", children: "\uB300\uC0C1\uC9C0 \uC8FC\uC18C" }),
-                      /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "text-[#0b1c30] font-semibold", children: "\uC11C\uC6B8\uD2B9\uBCC4\uC2DC \uB9C8\uD3EC\uAD6C \uC6D4\uB4DC\uCEF5\uBD81\uB85C 120 (\uC131\uC0B0\uBE4C\uB529)" })
+                  /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "grid grid-cols-2 gap-4 text-[14px] text-[#43474f]", children: [
+                    /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "p-3 bg-[#eff4ff] rounded-xl", children: [
+                      /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { className: "text-[11px] block text-[#737780] font-bold", children: "\uB300\uC0C1\uC9C0 \uC8FC\uC18C" }),
+                      /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { className: "text-[#0b1c30] font-semibold", children: "\uC11C\uC6B8\uD2B9\uBCC4\uC2DC \uB9C8\uD3EC\uAD6C \uC6D4\uB4DC\uCEF5\uBD81\uB85C 120 (\uC131\uC0B0\uBE4C\uB529)" })
                     ] }),
-                    /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "p-3 bg-[#eff4ff] rounded-xl", children: [
-                      /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "text-[11px] block text-[#737780] font-bold", children: "\uACC4\uC57D \uD76C\uB9DD \uD615\uD0DC" }),
-                      /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "text-[#0b1c30] font-semibold", children: "3\uAC1C\uC6D4 \uACE0\uC815 \uC815\uAE30\uAD00\uB9AC \uC6A9\uC5ED \uACC4\uC57D" })
+                    /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "p-3 bg-[#eff4ff] rounded-xl", children: [
+                      /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { className: "text-[11px] block text-[#737780] font-bold", children: "\uACC4\uC57D \uD76C\uB9DD \uD615\uD0DC" }),
+                      /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { className: "text-[#0b1c30] font-semibold", children: "3\uAC1C\uC6D4 \uACE0\uC815 \uC815\uAE30\uAD00\uB9AC \uC6A9\uC5ED \uACC4\uC57D" })
                     ] })
                   ] })
                 ] }),
-                /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "bg-white p-6 rounded-2xl shadow-sm flex flex-col gap-4 border border-[#e5eeff]", children: [
-                  /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "flex justify-between items-center", children: [
-                    /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { children: [
-                      /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("h2", { className: "text-[20px] font-bold text-[#00254a]", children: "\uC815\uAE30\uCCAD\uC18C \uACFC\uC5C5 \uAD6C\uC5ED \uBAA9\uB85D" }),
-                      /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("p", { className: "text-[13px] text-[#43474f] mt-1", children: "\uC785\uCC30\uC5D0 \uBD80\uCE60 \uCCAD\uC18C \uC911\uBD84\uB958\uBCC4 \uCE35\uC218 \uBC0F \uD76C\uB9DD \uB2E8\uAC00\uB97C \uAD00\uB9AC\uD569\uB2C8\uB2E4." })
+                /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "bg-white p-6 rounded-2xl shadow-sm flex flex-col gap-4 border border-[#e5eeff]", children: [
+                  /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "flex justify-between items-center", children: [
+                    /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { children: [
+                      /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("h2", { className: "text-[20px] font-bold text-[#00254a]", children: "\uC815\uAE30\uCCAD\uC18C \uACFC\uC5C5 \uAD6C\uC5ED \uBAA9\uB85D" }),
+                      /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("p", { className: "text-[13px] text-[#43474f] mt-1", children: "\uC785\uCC30\uC5D0 \uBD80\uCE60 \uCCAD\uC18C \uC911\uBD84\uB958\uBCC4 \uCE35\uC218 \uBC0F \uD76C\uB9DD \uB2E8\uAC00\uB97C \uAD00\uB9AC\uD569\uB2C8\uB2E4." })
                     ] }),
-                    /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)(
+                    /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)(
                       "button",
                       {
                         type: "button",
                         className: "px-4 py-2 bg-[#00254a] text-white rounded-xl text-[13px] font-bold flex items-center gap-1 shadow-sm",
                         children: [
-                          /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "material-symbols-outlined text-[18px]", children: "add" }),
+                          /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { className: "material-symbols-outlined text-[18px]", children: "add" }),
                           "\uAD6C\uC5ED \uCD94\uAC00"
                         ]
                       }
                     )
                   ] }),
-                  /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("div", { className: "p-8 text-center bg-[#eff4ff] rounded-xl text-[#43474f] text-[14px]", children: "\uCD94\uAC00\uB41C \uCCAD\uC18C \uAD6C\uC5ED\uC774 \uC544\uC9C1 \uC5C6\uC2B5\uB2C8\uB2E4. \uC0C1\uB2E8\uC758 '\uAD6C\uC5ED \uCD94\uAC00' \uBC84\uD2BC\uC744 \uB20C\uB7EC\uC8FC\uC138\uC694." })
+                  /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("div", { className: "p-8 text-center bg-[#eff4ff] rounded-xl text-[#43474f] text-[14px]", children: "\uCD94\uAC00\uB41C \uCCAD\uC18C \uAD6C\uC5ED\uC774 \uC544\uC9C1 \uC5C6\uC2B5\uB2C8\uB2E4. \uC0C1\uB2E8\uC758 '\uAD6C\uC5ED \uCD94\uAC00' \uBC84\uD2BC\uC744 \uB20C\uB7EC\uC8FC\uC138\uC694." })
                 ] })
               ] }),
-              /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("div", { className: "col-span-4 flex flex-col gap-6", children: /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "bg-white p-6 rounded-2xl shadow-sm flex flex-col gap-4 border border-[#e5eeff]", children: [
-                /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("h3", { className: "text-[17px] font-bold text-[#00254a]", children: "\uACAC\uC801 \uC0B0\uCD9C \uC885\uD569 \uC694\uC57D" }),
-                /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "flex justify-between py-2 border-b border-[#eff4ff]", children: [
-                  /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "text-[#43474f] text-[13px]", children: "\uCD1D \uAD00\uB9AC \uAD6C\uC5ED \uC218" }),
-                  /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "font-bold text-[#0b1c30]", children: "0 \uAC1C \uAD6C\uC5ED" })
+              /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("div", { className: "col-span-4 flex flex-col gap-6", children: /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "bg-white p-6 rounded-2xl shadow-sm flex flex-col gap-4 border border-[#e5eeff]", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("h3", { className: "text-[17px] font-bold text-[#00254a]", children: "\uACAC\uC801 \uC0B0\uCD9C \uC885\uD569 \uC694\uC57D" }),
+                /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "flex justify-between py-2 border-b border-[#eff4ff]", children: [
+                  /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { className: "text-[#43474f] text-[13px]", children: "\uCD1D \uAD00\uB9AC \uAD6C\uC5ED \uC218" }),
+                  /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { className: "font-bold text-[#0b1c30]", children: "0 \uAC1C \uAD6C\uC5ED" })
                 ] }),
-                /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "flex justify-between py-2", children: [
-                  /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "text-[#43474f] text-[13px]", children: "3\uAC1C\uC6D4 \uCD1D \uC608\uC815 \uC6A9\uC5ED\uBE44" }),
-                  /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "text-[20px] text-[#00254a] font-bold", children: "0 \uC6D0" })
+                /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "flex justify-between py-2", children: [
+                  /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { className: "text-[#43474f] text-[13px]", children: "3\uAC1C\uC6D4 \uCD1D \uC608\uC815 \uC6A9\uC5ED\uBE44" }),
+                  /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { className: "text-[20px] text-[#00254a] font-bold", children: "0 \uC6D0" })
                 ] })
               ] }) })
             ] })
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
+          /* @__PURE__ */ (0, import_jsx_runtime42.jsx)(
             UserReq01Modal,
             {
               isOpen: true,
@@ -62451,41 +63773,41 @@ ${err.message}`);
             }
           )
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("footer", { className: "w-full bg-[#eff4ff] border-t border-[#dce9ff]/60", children: /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "max-w-[1280px] mx-auto px-6 lg:px-12 py-10 flex flex-col gap-6", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "flex flex-col gap-1", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "flex items-center gap-2", children: [
-                /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "text-[17px] font-bold text-[#00254a]", children: "SsulDak Care Platform" }),
-                /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "px-2 py-0.5 rounded bg-[#dce9ff] text-[#254873] text-[11px] font-bold", children: "B2B & Premium Care" })
+        /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("footer", { className: "w-full bg-[#eff4ff] border-t border-[#dce9ff]/60", children: /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "max-w-[1280px] mx-auto px-6 lg:px-12 py-10 flex flex-col gap-6", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "flex flex-col gap-1", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "flex items-center gap-2", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { className: "text-[17px] font-bold text-[#00254a]", children: "SsulDak Care Platform" }),
+                /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { className: "px-2 py-0.5 rounded bg-[#dce9ff] text-[#254873] text-[11px] font-bold", children: "B2B & Premium Care" })
               ] }),
-              /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("p", { className: "text-[13px] text-[#43474f] max-w-xl", children: "\uC4F8\uACE0\uB2E6\uACE0\uB294 \uACF5\uACF5\uAE30\uAD00, \uC0C1\uC5C5 \uC2DC\uC124, \uD504\uB9AC\uBBF8\uC5C4 \uC8FC\uAC70 \uD658\uACBD\uC744 \uC704\uD55C \uC804\uBB38 \uBC29\uC5ED\xB7\uC18C\uB3C5 \uBC0F \uC885\uD569 \uACF5\uAC04 \uC704\uC0DD \uCF00\uC5B4 \uD1B5\uD569 \uAD00\uC81C \uC194\uB8E8\uC158\uC785\uB2C8\uB2E4." })
+              /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("p", { className: "text-[13px] text-[#43474f] max-w-xl", children: "\uC4F8\uACE0\uB2E6\uACE0\uB294 \uACF5\uACF5\uAE30\uAD00, \uC0C1\uC5C5 \uC2DC\uC124, \uD504\uB9AC\uBBF8\uC5C4 \uC8FC\uAC70 \uD658\uACBD\uC744 \uC704\uD55C \uC804\uBB38 \uBC29\uC5ED\xB7\uC18C\uB3C5 \uBC0F \uC885\uD569 \uACF5\uAC04 \uC704\uC0DD \uCF00\uC5B4 \uD1B5\uD569 \uAD00\uC81C \uC194\uB8E8\uC158\uC785\uB2C8\uB2E4." })
             ] }),
-            /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "flex flex-col sm:flex-row items-start sm:items-center gap-6", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "flex flex-col", children: [
-                /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "text-[11px] text-[#43474f]", children: "\uACE0\uAC1D \uCF00\uC5B4 \uC885\uD569 \uAD00\uC81C \uC13C\uD130" }),
-                /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "text-[20px] font-bold text-[#00254a] tracking-tight", children: "1588-3024" }),
-                /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "text-[11px] text-[#737780]", children: "365\uC77C 24\uC2DC\uAC04 \uC5F0\uC911\uBB34\uD734 \uAE34\uAE09\uBC30\uCC28" })
+            /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "flex flex-col sm:flex-row items-start sm:items-center gap-6", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "flex flex-col", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { className: "text-[11px] text-[#43474f]", children: "\uACE0\uAC1D \uCF00\uC5B4 \uC885\uD569 \uAD00\uC81C \uC13C\uD130" }),
+                /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { className: "text-[20px] font-bold text-[#00254a] tracking-tight", children: "1588-3024" }),
+                /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { className: "text-[11px] text-[#737780]", children: "365\uC77C 24\uC2DC\uAC04 \uC5F0\uC911\uBB34\uD734 \uAE34\uAE09\uBC30\uCC28" })
               ] }),
-              /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white shadow-sm border border-[#e5eeff]", children: [
-                /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "material-symbols-outlined text-[#006c4a] text-[24px]", children: "verified_user" }),
-                /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "flex flex-col", children: [
-                  /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "text-[11px] text-[#0b1c30] font-bold", children: "KB\uC190\uD574\uBCF4\uD5D8 5\uC5B5\uC6D0" }),
-                  /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("span", { className: "text-[11px] text-[#43474f]", children: "\uC601\uC5C5\uBC30\uC0C1\uCC45\uC784\uBCF4\uD5D8 \uAC00\uC785" })
+              /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white shadow-sm border border-[#e5eeff]", children: [
+                /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { className: "material-symbols-outlined text-[#006c4a] text-[24px]", children: "verified_user" }),
+                /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "flex flex-col", children: [
+                  /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { className: "text-[11px] text-[#0b1c30] font-bold", children: "KB\uC190\uD574\uBCF4\uD5D8 5\uC5B5\uC6D0" }),
+                  /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("span", { className: "text-[11px] text-[#43474f]", children: "\uC601\uC5C5\uBC30\uC0C1\uCC45\uC784\uBCF4\uD5D8 \uAC00\uC785" })
                 ] })
               ] })
             ] })
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "flex flex-col md:flex-row justify-between items-center gap-4 pt-4 border-t border-[#dce9ff]/60 text-[13px]", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime41.jsxs)("div", { className: "flex flex-wrap items-center gap-4 text-[#43474f]", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("a", { className: "hover:text-[#0b1c30] transition-colors cursor-pointer", children: "\uC774\uC6A9\uC57D\uAD00" }),
-              /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("a", { className: "font-bold text-[#0b1c30] hover:text-[#00254a] transition-colors cursor-pointer", children: "\uAC1C\uC778\uC815\uBCF4\uCC98\uB9AC\uBC29\uCE68" }),
-              /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("a", { className: "hover:text-[#0b1c30] transition-colors cursor-pointer", children: "\uB9C8\uC2A4\uD130 \uD30C\uD2B8\uB108 \uACC4\uC57D\uAE30\uC900" }),
-              /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("a", { className: "hover:text-[#0b1c30] transition-colors cursor-pointer", children: "\uC804\uBB38 \uC704\uC0DD\uC0AC \uAC80\uC99D \uCCB4\uACC4" })
+          /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "flex flex-col md:flex-row justify-between items-center gap-4 pt-4 border-t border-[#dce9ff]/60 text-[13px]", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)("div", { className: "flex flex-wrap items-center gap-4 text-[#43474f]", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("a", { className: "hover:text-[#0b1c30] transition-colors cursor-pointer", children: "\uC774\uC6A9\uC57D\uAD00" }),
+              /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("a", { className: "font-bold text-[#0b1c30] hover:text-[#00254a] transition-colors cursor-pointer", children: "\uAC1C\uC778\uC815\uBCF4\uCC98\uB9AC\uBC29\uCE68" }),
+              /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("a", { className: "hover:text-[#0b1c30] transition-colors cursor-pointer", children: "\uB9C8\uC2A4\uD130 \uD30C\uD2B8\uB108 \uACC4\uC57D\uAE30\uC900" }),
+              /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("a", { className: "hover:text-[#0b1c30] transition-colors cursor-pointer", children: "\uC804\uBB38 \uC704\uC0DD\uC0AC \uAC80\uC99D \uCCB4\uACC4" })
             ] }),
-            /* @__PURE__ */ (0, import_jsx_runtime41.jsx)("div", { className: "text-[#737780] text-[12px]", children: "\xA9 2026 SsulDak Inc. All rights reserved. Pristine Precision System." })
+            /* @__PURE__ */ (0, import_jsx_runtime42.jsx)("div", { className: "text-[#737780] text-[12px]", children: "\xA9 2026 SsulDak Inc. All rights reserved. Pristine Precision System." })
           ] })
         ] }) })
-      ] }, "screen_user_req_01") : currentScreen === "USER-REQ-00" ? /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
+      ] }, "screen_user_req_01") : currentScreen === "USER-REQ-00" ? /* @__PURE__ */ (0, import_jsx_runtime42.jsx)(
         UserReq00Screen,
         {
           initialUserNo: currentUserNo || "U20261000001",
@@ -62494,7 +63816,7 @@ ${err.message}`);
           apiEndpoint: "/api/user/user_req_00"
         },
         "screen_user_req_00"
-      ) : currentScreen === "USER-ATH-03" ? /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
+      ) : currentScreen === "USER-ATH-03" ? /* @__PURE__ */ (0, import_jsx_runtime42.jsx)(
         UserAth03Screen,
         {
           initialUserNo: currentUserNo || "U20261000001",
@@ -62503,7 +63825,7 @@ ${err.message}`);
           apiEndpoint: "/api/user/user_ath_03"
         },
         `screen_user_ath_03_${currentUserNo || "default"}`
-      ) : currentScreen === "USER-ATH-02" ? /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
+      ) : currentScreen === "USER-ATH-02" ? /* @__PURE__ */ (0, import_jsx_runtime42.jsx)(
         UserAth02Screen,
         {
           onNavigate: handleNavigate,
@@ -62511,16 +63833,30 @@ ${err.message}`);
           apiEndpoint: "/api/user/user_ath_02"
         },
         "screen_user_ath_02"
-      ) : currentScreen === "USER-ATH-01" ? /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
-        UserAth01Screen,
-        {
-          onNavigate: handleNavigate,
-          onRegisterSuccess: handleRegisterSuccess,
-          logoSrc: "/logo.png",
-          apiEndpoint: "/api/user/user_ath_01"
-        },
-        "screen_user_ath_01"
-      ) : currentScreen === "USER-ATH-00" ? /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
+      ) : currentScreen === "USER-ATH-01" ? /* @__PURE__ */ (0, import_jsx_runtime42.jsxs)(import_jsx_runtime42.Fragment, { children: [
+        /* @__PURE__ */ (0, import_jsx_runtime42.jsx)(
+          USER_COM_00_default,
+          {
+            initialUserNo: currentUserNo,
+            onNavigate: handleNavigate,
+            onLogout: handleLogout,
+            logoUrl: "/logo.png"
+          },
+          `screen_user_com_00_bg_${currentUserNo || "guest"}`
+        ),
+        /* @__PURE__ */ (0, import_jsx_runtime42.jsx)(
+          UserAth01Modal,
+          {
+            isOpen: true,
+            onClose: () => handleNavigate("USER-COM-00"),
+            onNavigate: handleNavigate,
+            onRegisterSuccess: handleRegisterSuccess,
+            logoSrc: "/logo.png",
+            apiEndpoint: "/api/user/user_ath_01"
+          },
+          "screen_user_ath_01"
+        )
+      ] }) : currentScreen === "USER-ATH-00" ? /* @__PURE__ */ (0, import_jsx_runtime42.jsx)(
         USER_ATH_00_default,
         {
           onNavigate: handleNavigate,
@@ -62529,7 +63865,7 @@ ${err.message}`);
           apiEndpoint: "/api/user/user_ath_00"
         },
         "screen_user_ath_00"
-      ) : /* @__PURE__ */ (0, import_jsx_runtime41.jsx)(
+      ) : /* @__PURE__ */ (0, import_jsx_runtime42.jsx)(
         USER_COM_00_default,
         {
           initialUserNo: currentUserNo,
@@ -62544,7 +63880,7 @@ ${err.message}`);
   var rootElement = document.getElementById("root");
   if (rootElement) {
     const root = import_client.default.createRoot(rootElement);
-    root.render(/* @__PURE__ */ (0, import_jsx_runtime41.jsx)(AppPreview, {}));
+    root.render(/* @__PURE__ */ (0, import_jsx_runtime42.jsx)(AppPreview, {}));
   }
 })();
 /*! Bundled license information:
@@ -62604,4 +63940,3 @@ react/cjs/react-jsx-runtime.development.js:
    * LICENSE file in the root directory of this source tree.
    *)
 */
-//# sourceMappingURL=bundle.js.map

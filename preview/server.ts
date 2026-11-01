@@ -1,47 +1,48 @@
 import express from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { processUserCom00, validateUserNo } from '../SsulDak_Web/User/backend/api_USER_COM_00/route.ts';
-import { processUserAth00 } from '../SsulDak_Web/User/backend/api_USER_ATH_00/route.ts';
-import { processUserAth01 } from '../SsulDak_Web/User/backend/api_USER_ATH_01/route.ts';
-import { processUserAth02 } from '../SsulDak_Web/User/backend/api_USER_ATH_02/route.ts';
-import { processUserAth03 } from '../SsulDak_Web/User/backend/api_USER_ATH_03/route.ts';
-import { processUserReq00 } from '../SsulDak_Web/User/backend/api_USER_REQ_00/route.ts';
-import { processUserReq01 } from '../SsulDak_Web/User/backend/api_USER_REQ_01/route.ts';
-import { processUserReq02 } from '../SsulDak_Web/User/backend/api_USER_REQ_02/route.ts';
-import { processUserReq03 } from '../SsulDak_Web/User/backend/api_USER_REQ_03/route.ts';
-import { processUserReq04 } from '../SsulDak_Web/User/backend/api_USER_REQ_04/route.ts';
-import { processUserQot00 } from '../SsulDak_Web/User/backend/api_USER_QOT_00/route.ts';
-import { processUserQot01 } from '../SsulDak_Web/User/backend/api_USER_QOT_01/route.ts';
-import { processUserQot02 } from '../SsulDak_Web/User/backend/api_USER_QOT_02/route.ts';
-import { processUserCnt00 } from '../SsulDak_Web/User/backend/api_USER_CNT_00/route.ts';
-import { processUserCnt01 } from '../SsulDak_Web/User/backend/api_USER_CNT_01/route.ts';
-import { processUserCnt02 } from '../SsulDak_Web/User/backend/api_USER_CNT_02/route.ts';
-import { processUserHis00 } from '../SsulDak_Web/User/backend/api_USER_HIS_00/route.ts';
-import { processUserHis01 } from '../SsulDak_Web/User/backend/api_USER_HIS_01/route.ts';
-import { processUserHis02 } from '../SsulDak_Web/User/backend/api_USER_HIS_02/route.ts';
-import { processUserMyp00 } from '../SsulDak_Web/User/backend/api_USER_MYP_00/route.ts';
-import { processUserMyp01 } from '../SsulDak_Web/User/backend/api_USER_MYP_01/route.ts';
-import { processUserMyp02 } from '../SsulDak_Web/User/backend/api_USER_MYP_02/route.ts';
-import { processPtnrAth00 } from '../SsulDak_Web/Partner/backend/api_PTNR_ATH_00/route.ts';
-import { processPtnrAth01 } from '../SsulDak_Web/Partner/backend/api_PTNR_ATH_01/route.ts';
-import { processPtnrDsh00 } from '../SsulDak_Web/Partner/backend/api_PTNR_DSH_00/route.ts';
-import { processPtnrDsh01 } from '../SsulDak_Web/Partner/backend/api_PTNR_DSH_01/route.ts';
-import { processPtnrDsh02 } from '../SsulDak_Web/Partner/backend/api_PTNR_DSH_02/route.ts';
-import { processPtnrQot00 } from '../SsulDak_Web/Partner/backend/api_PTNR_QOT_00/route.ts';
-import { processPtnrQot01 } from '../SsulDak_Web/Partner/backend/api_PTNR_QOT_01/route.ts';
-import { processPtnrQot02 } from '../SsulDak_Web/Partner/backend/api_PTNR_QOT_02/route.ts';
-import { processPtnrJob00 } from '../SsulDak_Web/Partner/backend/api_PTNR_JOB_00/route.ts';
-import { processPtnrJob01 } from '../SsulDak_Web/Partner/backend/api_PTNR_JOB_01/route.ts';
-import { processPtnrJob02 } from '../SsulDak_Web/Partner/backend/api_PTNR_JOB_02/route.ts';
-import { processPtnrSet00 } from '../SsulDak_Web/Partner/backend/api_PTNR_SET_00/route.ts';
-import { processPtnrSet01 } from '../SsulDak_Web/Partner/backend/api_PTNR_SET_01/route.ts';
-import { processAdmnAth00 } from '../SsulDak_Web/Admin/backend/api_ADMN_ATH_00/route.ts';
-import { processAdmnDsh00 } from '../SsulDak_Web/Admin/backend/api_ADMN_DSH_00/route.ts';
-import { processAdmnPrm00 } from '../SsulDak_Web/Admin/backend/api_ADMN_PRM_00/route.ts';
-import { processAdmnPrm01 } from '../SsulDak_Web/Admin/backend/api_ADMN_PRM_01/route.ts';
-import { processAdmnSys01 } from '../SsulDak_Web/Admin/backend/api_ADMN_SYS_01/route.ts';
-import { processAdmnSys02 } from '../SsulDak_Web/Admin/backend/api_ADMN_SYS_02/route.ts';
+import { processUserCom00, validateUserNo } from '../SseulDakGo_Web/User/backend/api_USER_COM_00/route.ts';
+import { processUserAth00 } from '../SseulDakGo_Web/User/backend/api_USER_ATH_00/route.ts';
+import { processUserAth01 } from '../SseulDakGo_Web/User/backend/api_USER_ATH_01/route.ts';
+import { processUserAth02 } from '../SseulDakGo_Web/User/backend/api_USER_ATH_02/route.ts';
+import { processUserAth03 } from '../SseulDakGo_Web/User/backend/api_USER_ATH_03/route.ts';
+import { processUserReq00 } from '../SseulDakGo_Web/User/backend/api_USER_REQ_00/route.ts';
+import { processUserReq01 } from '../SseulDakGo_Web/User/backend/api_USER_REQ_01/route.ts';
+import { processUserReq02 } from '../SseulDakGo_Web/User/backend/api_USER_REQ_02/route.ts';
+import { processUserReq03 } from '../SseulDakGo_Web/User/backend/api_USER_REQ_03/route.ts';
+import { processUserReq04 } from '../SseulDakGo_Web/User/backend/api_USER_REQ_04/route.ts';
+import { processUserQot00 } from '../SseulDakGo_Web/User/backend/api_USER_QOT_00/route.ts';
+import { processUserQot01 } from '../SseulDakGo_Web/User/backend/api_USER_QOT_01/route.ts';
+import { processUserQot02 } from '../SseulDakGo_Web/User/backend/api_USER_QOT_02/route.ts';
+import { processUserCnt00 } from '../SseulDakGo_Web/User/backend/api_USER_CNT_00/route.ts';
+import { processUserCnt01 } from '../SseulDakGo_Web/User/backend/api_USER_CNT_01/route.ts';
+import { processUserCnt02 } from '../SseulDakGo_Web/User/backend/api_USER_CNT_02/route.ts';
+import { processUserHis00 } from '../SseulDakGo_Web/User/backend/api_USER_HIS_00/route.ts';
+import { processUserHis01 } from '../SseulDakGo_Web/User/backend/api_USER_HIS_01/route.ts';
+import { processUserHis02 } from '../SseulDakGo_Web/User/backend/api_USER_HIS_02/route.ts';
+import { processUserMyp00 } from '../SseulDakGo_Web/User/backend/api_USER_MYP_00/route.ts';
+import { processUserMyp01 } from '../SseulDakGo_Web/User/backend/api_USER_MYP_01/route.ts';
+import { processUserMyp02 } from '../SseulDakGo_Web/User/backend/api_USER_MYP_02/route.ts';
+import { processPtnrAth00 } from '../SseulDakGo_Web/Partner/backend/api_PTNR_ATH_00/route.ts';
+import { processPtnrAth01 } from '../SseulDakGo_Web/Partner/backend/api_PTNR_ATH_01/route.ts';
+import { processPtnrDsh00 } from '../SseulDakGo_Web/Partner/backend/api_PTNR_DSH_00/route.ts';
+import { processPtnrDsh01 } from '../SseulDakGo_Web/Partner/backend/api_PTNR_DSH_01/route.ts';
+import { processPtnrDsh02 } from '../SseulDakGo_Web/Partner/backend/api_PTNR_DSH_02/route.ts';
+import { processPtnrQot00 } from '../SseulDakGo_Web/Partner/backend/api_PTNR_QOT_00/route.ts';
+import { processPtnrQot01 } from '../SseulDakGo_Web/Partner/backend/api_PTNR_QOT_01/route.ts';
+import { processPtnrQot02 } from '../SseulDakGo_Web/Partner/backend/api_PTNR_QOT_02/route.ts';
+import { processPtnrJob00 } from '../SseulDakGo_Web/Partner/backend/api_PTNR_JOB_00/route.ts';
+import { processPtnrJob01 } from '../SseulDakGo_Web/Partner/backend/api_PTNR_JOB_01/route.ts';
+import { processPtnrJob02 } from '../SseulDakGo_Web/Partner/backend/api_PTNR_JOB_02/route.ts';
+import { processPtnrSet00 } from '../SseulDakGo_Web/Partner/backend/api_PTNR_SET_00/route.ts';
+import { processPtnrSet01 } from '../SseulDakGo_Web/Partner/backend/api_PTNR_SET_01/route.ts';
+import { processAdmnAth00 } from '../SseulDakGo_Web/Admin/backend/api_ADMN_ATH_00/route.ts';
+import { processAdmnDsh00 } from '../SseulDakGo_Web/Admin/backend/api_ADMN_DSH_00/route.ts';
+import { processAdmnPrm00 } from '../SseulDakGo_Web/Admin/backend/api_ADMN_PRM_00/route.ts';
+import { processAdmnPrm01 } from '../SseulDakGo_Web/Admin/backend/api_ADMN_PRM_01/route.ts';
+import { processAdmnSys01 } from '../SseulDakGo_Web/Admin/backend/api_ADMN_SYS_01/route.ts';
+import { processAdmnSys02 } from '../SseulDakGo_Web/Admin/backend/api_ADMN_SYS_02/route.ts';
+import { processAdmnSys03 } from '../SseulDakGo_Web/Admin/backend/api_ADMN_SYS_03/route.ts';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -97,7 +98,9 @@ app.post('/api/user/user_ath_00', async (req, res) => {
 // API 엔드포인트: POST /api/user/user_ath_01 (회원가입 및 서명등록)
 app.post('/api/user/user_ath_01', async (req, res) => {
   try {
-    const { status, data } = await processUserAth01(req.body || {});
+    const clientIp = (req.headers['x-forwarded-for'] as string) || req.socket.remoteAddress || '127.0.0.1';
+    const userAgent = (req.headers['user-agent'] as string) || 'Preview Express';
+    const { status, data } = await processUserAth01(req.body || {}, clientIp, userAgent);
     return res.status(status).json(data);
   } catch (err: unknown) {
     const error = err as Error;
@@ -724,6 +727,23 @@ app.post('/api/admin/admn_sys_02', async (req, res) => {
   }
 });
 
+// API 엔드포인트: POST /api/admin/admn_sys_03 (공지사항 및 FAQ 콘텐츠 관리)
+app.post('/api/admin/admn_sys_03', async (req, res) => {
+  try {
+    const clientIp = (req.headers['x-forwarded-for'] as string) || req.socket.remoteAddress || '192.168.0.12';
+    const userAgent = (req.headers['user-agent'] as string) || 'Preview Express Admin Console';
+    const result = await processAdmnSys03(req.body || {}, clientIp, userAgent);
+    return res.status(result.success ? 200 : 400).json(result);
+  } catch (err: unknown) {
+    const error = err as Error;
+    console.error('❌ API Error (ADMN-SYS-03):', error.message);
+    return res.status(500).json({
+      success: false,
+      message: error.message || '서버 내부 오류가 발생했습니다.',
+    });
+  }
+});
+
 
 // 정적 파일 제공 (개발 캐시 비활성화)
 app.use((req, res, next) => {
@@ -740,5 +760,5 @@ app.use((req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`🚀 [SsulDak] USER-COM-00 프리뷰 서버 실행 완료: http://localhost:${PORT}`);
+  console.log(`🚀 [SseulDakGo] USER-COM-00 프리뷰 서버 실행 완료: http://localhost:${PORT}`);
 });

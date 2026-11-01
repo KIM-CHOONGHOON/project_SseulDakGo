@@ -1,6 +1,6 @@
 # =============================================================================
-# SsulDak (쓸고닦고) Full-Stack Development Standards & Rules (RULES.md)
-# Root Directory: project_SsulDak
+# SseulDakGo (쓸고닦고) Full-Stack Development Standards & Rules (RULES.md)
+# Root Directory: Project_SseulDakGo
 # Technology Stack: Full-Stack React (Next.js App Router / Node.js API Routes / React Native)
 # Database: MySQL / MariaDB (InnoDB, utf8mb4_0900_ai_ci)
 # =============================================================================
@@ -10,8 +10,8 @@
    - 웹(Web) 및 모바일 앱(App) 프론트엔드 컴포넌트는 모두 **React** 기반으로 작성한다.
    - 백엔드 서버 로직 및 API 엔드포인트 또한 **React 기반 풀스택 프레임워크(Next.js App Router API Routes / Node.js)**를 사용하여 작성한다.
 2. **물리적 분리 배치**:
-   - 웹 소스코드는 `project_SsulDak/SsulDak_Web` 디렉터리에 배치한다.
-   - 모바일 앱 소스코드는 `project_SsulDak/SsulDak_App` 디렉터리에 배치한다.
+   - 웹 소스코드는 `Project_SseulDakGo/SseulDakGo_Web` 디렉터리에 배치한다.
+   - 모바일 앱 소스코드는 `Project_SseulDakGo/SseulDakGo_App` 디렉터리에 배치한다.
 
 ---
 
@@ -79,7 +79,7 @@
 
 ---
 
-## 6. SsulDak 비즈니스 워크플로우 및 프로모션 처리 규칙 (Business Rules)
+## 6. SseulDakGo 비즈니스 워크플로우 및 프로모션 처리 규칙 (Business Rules)
 
 ### 1) 서비스 신청 및 견적 공고 원칙 (USER-REQ-00 ~ 04)
 - **정기청소 계약기간 From-To 3개월 이상 락 검증**:

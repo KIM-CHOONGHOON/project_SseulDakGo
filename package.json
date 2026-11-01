@@ -1,10 +1,11 @@
 {
-  "name": "ssuldak",
+  "name": "sseuldakgo",
   "version": "0.1.0",
   "private": true,
   "scripts": {
     "start": "node index.js",
-    "dev": "nodemon index.js"
+    "dev": "nodemon index.js",
+    "build:preview": "node scripts/build-preview.js"
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",

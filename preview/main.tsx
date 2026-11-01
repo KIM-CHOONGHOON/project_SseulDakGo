@@ -1,47 +1,48 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import ReactDOM from 'react-dom/client';
-import UserCom00Screen from '../SsulDak_Web/User/frontend/USER-COM-00/index.tsx';
-import UserAth00Screen from '../SsulDak_Web/User/frontend/USER-ATH-00/index.tsx';
-import UserAth01Screen from '../SsulDak_Web/User/frontend/USER-ATH-01/index.tsx';
-import UserAth02Screen from '../SsulDak_Web/User/frontend/USER-ATH-02/index.tsx';
-import UserAth03Screen from '../SsulDak_Web/User/frontend/USER-ATH-03/index.tsx';
-import UserReq00Screen from '../SsulDak_Web/User/frontend/USER-REQ-00/index.tsx';
-import UserReq01Modal, { RegularItemToAdd } from '../SsulDak_Web/User/frontend/USER-REQ-01/index.tsx';
-import UserReq02Modal, { ApplianceItemToAdd } from '../SsulDak_Web/User/frontend/USER-REQ-02/index.tsx';
-import UserReq03Modal, { SelectedAddress } from '../SsulDak_Web/User/frontend/USER-REQ-03/index.tsx';
-import UserReq04Modal, { SitePhotoItem } from '../SsulDak_Web/User/frontend/USER-REQ-04/index.tsx';
-import UserQot00Screen from '../SsulDak_Web/User/frontend/USER-QOT-00/index.tsx';
-import UserQot01Screen from '../SsulDak_Web/User/frontend/USER-QOT-01/index.tsx';
-import UserQot02Screen from '../SsulDak_Web/User/frontend/USER-QOT-02/index.tsx';
-import UserCnt00Screen from '../SsulDak_Web/User/frontend/USER-CNT-00/index.tsx';
-import UserCnt01Screen from '../SsulDak_Web/User/frontend/USER-CNT-01/index.tsx';
-import UserCnt02Screen from '../SsulDak_Web/User/frontend/USER-CNT-02/index.tsx';
-import UserHis00Screen from '../SsulDak_Web/User/frontend/USER-HIS-00/index.tsx';
-import UserHis01Screen from '../SsulDak_Web/User/frontend/USER-HIS-01/index.tsx';
-import UserHis02Screen from '../SsulDak_Web/User/frontend/USER-HIS-02/index.tsx';
-import UserMyp00Screen from '../SsulDak_Web/User/frontend/USER-MYP-00/index.tsx';
-import UserMyp01Screen from '../SsulDak_Web/User/frontend/USER-MYP-01/index.tsx';
-import PtnrAth00Screen from '../SsulDak_Web/Partner/frontend/PTNR-ATH-00/index.tsx';
-import PtnrAth01Screen from '../SsulDak_Web/Partner/frontend/PTNR-ATH-01/index.tsx';
-import PtnrDsh00Screen from '../SsulDak_Web/Partner/frontend/PTNR-DSH-00/index.tsx';
-import PtnrDsh01Screen from '../SsulDak_Web/Partner/frontend/PTNR-DSH-01/index.tsx';
-import PtnrDsh02Screen from '../SsulDak_Web/Partner/frontend/PTNR-DSH-02/index.tsx';
-import PtnrQot00Screen from '../SsulDak_Web/Partner/frontend/PTNR-QOT-00/index.tsx';
-import PtnrQot01Screen from '../SsulDak_Web/Partner/frontend/PTNR-QOT-01/index.tsx';
-import PtnrQot02Screen from '../SsulDak_Web/Partner/frontend/PTNR-QOT-02/index.tsx';
-import PtnrJob00Screen from '../SsulDak_Web/Partner/frontend/PTNR-JOB-00/index.tsx';
-import PtnrJob01Screen from '../SsulDak_Web/Partner/frontend/PTNR-JOB-01/index.tsx';
-import PtnrJob02Screen from '../SsulDak_Web/Partner/frontend/PTNR-JOB-02/index.tsx';
-import PtnrSet00Screen from '../SsulDak_Web/Partner/frontend/PTNR-SET-00/index.tsx';
-import PtnrSet01Screen from '../SsulDak_Web/Partner/frontend/PTNR-SET-01/index.tsx';
-import AdmnAth00Screen from '../SsulDak_Web/Admin/frontend/ADMN-ATH-00/index.tsx';
-import AdmnDsh00Screen from '../SsulDak_Web/Admin/frontend/ADMN-DSH-00/index.tsx';
-import AdmnPrm00Screen from '../SsulDak_Web/Admin/frontend/ADMN-PRM-00/index.tsx';
-import AdmnPrm01Modal from '../SsulDak_Web/Admin/frontend/ADMN-PRM-01/index.tsx';
-import AdmnSys01Screen from '../SsulDak_Web/Admin/frontend/ADMN-SYS-01/index.tsx';
-import AdmnSys02Screen from '../SsulDak_Web/Admin/frontend/ADMN-SYS-02/index.tsx';
+import UserCom00Screen from '../SseulDakGo_Web/User/frontend/USER-COM-00/index.tsx';
+import UserAth00Screen from '../SseulDakGo_Web/User/frontend/USER-ATH-00/index.tsx';
+import UserAth01Screen from '../SseulDakGo_Web/User/frontend/USER-ATH-01/index.tsx';
+import UserAth02Screen from '../SseulDakGo_Web/User/frontend/USER-ATH-02/index.tsx';
+import UserAth03Screen from '../SseulDakGo_Web/User/frontend/USER-ATH-03/index.tsx';
+import UserReq00Screen from '../SseulDakGo_Web/User/frontend/USER-REQ-00/index.tsx';
+import UserReq01Modal, { RegularItemToAdd } from '../SseulDakGo_Web/User/frontend/USER-REQ-01/index.tsx';
+import UserReq02Modal, { ApplianceItemToAdd } from '../SseulDakGo_Web/User/frontend/USER-REQ-02/index.tsx';
+import UserReq03Modal, { SelectedAddress } from '../SseulDakGo_Web/User/frontend/USER-REQ-03/index.tsx';
+import UserReq04Modal, { SitePhotoItem } from '../SseulDakGo_Web/User/frontend/USER-REQ-04/index.tsx';
+import UserQot00Screen from '../SseulDakGo_Web/User/frontend/USER-QOT-00/index.tsx';
+import UserQot01Screen from '../SseulDakGo_Web/User/frontend/USER-QOT-01/index.tsx';
+import UserQot02Screen from '../SseulDakGo_Web/User/frontend/USER-QOT-02/index.tsx';
+import UserCnt00Screen from '../SseulDakGo_Web/User/frontend/USER-CNT-00/index.tsx';
+import UserCnt01Screen from '../SseulDakGo_Web/User/frontend/USER-CNT-01/index.tsx';
+import UserCnt02Screen from '../SseulDakGo_Web/User/frontend/USER-CNT-02/index.tsx';
+import UserHis00Screen from '../SseulDakGo_Web/User/frontend/USER-HIS-00/index.tsx';
+import UserHis01Screen from '../SseulDakGo_Web/User/frontend/USER-HIS-01/index.tsx';
+import UserHis02Screen from '../SseulDakGo_Web/User/frontend/USER-HIS-02/index.tsx';
+import UserMyp00Screen from '../SseulDakGo_Web/User/frontend/USER-MYP-00/index.tsx';
+import UserMyp01Screen from '../SseulDakGo_Web/User/frontend/USER-MYP-01/index.tsx';
+import PtnrAth00Screen from '../SseulDakGo_Web/Partner/frontend/PTNR-ATH-00/index.tsx';
+import PtnrAth01Screen from '../SseulDakGo_Web/Partner/frontend/PTNR-ATH-01/index.tsx';
+import PtnrDsh00Screen from '../SseulDakGo_Web/Partner/frontend/PTNR-DSH-00/index.tsx';
+import PtnrDsh01Screen from '../SseulDakGo_Web/Partner/frontend/PTNR-DSH-01/index.tsx';
+import PtnrDsh02Screen from '../SseulDakGo_Web/Partner/frontend/PTNR-DSH-02/index.tsx';
+import PtnrQot00Screen from '../SseulDakGo_Web/Partner/frontend/PTNR-QOT-00/index.tsx';
+import PtnrQot01Screen from '../SseulDakGo_Web/Partner/frontend/PTNR-QOT-01/index.tsx';
+import PtnrQot02Screen from '../SseulDakGo_Web/Partner/frontend/PTNR-QOT-02/index.tsx';
+import PtnrJob00Screen from '../SseulDakGo_Web/Partner/frontend/PTNR-JOB-00/index.tsx';
+import PtnrJob01Screen from '../SseulDakGo_Web/Partner/frontend/PTNR-JOB-01/index.tsx';
+import PtnrJob02Screen from '../SseulDakGo_Web/Partner/frontend/PTNR-JOB-02/index.tsx';
+import PtnrSet00Screen from '../SseulDakGo_Web/Partner/frontend/PTNR-SET-00/index.tsx';
+import PtnrSet01Screen from '../SseulDakGo_Web/Partner/frontend/PTNR-SET-01/index.tsx';
+import AdmnAth00Screen from '../SseulDakGo_Web/Admin/frontend/ADMN-ATH-00/index.tsx';
+import AdmnDsh00Screen from '../SseulDakGo_Web/Admin/frontend/ADMN-DSH-00/index.tsx';
+import AdmnPrm00Screen from '../SseulDakGo_Web/Admin/frontend/ADMN-PRM-00/index.tsx';
+import AdmnPrm01Modal from '../SseulDakGo_Web/Admin/frontend/ADMN-PRM-01/index.tsx';
+import AdmnSys01Screen from '../SseulDakGo_Web/Admin/frontend/ADMN-SYS-01/index.tsx';
+import AdmnSys02Screen from '../SseulDakGo_Web/Admin/frontend/ADMN-SYS-02/index.tsx';
+import AdmnSys03Screen from '../SseulDakGo_Web/Admin/frontend/ADMN-SYS-03/index.tsx';
 
-type ScreenId = 'USER-COM-00' | 'USER-ATH-00' | 'USER-ATH-01' | 'USER-ATH-02' | 'USER-ATH-03' | 'USER-REQ-00' | 'USER-REQ-01' | 'USER-REQ-02' | 'USER-REQ-03' | 'USER-REQ-04' | 'USER-QOT-00' | 'USER-QOT-01' | 'USER-QOT-02' | 'USER-CNT-00' | 'USER-CNT-01' | 'USER-CNT-02' | 'USER-HIS-00' | 'USER-HIS-01' | 'USER-HIS-02' | 'USER-MYP-00' | 'USER-MYP-01' | 'USER-MYP-02' | 'PTNR-ATH-00' | 'PTNR-ATH-01' | 'PTNR-DSH-00' | 'PTNR-DSH-01' | 'PTNR-DSH-02' | 'PTNR-QOT-00' | 'PTNR-QOT-01' | 'PTNR-QOT-02' | 'PTNR-JOB-00' | 'PTNR-JOB-01' | 'PTNR-JOB-02' | 'PTNR-SET-00' | 'PTNR-SET-01' | 'ADMN-ATH-00' | 'ADMN-DSH-00' | 'ADMN-PRM-00' | 'ADMN-PRM-01' | 'ADMN-SYS-01' | 'ADMN-SYS-02';
+type ScreenId = 'USER-COM-00' | 'USER-ATH-00' | 'USER-ATH-01' | 'USER-ATH-02' | 'USER-ATH-03' | 'USER-REQ-00' | 'USER-REQ-01' | 'USER-REQ-02' | 'USER-REQ-03' | 'USER-REQ-04' | 'USER-QOT-00' | 'USER-QOT-01' | 'USER-QOT-02' | 'USER-CNT-00' | 'USER-CNT-01' | 'USER-CNT-02' | 'USER-HIS-00' | 'USER-HIS-01' | 'USER-HIS-02' | 'USER-MYP-00' | 'USER-MYP-01' | 'USER-MYP-02' | 'PTNR-ATH-00' | 'PTNR-ATH-01' | 'PTNR-DSH-00' | 'PTNR-DSH-01' | 'PTNR-DSH-02' | 'PTNR-QOT-00' | 'PTNR-QOT-01' | 'PTNR-QOT-02' | 'PTNR-JOB-00' | 'PTNR-JOB-01' | 'PTNR-JOB-02' | 'PTNR-SET-00' | 'PTNR-SET-01' | 'ADMN-ATH-00' | 'ADMN-DSH-00' | 'ADMN-PRM-00' | 'ADMN-PRM-01' | 'ADMN-SYS-01' | 'ADMN-SYS-02' | 'ADMN-SYS-03';
 
 function AppPreview() {
   // 초기 화면 판별 (URL 해시 또는 쿼리스트링)
@@ -49,6 +50,22 @@ function AppPreview() {
     if (typeof window === 'undefined') return 'USER-COM-00';
     const hash = window.location.hash.toLowerCase();
     const search = window.location.search.toLowerCase();
+    if (
+      hash.includes('user-com-00') ||
+      hash.includes('web_user-com-000') ||
+      hash.includes('web_user-com-00') ||
+      hash.includes('com-000') ||
+      hash.includes('home') ||
+      search.includes('screen=user-com-00') ||
+      search.includes('screen=web_user-com-000') ||
+      search.includes('screen=web_user-com-00') ||
+      search.includes('screen=com-00')
+    ) {
+      return 'USER-COM-00';
+    }
+    if (hash.includes('admn-sys-03') || hash.includes('notice') || hash.includes('faq') || search.includes('screen=admn-sys-03')) {
+      return 'ADMN-SYS-03';
+    }
     if (hash.includes('admn-sys-02') || hash.includes('floor-price') || search.includes('screen=admn-sys-02')) {
       return 'ADMN-SYS-02';
     }
@@ -233,7 +250,21 @@ function AppPreview() {
     const handleLocationChange = () => {
       const hash = window.location.hash.toLowerCase();
       const search = window.location.search.toLowerCase();
-      if (hash.includes('admn-sys-02') || hash.includes('floor-price') || search.includes('screen=admn-sys-02')) {
+      if (
+        hash.includes('user-com-00') ||
+        hash.includes('web_user-com-000') ||
+        hash.includes('web_user-com-00') ||
+        hash.includes('com-000') ||
+        hash.includes('home') ||
+        search.includes('screen=user-com-00') ||
+        search.includes('screen=web_user-com-000') ||
+        search.includes('screen=web_user-com-00') ||
+        search.includes('screen=com-00')
+      ) {
+        setCurrentScreen('USER-COM-00');
+      } else if (hash.includes('admn-sys-03') || hash.includes('notice') || hash.includes('faq') || search.includes('screen=admn-sys-03')) {
+        setCurrentScreen('ADMN-SYS-03');
+      } else if (hash.includes('admn-sys-02') || hash.includes('floor-price') || search.includes('screen=admn-sys-02')) {
         setCurrentScreen('ADMN-SYS-02');
       } else if (hash.includes('admn-sys-01') || hash.includes('codes') || hash.includes('policy-codes') || search.includes('screen=admn-sys-01')) {
         setCurrentScreen('ADMN-SYS-01');
@@ -644,13 +675,29 @@ function AppPreview() {
       setCurrentScreen('USER-ATH-00');
     } else if (
       path === 'USER-COM-00' ||
+      path === 'WEB_USER-COM-000' ||
+      path === 'WEB_USER-COM-00' ||
+      path === 'user-com-00' ||
+      path === 'web_user-com-000' ||
       path === 'service-overview' ||
       path === '/' ||
       path === 'home' ||
-      path === '#home'
+      path === '#home' ||
+      path === '#user-com-00' ||
+      path === '#web_user-com-000'
     ) {
       window.location.hash = '#home';
       setCurrentScreen('USER-COM-00');
+    } else if (
+      path === 'ADMN-SYS-03' ||
+      path === 'admn-sys-03' ||
+      path === '#admn-sys-03' ||
+      path === 'notices-faq' ||
+      path === 'notice' ||
+      path === 'faq'
+    ) {
+      window.location.hash = '#admn-sys-03';
+      setCurrentScreen('ADMN-SYS-03');
     } else if (
       path === 'ADMN-SYS-02' ||
       path === 'admn-sys-02' ||
@@ -753,6 +800,17 @@ function AppPreview() {
             className="flex items-center gap-1.5 p-1.5 rounded-2xl bg-neutral-900/95 backdrop-blur-md shadow-2xl border border-white/20 text-xs text-white max-w-[95vw] overflow-x-auto"
           >
             <span className="font-bold px-2 text-emerald-400 shrink-0">화면 선택:</span>
+        <button
+          type="button"
+          onClick={() => handleNavigate('ADMN-SYS-03')}
+          className={`px-3 py-1.5 rounded-xl font-semibold transition-all cursor-pointer ${
+            currentScreen === 'ADMN-SYS-03'
+              ? 'bg-amber-400 text-neutral-950 shadow-md font-bold'
+              : 'hover:bg-white/10 text-neutral-300'
+          }`}
+        >
+          ADMN-SYS-03 (공지/FAQ 관리)
+        </button>
         <button
           type="button"
           onClick={() => handleNavigate('ADMN-SYS-02')}
@@ -1209,7 +1267,12 @@ function AppPreview() {
       </div>
 
       {/* 화면 렌더링 분기 (key를 주어 확실한 언마운트/마운트 보장) */}
-      {currentScreen === 'ADMN-SYS-02' ? (
+      {currentScreen === 'ADMN-SYS-03' ? (
+        <AdmnSys03Screen
+          key="screen_admn_sys_03"
+          onNavigate={handleNavigate}
+        />
+      ) : currentScreen === 'ADMN-SYS-02' ? (
         <AdmnSys02Screen
           key="screen_admn_sys_02"
           onNavigate={handleNavigate}
@@ -2302,13 +2365,24 @@ function AppPreview() {
           apiEndpoint="/api/user/user_ath_02"
         />
       ) : currentScreen === 'USER-ATH-01' ? (
-        <UserAth01Screen
-          key="screen_user_ath_01"
-          onNavigate={handleNavigate}
-          onRegisterSuccess={handleRegisterSuccess}
-          logoSrc="/logo.png"
-          apiEndpoint="/api/user/user_ath_01"
-        />
+        <>
+          <UserCom00Screen
+            key={`screen_user_com_00_bg_${currentUserNo || 'guest'}`}
+            initialUserNo={currentUserNo}
+            onNavigate={handleNavigate}
+            onLogout={handleLogout}
+            logoUrl="/logo.png"
+          />
+          <UserAth01Screen
+            key="screen_user_ath_01"
+            isOpen={true}
+            onClose={() => handleNavigate('USER-COM-00')}
+            onNavigate={handleNavigate}
+            onRegisterSuccess={handleRegisterSuccess}
+            logoSrc="/logo.png"
+            apiEndpoint="/api/user/user_ath_01"
+          />
+        </>
       ) : currentScreen === 'USER-ATH-00' ? (
         <UserAth00Screen
           key="screen_user_ath_00"
