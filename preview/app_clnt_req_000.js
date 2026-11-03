@@ -104,7 +104,7 @@ function MobileNaverAddressSearchModal({ isOpen, onClose, onSelectAddress, }) {
                 React.createElement("button", { onClick: () => handleSearch(keyword), type: "button", className: "px-4 h-11 rounded-xl bg-[#03C75A] hover:bg-[#02b350] text-white font-bold text-[14px] flex items-center justify-center shrink-0 cursor-pointer shadow-sm active:scale-95 transition-transform" }, "\uAC80\uC0C9")),
             React.createElement("div", { className: "flex items-center gap-1.5 px-3.5 py-2 overflow-x-auto text-[11px] bg-slate-50 border-b border-slate-100" },
                 React.createElement("span", { className: "shrink-0 text-slate-400 font-medium" }, "\uCD94\uCC9C:"),
-                ['삼혜빌딩', '마두동 802-1', '토당로 105', '화신로 260', '테헤란로 152'].map((chip) => (React.createElement("button", { key: chip, type: "button", onClick: () => {
+                ['세브란스병원', '명지병원', '토당로 105', '국립암센터', '삼혜빌딩', '화신로 260'].map((chip) => (React.createElement("button", { key: chip, type: "button", onClick: () => {
                         triggerHaptic('LIGHT');
                         setKeyword(chip);
                         handleSearch(chip);

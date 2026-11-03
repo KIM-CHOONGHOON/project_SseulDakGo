@@ -134,167 +134,6 @@ const TAB_NOTICES = {
     MOVEIN: '입주/이사 청소는 실내 전공간 탈거 정밀 케어이며, 피톤치드 연무 소독이 기본 제공됩니다.',
 };
 // ============================================================================
-// [네이버 주소 검색 모달 컴포넌트] (NAVER MAPS API 연동)
-// ============================================================================
-function NaverAddressSearchModal({ isOpen, onClose, onSelectAddress, currentKeyword = '', }) {
-    const [keyword, setKeyword] = useState(currentKeyword || '');
-    const [isLoading, setIsLoading] = useState(false);
-    const [searchResults, setSearchResults] = useState([]);
-    const [hasSearched, setHasSearched] = useState(false);
-    const [searchMeta, setSearchMeta] = useState(null);
-    const inputRef = useRef(null);
-    const executeSearch = useCallback(async (targetQuery) => {
-        const q = String(targetQuery !== undefined ? targetQuery : inputRef.current?.value || '').trim();
-        if (!q)
-            return;
-        setIsLoading(true);
-        setHasSearched(true);
-        try {
-            const res = await fetch('/api/web/client/search_address', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ query: q }),
-            });
-            if (res.ok) {
-                const data = await res.json();
-                if (data && data.success && Array.isArray(data.items)) {
-                    setSearchResults(data.items);
-                    setSearchMeta(data);
-                }
-            }
-        }
-        catch (err) {
-            console.warn('Address search failed', err);
-        }
-        finally {
-            setIsLoading(false);
-        }
-    }, []);
-    // 카카오/다음 우편번호 API 연동 (전국 주소 100% 실시간 정밀 검색)
-    const handleOpenDaumPostcode = () => {
-        if (typeof window !== 'undefined' && window.daum && window.daum.Postcode) {
-            new window.daum.Postcode({
-                oncomplete: (data) => {
-                    const selected = {
-                        roadAddress: data.roadAddress || data.jibunAddress || data.address,
-                        jibunAddress: data.jibunAddress || data.roadAddress || data.address,
-                        sido: data.sido,
-                        sidoCd: '41',
-                        sigungu: data.sigungu,
-                        sigunguCd: data.bcode?.substring(0, 5) || '41281',
-                        dong: data.bname || '',
-                        bldNm: data.buildingName || '',
-                        zonecode: data.zonecode || '',
-                        x: '126.7778',
-                        y: '37.6521',
-                    };
-                    onSelectAddress(selected);
-                },
-            }).open();
-        }
-        else {
-            executeSearch(keyword || '토당로 105');
-        }
-    };
-    // 모달이 처음 열릴 때만(isOpen이 true가 될 때) 단 한 번 초기화 및 초기 검색 수행
-    useEffect(() => {
-        if (isOpen) {
-            const initQ = currentKeyword || '마두동';
-            setKeyword(initQ);
-            setHasSearched(false);
-            executeSearch(initQ);
-            setTimeout(() => {
-                if (inputRef.current) {
-                    inputRef.current.focus();
-                    inputRef.current.select();
-                }
-            }, 100);
-        }
-    }, [isOpen]);
-    if (!isOpen)
-        return null;
-    return (React.createElement("div", { "aria-modal": "true", className: "fixed inset-0 z-[60] bg-inverse-surface/70 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto", onClick: (e) => {
-            if (e.target === e.currentTarget)
-                onClose();
-        }, role: "dialog" },
-        React.createElement("div", { className: "relative w-full max-w-lg bg-surface-container-lowest rounded-2xl shadow-2xl overflow-hidden my-4 border border-slate-200 animate-in fade-in zoom-in-95 duration-200" },
-            React.createElement("div", { className: "p-5 bg-surface-container-low border-b border-slate-200/80 flex items-center justify-between" },
-                React.createElement("div", { className: "flex items-center gap-2.5" },
-                    React.createElement("div", { className: "w-8 h-8 rounded-lg bg-[#03C75A] text-white flex items-center justify-center font-bold text-sm shadow-sm" }, "N"),
-                    React.createElement("div", null,
-                        React.createElement("div", { className: "flex items-center gap-2" },
-                            React.createElement("h3", { className: "font-headline-sm text-[17px] text-on-surface font-bold leading-none" }, "\uB124\uC774\uBC84 \uC9C0\uB3C4 \uC8FC\uC18C \uAC80\uC0C9"),
-                            React.createElement("span", { className: "px-2 py-0.5 rounded text-[10px] font-bold bg-[#03C75A]/15 text-[#008f3e]" }, "NAVER MAPS API")),
-                        React.createElement("p", { className: "text-[12px] text-on-surface-variant mt-0.5" }, "\uB3C4\uB85C\uBA85, \uAC74\uBB3C\uBA85, \uC9C0\uBC88\uC73C\uB85C \uAC80\uC0C9\uD558\uC2DC\uBA74 \uD589\uC815\uAD6C\uC5ED\uC774 \uC790\uB3D9 \uC785\uB825\uB429\uB2C8\uB2E4."))),
-                React.createElement("button", { "aria-label": "\uB2EB\uAE30", className: "w-8 h-8 rounded-full bg-surface-container hover:bg-surface-container-high flex items-center justify-center text-on-surface transition-colors", onClick: onClose, type: "button" },
-                    React.createElement("span", { className: "material-symbols-outlined text-[18px]" }, "close"))),
-            React.createElement("div", { className: "p-4 bg-white border-b border-slate-100" },
-                React.createElement("form", { className: "flex items-center gap-2", onSubmit: (e) => {
-                        e.preventDefault();
-                        executeSearch(keyword);
-                    } },
-                    React.createElement("div", { className: "relative flex-1" },
-                        React.createElement("span", { className: "material-symbols-outlined absolute left-3 top-2.5 text-[#03C75A] text-[20px]" }, "search"),
-                        React.createElement("input", { className: "w-full h-11 pl-10 pr-9 rounded-xl bg-surface-container-low text-[14px] text-on-surface placeholder:text-outline border border-transparent focus:border-[#03C75A] focus:bg-white outline-none transition-all", onChange: (e) => setKeyword(e.target.value), placeholder: "\uC608: \uB9C8\uB450\uB3D9 123-4, \uC911\uC559\uB85C 1261, \uC2DD\uC0AC\uB3D9 \uC704\uC2DC\uD2F0", ref: inputRef, type: "text", value: keyword }),
-                        keyword && (React.createElement("button", { className: "absolute right-2.5 top-2.5 text-slate-400 hover:text-slate-600", onClick: () => {
-                                setKeyword('');
-                                inputRef.current?.focus();
-                            }, type: "button" },
-                            React.createElement("span", { className: "material-symbols-outlined text-[18px]" }, "cancel")))),
-                    React.createElement("button", { className: "h-11 px-5 rounded-xl bg-[#03C75A] hover:bg-[#02b350] text-white font-bold text-[14px] flex items-center gap-1 shadow-sm transition-colors shrink-0", type: "submit" },
-                        React.createElement("span", null, "\uAC80\uC0C9"))),
-                React.createElement("div", { className: "flex items-center gap-1.5 mt-2.5 overflow-x-auto text-[11px] pb-1 text-slate-500" },
-                    React.createElement("span", { className: "shrink-0 text-slate-400 font-medium" }, "\uCD94\uCC9C \uAC80\uC0C9\uC5B4:"),
-                    ['토당로 105', '화신로 260', '마두동 빌라', '식사동 위시티', '웨스턴돔'].map((pill) => (React.createElement("button", { className: "px-2.5 py-1 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 whitespace-nowrap transition-colors", key: pill, onClick: () => {
-                            setKeyword(pill);
-                            executeSearch(pill);
-                        }, type: "button" },
-                        "#",
-                        pill)))),
-                React.createElement("button", { type: "button", onClick: handleOpenDaumPostcode, className: "w-full mt-2.5 py-2 px-3 rounded-xl bg-slate-50 hover:bg-slate-100 text-[#003262] text-[12px] font-semibold flex items-center justify-center gap-1.5 transition-colors border border-slate-200 shadow-2xs" },
-                    React.createElement("span", { className: "material-symbols-outlined text-[16px] text-[#006a61]" }, "markunread_mailbox"),
-                    React.createElement("span", null, "\uC6B0\uD3B8\uBC88\uD638\uB85C \uC804\uAD6D \uC8FC\uC18C \uCC3E\uAE30 (\uAC74\uBB3C\uBA85\u00B7\uC9C0\uBC88 \uC804\uCCB4 \uAC80\uC0C9)"))),
-            React.createElement("div", { className: "max-h-[360px] overflow-y-auto p-4 space-y-2.5 custom-scrollbar bg-slate-50/50" }, isLoading ? (React.createElement("div", { className: "py-12 flex flex-col items-center justify-center gap-2 text-slate-500" },
-                React.createElement("span", { className: "material-symbols-outlined text-[28px] text-[#03C75A] animate-spin" }, "progress_activity"),
-                React.createElement("span", { className: "text-[13px] font-medium" }, "\uB124\uC774\uBC84 \uC8FC\uC18C \uAC80\uC0C9 \uC911..."))) : searchResults.length > 0 ? (React.createElement(React.Fragment, null,
-                React.createElement("div", { className: "flex items-center justify-between text-[12px] text-slate-500 px-1 pb-1" },
-                    React.createElement("span", null,
-                        "\uAC80\uC0C9 \uACB0\uACFC ",
-                        React.createElement("strong", null, searchResults.length),
-                        "\uAC74"),
-                    React.createElement("span", { className: "text-[11px] text-[#03C75A] font-semibold" }, "\uD074\uB9AD \uC2DC \uC790\uB3D9 \uBC18\uC601")),
-                searchResults.map((item, idx) => (React.createElement("div", { className: "group p-3.5 rounded-xl bg-white border border-slate-200 hover:border-[#03C75A] hover:shadow-md transition-all cursor-pointer flex flex-col gap-1.5", key: idx, onClick: () => onSelectAddress(item) },
-                    React.createElement("div", { className: "flex items-start justify-between gap-2" },
-                        React.createElement("div", { className: "flex items-start gap-2" },
-                            React.createElement("span", { className: "px-1.5 py-0.5 rounded text-[10px] font-bold bg-teal-50 text-teal-700 border border-teal-100 shrink-0 mt-0.5" }, "\uB3C4\uB85C\uBA85"),
-                            React.createElement("span", { className: "text-[13px] font-bold text-slate-900 group-hover:text-[#0D9488] transition-colors leading-snug" }, item.roadAddress)),
-                        React.createElement("span", { className: "text-[11px] font-mono text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded shrink-0" },
-                            "\uC6B0 ",
-                            item.zonecode)),
-                    item.jibunAddress && (React.createElement("div", { className: "flex items-start gap-2 pl-0.5" },
-                        React.createElement("span", { className: "px-1.5 py-0.5 rounded text-[10px] font-medium bg-slate-100 text-slate-600 shrink-0" }, "\uC9C0\uBC88"),
-                        React.createElement("span", { className: "text-[12px] text-slate-500 leading-snug" }, item.jibunAddress))),
-                    item.bldNm && item.bldNm !== item.roadAddress && (React.createElement("div", { className: "text-[11px] text-[#1F497D] font-semibold pl-1 flex items-center gap-1" },
-                        React.createElement("span", { className: "material-symbols-outlined text-[13px]" }, "apartment"),
-                        React.createElement("span", null, item.bldNm))),
-                    React.createElement("div", { className: "flex items-center justify-between pt-1 border-t border-slate-100 text-[11px] text-slate-400" },
-                        React.createElement("span", null,
-                            item.sido,
-                            " ",
-                            item.sigungu),
-                        React.createElement("span", { className: "text-[#03C75A] font-semibold group-hover:underline flex items-center gap-0.5" },
-                            React.createElement("span", null, "\uC120\uD0DD\uD558\uAE30"),
-                            React.createElement("span", { className: "material-symbols-outlined text-[12px]" }, "chevron_right")))))))) : hasSearched ? (React.createElement("div", { className: "py-12 text-center text-slate-500 space-y-2" },
-                React.createElement("span", { className: "material-symbols-outlined text-[32px] text-slate-300" }, "location_off"),
-                React.createElement("p", { className: "text-[13px] font-medium" }, "\uAC80\uC0C9 \uACB0\uACFC\uAC00 \uC5C6\uC2B5\uB2C8\uB2E4."),
-                React.createElement("p", { className: "text-[11px] text-slate-400" }, "\uB3C4\uB85C\uBA85 \uB610\uB294 \uB3D9/\uB9AC \uC774\uB984\uC73C\uB85C \uB2E4\uC2DC \uAC80\uC0C9\uD574 \uBCF4\uC138\uC694."))) : (React.createElement("div", { className: "py-10 text-center text-slate-400 text-[12px]" }, "\uC8FC\uC18C \uB610\uB294 \uAC74\uBB3C\uBA85\uC744 \uC785\uB825 \uD6C4 \uAC80\uC0C9 \uBC84\uD2BC\uC744 \uB20C\uB7EC\uC8FC\uC138\uC694."))),
-            React.createElement("div", { className: "p-3 bg-surface-container-low border-t border-slate-200/80 text-[11px] text-slate-500 flex items-center justify-between" },
-                React.createElement("span", { className: "flex items-center gap-1" },
-                    React.createElement("span", { className: "w-1.5 h-1.5 rounded-full bg-[#03C75A]" }),
-                    "\uB124\uC774\uBC84 \uC9C0\uB3C4 API \uC2E4\uC2DC\uAC04 \uC9C0\uC624\uCF54\uB529"),
-                React.createElement("button", { className: "px-3 py-1 rounded-lg bg-surface-container hover:bg-surface-container-high text-slate-700 font-semibold transition-colors", onClick: onClose, type: "button" }, "\uB2EB\uAE30")))));
-}
-// ============================================================================
 // [청소 계약 기간 및 주차 관리 상수 및 유틸]
 // ============================================================================
 const COM_CODE_BLDG_TYPE = [
@@ -387,19 +226,51 @@ function chunkCleanLocNamesByLength(selectedCodes, locList = COM_CODE_CLEAN_LOC)
  * 연동 백엔드 API: POST /api/web/client/req_000
  * ============================================================================
  */
-// 네이버 주소 검색 팝업 모달
+// ============================================================================
+// 네이버 주소 검색 팝업 모달 (APP-CLNT-REQ-000 100% 동기화 웹 버전)
+// ============================================================================
 function NaverAddressSearchModal({ isOpen, onClose, onSelectAddress }) {
     const [keyword, setKeyword] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [searchResults, setSearchResults] = useState([]);
     const [hasSearched, setHasSearched] = useState(false);
+    const [isEmbedMode, setIsEmbedMode] = useState(false);
     const inputRef = useRef(null);
+    const embedContainerRef = useRef(null);
+    // Daum 전국 주소 검색 임베드 실행 함수
+    const runDaumEmbed = useCallback((targetQ) => {
+        setIsEmbedMode(true);
+        setTimeout(() => {
+            if (embedContainerRef.current && typeof window !== 'undefined' && window.daum && window.daum.Postcode) {
+                embedContainerRef.current.innerHTML = '';
+                new window.daum.Postcode({
+                    oncomplete: (data) => {
+                        const selectedItem = {
+                            roadAddress: data.roadAddress || data.jibunAddress,
+                            jibunAddress: data.jibunAddress || data.roadAddress,
+                            sido: data.sido,
+                            sigungu: data.sigungu,
+                            bldNm: data.buildingName || '',
+                            zonecode: data.zonecode,
+                            dong: data.bname || '',
+                        };
+                        onSelectAddress(selectedItem);
+                        onClose();
+                    },
+                    width: '100%',
+                    height: '100%',
+                }).embed(embedContainerRef.current, { q: targetQ || '', autoClose: true });
+            }
+        }, 50);
+    }, [onSelectAddress, onClose]);
     const handleSearch = useCallback(async (q) => {
-        const targetQ = String(q !== undefined ? q : (inputRef.current?.value || keyword)).trim();
+        const rawVal = q !== undefined ? q : (inputRef.current ? inputRef.current.value : keyword);
+        const targetQ = String(rawVal || '').trim();
         if (!targetQ)
             return;
         setIsLoading(true);
         setHasSearched(true);
+        setIsEmbedMode(false);
         try {
             const res = await fetch('/api/web/client/search_address', {
                 method: 'POST',
@@ -408,81 +279,112 @@ function NaverAddressSearchModal({ isOpen, onClose, onSelectAddress }) {
             });
             if (res.ok) {
                 const data = await res.json();
-                if (data && data.success && Array.isArray(data.items)) {
+                if (data && data.success && Array.isArray(data.items) && data.items.length > 0) {
                     setSearchResults(data.items);
+                    setIsEmbedMode(false);
                 }
                 else {
+                    // 백엔드 결과가 없을 경우, 전국 100% 주소/건물명 검색을 위해 Daum 임베드 즉시 자동 활성화
                     setSearchResults([]);
+                    runDaumEmbed(targetQ);
                 }
+            }
+            else {
+                setSearchResults([]);
+                runDaumEmbed(targetQ);
             }
         }
         catch (err) {
-            console.warn('Address search failed', err);
+            console.warn('Address search failed, fallback to Daum embed', err);
+            setSearchResults([]);
+            runDaumEmbed(targetQ);
         }
         finally {
             setIsLoading(false);
         }
-    }, []);
-    // 모달이 처음 열릴 때(isOpen 변경 시)만 1회 초기화 및 초기 검색 수행 (키보드 입력 중 재실행 방지)
+    }, [keyword, runDaumEmbed]);
+    // Daum 전국 우편번호 검색 팝업
+    const handleOpenDaumPostcode = useCallback(() => {
+        runDaumEmbed(inputRef.current?.value || keyword || '');
+    }, [runDaumEmbed, keyword]);
+    // 모달이 처음 열릴 때(isOpen 변경 시)만 1회 초기화 및 초기 검색 수행
     useEffect(() => {
         if (isOpen) {
             const initQ = '마두동';
             setKeyword(initQ);
             setHasSearched(false);
+            setIsEmbedMode(false);
             handleSearch(initQ);
             setTimeout(() => {
                 if (inputRef.current) {
                     inputRef.current.focus();
                     inputRef.current.select();
                 }
-            }, 80);
+            }, 100);
         }
     }, [isOpen]);
     if (!isOpen)
         return null;
-    return (React.createElement("div", { "aria-modal": "true", className: "fixed inset-0 z-[70] bg-inverse-surface/70 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto", onClick: (e) => {
+    return (React.createElement("div", { "aria-modal": "true", className: "fixed inset-0 z-[70] bg-inverse-surface/70 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto animate-in fade-in", onClick: (e) => {
             if (e.target === e.currentTarget)
                 onClose();
         }, role: "dialog" },
-        React.createElement("div", { className: "relative w-full max-w-lg bg-surface-container-lowest rounded-2xl shadow-2xl overflow-hidden my-4 border border-slate-200 animate-in fade-in zoom-in-95 duration-150" },
-            React.createElement("div", { className: "p-4 bg-surface-container-low border-b border-slate-200 flex items-center justify-between" },
+        React.createElement("div", { className: "relative w-full max-w-lg bg-surface-container-lowest rounded-2xl shadow-2xl overflow-hidden my-4 border border-slate-200 animate-in zoom-in-95 duration-150 flex flex-col max-h-[85vh]" },
+            React.createElement("div", { className: "p-4 bg-surface-container-low border-b border-slate-200 flex items-center justify-between shrink-0" },
                 React.createElement("div", { className: "flex items-center gap-2" },
                     React.createElement("span", { className: "w-6 h-6 rounded bg-[#03C75A] text-white flex items-center justify-center font-bold text-xs" }, "N"),
                     React.createElement("h3", { className: "font-headline-sm text-[16px] text-on-surface font-bold" }, "\uB124\uC774\uBC84 \uC9C0\uB3C4 \uC8FC\uC18C \uAC80\uC0C9"),
-                    React.createElement("span", { className: "px-1.5 py-0.2 rounded text-[10px] font-bold bg-[#03C75A]/15 text-[#008f3e]" }, "\uC2E4\uC2DC\uAC04 \uC9C0\uC624\uCF54\uB529")),
-                React.createElement("button", { onClick: onClose, type: "button", className: "w-8 h-8 rounded-full bg-surface-container flex items-center justify-center text-slate-500 hover:text-slate-800 transition-colors" },
+                    React.createElement("span", { className: "px-1.5 py-0.5 rounded text-[10px] font-bold bg-[#03C75A]/15 text-[#008f3e]" }, "\uC804\uAD6D \uC2E4\uC2DC\uAC04 \uC5F0\uB3D9")),
+                React.createElement("button", { onClick: onClose, type: "button", className: "w-8 h-8 rounded-full bg-surface-container hover:bg-surface-container-high flex items-center justify-center text-on-surface transition-colors cursor-pointer" },
                     React.createElement("span", { className: "material-symbols-outlined text-[18px]" }, "close"))),
-            React.createElement("div", { className: "p-4 bg-white border-b border-slate-100 flex gap-2" },
+            React.createElement("div", { className: "p-4 bg-white border-b border-slate-100 flex gap-2 shrink-0" },
                 React.createElement("div", { className: "relative flex-1" },
                     React.createElement("input", { ref: inputRef, type: "text", value: keyword, onChange: (e) => setKeyword(e.target.value), onKeyDown: (e) => {
                             if (e.key === 'Enter') {
                                 e.preventDefault();
-                                handleSearch(e.currentTarget.value);
+                                handleSearch(e.currentTarget.value || keyword);
                             }
-                        }, placeholder: "\uB3C4\uB85C\uBA85, \uAC74\uBB3C\uBA85, \uC9C0\uBC88 \uC785\uB825 (\uC608: \uC0BC\uD61C\uBE4C\uB529, \uD1A0\uB2F9\uB85C 105)", className: "w-full h-11 pl-3.5 pr-8 rounded-xl bg-surface-container-low text-[14px] outline-none border border-transparent focus:border-[#03C75A] focus:bg-white transition-all font-medium" }),
+                        }, placeholder: "\uB3C4\uB85C\uBA85, \uAC74\uBB3C\uBA85, \uD559\uAD50\uBA85 \uC785\uB825 (\uC608: \uC131\uC0B0\uCD08\uB4F1\uD559\uAD50, \uD1A0\uB2F9\uB85C 105)", className: "w-full h-11 px-3.5 pr-8 rounded-xl bg-surface-container-low text-[14px] outline-none border border-transparent focus:border-[#03C75A] focus:bg-white transition-all font-medium" }),
                     keyword && (React.createElement("button", { type: "button", onClick: () => {
                             setKeyword('');
-                            inputRef.current?.focus();
-                        }, className: "absolute right-2.5 top-3 text-slate-400 hover:text-slate-600" },
+                            if (inputRef.current) {
+                                inputRef.current.value = '';
+                                inputRef.current.focus();
+                            }
+                        }, className: "absolute right-2.5 top-3 text-slate-400 hover:text-slate-600 cursor-pointer" },
                         React.createElement("span", { className: "material-symbols-outlined text-[16px]" }, "cancel")))),
-                React.createElement("button", { onClick: () => handleSearch(keyword), type: "button", className: "px-5 h-11 rounded-xl bg-[#03C75A] hover:bg-[#02b350] active:scale-95 text-white font-bold text-[14px] flex items-center justify-center shrink-0 shadow-sm transition-all" }, "\uAC80\uC0C9")),
-            React.createElement("div", { className: "flex items-center gap-1.5 px-4 py-2.5 overflow-x-auto text-[11px] bg-slate-50 border-b border-slate-100" },
+                React.createElement("button", { onClick: () => {
+                        const q = (inputRef.current ? inputRef.current.value : keyword) || keyword;
+                        handleSearch(q);
+                    }, type: "button", className: "px-5 h-11 rounded-xl bg-[#03C75A] hover:bg-[#02b350] active:scale-95 text-white font-bold text-[14px] flex items-center justify-center shrink-0 shadow-sm transition-all cursor-pointer" }, "\uAC80\uC0C9"),
+                React.createElement("button", { onClick: handleOpenDaumPostcode, type: "button", title: "\uB300\uD55C\uBBFC\uAD6D \uC804\uAD6D \uBAA8\uB4E0 \uC8FC\uC18C/\uAC74\uBB3C\uBA85 \uC815\uBC00 \uAC80\uC0C9", className: "px-3.5 h-11 rounded-xl bg-slate-100 hover:bg-slate-200 active:scale-95 text-slate-700 font-bold text-[12px] flex items-center justify-center shrink-0 border border-slate-200 transition-all cursor-pointer gap-1" },
+                    React.createElement("span", { className: "material-symbols-outlined text-[16px] text-slate-600" }, "travel_explore"),
+                    React.createElement("span", null, "\uC804\uAD6D \uC8FC\uC18C"))),
+            React.createElement("div", { className: "flex items-center gap-1.5 px-4 py-2.5 overflow-x-auto text-[11px] bg-slate-50 border-b border-slate-100 shrink-0" },
                 React.createElement("span", { className: "shrink-0 text-slate-400 font-medium" }, "\uCD94\uCC9C:"),
-                ['삼혜빌딩', '마두동 802-1', '토당로 105', '화신로 260', '테헤란로 152', '일산로 200'].map((chip) => (React.createElement("button", { key: chip, type: "button", onClick: () => {
+                ['성산초등학교', '세브란스병원', '명지병원', '토당로 105', '국립암센터', '삼혜빌딩', '화신로 260'].map((chip) => (React.createElement("button", { key: chip, type: "button", onClick: () => {
                         setKeyword(chip);
+                        if (inputRef.current)
+                            inputRef.current.value = chip;
                         handleSearch(chip);
-                    }, className: "px-2.5 py-1 rounded-full bg-white border border-slate-200 hover:border-[#03C75A] text-slate-700 whitespace-nowrap transition-colors shadow-xs" }, chip)))),
-            React.createElement("div", { className: "max-h-[320px] overflow-y-auto p-4 space-y-2 bg-slate-50/50" }, isLoading ? (React.createElement("div", { className: "py-10 text-center text-slate-400 text-xs" }, "\uB124\uC774\uBC84 \uC8FC\uC18C \uAC80\uC0C9 \uC911...")) : searchResults.length > 0 ? (searchResults.map((item, idx) => (React.createElement("div", { key: idx, onClick: () => {
+                    }, className: "px-2.5 py-1 rounded-full bg-white border border-slate-200 hover:border-[#03C75A] hover:text-[#03C75A] text-slate-700 whitespace-nowrap transition-colors shadow-xs cursor-pointer font-medium" }, chip)))),
+            React.createElement("div", { className: "flex-1 min-h-[350px] max-h-[460px] overflow-y-auto p-3 space-y-2 bg-slate-50/50 relative" }, isLoading ? (React.createElement("div", { className: "py-16 text-center text-slate-400 text-xs flex flex-col items-center gap-2" },
+                React.createElement("span", { className: "material-symbols-outlined animate-spin text-[24px] text-[#03C75A]" }, "progress_activity"),
+                React.createElement("span", null, "\uC804\uAD6D \uC8FC\uC18C \uBC0F \uAC74\uBB3C \uAC80\uC0C9 \uC911..."))) : isEmbedMode ? (React.createElement("div", { className: "w-full h-full min-h-[350px] rounded-xl overflow-hidden bg-white border border-slate-200" },
+                React.createElement("div", { ref: embedContainerRef, className: "w-full h-[350px]" }))) : searchResults.length > 0 ? (searchResults.map((item, idx) => (React.createElement("div", { key: idx, onClick: () => {
                     onSelectAddress(item);
                     onClose();
-                }, className: "p-3 rounded-xl bg-white border border-slate-200 hover:border-[#03C75A] hover:shadow-sm cursor-pointer transition-all text-left" },
-                React.createElement("div", { className: "text-[13px] font-bold text-slate-800" }, item.roadAddress),
+                }, className: "p-3.5 rounded-xl bg-white border border-slate-200 hover:border-[#03C75A] hover:shadow-sm cursor-pointer transition-all text-left group" },
+                React.createElement("div", { className: "text-[13px] font-bold text-slate-800 group-hover:text-[#008f3e]" }, item.roadAddress),
                 item.jibunAddress && (React.createElement("div", { className: "text-[11px] text-slate-500 mt-0.5" },
                     "\uC9C0\uBC88: ",
                     item.jibunAddress)),
                 item.bldNm && item.bldNm !== item.roadAddress && (React.createElement("div", { className: "text-[11px] text-[#1F497D] font-medium mt-0.5" },
                     "\uAC74\uBB3C: ",
-                    item.bldNm)))))) : (React.createElement("div", { className: "py-10 text-center text-slate-400 text-xs" }, "\uAC80\uC0C9 \uACB0\uACFC\uAC00 \uC5C6\uC2B5\uB2C8\uB2E4. \uB3C4\uB85C\uBA85\uC774\uB098 \uAC74\uBB3C\uBA85\uC744 \uC815\uD655\uD788 \uC785\uB825\uD574 \uC8FC\uC138\uC694."))))));
+                    item.bldNm)))))) : hasSearched ? (React.createElement("div", { className: "py-12 text-center text-slate-400 text-xs flex flex-col items-center gap-3" },
+                React.createElement("span", { className: "material-symbols-outlined text-[32px] text-slate-300" }, "location_off"),
+                React.createElement("p", null, "\uAC80\uC0C9 \uACB0\uACFC\uAC00 \uC5C6\uC2B5\uB2C8\uB2E4. \uC804\uAD6D \uC8FC\uC18C \uAC80\uC0C9\uC744 \uC2DC\uC791\uD569\uB2C8\uB2E4."),
+                React.createElement("button", { type: "button", onClick: () => runDaumEmbed(keyword), className: "px-4 py-2 bg-[#03C75A] text-white rounded-lg font-bold text-xs shadow-sm hover:bg-[#02b350] cursor-pointer" }, "\uC804\uAD6D \uC815\uBC00 \uC8FC\uC18C \uAC80\uC0C9 \uC5F4\uAE30"))) : null))));
 }
 // 계절가전청소 총 9개 세부 품목 카탈로그 정의
 const APPLIANCE_CATALOG = [
@@ -5556,79 +5458,6 @@ function WebClntJob000({ contractNo: propContractNo, currentUser = { USER_NO: 'C
                                 React.createElement("strong", { className: "font-semibold" }, "[\uD50C\uB7AB\uD3FC \uBA74\uCC45 \uBC0F \uACB0\uC81C \uC548\uB0B4]"),
                                 " \uC4F8\uACE0\uB2E6\uACE0\uB294 \uD1B5\uC2E0\uD310\uB9E4\uC911\uAC1C\uC790\uB85C\uC11C \uAC70\uB798 \uB2F9\uC0AC\uC790\uAC00 \uC544\uB2C8\uBA70, \uD604\uC7A5 \uC778\uAC74\uBE44 \uBC0F \uC218\uB9AC \uB178\uBB34\uBE44\uB294 \uC791\uC5C5 \uAC80\uC218 \uD6C4 \uC2DC\uACF5 \uAE30\uC0AC\uB2D8\uAED8 \uC9C1\uC811 \uC9C0\uAE09\uB429\uB2C8\uB2E4. \uD50C\uB7AB\uD3FC\uC740 \uD604\uC7A5 \uB178\uBB34\uBE44 \uC5D0\uC2A4\uD06C\uB85C\uB97C \uBCF4\uC720\uD558\uC9C0 \uC54A\uC73C\uBA70 \uD50C\uB7AB\uD3FC \uB9E4\uCE6D \uC218\uC218\uB8CC \uC678 \uC2DC\uACF5 \uD558\uC790\uC758 \uBC95\uC801 \uCC45\uC784\uC740 \uC2DC\uACF5 \uD30C\uD2B8\uB108\uC5D0\uAC8C \uADC0\uC18D\uB429\uB2C8\uB2E4.")),
                         React.createElement("p", { className: "font-caption text-caption text-outline text-right md:text-left" }, "\u00A9 2026 (\uC8FC)\uACF5\uAC04\uB2E4\uC6D0. All rights reserved.")))))));
-}
-/**
- * ============================================================================
- * [프론트엔드 모달 화면]
- * 화면 ID: WEB-CLNT-REQ-000
- * 한글 화면명: 청소 서비스 신청 및 발주서 작성 (고객 지정가 확정 발주 모달)
- * 파일 경로: SseulDakGo_Web/Client/frontend/WEB-CLNT-REQ-000/index.jsx
- * 연동 백엔드 API: POST /api/web/client/req_000
- * ============================================================================
- */
-// 네이버 주소 검색 팝업 모달
-function NaverAddressSearchModal({ isOpen, onClose, onSelectAddress }) {
-    const [keyword, setKeyword] = useState('');
-    const [isLoading, setIsLoading] = useState(false);
-    const [searchResults, setSearchResults] = useState([]);
-    const [hasSearched, setHasSearched] = useState(false);
-    const handleSearch = useCallback(async (q) => {
-        const targetQ = String(q !== undefined ? q : keyword).trim();
-        if (!targetQ)
-            return;
-        setIsLoading(true);
-        setHasSearched(true);
-        try {
-            const res = await fetch('/api/web/client/search_address', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ query: targetQ }),
-            });
-            if (res.ok) {
-                const data = await res.json();
-                if (data && data.success && Array.isArray(data.items)) {
-                    setSearchResults(data.items);
-                }
-            }
-        }
-        catch (err) {
-            console.warn('Address search failed', err);
-        }
-        finally {
-            setIsLoading(false);
-        }
-    }, []);
-    useEffect(() => {
-        if (isOpen) {
-            setKeyword('마두동');
-            setHasSearched(false);
-            handleSearch('마두동');
-        }
-    }, [isOpen]);
-    if (!isOpen)
-        return null;
-    return (React.createElement("div", { "aria-modal": "true", className: "fixed inset-0 z-[70] bg-inverse-surface/70 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto", onClick: (e) => {
-            if (e.target === e.currentTarget)
-                onClose();
-        }, role: "dialog" },
-        React.createElement("div", { className: "relative w-full max-w-lg bg-surface-container-lowest rounded-2xl shadow-2xl overflow-hidden my-4 border border-slate-200" },
-            React.createElement("div", { className: "p-4 bg-surface-container-low border-b border-slate-200 flex items-center justify-between" },
-                React.createElement("div", { className: "flex items-center gap-2" },
-                    React.createElement("span", { className: "w-6 h-6 rounded bg-[#03C75A] text-white flex items-center justify-center font-bold text-xs" }, "N"),
-                    React.createElement("h3", { className: "font-headline-sm text-[16px] text-on-surface font-bold" }, "\uB124\uC774\uBC84 \uC8FC\uC18C \uAC80\uC0C9")),
-                React.createElement("button", { onClick: onClose, type: "button", className: "w-7 h-7 rounded-full bg-surface-container flex items-center justify-center" },
-                    React.createElement("span", { className: "material-symbols-outlined text-[16px]" }, "close"))),
-            React.createElement("div", { className: "p-4 bg-white border-b border-slate-100 flex gap-2" },
-                React.createElement("input", { type: "text", value: keyword, onChange: (e) => setKeyword(e.target.value), onKeyDown: (e) => e.key === 'Enter' && (e.preventDefault(), handleSearch()), placeholder: "\uB3C4\uB85C\uBA85 \uB610\uB294 \uB3D9/\uAC74\uBB3C\uBA85 \uC785\uB825", className: "flex-1 h-10 px-3 rounded-xl bg-surface-container-low text-[13px] outline-none border border-transparent focus:border-[#03C75A]" }),
-                React.createElement("button", { onClick: () => handleSearch(), type: "button", className: "px-4 h-10 rounded-xl bg-[#03C75A] text-white font-bold text-[13px]" }, "\uAC80\uC0C9")),
-            React.createElement("div", { className: "max-h-[300px] overflow-y-auto p-4 space-y-2 bg-slate-50/50" }, isLoading ? (React.createElement("div", { className: "py-8 text-center text-slate-400 text-xs" }, "\uAC80\uC0C9 \uC911...")) : searchResults.length > 0 ? (searchResults.map((item, idx) => (React.createElement("div", { key: idx, onClick: () => onSelectAddress(item), className: "p-3 rounded-xl bg-white border border-slate-200 hover:border-[#03C75A] hover:shadow-sm cursor-pointer transition-all" },
-                React.createElement("div", { className: "text-[13px] font-bold text-slate-800" }, item.roadAddress),
-                item.jibunAddress && (React.createElement("div", { className: "text-[11px] text-slate-500 mt-0.5" },
-                    "\uC9C0\uBC88: ",
-                    item.jibunAddress)),
-                item.bldNm && item.bldNm !== item.roadAddress && (React.createElement("div", { className: "text-[11px] text-[#1F497D] font-medium mt-0.5" },
-                    "\uAC74\uBB3C: ",
-                    item.bldNm)))))) : (React.createElement("div", { className: "py-8 text-center text-slate-400 text-xs" }, "\uAC80\uC0C9 \uACB0\uACFC\uAC00 \uC5C6\uC2B5\uB2C8\uB2E4."))))));
 }
 
 if (typeof window !== 'undefined') {

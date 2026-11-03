@@ -142,307 +142,6 @@ const TAB_NOTICES = {
 };
 
 // ============================================================================
-// [네이버 주소 검색 모달 컴포넌트] (NAVER MAPS API 연동)
-// ============================================================================
-export function NaverAddressSearchModal({
-  isOpen,
-  onClose,
-  onSelectAddress,
-  currentKeyword = '',
-}) {
-  const [keyword, setKeyword] = useState(currentKeyword || '');
-  const [isLoading, setIsLoading] = useState(false);
-  const [searchResults, setSearchResults] = useState([]);
-  const [hasSearched, setHasSearched] = useState(false);
-  const [searchMeta, setSearchMeta] = useState(null);
-  const inputRef = useRef(null);
-
-  const executeSearch = useCallback(async (targetQuery) => {
-    const q = String(targetQuery !== undefined ? targetQuery : inputRef.current?.value || '').trim();
-    if (!q) return;
-    setIsLoading(true);
-    setHasSearched(true);
-    try {
-      const res = await fetch('/api/web/client/search_address', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ query: q }),
-      });
-      if (res.ok) {
-        const data = await res.json();
-        if (data && data.success && Array.isArray(data.items)) {
-          setSearchResults(data.items);
-          setSearchMeta(data);
-        }
-      }
-    } catch (err) {
-      console.warn('Address search failed', err);
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
-
-  // 카카오/다음 우편번호 API 연동 (전국 주소 100% 실시간 정밀 검색)
-  const handleOpenDaumPostcode = () => {
-    if (typeof window !== 'undefined' && window.daum && window.daum.Postcode) {
-      new window.daum.Postcode({
-        oncomplete: (data) => {
-          const selected = {
-            roadAddress: data.roadAddress || data.jibunAddress || data.address,
-            jibunAddress: data.jibunAddress || data.roadAddress || data.address,
-            sido: data.sido,
-            sidoCd: '41',
-            sigungu: data.sigungu,
-            sigunguCd: data.bcode?.substring(0, 5) || '41281',
-            dong: data.bname || '',
-            bldNm: data.buildingName || '',
-            zonecode: data.zonecode || '',
-            x: '126.7778',
-            y: '37.6521',
-          };
-          onSelectAddress(selected);
-        },
-      }).open();
-    } else {
-      executeSearch(keyword || '토당로 105');
-    }
-  };
-
-  // 모달이 처음 열릴 때만(isOpen이 true가 될 때) 단 한 번 초기화 및 초기 검색 수행
-  useEffect(() => {
-    if (isOpen) {
-      const initQ = currentKeyword || '마두동';
-      setKeyword(initQ);
-      setHasSearched(false);
-      executeSearch(initQ);
-      setTimeout(() => {
-        if (inputRef.current) {
-          inputRef.current.focus();
-          inputRef.current.select();
-        }
-      }, 100);
-    }
-  }, [isOpen]);
-
-  if (!isOpen) return null;
-
-  return (
-    <div
-      aria-modal="true"
-      className="fixed inset-0 z-[60] bg-inverse-surface/70 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto"
-      onClick={(e) => {
-        if (e.target === e.currentTarget) onClose();
-      }}
-      role="dialog"
-    >
-      <div className="relative w-full max-w-lg bg-surface-container-lowest rounded-2xl shadow-2xl overflow-hidden my-4 border border-slate-200 animate-in fade-in zoom-in-95 duration-200">
-        {/* Modal Header with NAVER brand badge */}
-        <div className="p-5 bg-surface-container-low border-b border-slate-200/80 flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-[#03C75A] text-white flex items-center justify-center font-bold text-sm shadow-sm">
-              N
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <h3 className="font-headline-sm text-[17px] text-on-surface font-bold leading-none">
-                  네이버 지도 주소 검색
-                </h3>
-                <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-[#03C75A]/15 text-[#008f3e]">
-                  NAVER MAPS API
-                </span>
-              </div>
-              <p className="text-[12px] text-on-surface-variant mt-0.5">
-                도로명, 건물명, 지번으로 검색하시면 행정구역이 자동 입력됩니다.
-              </p>
-            </div>
-          </div>
-          <button
-            aria-label="닫기"
-            className="w-8 h-8 rounded-full bg-surface-container hover:bg-surface-container-high flex items-center justify-center text-on-surface transition-colors"
-            onClick={onClose}
-            type="button"
-          >
-            <span className="material-symbols-outlined text-[18px]">close</span>
-          </button>
-        </div>
-
-        {/* Search Input Box */}
-        <div className="p-4 bg-white border-b border-slate-100">
-          <form
-            className="flex items-center gap-2"
-            onSubmit={(e) => {
-              e.preventDefault();
-              executeSearch(keyword);
-            }}
-          >
-            <div className="relative flex-1">
-              <span className="material-symbols-outlined absolute left-3 top-2.5 text-[#03C75A] text-[20px]">
-                search
-              </span>
-              <input
-                className="w-full h-11 pl-10 pr-9 rounded-xl bg-surface-container-low text-[14px] text-on-surface placeholder:text-outline border border-transparent focus:border-[#03C75A] focus:bg-white outline-none transition-all"
-                onChange={(e) => setKeyword(e.target.value)}
-                placeholder="예: 마두동 123-4, 중앙로 1261, 식사동 위시티"
-                ref={inputRef}
-                type="text"
-                value={keyword}
-              />
-              {keyword && (
-                <button
-                  className="absolute right-2.5 top-2.5 text-slate-400 hover:text-slate-600"
-                  onClick={() => {
-                    setKeyword('');
-                    inputRef.current?.focus();
-                  }}
-                  type="button"
-                >
-                  <span className="material-symbols-outlined text-[18px]">cancel</span>
-                </button>
-              )}
-            </div>
-            <button
-              className="h-11 px-5 rounded-xl bg-[#03C75A] hover:bg-[#02b350] text-white font-bold text-[14px] flex items-center gap-1 shadow-sm transition-colors shrink-0"
-              type="submit"
-            >
-              <span>검색</span>
-            </button>
-          </form>
-
-          {/* Quick Filter Pills */}
-          <div className="flex items-center gap-1.5 mt-2.5 overflow-x-auto text-[11px] pb-1 text-slate-500">
-            <span className="shrink-0 text-slate-400 font-medium">추천 검색어:</span>
-            {['토당로 105', '화신로 260', '마두동 빌라', '식사동 위시티', '웨스턴돔'].map(
-              (pill) => (
-                <button
-                  className="px-2.5 py-1 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 whitespace-nowrap transition-colors"
-                  key={pill}
-                  onClick={() => {
-                    setKeyword(pill);
-                    executeSearch(pill);
-                  }}
-                  type="button"
-                >
-                  #{pill}
-                </button>
-              )
-            )}
-          </div>
-
-          {/* 전국 우편번호 검색 보조 버튼 */}
-          <button
-            type="button"
-            onClick={handleOpenDaumPostcode}
-            className="w-full mt-2.5 py-2 px-3 rounded-xl bg-slate-50 hover:bg-slate-100 text-[#003262] text-[12px] font-semibold flex items-center justify-center gap-1.5 transition-colors border border-slate-200 shadow-2xs"
-          >
-            <span className="material-symbols-outlined text-[16px] text-[#006a61]">markunread_mailbox</span>
-            <span>우편번호로 전국 주소 찾기 (건물명·지번 전체 검색)</span>
-          </button>
-        </div>
-
-        {/* Results List */}
-        <div className="max-h-[360px] overflow-y-auto p-4 space-y-2.5 custom-scrollbar bg-slate-50/50">
-          {isLoading ? (
-            <div className="py-12 flex flex-col items-center justify-center gap-2 text-slate-500">
-              <span className="material-symbols-outlined text-[28px] text-[#03C75A] animate-spin">
-                progress_activity
-              </span>
-              <span className="text-[13px] font-medium">네이버 주소 검색 중...</span>
-            </div>
-          ) : searchResults.length > 0 ? (
-            <>
-              <div className="flex items-center justify-between text-[12px] text-slate-500 px-1 pb-1">
-                <span>
-                  검색 결과 <strong>{searchResults.length}</strong>건
-                </span>
-                <span className="text-[11px] text-[#03C75A] font-semibold">클릭 시 자동 반영</span>
-              </div>
-              {searchResults.map((item, idx) => (
-                <div
-                  className="group p-3.5 rounded-xl bg-white border border-slate-200 hover:border-[#03C75A] hover:shadow-md transition-all cursor-pointer flex flex-col gap-1.5"
-                  key={idx}
-                  onClick={() => onSelectAddress(item)}
-                >
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="flex items-start gap-2">
-                      <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-teal-50 text-teal-700 border border-teal-100 shrink-0 mt-0.5">
-                        도로명
-                      </span>
-                      <span className="text-[13px] font-bold text-slate-900 group-hover:text-[#0D9488] transition-colors leading-snug">
-                        {item.roadAddress}
-                      </span>
-                    </div>
-                    <span className="text-[11px] font-mono text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded shrink-0">
-                      우 {item.zonecode}
-                    </span>
-                  </div>
-
-                  {item.jibunAddress && (
-                    <div className="flex items-start gap-2 pl-0.5">
-                      <span className="px-1.5 py-0.5 rounded text-[10px] font-medium bg-slate-100 text-slate-600 shrink-0">
-                        지번
-                      </span>
-                      <span className="text-[12px] text-slate-500 leading-snug">
-                        {item.jibunAddress}
-                      </span>
-                    </div>
-                  )}
-
-                  {item.bldNm && item.bldNm !== item.roadAddress && (
-                    <div className="text-[11px] text-[#1F497D] font-semibold pl-1 flex items-center gap-1">
-                      <span className="material-symbols-outlined text-[13px]">apartment</span>
-                      <span>{item.bldNm}</span>
-                    </div>
-                  )}
-
-                  <div className="flex items-center justify-between pt-1 border-t border-slate-100 text-[11px] text-slate-400">
-                    <span>
-                      {item.sido} {item.sigungu}
-                    </span>
-                    <span className="text-[#03C75A] font-semibold group-hover:underline flex items-center gap-0.5">
-                      <span>선택하기</span>
-                      <span className="material-symbols-outlined text-[12px]">chevron_right</span>
-                    </span>
-                  </div>
-                </div>
-              ))}
-            </>
-          ) : hasSearched ? (
-            <div className="py-12 text-center text-slate-500 space-y-2">
-              <span className="material-symbols-outlined text-[32px] text-slate-300">
-                location_off
-              </span>
-              <p className="text-[13px] font-medium">검색 결과가 없습니다.</p>
-              <p className="text-[11px] text-slate-400">
-                도로명 또는 동/리 이름으로 다시 검색해 보세요.
-              </p>
-            </div>
-          ) : (
-            <div className="py-10 text-center text-slate-400 text-[12px]">
-              주소 또는 건물명을 입력 후 검색 버튼을 눌러주세요.
-            </div>
-          )}
-        </div>
-
-        {/* Footer */}
-        <div className="p-3 bg-surface-container-low border-t border-slate-200/80 text-[11px] text-slate-500 flex items-center justify-between">
-          <span className="flex items-center gap-1">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#03C75A]"></span>
-            네이버 지도 API 실시간 지오코딩
-          </span>
-          <button
-            className="px-3 py-1 rounded-lg bg-surface-container hover:bg-surface-container-high text-slate-700 font-semibold transition-colors"
-            onClick={onClose}
-            type="button"
-          >
-            닫기
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// ============================================================================
 // [청소 계약 기간 및 주차 관리 상수 및 유틸]
 // ============================================================================
 export const COM_CODE_BLDG_TYPE = [
@@ -541,19 +240,52 @@ export function chunkCleanLocNamesByLength(selectedCodes, locList = COM_CODE_CLE
  * ============================================================================
  */
 
-// 네이버 주소 검색 팝업 모달
+// ============================================================================
+// 네이버 주소 검색 팝업 모달 (APP-CLNT-REQ-000 100% 동기화 웹 버전)
+// ============================================================================
 function NaverAddressSearchModal({ isOpen, onClose, onSelectAddress }) {
   const [keyword, setKeyword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [searchResults, setSearchResults] = useState([]);
   const [hasSearched, setHasSearched] = useState(false);
+  const [isEmbedMode, setIsEmbedMode] = useState(false);
   const inputRef = useRef(null);
+  const embedContainerRef = useRef(null);
+
+  // Daum 전국 주소 검색 임베드 실행 함수
+  const runDaumEmbed = useCallback((targetQ) => {
+    setIsEmbedMode(true);
+    setTimeout(() => {
+      if (embedContainerRef.current && typeof window !== 'undefined' && window.daum && window.daum.Postcode) {
+        embedContainerRef.current.innerHTML = '';
+        new window.daum.Postcode({
+          oncomplete: (data) => {
+            const selectedItem = {
+              roadAddress: data.roadAddress || data.jibunAddress,
+              jibunAddress: data.jibunAddress || data.roadAddress,
+              sido: data.sido,
+              sigungu: data.sigungu,
+              bldNm: data.buildingName || '',
+              zonecode: data.zonecode,
+              dong: data.bname || '',
+            };
+            onSelectAddress(selectedItem);
+            onClose();
+          },
+          width: '100%',
+          height: '100%',
+        }).embed(embedContainerRef.current, { q: targetQ || '', autoClose: true });
+      }
+    }, 50);
+  }, [onSelectAddress, onClose]);
 
   const handleSearch = useCallback(async (q) => {
-    const targetQ = String(q !== undefined ? q : (inputRef.current?.value || keyword)).trim();
+    const rawVal = q !== undefined ? q : (inputRef.current ? inputRef.current.value : keyword);
+    const targetQ = String(rawVal || '').trim();
     if (!targetQ) return;
     setIsLoading(true);
     setHasSearched(true);
+    setIsEmbedMode(false);
     try {
       const res = await fetch('/api/web/client/search_address', {
         method: 'POST',
@@ -562,32 +294,46 @@ function NaverAddressSearchModal({ isOpen, onClose, onSelectAddress }) {
       });
       if (res.ok) {
         const data = await res.json();
-        if (data && data.success && Array.isArray(data.items)) {
+        if (data && data.success && Array.isArray(data.items) && data.items.length > 0) {
           setSearchResults(data.items);
+          setIsEmbedMode(false);
         } else {
+          // 백엔드 결과가 없을 경우, 전국 100% 주소/건물명 검색을 위해 Daum 임베드 즉시 자동 활성화
           setSearchResults([]);
+          runDaumEmbed(targetQ);
         }
+      } else {
+        setSearchResults([]);
+        runDaumEmbed(targetQ);
       }
     } catch (err) {
-      console.warn('Address search failed', err);
+      console.warn('Address search failed, fallback to Daum embed', err);
+      setSearchResults([]);
+      runDaumEmbed(targetQ);
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [keyword, runDaumEmbed]);
 
-  // 모달이 처음 열릴 때(isOpen 변경 시)만 1회 초기화 및 초기 검색 수행 (키보드 입력 중 재실행 방지)
+  // Daum 전국 우편번호 검색 팝업
+  const handleOpenDaumPostcode = useCallback(() => {
+    runDaumEmbed(inputRef.current?.value || keyword || '');
+  }, [runDaumEmbed, keyword]);
+
+  // 모달이 처음 열릴 때(isOpen 변경 시)만 1회 초기화 및 초기 검색 수행
   useEffect(() => {
     if (isOpen) {
       const initQ = '마두동';
       setKeyword(initQ);
       setHasSearched(false);
+      setIsEmbedMode(false);
       handleSearch(initQ);
       setTimeout(() => {
         if (inputRef.current) {
           inputRef.current.focus();
           inputRef.current.select();
         }
-      }, 80);
+      }, 100);
     }
   }, [isOpen]);
 
@@ -596,28 +342,33 @@ function NaverAddressSearchModal({ isOpen, onClose, onSelectAddress }) {
   return (
     <div
       aria-modal="true"
-      className="fixed inset-0 z-[70] bg-inverse-surface/70 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto"
+      className="fixed inset-0 z-[70] bg-inverse-surface/70 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto animate-in fade-in"
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
       role="dialog"
     >
-      <div className="relative w-full max-w-lg bg-surface-container-lowest rounded-2xl shadow-2xl overflow-hidden my-4 border border-slate-200 animate-in fade-in zoom-in-95 duration-150">
-        <div className="p-4 bg-surface-container-low border-b border-slate-200 flex items-center justify-between">
+      <div className="relative w-full max-w-lg bg-surface-container-lowest rounded-2xl shadow-2xl overflow-hidden my-4 border border-slate-200 animate-in zoom-in-95 duration-150 flex flex-col max-h-[85vh]">
+        {/* 모달 상단 헤더 바 */}
+        <div className="p-4 bg-surface-container-low border-b border-slate-200 flex items-center justify-between shrink-0">
           <div className="flex items-center gap-2">
             <span className="w-6 h-6 rounded bg-[#03C75A] text-white flex items-center justify-center font-bold text-xs">N</span>
             <h3 className="font-headline-sm text-[16px] text-on-surface font-bold">네이버 지도 주소 검색</h3>
-            <span className="px-1.5 py-0.2 rounded text-[10px] font-bold bg-[#03C75A]/15 text-[#008f3e]">
-              실시간 지오코딩
+            <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-[#03C75A]/15 text-[#008f3e]">
+              전국 실시간 연동
             </span>
           </div>
-          <button onClick={onClose} type="button" className="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center text-slate-500 hover:text-slate-800 transition-colors">
+          <button
+            onClick={onClose}
+            type="button"
+            className="w-8 h-8 rounded-full bg-surface-container hover:bg-surface-container-high flex items-center justify-center text-on-surface transition-colors cursor-pointer"
+          >
             <span className="material-symbols-outlined text-[18px]">close</span>
           </button>
         </div>
 
-        {/* 검색 입력창 */}
-        <div className="p-4 bg-white border-b border-slate-100 flex gap-2">
+        {/* 검색 입력창 및 버튼 */}
+        <div className="p-4 bg-white border-b border-slate-100 flex gap-2 shrink-0">
           <div className="relative flex-1">
             <input
               ref={inputRef}
@@ -627,56 +378,79 @@ function NaverAddressSearchModal({ isOpen, onClose, onSelectAddress }) {
               onKeyDown={(e) => {
                 if (e.key === 'Enter') {
                   e.preventDefault();
-                  handleSearch(e.currentTarget.value);
+                  handleSearch(e.currentTarget.value || keyword);
                 }
               }}
-              placeholder="도로명, 건물명, 지번 입력 (예: 삼혜빌딩, 토당로 105)"
-              className="w-full h-11 pl-3.5 pr-8 rounded-xl bg-surface-container-low text-[14px] outline-none border border-transparent focus:border-[#03C75A] focus:bg-white transition-all font-medium"
+              placeholder="도로명, 건물명, 학교명 입력 (예: 성산초등학교, 토당로 105)"
+              className="w-full h-11 px-3.5 pr-8 rounded-xl bg-surface-container-low text-[14px] outline-none border border-transparent focus:border-[#03C75A] focus:bg-white transition-all font-medium"
             />
             {keyword && (
               <button
                 type="button"
                 onClick={() => {
                   setKeyword('');
-                  inputRef.current?.focus();
+                  if (inputRef.current) {
+                    inputRef.current.value = '';
+                    inputRef.current.focus();
+                  }
                 }}
-                className="absolute right-2.5 top-3 text-slate-400 hover:text-slate-600"
+                className="absolute right-2.5 top-3 text-slate-400 hover:text-slate-600 cursor-pointer"
               >
                 <span className="material-symbols-outlined text-[16px]">cancel</span>
               </button>
             )}
           </div>
           <button
-            onClick={() => handleSearch(keyword)}
+            onClick={() => {
+              const q = (inputRef.current ? inputRef.current.value : keyword) || keyword;
+              handleSearch(q);
+            }}
             type="button"
-            className="px-5 h-11 rounded-xl bg-[#03C75A] hover:bg-[#02b350] active:scale-95 text-white font-bold text-[14px] flex items-center justify-center shrink-0 shadow-sm transition-all"
+            className="px-5 h-11 rounded-xl bg-[#03C75A] hover:bg-[#02b350] active:scale-95 text-white font-bold text-[14px] flex items-center justify-center shrink-0 shadow-sm transition-all cursor-pointer"
           >
             검색
+          </button>
+          <button
+            onClick={handleOpenDaumPostcode}
+            type="button"
+            title="대한민국 전국 모든 주소/건물명 정밀 검색"
+            className="px-3.5 h-11 rounded-xl bg-slate-100 hover:bg-slate-200 active:scale-95 text-slate-700 font-bold text-[12px] flex items-center justify-center shrink-0 border border-slate-200 transition-all cursor-pointer gap-1"
+          >
+            <span className="material-symbols-outlined text-[16px] text-slate-600">travel_explore</span>
+            <span>전국 주소</span>
           </button>
         </div>
 
         {/* 추천 검색어 칩 */}
-        <div className="flex items-center gap-1.5 px-4 py-2.5 overflow-x-auto text-[11px] bg-slate-50 border-b border-slate-100">
+        <div className="flex items-center gap-1.5 px-4 py-2.5 overflow-x-auto text-[11px] bg-slate-50 border-b border-slate-100 shrink-0">
           <span className="shrink-0 text-slate-400 font-medium">추천:</span>
-          {['삼혜빌딩', '마두동 802-1', '토당로 105', '화신로 260', '테헤란로 152', '일산로 200'].map((chip) => (
+          {['성산초등학교', '세브란스병원', '명지병원', '토당로 105', '국립암센터', '삼혜빌딩', '화신로 260'].map((chip) => (
             <button
               key={chip}
               type="button"
               onClick={() => {
                 setKeyword(chip);
+                if (inputRef.current) inputRef.current.value = chip;
                 handleSearch(chip);
               }}
-              className="px-2.5 py-1 rounded-full bg-white border border-slate-200 hover:border-[#03C75A] text-slate-700 whitespace-nowrap transition-colors shadow-xs"
+              className="px-2.5 py-1 rounded-full bg-white border border-slate-200 hover:border-[#03C75A] hover:text-[#03C75A] text-slate-700 whitespace-nowrap transition-colors shadow-xs cursor-pointer font-medium"
             >
               {chip}
             </button>
           ))}
         </div>
 
-        {/* 검색 결과 목록 */}
-        <div className="max-h-[320px] overflow-y-auto p-4 space-y-2 bg-slate-50/50">
+        {/* 검색 결과 목록 영역 (네이버 리스트 또는 전국 실시간 임베드) */}
+        <div className="flex-1 min-h-[350px] max-h-[460px] overflow-y-auto p-3 space-y-2 bg-slate-50/50 relative">
           {isLoading ? (
-            <div className="py-10 text-center text-slate-400 text-xs">네이버 주소 검색 중...</div>
+            <div className="py-16 text-center text-slate-400 text-xs flex flex-col items-center gap-2">
+              <span className="material-symbols-outlined animate-spin text-[24px] text-[#03C75A]">progress_activity</span>
+              <span>전국 주소 및 건물 검색 중...</span>
+            </div>
+          ) : isEmbedMode ? (
+            <div className="w-full h-full min-h-[350px] rounded-xl overflow-hidden bg-white border border-slate-200">
+              <div ref={embedContainerRef} className="w-full h-[350px]" />
+            </div>
           ) : searchResults.length > 0 ? (
             searchResults.map((item, idx) => (
               <div
@@ -685,9 +459,9 @@ function NaverAddressSearchModal({ isOpen, onClose, onSelectAddress }) {
                   onSelectAddress(item);
                   onClose();
                 }}
-                className="p-3 rounded-xl bg-white border border-slate-200 hover:border-[#03C75A] hover:shadow-sm cursor-pointer transition-all text-left"
+                className="p-3.5 rounded-xl bg-white border border-slate-200 hover:border-[#03C75A] hover:shadow-sm cursor-pointer transition-all text-left group"
               >
-                <div className="text-[13px] font-bold text-slate-800">{item.roadAddress}</div>
+                <div className="text-[13px] font-bold text-slate-800 group-hover:text-[#008f3e]">{item.roadAddress}</div>
                 {item.jibunAddress && (
                   <div className="text-[11px] text-slate-500 mt-0.5">지번: {item.jibunAddress}</div>
                 )}
@@ -696,11 +470,19 @@ function NaverAddressSearchModal({ isOpen, onClose, onSelectAddress }) {
                 )}
               </div>
             ))
-          ) : (
-            <div className="py-10 text-center text-slate-400 text-xs">
-              검색 결과가 없습니다. 도로명이나 건물명을 정확히 입력해 주세요.
+          ) : hasSearched ? (
+            <div className="py-12 text-center text-slate-400 text-xs flex flex-col items-center gap-3">
+              <span className="material-symbols-outlined text-[32px] text-slate-300">location_off</span>
+              <p>검색 결과가 없습니다. 전국 주소 검색을 시작합니다.</p>
+              <button
+                type="button"
+                onClick={() => runDaumEmbed(keyword)}
+                className="px-4 py-2 bg-[#03C75A] text-white rounded-lg font-bold text-xs shadow-sm hover:bg-[#02b350] cursor-pointer"
+              >
+                전국 정밀 주소 검색 열기
+              </button>
             </div>
-          )}
+          ) : null}
         </div>
       </div>
     </div>
@@ -9673,120 +9455,6 @@ export function WebClntJob000({
           </div>
         </div>
       </footer>
-    </div>
-  );
-}
-/**
- * ============================================================================
- * [프론트엔드 모달 화면]
- * 화면 ID: WEB-CLNT-REQ-000
- * 한글 화면명: 청소 서비스 신청 및 발주서 작성 (고객 지정가 확정 발주 모달)
- * 파일 경로: SseulDakGo_Web/Client/frontend/WEB-CLNT-REQ-000/index.jsx
- * 연동 백엔드 API: POST /api/web/client/req_000
- * ============================================================================
- */
-
-// 네이버 주소 검색 팝업 모달
-function NaverAddressSearchModal({ isOpen, onClose, onSelectAddress }) {
-  const [keyword, setKeyword] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [searchResults, setSearchResults] = useState([]);
-  const [hasSearched, setHasSearched] = useState(false);
-
-  const handleSearch = useCallback(async (q) => {
-    const targetQ = String(q !== undefined ? q : keyword).trim();
-    if (!targetQ) return;
-    setIsLoading(true);
-    setHasSearched(true);
-    try {
-      const res = await fetch('/api/web/client/search_address', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ query: targetQ }),
-      });
-      if (res.ok) {
-        const data = await res.json();
-        if (data && data.success && Array.isArray(data.items)) {
-          setSearchResults(data.items);
-        }
-      }
-    } catch (err) {
-      console.warn('Address search failed', err);
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    if (isOpen) {
-      setKeyword('마두동');
-      setHasSearched(false);
-      handleSearch('마두동');
-    }
-  }, [isOpen]);
-
-  if (!isOpen) return null;
-
-  return (
-    <div
-      aria-modal="true"
-      className="fixed inset-0 z-[70] bg-inverse-surface/70 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto"
-      onClick={(e) => {
-        if (e.target === e.currentTarget) onClose();
-      }}
-      role="dialog"
-    >
-      <div className="relative w-full max-w-lg bg-surface-container-lowest rounded-2xl shadow-2xl overflow-hidden my-4 border border-slate-200">
-        <div className="p-4 bg-surface-container-low border-b border-slate-200 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span className="w-6 h-6 rounded bg-[#03C75A] text-white flex items-center justify-center font-bold text-xs">N</span>
-            <h3 className="font-headline-sm text-[16px] text-on-surface font-bold">네이버 주소 검색</h3>
-          </div>
-          <button onClick={onClose} type="button" className="w-7 h-7 rounded-full bg-surface-container flex items-center justify-center">
-            <span className="material-symbols-outlined text-[16px]">close</span>
-          </button>
-        </div>
-        <div className="p-4 bg-white border-b border-slate-100 flex gap-2">
-          <input
-            type="text"
-            value={keyword}
-            onChange={(e) => setKeyword(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), handleSearch())}
-            placeholder="도로명 또는 동/건물명 입력"
-            className="flex-1 h-10 px-3 rounded-xl bg-surface-container-low text-[13px] outline-none border border-transparent focus:border-[#03C75A]"
-          />
-          <button
-            onClick={() => handleSearch()}
-            type="button"
-            className="px-4 h-10 rounded-xl bg-[#03C75A] text-white font-bold text-[13px]"
-          >
-            검색
-          </button>
-        </div>
-        <div className="max-h-[300px] overflow-y-auto p-4 space-y-2 bg-slate-50/50">
-          {isLoading ? (
-            <div className="py-8 text-center text-slate-400 text-xs">검색 중...</div>
-          ) : searchResults.length > 0 ? (
-            searchResults.map((item, idx) => (
-              <div
-                key={idx}
-                onClick={() => onSelectAddress(item)}
-                className="p-3 rounded-xl bg-white border border-slate-200 hover:border-[#03C75A] hover:shadow-sm cursor-pointer transition-all"
-              >
-                <div className="text-[13px] font-bold text-slate-800">{item.roadAddress}</div>
-                {item.jibunAddress && (
-                  <div className="text-[11px] text-slate-500 mt-0.5">지번: {item.jibunAddress}</div>
-                )}
-                {item.bldNm && item.bldNm !== item.roadAddress && (
-                  <div className="text-[11px] text-[#1F497D] font-medium mt-0.5">건물: {item.bldNm}</div>
-                )}
-              </div>
-            ))
-          ) : (
-            <div className="py-8 text-center text-slate-400 text-xs">검색 결과가 없습니다.</div>
-          )}
-        </div>
-      </div>
     </div>
   );
 }

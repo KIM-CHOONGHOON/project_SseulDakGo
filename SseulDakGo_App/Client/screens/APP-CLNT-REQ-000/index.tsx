@@ -188,7 +188,7 @@ function MobileNaverAddressSearchModal({
         {/* 추천 검색어 칩 */}
         <div className="flex items-center gap-1.5 px-3.5 py-2 overflow-x-auto text-[11px] bg-slate-50 border-b border-slate-100">
           <span className="shrink-0 text-slate-400 font-medium">추천:</span>
-          {['삼혜빌딩', '마두동 802-1', '토당로 105', '화신로 260', '테헤란로 152'].map((chip) => (
+          {['세브란스병원', '명지병원', '토당로 105', '국립암센터', '삼혜빌딩', '화신로 260'].map((chip) => (
             <button
               key={chip}
               type="button"
