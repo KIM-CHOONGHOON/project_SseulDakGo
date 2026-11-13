@@ -1,55 +1,37 @@
+Set-Location "C:\GongGanDaWon_Project\project_SseulDakGo"
+@"
+# 1. 민감한 환경변수 및 설정 파일 (절대 업로드 금지)
+.env
+.env.*
+db.*
+*.pem
+*.key
+application-prod.yml
+application-secret.yml
 
-# 의존성 및 패키지
-
+# 2. 패키지 및 의존성 폴더 (용량 큼)
 node_modules/
-
 .pnp
-
 .pnp.js
 
-
-
-# 빌드 및 컴파일 결과물
-
-.next/
-
-out/
-
+# 3. 빌드 및 실행 결과물
 build/
-
 dist/
+out/
+.next/
+target/
+*.jar
+*.war
 
-
-
-# 보안 및 환경 변수 (db.ts 내 접속 정보 보호용)
-
-.env
-
-.env*.local
-
-.env.development.local
-
-.env.test.local
-
-.env.production.local
-
-
-
-# 운영체제 및 에디터 임시 파일
-
-.DS_Store
-
-*.pem
-
-*.log
-
-npm-debug.log*
-
-yarn-debug.log*
-
-yarn-error.log*
-
-.cursor/
-
+# 4. IDE / 에디터 및 OS 자동 생성 파일
 .vscode/
+.idea/
+*.iml
+.DS_Store
+Thumbs.db
 
+# 5. 로그 파일
+*.log
+npm-debug.log*
+logs/
+"@ | Out-File -FilePath ".gitignore" -Encoding utf8
