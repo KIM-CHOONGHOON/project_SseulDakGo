@@ -250,8 +250,8 @@ function Build-ListWorksheet([string]$titleText, [array]$items) {
     [void]$sb.AppendLine('  <sheetData>')
 
     $titleIdx = Get-SstIndex "■ $titleText"
-    [void]$sb.AppendLine("    <row r=`"1`" ht=`"30`" customHeight=`"1`">")
-    [void]$sb.AppendLine("      <c r=`"A1`" s=`"1`" t=`"s`"><v>$titleIdx</v></c>")
+    [void]$sb.AppendLine('    <row r="1" ht="30" customHeight="1">')
+    [void]$sb.AppendLine("      <c r=""A1"" s=""1"" t=""s""><v>$titleIdx</v></c>")
     [void]$sb.AppendLine('    </row>')
 
     $hNo = Get-SstIndex "No"
@@ -261,13 +261,13 @@ function Build-ListWorksheet([string]$titleText, [array]$items) {
     $hPath = Get-SstIndex "프론트엔드 파일 경로"
     $hStat = Get-SstIndex "작성 상태"
 
-    [void]$sb.AppendLine("    <row r=`"2`" ht=`"25`" customHeight=`"1`">")
-    [void]$sb.AppendLine("      <c r=`"A2`" s=`"2`" t=`"s`"><v>$hNo</v></c>")
-    [void]$sb.AppendLine("      <c r=`"B2`" s=`"2`" t=`"s`"><v>$hId</v></c>")
-    [void]$sb.AppendLine("      <c r=`"C2`" s=`"2`" t=`"s`"><v>$hType</v></c>")
-    [void]$sb.AppendLine("      <c r=`"D2`" s=`"2`" t=`"s`"><v>$hName</v></c>")
-    [void]$sb.AppendLine("      <c r=`"E2`" s=`"2`" t=`"s`"><v>$hPath</v></c>")
-    [void]$sb.AppendLine("      <c r=`"F2`" s=`"2`" t=`"s`"><v>$hStat</v></c>")
+    [void]$sb.AppendLine('    <row r="2" ht="25" customHeight="1">')
+    [void]$sb.AppendLine("      <c r=""A2"" s=""2"" t=""s""><v>$hNo</v></c>")
+    [void]$sb.AppendLine("      <c r=""B2"" s=""2"" t=""s""><v>$hId</v></c>")
+    [void]$sb.AppendLine("      <c r=""C2"" s=""2"" t=""s""><v>$hType</v></c>")
+    [void]$sb.AppendLine("      <c r=""D2"" s=""2"" t=""s""><v>$hName</v></c>")
+    [void]$sb.AppendLine("      <c r=""E2"" s=""2"" t=""s""><v>$hPath</v></c>")
+    [void]$sb.AppendLine("      <c r=""F2"" s=""2"" t=""s""><v>$hStat</v></c>")
     [void]$sb.AppendLine('    </row>')
 
     $rowNum = 3
@@ -279,13 +279,13 @@ function Build-ListWorksheet([string]$titleText, [array]$items) {
         $pathIdx = Get-SstIndex $it.Path
         $statIdx = Get-SstIndex $it.Status
 
-        [void]$sb.AppendLine("    <row r=`"$rowNum`" ht=`"22`" customHeight=`"1`">")
-        [void]$sb.AppendLine("      <c r=`"A$rowNum`" s=`"3`"><v>$noVal</v></c>")
-        [void]$sb.AppendLine("      <c r=`"B$rowNum`" s=`"3`" t=`"s`"><v>$idIdx</v></c>")
-        [void]$sb.AppendLine("      <c r=`"C$rowNum`" s=`"3`" t=`"s`"><v>$typeIdx</v></c>")
-        [void]$sb.AppendLine("      <c r=`"D$rowNum`" s=`"4`" t=`"s`"><v>$nameIdx</v></c>")
-        [void]$sb.AppendLine("      <c r=`"E$rowNum`" s=`"4`" t=`"s`"><v>$pathIdx</v></c>")
-        [void]$sb.AppendLine("      <c r=`"F$rowNum`" s=`"3`" t=`"s`"><v>$statIdx</v></c>")
+        [void]$sb.AppendLine("    <row r=""$rowNum"" ht=""22"" customHeight=""1"">")
+        [void]$sb.AppendLine("      <c r=""A$rowNum"" s=""3""><v>$noVal</v></c>")
+        [void]$sb.AppendLine("      <c r=""B$rowNum"" s=""3"" t=""s""><v>$idIdx</v></c>")
+        [void]$sb.AppendLine("      <c r=""C$rowNum"" s=""3"" t=""s""><v>$typeIdx</v></c>")
+        [void]$sb.AppendLine("      <c r=""D$rowNum"" s=""4"" t=""s""><v>$nameIdx</v></c>")
+        [void]$sb.AppendLine("      <c r=""E$rowNum"" s=""4"" t=""s""><v>$pathIdx</v></c>")
+        [void]$sb.AppendLine("      <c r=""F$rowNum"" s=""3"" t=""s""><v>$statIdx</v></c>")
         [void]$sb.AppendLine('    </row>')
         $rowNum++
     }
@@ -302,8 +302,8 @@ $clientRows = @(
   @{No=1; Id="WEB-CLNT-COM-010000"; Type="Main"; Name="고객 메인 홈"; Path="SseulDakGo_Web/Client/frontend/WEB-CLNT-COM-010000/index.jsx"; Status="화면작성완료"},
   @{No=2; Id="WEB-CLNT-REQ-010100"; Type="Sub (모달)"; Name="청소 서비스 신청 (발주서 작성)"; Path="SseulDakGo_Web/Client/frontend/WEB-CLNT-REQ-010100/index.jsx"; Status="화면작성완료"},
   @{No=3; Id="WEB-CLNT-REQ-010101"; Type="Sub (모달)"; Name="동일 시공 현장 주소 확인 및 변경 안내"; Path="SseulDakGo_Web/Client/frontend/WEB-CLNT-REQ-010101/index.jsx"; Status="화면작성완료"},
-  @{No=4; Id="WEB-CLNT-ATH-010100"; Type="Sub (모달)"; Name="고객 로그인"; Path="SseulDakGo_Web/Client/frontend/WEB-CLNT-ATH-010100/index.jsx"; Status="화면작성완료"},
-  @{No=5; Id="WEB-CLNT-ATH-010200"; Type="Sub (모달)"; Name="통합 회원가입 및 약관동의 서명"; Path="SseulDakGo_Web/Client/frontend/WEB-CLNT-ATH-010200/index.jsx"; Status="화면작성완료"},
+  @{No=4; Id="WEB-CLNT-ATH-010100"; Type="Sub (모달)"; Name="고객 로그인 (네이버/카카오 간편인증)"; Path="SseulDakGo_Web/Client/frontend/WEB-CLNT-ATH-010100/index.jsx"; Status="화면작성완료"},
+  @{No=5; Id="WEB-CLNT-ATH-010200"; Type="Sub (모달)"; Name="통합 회원가입 및 약관동의 서명 (네이버/카카오 연동)"; Path="SseulDakGo_Web/Client/frontend/WEB-CLNT-ATH-010200/index.jsx"; Status="화면작성완료"},
   @{No=6; Id="WEB-CLNT-ATH-010201"; Type="Sub (모달)"; Name="고객 가입 완료 환영 안내"; Path="SseulDakGo_Web/Client/frontend/WEB-CLNT-ATH-010201/index.jsx"; Status="화면작성완료"},
   @{No=7; Id="WEB-CLNT-ORD-010000"; Type="Main"; Name="나의 청소 신청 현황"; Path="SseulDakGo_Web/Client/frontend/WEB-CLNT-ORD-010000/index.jsx"; Status="화면작성완료"},
   @{No=8; Id="WEB-CLNT-ORD-010100"; Type="Sub"; Name="청소 요청 상세 및 용역 청약서 비교/선택"; Path="SseulDakGo_Web/Client/frontend/WEB-CLNT-ORD-010100/index.jsx"; Status="화면작성완료"},

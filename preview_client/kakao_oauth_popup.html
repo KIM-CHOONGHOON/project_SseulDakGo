@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>카카오계정으로 로그인 | 쓸고닦고</title>
+  <link rel="icon" type="image/png" href="logo.png"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin=""/>
+  <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif; }
+  </style>
+</head>
+<body class="bg-[#F8F9FA] text-slate-800 min-h-screen flex flex-col justify-between p-4 antialiased select-none">
+
+  <!-- 상단 카카오 헤더 -->
+  <header class="bg-[#FEE500] px-5 py-3.5 -mx-4 -mt-4 shadow-xs flex items-center justify-between border-b border-amber-300/80">
+    <div class="flex items-center gap-2">
+      <svg aria-hidden="true" className="w-5 h-5 fill-[#3C1E1E]" viewBox="0 0 24 24">
+        <path d="M12 3C6.477 3 2 6.48 2 10.772c0 2.76 1.848 5.178 4.636 6.53l-.946 3.52c-.084.312.247.568.52.387l4.22-2.793c.516.052 1.042.086 1.57.086 5.523 0 10-3.48 10-7.772C22 6.48 17.523 3 12 3z"></path>
+      </svg>
+      <span class="font-extrabold text-[#3C1E1E] text-lg tracking-tight">kakao</span>
+      <span class="text-xs text-[#3C1E1E]/80 font-bold ml-1">계정으로 로그인</span>
+    </div>
+    <div class="flex items-center gap-1.5">
+      <span class="text-[10px] font-bold bg-[#3C1E1E]/10 text-[#3C1E1E] px-2 py-0.5 rounded font-mono">
+        비즈 앱 (ID 1650108)
+      </span>
+    </div>
+  </header>
+
+  <!-- 메인 인증 영역 -->
+  <main class="flex-1 max-w-md mx-auto w-full py-4 space-y-4">
+    <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm text-center">
+      <div class="flex items-center justify-center gap-3 mb-3">
+        <div class="w-12 h-12 rounded-2xl bg-slate-50 border border-slate-200 p-1 flex items-center justify-center shadow-xs">
+          <img src="logo.png" alt="쓸고닦고" class="w-full h-full object-contain" onerror="this.src='../public/logo.png'"/>
+        </div>
+        <span class="text-slate-300 font-bold text-lg">+</span>
+        <div class="w-12 h-12 rounded-2xl bg-[#FEE500] flex items-center justify-center shadow-xs">
+          <svg aria-hidden="true" class="w-7 h-7 fill-[#3C1E1E]" viewBox="0 0 24 24">
+            <path d="M12 3C6.477 3 2 6.48 2 10.772c0 2.76 1.848 5.178 4.636 6.53l-.946 3.52c-.084.312.247.568.52.387l4.22-2.793c.516.052 1.042.086 1.57.086 5.523 0 10-3.48 10-7.772C22 6.48 17.523 3 12 3z"></path>
+          </svg>
+        </div>
+      </div>
+      <h1 class="text-base font-extrabold text-slate-900 mb-1">
+        <span class="text-[#003262]">쓸고닦고</span> 서비스 제공을 위한<br/>
+        카카오 개인정보 제3자 제공 동의
+      </h1>
+      <p class="text-xs text-slate-500">
+        카카오 비즈 앱 인증 회원 정보로 간편하게 가입하고 시공 발주 및 견적을 안전하게 이용합니다.
+      </p>
+    </div>
+
+    <div class="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm space-y-3">
+      <div class="flex items-center justify-between pb-2.5 border-b border-slate-100 text-xs">
+        <span class="font-bold text-slate-500">카카오 로그인 계정 (이메일)</span>
+        <div class="flex items-center gap-1.5 text-slate-900 font-semibold">
+          <span class="w-2 h-2 rounded-full bg-[#FEE500] border border-[#3C1E1E]"></span>
+          <input id="inputEmail" type="email" value="chunggiwa@gmail.com" class="text-xs text-slate-800 font-bold bg-white border border-slate-300 rounded px-2 py-0.5 focus:outline-none focus:ring-1 focus:ring-amber-500" title="이메일 직접 수정 가능"/>
+        </div>
+      </div>
+
+      <div>
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-xs font-bold text-slate-800">제공 항목 (필수 4개)</span>
+          <span class="text-[11px] text-amber-700 font-bold">비즈 앱 필수 동의</span>
+        </div>
+        <div class="space-y-2 text-xs">
+          <div class="flex items-center justify-between p-2.5 bg-slate-50 rounded-xl border border-slate-100">
+            <span class="font-medium text-slate-700">1. 카카오 회원번호 (고유 ID)</span>
+            <span class="text-[10px] font-bold text-amber-900 bg-amber-100 px-1.5 py-0.5 rounded">필수</span>
+          </div>
+          <div class="flex items-center justify-between p-2.5 bg-slate-50 rounded-xl border border-slate-100">
+            <div class="flex flex-col">
+              <span class="font-medium text-slate-700">2. 카카오계정 이메일 (계정 ID)</span>
+              <span class="text-[11px] text-slate-400 font-mono" id="subEmail">chunggiwa@gmail.com</span>
+            </div>
+            <span class="text-[10px] font-bold text-amber-900 bg-amber-100 px-1.5 py-0.5 rounded">필수</span>
+          </div>
+          <div class="flex items-center justify-between p-2.5 bg-slate-50 rounded-xl border border-slate-100">
+            <div class="flex flex-col">
+              <span class="font-medium text-slate-700">3. 성명 (실명)</span>
+              <input id="inputName" type="text" value="김충훈" class="text-xs text-slate-800 font-bold bg-white border border-slate-200 rounded px-1.5 py-0.5 mt-0.5 focus:outline-none focus:ring-1 focus:ring-amber-500" title="실명 수정 가능"/>
+            </div>
+            <span class="text-[10px] font-bold text-amber-900 bg-amber-100 px-1.5 py-0.5 rounded">필수</span>
+          </div>
+          <div class="flex items-center justify-between p-2.5 bg-slate-50 rounded-xl border border-slate-100">
+            <div class="flex flex-col">
+              <span class="font-medium text-slate-700">4. 휴대폰 번호 (본인명의 실명확인)</span>
+              <input id="inputPhone" type="text" value="010-8286-3457" class="text-xs text-slate-800 font-bold bg-white border border-slate-200 rounded px-1.5 py-0.5 mt-0.5 focus:outline-none focus:ring-1 focus:ring-amber-500" title="휴대폰 번호 수정 가능"/>
+            </div>
+            <span class="text-[10px] font-bold text-amber-900 bg-amber-100 px-1.5 py-0.5 rounded">필수</span>
+          </div>
+        </div>
+      </div>
+
+      <p class="text-[11px] text-slate-400 leading-relaxed pt-1">
+        * 제공된 정보는 쓸고닦고 회원 식별 및 시공 매칭 알림톡 전송 목적으로만 이용되며 회원 탈퇴 시 즉시 파기됩니다.
+      </p>
+    </div>
+  </main>
+
+  <footer class="max-w-md mx-auto w-full space-y-2 pt-2">
+    <button
+      id="btnAgree"
+      onclick="handleAgreeAndSend()"
+      type="button"
+      class="w-full h-12 bg-[#FEE500] hover:bg-[#FDD835] active:scale-[0.99] text-[#3C1E1E] font-bold text-sm rounded-xl transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer"
+    >
+      <div class="w-4 h-4 bg-[#3C1E1E] rounded-full flex items-center justify-center text-[#FEE500] font-black text-[10px]">✓</div>
+      <span>동의하고 계속하기 (회원정보 자동 연동)</span>
+    </button>
+
+    <div class="flex items-center justify-between text-xs text-slate-500 px-1">
+      <button onclick="window.close()" type="button" class="hover:text-slate-800 underline cursor-pointer">
+        취소하고 창 닫기
+      </button>
+      <a id="btnRealOAuth" href="/api/auth/kakao/authorize?userRoleCd=C&mode=redirect" target="_self" class="text-slate-400 hover:text-amber-700 text-[11px] flex items-center gap-0.5">
+        <span>실제 카카오 서버(kauth.kakao.com)로 전환</span>
+        <span>→</span>
+      </a>
+    </div>
+  </footer>
+
+  <script>
+    // 이전에 가입/로그인된 회원 정보가 있으면 자동 연동
+    try {
+      const savedUser = JSON.parse(localStorage.getItem('SSEULDAKGO_AUTH_USER') || localStorage.getItem('SSEULDAKGO_KAKAO_PROFILE') || 'null');
+      if (savedUser) {
+        if (savedUser.userEmail || savedUser.email) {
+          const em = savedUser.userEmail || savedUser.email;
+          document.getElementById('inputEmail').value = em;
+          const sub = document.getElementById('subEmail');
+          if (sub) sub.textContent = em;
+        }
+        if (savedUser.userNm || savedUser.name) document.getElementById('inputName').value = savedUser.userNm || savedUser.name;
+        if (savedUser.userTel || savedUser.mobile) document.getElementById('inputPhone').value = savedUser.userTel || savedUser.mobile;
+      }
+    } catch (e) {}
+
+    function handleAgreeAndSend() {
+      const name = document.getElementById('inputName').value.trim() || '김충훈';
+      const phone = document.getElementById('inputPhone').value.trim() || '010-8286-3457';
+      const email = (document.getElementById('inputEmail')?.value || 'chunggiwa@gmail.com').trim();
+      let uid = 'kakao_1794659626956';
+      try {
+        const savedUser = JSON.parse(localStorage.getItem('SSEULDAKGO_AUTH_USER') || localStorage.getItem('SSEULDAKGO_KAKAO_PROFILE') || '{}');
+        if (savedUser.socialUid) uid = savedUser.socialUid;
+      } catch (e) {}
+
+      const profileData = {
+        id: uid,
+        email: email,
+        name: name,
+        mobile: phone,
+        userRoleCd: 'C',
+        provider: 'KAKAO'
+      };
+
+      try {
+        if (window.opener && !window.opener.closed) {
+          window.opener.postMessage({
+            type: 'KAKAO_AUTH_SUCCESS',
+            provider: 'KAKAO',
+            profile: profileData,
+            data: {
+              success: true,
+              isRegisteredUser: true,
+              profile: profileData
+            }
+          }, '*');
+        }
+      } catch (err) {
+        console.warn('postMessage to opener fail:', err);
+      }
+
+      try {
+        localStorage.setItem('SSEULDAKGO_KAKAO_AUTH_BRIDGE', JSON.stringify({
+          timestamp: Date.now(),
+          profile: profileData
+        }));
+        localStorage.setItem('SSEULDAKGO_KAKAO_PROFILE', JSON.stringify(profileData));
+      } catch (e) {}
+
+      const btn = document.getElementById('btnAgree');
+      btn.innerHTML = '<span>연동 완료! 창을 닫습니다...</span>';
+      btn.className = 'w-full h-12 bg-amber-400 text-[#3C1E1E] font-bold text-sm rounded-xl flex items-center justify-center';
+      
+      setTimeout(() => {
+        window.close();
+      }, 350);
+    }
+  </script>
+</body>
+</html>
+

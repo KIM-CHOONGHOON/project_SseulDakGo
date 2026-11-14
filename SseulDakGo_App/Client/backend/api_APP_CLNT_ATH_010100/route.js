@@ -58,12 +58,14 @@ export async function processAppClntAth010200100(payload = {}) {
       }
 
       if (db && typeof db.executeQuery === 'function') {
+        const cleanEmail = userEmail ? userEmail.trim().toLowerCase() : '';
         const rows = await db.executeQuery(
           `SELECT USER_NO, USER_ROLE_CD, USER_EMAIL, USER_NM, USER_STAT_CD, SUSPEND_EXPIRE_DT
            FROM TB_USER
-           WHERE SOCIAL_PROVIDER = ? AND SOCIAL_UID = ? AND USER_ROLE_CD = ?
+           WHERE ((SOCIAL_PROVIDER = ? AND SOCIAL_UID = ? AND USER_ROLE_CD = ?)
+              OR (SOCIAL_PROVIDER = ? AND USER_EMAIL = ? AND USER_ROLE_CD = ?))
            LIMIT 1`,
-          [socialProvider, socialUid, normalizedRole]
+          [socialProvider, socialUid, normalizedRole, socialProvider, cleanEmail, normalizedRole]
         );
 
         if (rows && rows.length > 0) {

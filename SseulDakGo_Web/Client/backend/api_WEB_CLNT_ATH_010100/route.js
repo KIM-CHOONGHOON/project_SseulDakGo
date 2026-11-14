@@ -48,7 +48,7 @@ export async function processWebClntAth010200100(payload = {}) {
   const normalizedRole = userRoleCd === 'S' ? 'S' : 'C';
 
   // 1. 소셜 로그인 처리 (간편 연동)
-  if (socialProvider && socialUid) {
+  if (socialProvider && (socialUid || userEmail)) {
     try {
       let db = null;
       try {
@@ -58,12 +58,14 @@ export async function processWebClntAth010200100(payload = {}) {
       }
 
       if (db && typeof db.executeQuery === 'function') {
+        const cleanEmail = userEmail ? userEmail.trim().toLowerCase() : '';
+        // 1) 소셜 고유 ID 또는 (동일 SOCIAL_PROVIDER 내 이메일)로 TB_USER 기존 회원 여부 엄격 조회
         const rows = await db.executeQuery(
-          `SELECT USER_NO, USER_ROLE_CD, USER_EMAIL, USER_NM, USER_STAT_CD, SUSPEND_EXPIRE_DT
+          `SELECT USER_NO, USER_ROLE_CD, USER_EMAIL, USER_NM, USER_STAT_CD, SUSPEND_EXPIRE_DT, SOCIAL_PROVIDER, SOCIAL_UID
            FROM TB_USER
-           WHERE SOCIAL_PROVIDER = ? AND SOCIAL_UID = ? AND USER_ROLE_CD = ?
+           WHERE ((SOCIAL_PROVIDER = ? AND SOCIAL_UID = ?) OR (SOCIAL_PROVIDER = ? AND USER_EMAIL = ? AND USER_ROLE_CD = ?))
            LIMIT 1`,
-          [socialProvider, socialUid, normalizedRole]
+          [socialProvider, socialUid || '', socialProvider, cleanEmail, normalizedRole]
         );
 
         if (rows && rows.length > 0) {
@@ -74,54 +76,62 @@ export async function processWebClntAth010200100(payload = {}) {
               status: 403,
               data: {
                 success: false,
+                isNewUser: false,
                 code: 'ERR_ACCOUNT_SUSPENDED',
                 message: `운영 정책 위반으로 계정이 정지되었습니다. (정지 해제일: ${user.SUSPEND_EXPIRE_DT})`
               }
             };
           }
 
-          // 최종 로그인 일시 갱신
-          await db.executeQuery('UPDATE TB_USER SET LAST_LOGIN_DT = NOW() WHERE USER_NO = ?', [user.USER_NO]);
+          // 소셜 연동 정보 보강 및 최종 로그인 일시 갱신
+          await db.executeQuery(
+            `UPDATE TB_USER 
+             SET SOCIAL_PROVIDER = COALESCE(SOCIAL_PROVIDER, ?), 
+                 SOCIAL_UID = COALESCE(SOCIAL_UID, ?), 
+                 LAST_LOGIN_DT = NOW(),
+                 MOD_DT = NOW()
+             WHERE USER_NO = ?`,
+            [socialProvider, socialUid || null, user.USER_NO]
+          );
 
           return {
             status: 200,
             data: {
               success: true,
+              isNewUser: false,
               code: 'OK',
               data: {
                 userNo: user.USER_NO,
                 userNm: user.USER_NM,
                 userEmail: user.USER_EMAIL,
                 userRoleCd: user.USER_ROLE_CD,
-                accessToken: `mock_jwt_token_${user.USER_NO}_${Date.now()}`
+                accessToken: `jwt_token_${user.USER_NO}_${Date.now()}`
               },
-              message: '소셜 계정으로 로그인되었습니다.'
+              message: `${socialProvider} 계정으로 로그인되었습니다.`
+            }
+          };
+        } else {
+          // DB에 회원이 존재하지 않는 경우: 신규 회원 상태로 응답하여 회원가입 유도
+          return {
+            status: 200,
+            data: {
+              success: false,
+              isNewUser: true,
+              code: 'NEW_USER_REGISTRATION_REQUIRED',
+              data: {
+                socialProvider,
+                socialUid,
+                userEmail: cleanEmail,
+                userRoleCd: normalizedRole
+              },
+              message: `${socialProvider} 연동 계정으로 등록된 회원이 없습니다. 회원가입 화면으로 이동합니다.`
             }
           };
         }
       }
     } catch (dbErr) {
-      console.warn('[AUTH_SOCIAL_DB_FALLBACK]', dbErr.message);
+      console.warn('[AUTH_SOCIAL_DB_ERROR]', dbErr.message);
     }
-
-    // 소셜 로그인 모의 처리 (Sandbox / DB 미연결 시)
-    const mockUserNo = normalizedRole === 'C' ? 'C20261000001' : 'S20261000001';
-    const mockUserNm = normalizedRole === 'C' ? '소셜고객' : '소셜시공사';
-    return {
-      status: 200,
-      data: {
-        success: true,
-        code: 'OK',
-        data: {
-          userNo: mockUserNo,
-          userNm: mockUserNm,
-          userEmail: `${socialProvider.toLowerCase()}_user@sseuldakgo.kr`,
-          userRoleCd: normalizedRole,
-          accessToken: `mock_jwt_token_${mockUserNo}_${Date.now()}`
-        },
-        message: `${socialProvider} 계정으로 로그인되었습니다.`
-      }
-    };
   }
 
   // 2. 이메일 / 비밀번호 입력 필수 검증

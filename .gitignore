@@ -2,6 +2,7 @@
 .env
 .env.*
 db.*
+sms.*
 *.pem
 *.key
 application-prod.yml
@@ -27,11 +28,32 @@ target/
 *.iml
 .DS_Store
 Thumbs.db
+.cursorrules
 
 # 5. 오피스(엑셀 등) 임시 잠금 파일
 ~$*
+*.tmp
 
 # 6. 로그 파일
 *.log
 npm-debug.log*
 logs/
+
+# 7. 업로드된 동적 사용자 파일 및 스토리지 (스토리지 격리 원칙)
+public/uploads/
+uploads/
+storage/
+.temp_build/
+
+# 8. 개발/테스트용 임시 스크립트 및 테스트 페이지
+scripts/test_*.mjs
+scripts/check_*.mjs
+scripts/delete_*.mjs
+scripts/update_*.mjs
+scripts/read_*.ps1
+preview_test.html
+Logo_*.jpg
+
+# 9. 소스 내 로그인 및 인증 관련 파일 (보안)
+lib/google-login.ts
+lib/google-login.js

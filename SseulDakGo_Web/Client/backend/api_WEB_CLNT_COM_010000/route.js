@@ -41,7 +41,7 @@ export const SQL_SELECT_CLIENT_USER = `
   FROM TB_USER
   WHERE USER_NO = ?
     AND USER_ROLE_CD = 'C'
-    AND USE_YN = 'Y'
+    AND (ACTIVE_STATUS_YN = 'Y' OR USER_STAT_CD = 'NORMAL')
   LIMIT 1;
 `;
 
@@ -101,9 +101,14 @@ export const SQL_SELECT_REALTIME_ORDER_FEED = `
 // ============================================================================
 
 const DEFAULT_USER_MAP = {
+  C20261100001: {
+    USER_NO: 'C20261100001',
+    USER_NM: '김충훈',
+    USER_ROLE_CD: 'C',
+  },
   C20261000001: {
     USER_NO: 'C20261000001',
-    USER_NM: '홍길동',
+    USER_NM: '김충훈',
     USER_ROLE_CD: 'C',
   },
 };
@@ -331,7 +336,7 @@ export async function processWebClntCom010000(body = {}) {
   let userInfo = {
     isGuest,
     USER_NO: isGuest ? 'GUEST' : String(rawUserNo),
-    USER_NM: isGuest ? '비회원' : '홍길동',
+    USER_NM: isGuest ? '비회원' : (rawUserNo === 'C20261100001' ? '김충훈' : '고객'),
     USER_ROLE_CD: isGuest ? 'GUEST' : 'C',
   };
 

@@ -135,7 +135,7 @@ export async function processAppClntCom010000(payload = {}) {
 
     if (clientUserNo && String(clientUserNo).startsWith('C') && clientUserNo !== 'GUEST') {
       const userSql = `
-        SELECT USER_NO, USER_NM, USER_ROLE_CD, USER_EMAIL, USE_YN
+        SELECT USER_NO, USER_NM, USER_ROLE_CD, USER_EMAIL, ACTIVE_STATUS_YN
         FROM TB_USER
         WHERE USER_NO = ? AND USER_ROLE_CD = 'C'
         LIMIT 1
@@ -145,14 +145,14 @@ export async function processAppClntCom010000(payload = {}) {
         clientInfo = {
           isGuest: false,
           userNo: userRows[0].USER_NO,
-          userNm: userRows[0].USER_NM || '홍길동'
+          userNm: userRows[0].USER_NM || '김충훈'
         };
       } else {
         // DB 연결 실패 또는 시드 미등록 시 기본 회원 fallback
         clientInfo = {
           isGuest: false,
           userNo: clientUserNo,
-          userNm: '홍길동'
+          userNm: clientUserNo === 'C20261100001' ? '김충훈' : '고객'
         };
       }
     }

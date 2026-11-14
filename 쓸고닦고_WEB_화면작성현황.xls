@@ -81,7 +81,7 @@
     <Cell ss:StyleID="sCenter"><Data ss:Type="Number">4</Data></Cell>
     <Cell ss:StyleID="sCenter"><Data ss:Type="String">WEB-CLNT-ATH-010100</Data></Cell>
     <Cell ss:StyleID="sCenter"><Data ss:Type="String">Sub (모달)</Data></Cell>
-    <Cell ss:StyleID="sLeft"><Data ss:Type="String">고객 로그인</Data></Cell>
+    <Cell ss:StyleID="sLeft"><Data ss:Type="String">고객 로그인 (네이버/카카오 간편인증)</Data></Cell>
     <Cell ss:StyleID="sLeft"><Data ss:Type="String">SseulDakGo_Web/Client/frontend/WEB-CLNT-ATH-010100/index.jsx</Data></Cell>
     <Cell ss:StyleID="sCenter"><Data ss:Type="String">화면작성완료</Data></Cell>
    </Row>
@@ -89,7 +89,7 @@
     <Cell ss:StyleID="sCenter"><Data ss:Type="Number">5</Data></Cell>
     <Cell ss:StyleID="sCenter"><Data ss:Type="String">WEB-CLNT-ATH-010200</Data></Cell>
     <Cell ss:StyleID="sCenter"><Data ss:Type="String">Sub (모달)</Data></Cell>
-    <Cell ss:StyleID="sLeft"><Data ss:Type="String">통합 회원가입 및 약관동의 서명</Data></Cell>
+    <Cell ss:StyleID="sLeft"><Data ss:Type="String">통합 회원가입 및 약관동의 서명 (네이버/카카오 연동)</Data></Cell>
     <Cell ss:StyleID="sLeft"><Data ss:Type="String">SseulDakGo_Web/Client/frontend/WEB-CLNT-ATH-010200/index.jsx</Data></Cell>
     <Cell ss:StyleID="sCenter"><Data ss:Type="String">화면작성완료</Data></Cell>
    </Row>

@@ -213,27 +213,47 @@ export async function processWebClntAth010200200(payload = {}) {
     const cleanEmail = userEmail.trim().toLowerCase();
     const rolePrefix = getRolePrefix(userRoleCd);
     const roleNm = rolePrefix === 'S' ? '용역/시공사' : (rolePrefix === 'A' ? '관리자' : '고객');
+    const isSocialCheck = Boolean(socialProvider && socialProvider !== 'NONE');
 
     if (db && typeof db.executeQuery === 'function') {
       try {
-        // TB_USER의 USER_NO 컬럼 첫 1바이트가 고객 'C', 용역 'S', 관리 'A' 이면서
-        // USER_EMAIL 값이 동일한 정보가 있는지 중복 여부 정합성 검증
-        const rows = await db.executeQuery(
-          `SELECT USER_NO, USER_ROLE_CD, USER_EMAIL 
-           FROM TB_USER 
-           WHERE SUBSTRING(USER_NO, 1, 1) = ? 
-             AND LOWER(TRIM(USER_EMAIL)) = ? 
-           LIMIT 1`,
-          [rolePrefix, cleanEmail]
-        );
+        // [SOCIAL_PROVIDER 결합 검증]
+        // 동일한 이메일이라도 소셜 공급자(카카오, 네이버, Google, 일반)가 다르면 독립 가입 허용
+        let checkSql = '';
+        let checkParams = [];
+
+        if (isSocialCheck) {
+          checkSql = `
+            SELECT USER_NO, USER_ROLE_CD, USER_EMAIL, SOCIAL_PROVIDER 
+            FROM TB_USER 
+            WHERE SUBSTRING(USER_NO, 1, 1) = ? 
+              AND LOWER(TRIM(USER_EMAIL)) = ? 
+              AND SOCIAL_PROVIDER = ?
+            LIMIT 1
+          `;
+          checkParams = [rolePrefix, cleanEmail, socialProvider];
+        } else {
+          checkSql = `
+            SELECT USER_NO, USER_ROLE_CD, USER_EMAIL, SOCIAL_PROVIDER 
+            FROM TB_USER 
+            WHERE SUBSTRING(USER_NO, 1, 1) = ? 
+              AND LOWER(TRIM(USER_EMAIL)) = ? 
+              AND (SOCIAL_PROVIDER IS NULL OR SOCIAL_PROVIDER = 'NONE' OR SOCIAL_PROVIDER = '')
+            LIMIT 1
+          `;
+          checkParams = [rolePrefix, cleanEmail];
+        }
+
+        const rows = await db.executeQuery(checkSql, checkParams);
         if (rows && rows.length > 0) {
+          const providerText = isSocialCheck ? `${socialProvider} 연동 ` : '';
           return {
             status: 200,
             data: {
               success: false,
               isAvailable: false,
               code: 'ERR_DUPLICATE_EMAIL',
-              message: `이미 가입된 ${roleNm} 이메일 주소입니다. 다른 이메일을 사용해 주세요.`
+              message: `이미 ${providerText}가입된 ${roleNm} 이메일 주소입니다. 해당 계정으로 로그인해 주세요.`
             }
           };
         }
@@ -361,25 +381,46 @@ export async function processWebClntAth010200200(payload = {}) {
         }
       }
 
-      // 2-2. 이메일 중복 최종 확인 (USER_NO 첫 1바이트가 고객 'C', 용역 'S', 관리 'A' 이면서 USER_EMAIL 동일 여부)
+      // 2-2. 이메일 중복 최종 확인 (USER_NO 첫 1바이트가 고객 'C', 용역 'S', 관리 'A' 이면서 동일 SOCIAL_PROVIDER 결합 검증)
       const rolePrefix = getRolePrefix(normalizedRole);
       const roleNm = rolePrefix === 'S' ? '용역/시공사' : (rolePrefix === 'A' ? '관리자' : '고객');
 
-      const existRows = await db.executeQuery(
-        `SELECT USER_NO, USER_ROLE_CD, USER_EMAIL 
-         FROM TB_USER 
-         WHERE SUBSTRING(USER_NO, 1, 1) = ? 
-           AND LOWER(TRIM(USER_EMAIL)) = ? 
-         LIMIT 1`,
-        [rolePrefix, cleanEmail]
-      );
+      let duplicateEmailQuery = '';
+      let duplicateEmailParams = [];
+
+      if (isSocial) {
+        // 소셜 연동 가입: 동일한 역할 및 동일한 SOCIAL_PROVIDER 내에서 이메일 중복 검증
+        duplicateEmailQuery = `
+          SELECT USER_NO, USER_ROLE_CD, USER_EMAIL, SOCIAL_PROVIDER 
+          FROM TB_USER 
+          WHERE SUBSTRING(USER_NO, 1, 1) = ? 
+            AND LOWER(TRIM(USER_EMAIL)) = ? 
+            AND SOCIAL_PROVIDER = ?
+          LIMIT 1
+        `;
+        duplicateEmailParams = [rolePrefix, cleanEmail, socialProvider];
+      } else {
+        // 일반 이메일 가입: 동일한 역할 내 일반 가입 계정끼리 이메일 중복 검증
+        duplicateEmailQuery = `
+          SELECT USER_NO, USER_ROLE_CD, USER_EMAIL, SOCIAL_PROVIDER 
+          FROM TB_USER 
+          WHERE SUBSTRING(USER_NO, 1, 1) = ? 
+            AND LOWER(TRIM(USER_EMAIL)) = ? 
+            AND (SOCIAL_PROVIDER IS NULL OR SOCIAL_PROVIDER = 'NONE' OR SOCIAL_PROVIDER = '')
+          LIMIT 1
+        `;
+        duplicateEmailParams = [rolePrefix, cleanEmail];
+      }
+
+      const existRows = await db.executeQuery(duplicateEmailQuery, duplicateEmailParams);
       if (existRows && existRows.length > 0) {
+        const providerDesc = isSocial ? `${socialProvider} 연동 ` : '';
         return {
           status: 409,
           data: {
             success: false,
             code: 'ERR_DUPLICATE_EMAIL',
-            message: `이미 가입된 ${roleNm} 이메일 계정입니다.`
+            message: `이미 ${providerDesc}가입된 ${roleNm} 이메일 계정입니다. 해당 계정으로 로그인해 주세요.`
           }
         };
       }

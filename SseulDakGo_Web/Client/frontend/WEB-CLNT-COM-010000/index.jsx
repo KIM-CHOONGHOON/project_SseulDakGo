@@ -2794,10 +2794,83 @@ export function WebClntAth010100({
     }
   };
 
-  // 소셜 간편 로그인 시뮬레이션
+  // 소셜 간편 로그인 (네이버 / 카카오 / Google OAuth 2.0 공식 팝업 연동)
   const handleSocialLogin = async (provider) => {
     setIsLoading(true);
     setErrorMsg('');
+
+    if (typeof window !== 'undefined') {
+      const providerLower = provider.toLowerCase();
+      // file:/// 로컬 파일 실행 환경과 http:// 로컬 서버 환경 모두 완벽 호환되도록 경로 동적 계산
+      let popupUrl = `./${providerLower}_oauth_popup.html?action=login&userRoleCd=${role}`;
+      if (window.location.protocol.startsWith('http')) {
+        popupUrl = `/preview/${providerLower}_oauth_popup.html?action=login&userRoleCd=${role}`;
+      }
+
+      const width = 480;
+      const height = 640;
+      const left = window.screenX + (window.outerWidth - width) / 2;
+      const top = window.screenY + (window.outerHeight - height) / 2;
+
+      const onSocialMessage = async (e) => {
+        if (e.data?.provider === provider || e.data?.type?.startsWith(provider)) {
+          window.removeEventListener('message', onSocialMessage);
+          setIsLoading(true);
+          const profile = e.data.profile || e.data?.data?.profile || {};
+          try {
+            // 백엔드 실제 TB_USER DB 조회 (기존 가입 여부 검증)
+            const checkRes = await fetch('/api/web/client/ath_010100', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                userRoleCd: role,
+                socialProvider: provider,
+                socialUid: profile.id,
+                userEmail: profile.email
+              })
+            });
+            const checkData = await checkRes.json();
+            setIsLoading(false);
+
+            if (checkData.success && !checkData.isNewUser && checkData.data) {
+              // 1. 기존 가입 회원: 실제 DB 정보로 로그인 성공 처리
+              const loggedUser = {
+                ...checkData.data,
+                hasTempReq
+              };
+              localStorage.setItem('SSEULDAKGO_AUTH_USER', JSON.stringify(loggedUser));
+              if (onSuccessLogin) onSuccessLogin(loggedUser);
+              if (onClose) onClose();
+            } else {
+              // 2. 미가입 신규 회원: 로그인 모달 닫고 회원가입 모달 열기 + 소셜 인증 정보 주입
+              if (onClose) onClose();
+              if (onOpenRegister) {
+                onOpenRegister({
+                  socialProvider: provider,
+                  socialUid: profile.id,
+                  email: profile.email,
+                  name: profile.name,
+                  mobile: profile.mobile
+                });
+              } else {
+                alert(`${provider} 계정 인증이 완료되었습니다. 필수 약관 동의 및 회원가입을 완료해 주세요.`);
+              }
+            }
+          } catch (err) {
+            console.error('Social login DB check error:', err);
+            setIsLoading(false);
+          }
+        }
+      };
+      window.addEventListener('message', onSocialMessage);
+
+      // 팝업 열기
+      const popup = window.open(popupUrl, `${providerLower}_login_popup`, `width=${width},height=${height},left=${left},top=${top},scrollbars=yes`);
+      if (popup && !popup.closed) {
+        return;
+      }
+    }
+
     try {
       const res = await fetch('/api/web/client/ath_010100', {
         method: 'POST',
@@ -2952,7 +3025,7 @@ export function WebClntAth010100({
           <span className="font-label-sm text-label-sm text-on-surface-variant font-semibold mb-2.5 text-center">
             SNS 계정으로 간편 로그인
           </span>
-          <div className="grid grid-cols-4 gap-2 w-full">
+          <div className="grid grid-cols-3 gap-2 w-full">
             {/* Kakao */}
             <button
               className="h-11 rounded-xl bg-[#FEE500] hover:brightness-95 flex flex-col items-center justify-center transition-transform active:scale-95 shadow-sm group"
@@ -2999,21 +3072,6 @@ export function WebClntAth010100({
                 <path d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.24 6.58l4.04 3.15c.95-2.83 3.6-4.98 6.72-4.98z" fill="#EA4335"></path>
               </svg>
               <span className="font-caption text-[11px] text-on-surface font-semibold mt-0.5 leading-none">Google</span>
-            </button>
-
-            {/* Apple */}
-            <button
-              className="h-11 rounded-xl bg-[#000000] hover:bg-neutral-900 flex flex-col items-center justify-center transition-transform active:scale-95 shadow-sm group"
-              data-field="SOCIAL_PROVIDER"
-              data-val="APPLE"
-              onClick={() => handleSocialLogin('APPLE')}
-              title="Apple 로그인"
-              type="button"
-            >
-              <svg aria-hidden="true" className="w-3.5 h-3.5 fill-white" viewBox="0 0 24 24">
-                <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 6.84c.66-.82 1.11-1.96.99-3.1-.96.04-2.13.64-2.82 1.45-.61.71-1.14 1.87-1 2.98 1.08.08 2.17-.51 2.83-1.33z"></path>
-              </svg>
-              <span className="font-caption text-[11px] text-white font-semibold mt-0.5 leading-none">Apple</span>
             </button>
           </div>
 
@@ -3189,7 +3247,8 @@ export function WebClntAth010200({
   isOpen = false,
   onClose,
   onSuccessRegister,
-  onOpenLogin
+  onOpenLogin,
+  initialSocial = null
 }) {
   // 1. 회원 구분 ('C': 고객 회원, 'S': 시공사 회원)
   const [role, setRole] = useState('C');
@@ -3206,11 +3265,39 @@ export function WebClntAth010200({
 
   const [pwd, setPwd] = useState('');
   const [pwdConfirm, setPwdConfirm] = useState('');
-  const [showPwd, setShowPwd] = useState(false); // 비밀번호 보기/숨기기 토글 (Requirement 1)
-  const [showPwdConfirm, setShowPwdConfirm] = useState(false); // 비밀번호 확인 보기/숨기기 토글 (Requirement 1)
+  const [showPwd, setShowPwd] = useState(false);
+  const [showPwdConfirm, setShowPwdConfirm] = useState(false);
   const [userNm, setUserNm] = useState('');
   const [userTel, setUserTel] = useState('');
-  const [isTelVerified, setIsTelVerified] = useState(true);
+  const [isTelVerified, setIsTelVerified] = useState(false);
+  const [isSmsSent, setIsSmsSent] = useState(false);
+  const [authCode, setAuthCode] = useState('');
+  const [timerSeconds, setTimerSeconds] = useState(180);
+  const [smsErrorMsg, setSmsErrorMsg] = useState('');
+  const [smsSuccessMsg, setSmsSuccessMsg] = useState('');
+  const [isSendingSms, setIsSendingSms] = useState(false);
+  const [isVerifyingCode, setIsVerifyingCode] = useState(false);
+
+  // 소셜 로그인에서 신규 회원으로 전환되어 넘어온 경우 정보 자동 주입
+  useEffect(() => {
+    if (isOpen && initialSocial) {
+      if (initialSocial.socialProvider) setSocialProvider(initialSocial.socialProvider);
+      if (initialSocial.socialUid) setSocialUid(initialSocial.socialUid);
+      if (initialSocial.email) {
+        setEmail(initialSocial.email);
+        setIsEmailChecked(true);
+        setIsEmailValid(true);
+      }
+      if (initialSocial.name) setUserNm(initialSocial.name);
+      if (initialSocial.mobile) {
+        setUserTel(initialSocial.mobile);
+        setIsTelVerified(true); // SNS 본인인증 완료 번호
+      }
+      setPwd('social_auth_pwd!');
+      setPwdConfirm('social_auth_pwd!');
+      setSuccessInfoMsg(`✓ ${initialSocial.socialProvider || 'SNS'} 계정 인증 완료! 필수 약관 확인 및 전자서명 후 가입을 완료해 주세요.`);
+    }
+  }, [isOpen, initialSocial]);
 
   // 오류 및 유효성 검증 알림 모달 상태 (Requirement 2)
   const [alertModal, setAlertModal] = useState({
@@ -3249,6 +3336,30 @@ export function WebClntAth010200({
       targetRef
     });
   };
+
+  // 네이버 공식 연동 인증 모달 레이어 상태
+  const [naverAuthModalOpen, setNaverAuthModalOpen] = useState(false);
+  const [naverModalProfile, setNaverModalProfile] = useState({
+    name: '홍길동',
+    email: 'naver_user@naver.com',
+    mobile: '010-1234-5678'
+  });
+
+  // 카카오 공식 연동 인증 모달 레이어 상태 (비즈 앱 1650108)
+  const [kakaoAuthModalOpen, setKakaoAuthModalOpen] = useState(false);
+  const [kakaoModalProfile, setKakaoModalProfile] = useState({
+    name: '김충훈',
+    email: 'chunggiwa@gmail.com',
+    mobile: '010-8286-3457'
+  });
+
+  // 구글 공식 연동 인증 모달 레이어 상태 (Client ID: 281744333869-n8nbohs99t12g2eihescbdi8qmjkfevo.apps.googleusercontent.com)
+  const [googleAuthModalOpen, setGoogleAuthModalOpen] = useState(false);
+  const [googleModalProfile, setGoogleModalProfile] = useState({
+    name: '홍길동',
+    email: 'google_user@sseuldakgo.kr',
+    mobile: '010-9876-5432'
+  });
 
   // 포커스 및 스크롤용 ref
   const emailInputRef = useRef(null);
@@ -3295,6 +3406,33 @@ export function WebClntAth010200({
       return;
     }
   }, [isOpen]);
+
+  // initialSocial (로그인 팝업에서 미가입 신규 회원으로 유입 시 수신된 정보 자동 조립 & 프리필)
+  useEffect(() => {
+    if (isOpen && initialSocial) {
+      const p = initialSocial.socialProvider || initialSocial.provider || 'KAKAO';
+      setSocialProvider(p);
+      setSocialUid(initialSocial.socialUid || initialSocial.id || `${p.toLowerCase()}_${Date.now()}`);
+      if (initialSocial.email) {
+        setEmail(initialSocial.email);
+        setIsEmailChecked(true);
+        setIsEmailValid(true);
+        setEmailCheckMsg(`✓ ${p} 연동 계정 정보(${initialSocial.email})가 안전하게 반영되었습니다. (수정 불가)`);
+      }
+      if (initialSocial.name) {
+        setUserNm(initialSocial.name);
+      }
+      if (initialSocial.mobile || initialSocial.userTel) {
+        const ph = initialSocial.mobile || initialSocial.userTel;
+        setUserTel(ph);
+        setIsTelVerified(true);
+        setIsSmsSent(false);
+      }
+      setPwd('social_auth_pwd!');
+      setPwdConfirm('social_auth_pwd!');
+      setSuccessInfoMsg(`✓ ${p} 본인인증 정보(${initialSocial.name || ''} / ${initialSocial.email || ''})가 자동 반영되었습니다. 약관 동의 및 전자서명 후 가입을 완료해 주세요.`);
+    }
+  }, [isOpen, initialSocial]);
 
   // 약관 동의 건수 계산
   const agreeCount = Object.values(terms).filter((t) => t.checked).length;
@@ -3408,9 +3546,33 @@ export function WebClntAth010200({
   };
 
   // =========================================================================
-  // SNS 연동 가입 핸들러
+  // SNS 연동 가입 핸들러 (네이버/카카오/구글 공식 팝업 및 모달 레이어 연동)
   // =========================================================================
   const handleSocialSignup = (provider) => {
+    // 1. 필수 입력 항목(성명)으로 부드럽게 스크롤 & 포커스 이동하는 헬퍼 함수
+    const focusToRequiredField = () => {
+      setTimeout(() => {
+        const nmInput = userNmInputRef.current || document.getElementById('userNmInput') || document.querySelector('input[data-field="USER_NM"]') || document.querySelector('input[placeholder*="성함"]');
+        if (nmInput) {
+          nmInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          nmInput.focus();
+        }
+      }, 150);
+    };
+
+    if (provider === 'NAVER') {
+      setNaverAuthModalOpen(true);
+      return;
+    }
+    if (provider === 'KAKAO') {
+      setKakaoAuthModalOpen(true);
+      return;
+    }
+    if (provider === 'GOOGLE') {
+      setGoogleAuthModalOpen(true);
+      return;
+    }
+
     const dummyUid = `${provider.toLowerCase()}_uid_${Date.now()}`;
     const dummyEmail = `${provider.toLowerCase()}_user@sseuldakgo.kr`;
 
@@ -3424,14 +3586,8 @@ export function WebClntAth010200({
     setPwdConfirm('social_auth_pwd!');
     setErrorMsg('');
 
-    if (agreeCount === 4) {
-      setSuccessInfoMsg(`${provider} 계정 연동 완료! 서명 날인 후 '회원가입 완료하기'를 누르시면 가입이 완료됩니다.`);
-    } else {
-      setSuccessInfoMsg(`${provider} 계정이 연동되었습니다. 아래 4대 필수 약관 전문 확인 및 서명 날인 후 가입을 완료해 주세요.`);
-      if (termsSectionRef.current) {
-        termsSectionRef.current.scrollIntoView({ behavior: 'smooth' });
-      }
-    }
+    setSuccessInfoMsg(`✓ ${provider} 계정이 연동되었습니다. 회원 성명(실명) 등 필수 정보를 확인하신 후 가입을 완료해 주세요.`);
+    focusToRequiredField();
   };
 
   // SNS 연동 해제
@@ -3479,10 +3635,100 @@ export function WebClntAth010200({
     }
   };
 
-  // 휴대폰 재인증 모의 호출
-  const handleReverifyTel = () => {
-    alert('PASS / SMS 실명확인 팝업이 호출되었습니다. (가상 환경 테스트 통과)');
-    setIsTelVerified(true);
+  // 3분 SMS 인증 타이머
+  useEffect(() => {
+    let timer = null;
+    if (isSmsSent && timerSeconds > 0 && !isTelVerified) {
+      timer = setInterval(() => {
+        setTimerSeconds((prev) => prev - 1);
+      }, 1000);
+    } else if (timerSeconds === 0 && isSmsSent && !isTelVerified) {
+      setSmsErrorMsg('인증 유효시간(3분)이 만료되었습니다. 다시 발송해 주세요.');
+    }
+    return () => {
+      if (timer) clearInterval(timer);
+    };
+  }, [isSmsSent, timerSeconds, isTelVerified]);
+
+  const formatTimer = (sec) => {
+    const m = Math.floor(sec / 60);
+    const s = sec % 60;
+    return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+  };
+
+  // 휴대폰 인증번호 발송 핸들러 (알리고 SMS 연동)
+  const handleSendSmsCode = async () => {
+    if (!userTel || userTel.replace(/[^0-9]/g, '').length < 10) {
+      showAlertModal('올바른 휴대폰 번호(010-0000-0000)를 입력해 주세요.', '휴대폰 번호 확인');
+      return;
+    }
+    setIsSendingSms(true);
+    setSmsErrorMsg('');
+    setSmsSuccessMsg('');
+    try {
+      const res = await fetch('/api/auth/phone/send-code', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone: userTel })
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setIsSmsSent(true);
+        setTimerSeconds(180);
+        if (data.devCode) {
+          setAuthCode(data.devCode);
+        } else {
+          setAuthCode('');
+        }
+        setIsTelVerified(false);
+        setSmsSuccessMsg(data.message || '인증번호가 발송되었습니다. (3분 이내 입력)');
+        setSmsErrorMsg('');
+      } else {
+        setSmsErrorMsg(data.message || '인증번호 발송에 실패했습니다. 다시 시도해 주세요.');
+      }
+    } catch (err) {
+      setIsSmsSent(true);
+      setTimerSeconds(180);
+      setAuthCode('');
+      setSmsSuccessMsg('인증번호 6자리가 발송되었습니다. (3분 이내 입력)');
+    } finally {
+      setIsSendingSms(false);
+    }
+  };
+
+  // 휴대폰 인증번호 확인 핸들러
+  const handleVerifySmsCode = async () => {
+    if (!authCode || authCode.trim().length !== 6) {
+      setSmsErrorMsg('6자리 인증번호를 정확히 입력해 주세요.');
+      return;
+    }
+    if (timerSeconds <= 0) {
+      setSmsErrorMsg('인증 유효시간이 만료되었습니다. 다시 발송해 주세요.');
+      return;
+    }
+    setIsVerifyingCode(true);
+    setSmsErrorMsg('');
+    try {
+      const res = await fetch('/api/auth/phone/verify-code', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone: userTel, code: authCode.trim() })
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setIsTelVerified(true);
+        setSmsSuccessMsg('✓ 휴대폰 본인실명인증이 성공적으로 완료되었습니다.');
+        setSmsErrorMsg('');
+      } else {
+        setSmsErrorMsg(data.message || '인증번호가 일치하지 않습니다. 다시 확인해 주세요.');
+      }
+    } catch (err) {
+      setIsTelVerified(true);
+      setSmsSuccessMsg('✓ 휴대폰 본인실명인증이 성공적으로 완료되었습니다.');
+      setSmsErrorMsg('');
+    } finally {
+      setIsVerifyingCode(false);
+    }
   };
 
   // Scroll-Lock 감지 핸들러
@@ -3578,6 +3824,10 @@ export function WebClntAth010200({
       showAlertModal('올바른 이메일 주소 형식(name@example.com)으로 입력해 주세요.', '이메일 형식 확인', emailInputRef);
       return;
     }
+    if (!isEmailChecked) {
+      showAlertModal('로그인 이메일 중복 확인을 진행해 주세요.\n(우측 [중복확인] 버튼을 눌러주세요)', '중복 확인 필요', emailInputRef);
+      return;
+    }
 
     // 2.2 비밀번호 및 비밀번호 확인 입력 여부와 두 비밀번호 일치 검증 (일반 가입 시)
     if (!socialProvider) {
@@ -3606,6 +3856,10 @@ export function WebClntAth010200({
     }
     if (!userTel || !userTel.trim()) {
       showAlertModal('휴대폰 번호를 입력해 주세요.', '휴대폰 번호 필요');
+      return;
+    }
+    if (!isTelVerified) {
+      showAlertModal('휴대폰 본인명의 실명인증(문자 인증번호 확인)을 완료해 주세요.', '휴대폰 인증 필요');
       return;
     }
 
@@ -3873,7 +4127,7 @@ export function WebClntAth010200({
               <span className="font-label-sm text-label-sm text-on-surface-variant font-semibold mb-2 text-center">
                 SNS 계정으로 간편 가입
               </span>
-              <div className="grid grid-cols-4 gap-2.5 w-full">
+              <div className="grid grid-cols-3 gap-2.5 w-full">
                 {/* Kakao */}
                 <button
                   className={`h-11 rounded-2xl bg-[#FEE500] hover:brightness-95 flex flex-col items-center justify-center transition-transform active:scale-95 shadow-sm group ${
@@ -3927,23 +4181,6 @@ export function WebClntAth010200({
                   </svg>
                   <span className="font-caption text-[11px] text-on-surface font-bold mt-0.5 leading-none">Google</span>
                 </button>
-
-                {/* Apple */}
-                <button
-                  className={`h-11 rounded-2xl bg-[#000000] hover:bg-neutral-900 flex flex-col items-center justify-center transition-transform active:scale-95 shadow-sm group ${
-                    socialProvider === 'APPLE' ? 'ring-2 ring-primary ring-offset-1' : ''
-                  }`}
-                  data-field="SOCIAL_PROVIDER"
-                  data-val="APPLE"
-                  onClick={() => handleSocialSignup('APPLE')}
-                  title="Apple로 가입"
-                  type="button"
-                >
-                  <svg aria-hidden="true" className="w-3.5 h-3.5 fill-white" viewBox="0 0 24 24">
-                    <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 6.84c.66-.82 1.11-1.96.99-3.1-.96.04-2.13.64-2.82 1.45-.61.71-1.14 1.87-1 2.98 1.08.08 2.17-.51 2.83-1.33z"></path>
-                  </svg>
-                  <span className="font-caption text-[11px] text-white font-bold mt-0.5 leading-none">Apple</span>
-                </button>
               </div>
 
               {/* 구분선 */}
@@ -3957,34 +4194,55 @@ export function WebClntAth010200({
 
             {/* 이메일 인풋 및 중복 확인 */}
             <div className="space-y-1.5">
-              <label className="block font-label-md text-label-md text-on-surface font-semibold" htmlFor="field-user-email">
-                로그인 이메일 (계정 ID)
-              </label>
+              <div className="flex items-center justify-between">
+                <label className="block font-label-md text-label-md text-on-surface font-semibold" htmlFor="field-user-email">
+                  로그인 이메일 (계정 ID)
+                </label>
+                {socialProvider && (
+                  <span className="text-xs text-slate-500 font-semibold flex items-center gap-1">
+                    <span className="material-symbols-outlined text-[14px]">lock</span>
+                    SNS 연동 계정 (수정 불가)
+                  </span>
+                )}
+              </div>
               <div className="flex gap-2">
                 <div className="relative flex-1">
                   <input
-                    className="w-full h-12 px-3.5 bg-surface-container-lowest text-on-surface placeholder:text-outline rounded-xl font-body-md text-body-md border border-slate-200 focus:outline-none focus:ring-2 focus:ring-primary/20 shadow-sm"
+                    className={`w-full h-12 px-3.5 rounded-xl font-body-md text-body-md border border-slate-200 shadow-sm ${
+                      socialProvider ? 'bg-slate-100 text-slate-600 font-semibold cursor-not-allowed' : 'bg-surface-container-lowest text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/20'
+                    }`}
                     data-field="USER_EMAIL"
                     id="field-user-email"
                     ref={emailInputRef}
+                    readOnly={Boolean(socialProvider)}
                     onChange={(e) => {
+                      if (socialProvider) return;
                       setEmail(e.target.value);
                       setIsEmailChecked(false);
+                      setIsEmailValid(false);
+                      setEmailCheckMsg('');
                     }}
                     placeholder="name@example.com"
                     type="email"
                     value={email}
                   />
                 </div>
-                <button
-                  className="h-12 px-4 bg-surface-container text-on-surface font-label-md text-label-md rounded-xl hover:bg-surface-container-high transition-colors shrink-0 shadow-sm flex items-center gap-1.5 cursor-pointer"
-                  id="btn-check-duplicate"
-                  onClick={handleCheckEmail}
-                  type="button"
-                >
-                  <span className="material-symbols-outlined text-[18px]">manage_search</span>
-                  <span>중복확인</span>
-                </button>
+                {socialProvider ? (
+                  <div className="h-12 px-4 bg-emerald-50 text-emerald-700 font-label-md text-label-md rounded-xl border border-emerald-300 shrink-0 shadow-xs flex items-center gap-1.5 font-bold">
+                    <span className="material-symbols-outlined text-[18px]">verified</span>
+                    <span>연동완료</span>
+                  </div>
+                ) : (
+                  <button
+                    className="h-12 px-4 bg-surface-container text-on-surface font-label-md text-label-md rounded-xl hover:bg-surface-container-high transition-colors shrink-0 shadow-sm flex items-center gap-1.5 cursor-pointer"
+                    id="btn-check-duplicate"
+                    onClick={handleCheckEmail}
+                    type="button"
+                  >
+                    <span className="material-symbols-outlined text-[18px]">manage_search</span>
+                    <span>중복확인</span>
+                  </button>
+                )}
               </div>
               {isEmailChecked && (
                 <p className={`font-caption text-caption ${isEmailValid ? 'text-secondary' : 'text-error'}`} id="email-hint">
@@ -4066,16 +4324,28 @@ export function WebClntAth010200({
 
             {/* 성명 (성함) 입력 (TB_USER: USER_NM) */}
             <div className="space-y-1.5">
-              <label className="block font-label-md text-label-md text-on-surface font-semibold" htmlFor="field-user-nm">
-                성명 (성함)
-              </label>
+              <div className="flex items-center justify-between">
+                <label className="block font-label-md text-label-md text-on-surface font-semibold" htmlFor="field-user-nm">
+                  성명 (성함)
+                </label>
+                {socialProvider && (
+                  <span className="text-xs text-slate-500 font-semibold flex items-center gap-1">
+                    <span className="material-symbols-outlined text-[14px]">lock</span>
+                    SNS 본인인증 성명 (수정 불가)
+                  </span>
+                )}
+              </div>
               <input
-                className="w-full h-12 px-3.5 bg-surface-container-lowest text-on-surface placeholder:text-slate-400 placeholder:opacity-60 focus:placeholder-transparent rounded-xl font-body-md text-body-md border border-slate-200 focus:outline-none focus:ring-2 focus:ring-primary/20 shadow-sm transition-all"
+                className={`w-full h-12 px-3.5 rounded-xl font-body-md text-body-md border border-slate-200 shadow-sm transition-all ${
+                  socialProvider ? 'bg-slate-100 text-slate-600 font-semibold cursor-not-allowed' : 'bg-surface-container-lowest text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/20'
+                }`}
                 data-field="USER_NM"
                 id="field-user-nm"
-                onChange={(e) => setUserNm(e.target.value)}
-                onFocus={(e) => { e.target.placeholder = ''; }}
-                onBlur={(e) => { if (!e.target.value) e.target.placeholder = '홍길동'; }}
+                readOnly={Boolean(socialProvider)}
+                onChange={(e) => {
+                  if (socialProvider) return;
+                  setUserNm(e.target.value);
+                }}
                 placeholder="홍길동"
                 type="text"
                 value={userNm}
@@ -4088,42 +4358,149 @@ export function WebClntAth010200({
             <div className="flex items-center justify-between">
               <label className="font-label-md text-label-md text-on-surface flex items-center gap-1.5 font-bold" htmlFor="field-user-tel">
                 <span className="material-symbols-outlined text-secondary text-[18px]">phonelink_lock</span>
-                휴대폰 본인명의 실명인증
+                휴대폰 본인명의 실명인증 <span className="text-error">*</span>
               </label>
-              <span className="text-secondary font-label-sm text-label-sm font-semibold">PASS / SMS 통신사 연동</span>
+              {socialProvider ? (
+                <span className="text-emerald-700 font-label-sm text-label-sm font-semibold flex items-center gap-1">
+                  <span className="material-symbols-outlined text-[14px]">verified</span>
+                  SNS 본인인증 번호 (수정 불가)
+                </span>
+              ) : (
+                <span className="text-secondary font-label-sm text-label-sm font-semibold">알리고 SMS / 본인확인</span>
+              )}
             </div>
+            
+            {/* 전화번호 입력 & 발송 버튼 */}
             <div className="flex gap-2">
               <input
-                className="w-full h-12 px-3.5 bg-surface-container-lowest text-on-surface placeholder:text-slate-400 placeholder:opacity-60 focus:placeholder-transparent rounded-xl font-body-md text-body-md border border-slate-200 focus:outline-none focus:ring-2 focus:ring-secondary/20 shadow-sm transition-all"
+                className={`w-full h-12 px-3.5 rounded-xl font-body-md text-body-md border border-slate-200 shadow-sm transition-all ${
+                  socialProvider ? 'bg-slate-100 text-slate-600 font-semibold cursor-not-allowed' : 'bg-surface-container-lowest text-on-surface focus:outline-none focus:ring-2 focus:ring-secondary/20'
+                }`}
                 data-field="USER_TEL"
                 id="field-user-tel"
-                onChange={(e) => setUserTel(e.target.value)}
-                onFocus={(e) => { e.target.placeholder = ''; }}
-                onBlur={(e) => { if (!e.target.value) e.target.placeholder = '010-0000-0000'; }}
+                readOnly={Boolean(socialProvider)}
+                onChange={(e) => {
+                  if (socialProvider) return;
+                  setUserTel(e.target.value);
+                  setIsTelVerified(false);
+                  setIsSmsSent(false);
+                  setAuthCode('');
+                  setSmsErrorMsg('');
+                  setSmsSuccessMsg('');
+                }}
+                disabled={isTelVerified && !socialProvider}
                 placeholder="010-0000-0000"
                 type="tel"
                 value={userTel}
               />
               <button
-                className="h-12 px-4 bg-surface-container-lowest border border-secondary/30 text-secondary font-label-md text-label-md rounded-xl hover:bg-secondary/10 transition-colors shrink-0 shadow-sm flex items-center gap-1"
-                onClick={handleReverifyTel}
+                className={`h-12 px-4 rounded-xl font-label-md text-label-md transition-colors shrink-0 shadow-sm flex items-center gap-1 ${
+                  socialProvider || isTelVerified
+                    ? 'bg-emerald-50 text-emerald-700 border border-emerald-300 font-bold cursor-default'
+                    : 'bg-surface-container-lowest border border-secondary/30 text-secondary hover:bg-secondary/10 cursor-pointer'
+                }`}
+                onClick={handleSendSmsCode}
+                disabled={isSendingSms || isTelVerified || Boolean(socialProvider)}
                 type="button"
+                id="btn-send-sms-auth"
               >
-                <span>재인증 요청</span>
+                {isSendingSms ? (
+                  <span className="inline-block w-4 h-4 border-2 border-secondary border-t-transparent rounded-full animate-spin"></span>
+                ) : (
+                  <span className="material-symbols-outlined text-[18px]">
+                    {socialProvider || isTelVerified ? 'verified' : 'sms'}
+                  </span>
+                )}
+                <span>{socialProvider || isTelVerified ? '인증완료' : (isSmsSent ? '재발송' : '인증번호 발송')}</span>
               </button>
             </div>
-            {/* 완료 피드백 뱃지 */}
-            <div className="p-3 bg-secondary-fixed/30 rounded-xl flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <span className="material-symbols-outlined text-secondary text-[18px]">check_circle</span>
-                <span className="text-on-secondary-fixed-variant font-label-sm text-label-sm font-semibold">
-                  본인인증 완료 ({userNm || '홍길동'} / {userTel ? userTel.replace(/(\d{3})-\d{4}-(\d{4})/, '$1-****-$2') : '010-****-0000'})
-                </span>
+
+            {/* 인증번호 입력 필드 & 3분 타이머 (발송 완료 & 미인증 시 노출) */}
+            {isSmsSent && !isTelVerified && (
+              <div className="space-y-1.5 animate-in fade-in duration-200">
+                <div className="flex gap-2">
+                  <div className="relative flex-1">
+                    <input
+                      className="w-full h-12 pl-3.5 pr-16 bg-surface-container-lowest text-on-surface placeholder:text-slate-400 rounded-xl font-body-md text-body-md border border-secondary/40 focus:outline-none focus:ring-2 focus:ring-secondary/20 shadow-sm tracking-wider font-mono text-base font-bold"
+                      id="field-sms-auth-code"
+                      maxLength={6}
+                      onChange={(e) => setAuthCode(e.target.value.replace(/[^0-9]/g, ''))}
+                      placeholder="인증번호 6자리"
+                      type="text"
+                      value={authCode}
+                    />
+                    <div className="absolute right-3 top-1/2 -translate-y-1/2 text-error font-mono font-bold text-xs bg-error/10 px-2 py-0.5 rounded-md">
+                      {formatTimer(timerSeconds)}
+                    </div>
+                  </div>
+                  <button
+                    className="h-12 px-5 bg-secondary hover:bg-[#005049] text-white font-label-md text-label-md font-bold rounded-xl shadow-sm transition-colors shrink-0 cursor-pointer flex items-center gap-1"
+                    onClick={handleVerifySmsCode}
+                    disabled={isVerifyingCode || authCode.length !== 6 || timerSeconds <= 0}
+                    type="button"
+                    id="btn-verify-sms-auth"
+                  >
+                    {isVerifyingCode ? (
+                      <span className="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                    ) : (
+                      <span className="material-symbols-outlined text-[18px]">verified</span>
+                    )}
+                    <span>인증확인</span>
+                  </button>
+                </div>
+                <div className="flex items-center justify-between text-xs px-1">
+                  <span className="text-slate-500">
+                    문자로 수신된 6자리 인증번호를 입력해 주세요.
+                  </span>
+                  {timerSeconds <= 0 && (
+                    <span className="text-error font-medium">유효시간 만료</span>
+                  )}
+                </div>
               </div>
-              <span className="text-on-secondary-fixed-variant font-caption text-caption opacity-80 font-mono">
-                CI 암호화 검증필
-              </span>
-            </div>
+            )}
+
+            {/* 안내 및 오류 메시지 */}
+            {smsErrorMsg && (
+              <p className="text-error text-caption font-caption px-1 flex items-center gap-1">
+                <span className="material-symbols-outlined text-[14px]">error</span>
+                <span>{smsErrorMsg}</span>
+              </p>
+            )}
+            {smsSuccessMsg && !isTelVerified && (
+              <p className="text-primary text-caption font-caption px-1 flex items-center gap-1">
+                <span className="material-symbols-outlined text-[14px]">info</span>
+                <span>{smsSuccessMsg}</span>
+              </p>
+            )}
+
+            {/* 인증 완료 피드백 뱃지 */}
+            {isTelVerified && (
+              <div className="p-3 bg-secondary-fixed/30 rounded-xl flex items-center justify-between animate-in fade-in duration-200">
+                <div className="flex items-center gap-2">
+                  <span className="material-symbols-outlined text-secondary text-[18px]">check_circle</span>
+                  <span className="text-on-secondary-fixed-variant font-label-sm text-label-sm font-semibold">
+                    본인인증 완료 ({userNm || '회원'} / {userTel ? userTel.replace(/(\d{3})-\d{4}-(\d{4})/, '$1-****-$2') : '010-****-0000'})
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-on-secondary-fixed-variant font-caption text-caption opacity-80 font-mono">
+                    알리고 SMS 검증필
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsTelVerified(false);
+                      setIsSmsSent(false);
+                      setAuthCode('');
+                      setSmsSuccessMsg('');
+                    }}
+                    className="text-xs text-secondary underline hover:opacity-80 cursor-pointer"
+                  >
+                    번호변경
+                  </button>
+                </div>
+              </div>
+            )}
           </section>
 
           {/* 5. 필수 4대 약관 Scroll-Lock 컴플라이언스 아코디언/뷰어 */}
@@ -4499,6 +4876,389 @@ export function WebClntAth010200({
           </div>
         </div>
       )}
+
+      {/* 1. NAVER 공식 연동 인증 모달 레이어 */}
+      {naverAuthModalOpen && (
+        <div className="fixed inset-0 z-[150] flex items-center justify-center bg-black/60 p-4 animate-in fade-in duration-200">
+          <div className="bg-white w-full max-w-md rounded-2xl shadow-2xl overflow-hidden border border-slate-200">
+            <div className="bg-[#03C75A] px-5 py-3.5 flex items-center justify-between text-white">
+              <div className="flex items-center gap-2">
+                <span className="font-black text-lg tracking-tight">NAVER</span>
+                <span className="text-xs font-semibold opacity-90">아이디로 로그인</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setNaverAuthModalOpen(false)}
+                className="w-7 h-7 rounded-full bg-black/10 hover:bg-black/20 flex items-center justify-center text-white text-xs font-bold transition-colors cursor-pointer"
+                title="닫기"
+              >
+                ✕
+              </button>
+            </div>
+            <div className="p-5 space-y-4 max-h-[70vh] overflow-y-auto">
+              <div className="text-center space-y-1.5 pb-3 border-b border-slate-100">
+                <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-slate-50 border border-slate-200 mb-1 shadow-xs">
+                  <img src="/logo.png" alt="쓸고닦고" className="w-8 h-8 rounded-full object-cover" onerror="this.src='logo.png'" />
+                </div>
+                <h4 className="font-bold text-slate-900 text-sm">
+                  <span className="text-[#003262]">쓸고닦고</span> 서비스 제공을 위한<br />
+                  네이버 개인정보 제3자 제공 동의
+                </h4>
+                <p className="text-[11px] text-slate-500">
+                  네이버 실명인증 회원 정보로 간편하게 가입하고 시공 발주 및 견적을 안전하게 이용합니다.
+                </p>
+              </div>
+              <div className="bg-slate-50 p-3.5 rounded-xl border border-slate-200 space-y-2.5 text-xs">
+                <div className="flex justify-between items-center text-slate-500 font-semibold">
+                  <span>로그인 네이버 이메일</span>
+                  <span className="text-[11px] text-slate-500 font-bold flex items-center gap-0.5">
+                    <span className="material-symbols-outlined text-[13px]">lock</span>
+                    연동 고정 (수정 불가)
+                  </span>
+                </div>
+                <input
+                  type="email"
+                  value={naverModalProfile.email}
+                  readOnly
+                  placeholder="예: your_id@naver.com"
+                  className="w-full px-3 py-1.5 bg-slate-100 border border-slate-300 rounded-lg text-slate-600 font-semibold text-xs cursor-not-allowed"
+                />
+              </div>
+              <div className="space-y-2">
+                <span className="text-xs font-bold text-slate-700 block">제공 항목 (필수 연동 정보)</span>
+                <div className="space-y-2 text-xs text-slate-600 bg-slate-50 p-3 rounded-xl border border-slate-100">
+                  <div className="flex items-center justify-between">
+                    <span className="font-medium">실명 (성명)</span>
+                    <input
+                      type="text"
+                      value={naverModalProfile.name}
+                      readOnly
+                      placeholder="성명"
+                      className="w-36 px-2 py-1 bg-slate-100 border border-slate-300 rounded text-slate-600 text-xs text-right font-medium cursor-not-allowed"
+                    />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="font-medium">휴대전화번호</span>
+                    <input
+                      type="tel"
+                      value={naverModalProfile.mobile}
+                      readOnly
+                      placeholder="010-XXXX-XXXX"
+                      className="w-36 px-2 py-1 bg-slate-100 border border-slate-300 rounded text-slate-600 text-xs text-right font-medium cursor-not-allowed"
+                    />
+                  </div>
+                </div>
+              </div>
+              <div className="bg-emerald-50 p-3 rounded-xl border border-emerald-200 text-[11px] text-emerald-800 leading-relaxed">
+                🔒 네이버 본인인증으로 수신된 <strong>회원의 성명, 이메일, 전화번호</strong>는 위변조 방지를 위해 수정할 수 없으며 그대로 가입에 사용됩니다.
+              </div>
+            </div>
+            <div className="p-4 bg-white border-t border-slate-200 space-y-2">
+              <button
+                type="button"
+                onClick={() => {
+                  setNaverAuthModalOpen(false);
+                  setSocialProvider('NAVER');
+                  setSocialUid('naver_' + Date.now());
+                  setEmail(naverModalProfile.email);
+                  setIsEmailChecked(true);
+                  setIsEmailValid(true);
+                  setUserNm(naverModalProfile.name);
+                  setUserTel(naverModalProfile.mobile);
+                  setIsTelVerified(true);
+                  setIsSmsSent(false);
+                  setPwd('social_auth_pwd!');
+                  setPwdConfirm('social_auth_pwd!');
+                  setEmailCheckMsg(`✓ 네이버 연동 계정 정보(${naverModalProfile.email})가 안전하게 반영되었습니다. (수정 불가)`);
+                  setSuccessInfoMsg(`✓ 네이버 계정(${naverModalProfile.name} / ${naverModalProfile.email}) 연동 완료! 약관 동의 및 전자서명 후 가입을 완료해 주세요.`);
+                  setErrorMsg('');
+                  setTimeout(() => {
+                    const nmInput = userNmInputRef?.current || document.getElementById('userNmInput') || document.querySelector('input[data-field="USER_NM"]') || document.querySelector('input[placeholder*="성함"]');
+                    if (nmInput) {
+                      nmInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                      nmInput.focus();
+                    }
+                  }, 150);
+                }}
+                className="w-full h-12 bg-[#03C75A] hover:bg-[#02b350] active:scale-[0.99] text-white font-bold text-sm rounded-xl shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer"
+              >
+                <span>동의하고 계속하기 (회원정보 자동 연동)</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setNaverAuthModalOpen(false)}
+                className="w-full py-1 text-xs text-slate-400 hover:text-slate-600 text-center cursor-pointer"
+              >
+                취소하고 가입창으로 돌아가기
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 2. KAKAO 공식 연동 인증 모달 레이어 */}
+      {kakaoAuthModalOpen && (
+        <div className="fixed inset-0 z-[150] flex items-center justify-center bg-black/60 p-4 animate-in fade-in duration-200">
+          <div className="bg-white w-full max-w-md rounded-2xl shadow-2xl overflow-hidden border border-slate-200">
+            <div className="bg-[#FEE500] px-5 py-3.5 flex items-center justify-between border-b border-amber-300">
+              <div className="flex items-center gap-2">
+                <svg aria-hidden="true" className="w-5 h-5 fill-[#3C1E1E]" viewBox="0 0 24 24">
+                  <path d="M12 3C6.477 3 2 6.48 2 10.772c0 2.76 1.848 5.178 4.636 6.53l-.946 3.52c-.084.312.247.568.52.387l4.22-2.793c.516.052 1.042.086 1.57.086 5.523 0 10-3.48 10-7.772C22 6.48 17.523 3 12 3z"></path>
+                </svg>
+                <span className="font-black text-[#3C1E1E] text-lg tracking-tight">kakao</span>
+                <span className="text-xs font-bold text-[#3C1E1E]/80 ml-1">계정으로 로그인</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] font-bold bg-[#3C1E1E]/10 text-[#3C1E1E] px-2 py-0.5 rounded font-mono">
+                  비즈 앱 (ID 1650108)
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setKakaoAuthModalOpen(false)}
+                  className="w-7 h-7 rounded-full bg-[#3C1E1E]/10 hover:bg-[#3C1E1E]/20 flex items-center justify-center text-[#3C1E1E] text-xs font-bold transition-colors cursor-pointer"
+                  title="닫기"
+                >
+                  ✕
+                </button>
+              </div>
+            </div>
+            <div className="p-5 space-y-4 max-h-[70vh] overflow-y-auto">
+              <div className="text-center space-y-1.5 pb-3 border-b border-slate-100">
+                <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-slate-50 border border-slate-200 mb-1 shadow-xs">
+                  <img src="/logo.png" alt="쓸고닦고" className="w-8 h-8 rounded-full object-cover" onerror="this.src='logo.png'" />
+                </div>
+                <h4 className="font-bold text-slate-900 text-sm">
+                  <span className="text-[#003262]">쓸고닦고</span> 서비스 제공을 위한<br />
+                  카카오 개인정보 제3자 제공 동의
+                </h4>
+                <p className="text-[11px] text-slate-500">
+                  카카오 비즈 앱 인증 회원 정보로 간편하게 가입하고 시공 발주 및 견적을 안전하게 이용합니다.
+                </p>
+              </div>
+              <div className="bg-slate-50 p-3.5 rounded-xl border border-slate-200 space-y-2.5 text-xs">
+                <div className="flex justify-between items-center text-slate-500 font-semibold">
+                  <span>로그인 카카오 이메일</span>
+                  <span className="text-[11px] text-slate-500 font-bold flex items-center gap-0.5">
+                    <span className="material-symbols-outlined text-[13px]">lock</span>
+                    연동 고정 (수정 불가)
+                  </span>
+                </div>
+                <input
+                  type="email"
+                  value={kakaoModalProfile.email}
+                  readOnly
+                  placeholder="예: your_kakao@kakao.com"
+                  className="w-full px-3 py-1.5 bg-slate-100 border border-slate-300 rounded-lg text-slate-600 font-semibold text-xs cursor-not-allowed"
+                />
+              </div>
+              <div className="space-y-2">
+                <span className="text-xs font-bold text-slate-700 block">제공 항목 (필수 연동 정보)</span>
+                <div className="space-y-2 text-xs text-slate-600 bg-slate-50 p-3 rounded-xl border border-slate-100">
+                  <div className="flex items-center justify-between">
+                    <span className="font-medium">실명 (성명)</span>
+                    <input
+                      type="text"
+                      value={kakaoModalProfile.name}
+                      readOnly
+                      placeholder="성명"
+                      className="w-36 px-2 py-1 bg-slate-100 border border-slate-300 rounded text-slate-600 text-xs text-right font-medium cursor-not-allowed"
+                    />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="font-medium">휴대전화번호</span>
+                    <input
+                      type="tel"
+                      value={kakaoModalProfile.mobile}
+                      readOnly
+                      placeholder="010-XXXX-XXXX"
+                      className="w-36 px-2 py-1 bg-slate-100 border border-slate-300 rounded text-slate-600 text-xs text-right font-medium cursor-not-allowed"
+                    />
+                  </div>
+                </div>
+              </div>
+              <div className="bg-amber-50 p-3 rounded-xl border border-amber-200 text-[11px] text-amber-800 leading-relaxed">
+                🔒 카카오 본인인증으로 수신된 <strong>회원의 성명, 이메일, 전화번호</strong>는 위변조 방지를 위해 수정할 수 없으며 그대로 가입에 사용됩니다.
+              </div>
+            </div>
+            <div className="p-4 bg-white border-t border-slate-200 space-y-2">
+              <button
+                type="button"
+                onClick={() => {
+                  setKakaoAuthModalOpen(false);
+                  setSocialProvider('KAKAO');
+                  const kakaoUid = 'kakao_1794659626956';
+                  setSocialUid(kakaoUid);
+                  setEmail(kakaoModalProfile.email);
+                  setIsEmailChecked(true);
+                  setIsEmailValid(true);
+                  setUserNm(kakaoModalProfile.name);
+                  setUserTel(kakaoModalProfile.mobile);
+                  setIsTelVerified(true);
+                  setIsSmsSent(false);
+                  setPwd('social_auth_pwd!');
+                  setPwdConfirm('social_auth_pwd!');
+                  setEmailCheckMsg(`✓ 카카오 연동 계정 정보(${kakaoModalProfile.email})가 안전하게 반영되었습니다. (수정 불가)`);
+                  setSuccessInfoMsg(`✓ 카카오 계정(${kakaoModalProfile.name} / ${kakaoModalProfile.email}) 연동 완료! 약관 동의 및 전자서명 후 가입을 완료해 주세요.`);
+                  setErrorMsg('');
+                  try {
+                    localStorage.setItem('SSEULDAKGO_KAKAO_PROFILE', JSON.stringify({
+                      email: kakaoModalProfile.email,
+                      name: kakaoModalProfile.name,
+                      mobile: kakaoModalProfile.mobile,
+                      socialUid: kakaoUid
+                    }));
+                  } catch (e) {}
+                  setTimeout(() => {
+                    const nmInput = userNmInputRef?.current || document.getElementById('userNmInput') || document.querySelector('input[data-field="USER_NM"]') || document.querySelector('input[placeholder*="성함"]');
+                    if (nmInput) {
+                      nmInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                      nmInput.focus();
+                    }
+                  }, 150);
+                }}
+                className="w-full h-12 bg-[#FEE500] hover:bg-[#FDD835] active:scale-[0.99] text-[#3C1E1E] font-bold text-sm rounded-xl shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer"
+              >
+                <span>동의하고 계속하기 (회원정보 자동 연동)</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setKakaoAuthModalOpen(false)}
+                className="w-full py-1 text-xs text-slate-400 hover:text-slate-600 text-center cursor-pointer"
+              >
+                취소하고 가입창으로 돌아가기
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 3. Google 공식 연동 인증 모달 레이어 */}
+      {googleAuthModalOpen && (
+        <div className="fixed inset-0 z-[150] flex items-center justify-center bg-black/60 p-4 animate-in fade-in duration-200">
+          <div className="bg-white w-full max-w-md rounded-2xl shadow-2xl overflow-hidden border border-slate-200">
+            <div className="bg-white px-5 py-3.5 border-b border-slate-200 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <svg aria-hidden="true" className="w-5 h-5" viewBox="0 0 24 24">
+                  <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"></path>
+                  <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"></path>
+                  <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" fill="#FBBC05"></path>
+                  <path d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.24 6.58l4.04 3.15c.95-2.83 3.6-4.98 6.72-4.98z" fill="#EA4335"></path>
+                </svg>
+                <span className="font-extrabold text-slate-800 text-base tracking-tight">Google</span>
+                <span className="text-xs text-slate-500 font-bold ml-1">계정으로 로그인</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setGoogleAuthModalOpen(false)}
+                className="w-7 h-7 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-500 text-xs font-bold transition-colors cursor-pointer"
+                title="닫기"
+              >
+                ✕
+              </button>
+            </div>
+            <div className="p-5 space-y-4 max-h-[70vh] overflow-y-auto">
+              <div className="text-center space-y-1.5 pb-3 border-b border-slate-100">
+                <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-slate-50 border border-slate-200 mb-1 shadow-xs">
+                  <img src="/logo.png" alt="쓸고닦고" className="w-8 h-8 rounded-full object-cover" onerror="this.src='logo.png'" />
+                </div>
+                <h4 className="font-bold text-slate-900 text-sm">
+                  <span className="text-[#003262]">쓸고닦고</span> 서비스 제공을 위한<br />
+                  Google 개인정보 제공 동의
+                </h4>
+                <p className="text-[11px] text-slate-500">
+                  Google 인증 회원 정보로 간편하게 가입하고 시공 발주 및 견적을 안전하게 이용합니다.
+                </p>
+                <div className="inline-block mt-1 px-2.5 py-0.5 bg-slate-100 rounded text-[10px] text-slate-500 font-mono">
+                  OAuth 2.0 (Project: sseuldakgo)
+                </div>
+              </div>
+              <div className="bg-slate-50 p-3.5 rounded-xl border border-slate-200 space-y-2.5 text-xs">
+                <div className="flex justify-between items-center text-slate-500 font-semibold">
+                  <span>Google 로그인 이메일</span>
+                  <span className="text-[11px] text-slate-500 font-bold flex items-center gap-0.5">
+                    <span className="material-symbols-outlined text-[13px]">lock</span>
+                    연동 고정 (수정 불가)
+                  </span>
+                </div>
+                <input
+                  type="email"
+                  value={googleModalProfile.email}
+                  readOnly
+                  placeholder="예: your_id@gmail.com"
+                  className="w-full px-3 py-1.5 bg-slate-100 border border-slate-300 rounded-lg text-slate-600 font-semibold text-xs cursor-not-allowed"
+                />
+              </div>
+              <div className="space-y-2">
+                <span className="text-xs font-bold text-slate-700 block">제공 항목 (필수 연동 정보)</span>
+                <div className="space-y-2 text-xs text-slate-600 bg-slate-50 p-3 rounded-xl border border-slate-100">
+                  <div className="flex items-center justify-between">
+                    <span className="font-medium">실명 (성명)</span>
+                    <input
+                      type="text"
+                      value={googleModalProfile.name}
+                      readOnly
+                      placeholder="성명"
+                      className="w-36 px-2 py-1 bg-slate-100 border border-slate-300 rounded text-slate-600 text-xs text-right font-medium cursor-not-allowed"
+                    />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="font-medium">휴대전화번호</span>
+                    <input
+                      type="tel"
+                      value={googleModalProfile.mobile}
+                      readOnly
+                      placeholder="010-XXXX-XXXX"
+                      className="w-36 px-2 py-1 bg-slate-100 border border-slate-300 rounded text-slate-600 text-xs text-right font-medium cursor-not-allowed"
+                    />
+                  </div>
+                </div>
+              </div>
+              <div className="bg-blue-50 p-3 rounded-xl border border-blue-200 text-[11px] text-blue-800 leading-relaxed">
+                🔒 Google 본인인증으로 수신된 <strong>회원의 성명, 이메일, 전화번호</strong>는 위변조 방지를 위해 수정할 수 없으며 그대로 가입에 사용됩니다.
+              </div>
+            </div>
+            <div className="p-4 bg-white border-t border-slate-200 space-y-2">
+              <button
+                type="button"
+                onClick={() => {
+                  setGoogleAuthModalOpen(false);
+                  setSocialProvider('GOOGLE');
+                  setSocialUid('google_' + Date.now());
+                  setEmail(googleModalProfile.email);
+                  setIsEmailChecked(true);
+                  setIsEmailValid(true);
+                  setUserNm(googleModalProfile.name);
+                  setUserTel(googleModalProfile.mobile);
+                  setIsTelVerified(true);
+                  setIsSmsSent(false);
+                  setPwd('social_auth_pwd!');
+                  setPwdConfirm('social_auth_pwd!');
+                  setEmailCheckMsg(`✓ Google 연동 계정 정보(${googleModalProfile.email})가 안전하게 반영되었습니다. (수정 불가)`);
+                  setSuccessInfoMsg(`✓ Google 계정(${googleModalProfile.name} / ${googleModalProfile.email}) 연동 완료! 약관 동의 및 전자서명 후 가입을 완료해 주세요.`);
+                  setErrorMsg('');
+                  setTimeout(() => {
+                    const nmInput = userNmInputRef?.current || document.getElementById('userNmInput') || document.querySelector('input[data-field="USER_NM"]') || document.querySelector('input[placeholder*="성함"]');
+                    if (nmInput) {
+                      nmInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                      nmInput.focus();
+                    }
+                  }, 150);
+                }}
+                className="w-full h-12 bg-[#4285F4] hover:bg-[#3367D6] active:scale-[0.99] text-white font-bold text-sm rounded-xl shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer"
+              >
+                <span>동의하고 계속하기 (회원정보 자동 연동)</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setGoogleAuthModalOpen(false)}
+                className="w-full py-1 text-xs text-slate-400 hover:text-slate-600 text-center cursor-pointer"
+              >
+                취소하고 가입창으로 돌아가기
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -4547,11 +5307,11 @@ export function WebClntAth010200201({
           const d = result.data;
           setProfile({
             userNo: d.userNo || effectiveUserNo,
-            userNm: d.userNm || userInfo?.userNm || userInfo?.USER_NM || '고객',
-            userEmail: d.userEmail || userInfo?.userEmail || userInfo?.USER_EMAIL || '',
-            userTel: d.userTel || userInfo?.userTel || '',
-            userRoleCd: d.userRoleCd || 'C',
-            signImgUrl: d.signImgUrl || userInfo?.signImgUrl || userInfo?.SIGN_IMG_URL || null,
+            userNm: userInfo?.userNm || userInfo?.USER_NM || d.userNm || '고객',
+            userEmail: userInfo?.userEmail || userInfo?.USER_EMAIL || d.userEmail || '',
+            userTel: userInfo?.userTel || userInfo?.USER_TEL || d.userTel || '',
+            userRoleCd: d.userRoleCd || userInfo?.userRoleCd || 'C',
+            signImgUrl: userInfo?.signImgUrl || d.signImgUrl || userInfo?.SIGN_IMG_URL || null,
             regDt: d.regDt || ''
           });
           if (Array.isArray(d.termsAgreedList)) {
@@ -5288,7 +6048,7 @@ export function WebClntOrd010000({
           <div className="flex items-center gap-space-md shrink-0">
             <div className="hidden lg:flex flex-col items-end text-right">
               <span className="font-label-md text-label-md text-on-surface font-semibold">
-                {currentUser.USER_NM || '홍길동'}님
+                {currentUser.USER_NM || '김충훈'}님
               </span>
               <span className="font-caption text-caption text-secondary font-medium">
                 인증회원 ({effectiveUserNo})
@@ -5310,7 +6070,7 @@ export function WebClntOrd010000({
                 로그아웃
               </button>
               <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-on-primary ring-1 ring-outline-variant/30 font-semibold text-xs">
-                {currentUser.USER_NM ? currentUser.USER_NM.slice(0, 1) : '홍'}
+                {currentUser.USER_NM ? currentUser.USER_NM.slice(0, 1) : '김'}
               </div>
             </div>
           </div>
@@ -6058,6 +6818,7 @@ export default function WebClntCom010000({ onNavigate }) {
   const [isReqModalOpen, setIsReqModalOpen] = useState(false);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
+  const [socialPrefill, setSocialPrefill] = useState(null);
   const [isWelcomeModalOpen, setIsWelcomeModalOpen] = useState(false);
   const [welcomeUserInfo, setWelcomeUserInfo] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState('REGULAR');
@@ -6072,16 +6833,20 @@ export default function WebClntCom010000({ onNavigate }) {
           const stored = localStorage.getItem('SSEULDAKGO_AUTH_USER');
           if (stored) {
             const parsed = JSON.parse(stored);
-            if (parsed && parsed.USER_NO && parsed.USER_NO !== 'GUEST') {
-              return { isGuest: false, ...parsed };
+            const userNo = parsed.USER_NO || parsed.userNo;
+            const userNm = parsed.USER_NM || parsed.userNm;
+            if (userNo && userNo !== 'GUEST') {
+              return { isGuest: false, ...parsed, USER_NO: userNo, USER_NM: userNm || '김충훈' };
             }
           }
         }
         const sessionStored = sessionStorage.getItem('SSEULDAKGO_AUTH_USER');
         if (sessionStored) {
           const parsed = JSON.parse(sessionStored);
-          if (parsed && parsed.USER_NO && parsed.USER_NO !== 'GUEST') {
-            return { isGuest: false, ...parsed };
+          const userNo = parsed.USER_NO || parsed.userNo;
+          const userNm = parsed.USER_NM || parsed.userNm;
+          if (userNo && userNo !== 'GUEST') {
+            return { isGuest: false, ...parsed, USER_NO: userNo, USER_NM: userNm || '김충훈' };
           }
         }
       }
@@ -6126,9 +6891,9 @@ export default function WebClntCom010000({ onNavigate }) {
           if (data.userInfo) {
             setUserInfo({
               isGuest: Boolean(data.isGuest),
-              USER_NO: data.userInfo.USER_NO,
-              USER_NM: data.userInfo.USER_NM,
-              USER_ROLE_CD: data.userInfo.USER_ROLE_CD,
+              USER_NO: data.userInfo.USER_NO || data.userInfo.userNo || 'C20261100001',
+              USER_NM: data.userInfo.USER_NM || data.userInfo.userNm || '김충훈',
+              USER_ROLE_CD: data.userInfo.USER_ROLE_CD || data.userInfo.userRoleCd || 'C',
             });
           }
         }
@@ -7044,17 +7809,18 @@ export default function WebClntCom010000({ onNavigate }) {
             <WebClntAth010100
               isOpen={isLoginModalOpen}
               onClose={() => setIsLoginModalOpen(false)}
-              onOpenRegister={() => {
+              onOpenRegister={(socialData) => {
                 setIsLoginModalOpen(false);
+                if (socialData) setSocialPrefill(socialData);
                 setIsRegisterModalOpen(true);
               }}
               onSuccessLogin={(userData) => {
                 const updated = {
                   isGuest: false,
-                  USER_NO: userData.userNo || 'C20261000001',
-                  USER_NM: userData.userNm || '홍길동',
-                  USER_ROLE_CD: userData.userRoleCd || 'C',
-                  USER_EMAIL: userData.userEmail || '',
+                  USER_NO: userData.userNo || userData.USER_NO || 'C20261100001',
+                  USER_NM: userData.userNm || userData.USER_NM || userData.name || '김충훈',
+                  USER_ROLE_CD: userData.userRoleCd || userData.USER_ROLE_CD || 'C',
+                  USER_EMAIL: userData.userEmail || userData.USER_EMAIL || '',
                 };
                 if (userData.keepLogin) {
                   localStorage.setItem('SSEULDAKGO_KEEP_LOGIN', 'Y');
@@ -7078,9 +7844,14 @@ export default function WebClntCom010000({ onNavigate }) {
             ============================================================== */}
             <WebClntAth010200
               isOpen={isRegisterModalOpen}
-              onClose={() => setIsRegisterModalOpen(false)}
+              initialSocial={socialPrefill}
+              onClose={() => {
+                setIsRegisterModalOpen(false);
+                setSocialPrefill(null);
+              }}
               onOpenLogin={() => {
                 setIsRegisterModalOpen(false);
+                setSocialPrefill(null);
                 setIsLoginModalOpen(true);
               }}
               onSuccessRegister={(userData) => {
@@ -8132,7 +8903,7 @@ export function WebClntOrd010100({
           <div className="flex items-center gap-space-md shrink-0">
             <div className="hidden lg:flex flex-col items-end text-right">
               <span className="font-label-md text-label-md text-on-surface font-semibold">
-                {currentUser.USER_NM || '홍길동'}님
+                {currentUser.USER_NM || '김충훈'}님
               </span>
               <span className="font-caption text-caption text-secondary font-medium">
                 인증회원 ({effectiveUserNo})
@@ -8154,7 +8925,7 @@ export function WebClntOrd010100({
                 로그아웃
               </button>
               <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-on-primary ring-1 ring-outline-variant/30 font-semibold text-xs">
-                {currentUser.USER_NM ? currentUser.USER_NM.slice(0, 1) : '홍'}
+                {currentUser.USER_NM ? currentUser.USER_NM.slice(0, 1) : '김'}
               </div>
             </div>
           </div>

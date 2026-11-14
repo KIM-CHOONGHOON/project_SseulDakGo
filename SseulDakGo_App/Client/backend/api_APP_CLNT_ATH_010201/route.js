@@ -247,10 +247,10 @@ export async function processAppClntAth010200200201(payload = {}) {
       code: 'OK',
       data: {
         userNo: cleanUserNo,
-        userRoleCd: 'C',
-        userNm: '홍길동',
-        userEmail: 'hong.gd@example.com',
-        userTel: '010-1234-5678',
+        userRoleCd: payload.userRoleCd || 'C',
+        userNm: payload.userNm || '고객회원',
+        userEmail: payload.userEmail || 'user@example.com',
+        userTel: payload.userTel || '',
         signImgUrl: null,
         regDt: new Date().toISOString().replace('T', ' ').slice(0, 19),
         termsAgreedList: [
