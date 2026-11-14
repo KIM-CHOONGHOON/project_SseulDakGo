@@ -4,11 +4,11 @@ const React = window.React;
 /**
  * ============================================================================
  * [프론트엔드 화면]
- * 화면 ID: WEB-CLNT-COM-000
+ * 화면 ID: WEB-CLNT-COM-010000
  * 한글 화면명: 고객 메인 홈
- * 파일 경로: SseulDakGo_Web/Client/frontend/WEB-CLNT-COM-000/index.jsx
- * 연동 백엔드 API: POST /api/web/client/com_000
- *                (SseulDakGo_Web/Client/backend/api_WEB_CLNT_COM_000/route.js)
+ * 파일 경로: SseulDakGo_Web/Client/frontend/WEB-CLNT-COM-010000/index.jsx
+ * 연동 백엔드 API: POST /api/web/client/com_010000
+ *                (SseulDakGo_Web/Client/backend/api_WEB_CLNT_COM_010000/route.js)
  * ============================================================================
  */
 // ----------------------------------------------------------------------------
@@ -214,20 +214,20 @@ function chunkCleanLocNamesByLength(selectedCodes, locList = COM_CODE_CLEAN_LOC)
     return lines;
 }
 // ============================================================================
-// [모달 컴포넌트] WEB-CLNT-REQ-000 (청소 의뢰 등록 모달)
-// <WebClntReq000 isOpen={isReqModalOpen} initialTab={selectedCategory} onClose={() => setIsReqModalOpen(false)} />
+// [모달 컴포넌트] WEB-CLNT-REQ-010100 (청소 의뢰 등록 모달)
+// <WebClntReq010100 isOpen={isReqModalOpen} initialTab={selectedCategory} onClose={() => setIsReqModalOpen(false)} />
 // ============================================================================
 /**
  * ============================================================================
  * [프론트엔드 모달 화면]
- * 화면 ID: WEB-CLNT-REQ-000
+ * 화면 ID: WEB-CLNT-REQ-010100
  * 한글 화면명: 청소 서비스 신청 및 발주서 작성 (고객 지정가 확정 발주 모달)
- * 파일 경로: SseulDakGo_Web/Client/frontend/WEB-CLNT-REQ-000/index.jsx
- * 연동 백엔드 API: POST /api/web/client/req_000
+ * 파일 경로: SseulDakGo_Web/Client/frontend/WEB-CLNT-REQ-010100/index.jsx
+ * 연동 백엔드 API: POST /api/web/client/req_010100
  * ============================================================================
  */
 // ============================================================================
-// 네이버 주소 검색 팝업 모달 (APP-CLNT-REQ-000 100% 동기화 웹 버전)
+// 네이버 주소 검색 팝업 모달 (APP-CLNT-REQ-010100 100% 동기화 웹 버전)
 // ============================================================================
 function NaverAddressSearchModal({ isOpen, onClose, onSelectAddress }) {
     const [keyword, setKeyword] = useState('');
@@ -669,7 +669,7 @@ function compressImageToDataUrl(file, maxWidth = 1024, quality = 0.75) {
         reader.readAsDataURL(file);
     });
 }
-function WebClntReq000Modal({ isOpen = false, initialTab = 'REGULAR', onClose, onOpenLogin, onSuccess, }) {
+function WebClntReq010100Modal({ isOpen = false, initialTab = 'REGULAR', onClose, onOpenLogin, onSuccess, }) {
     const [activeTab, setActiveTab] = useState(initialTab || 'REGULAR');
     const [formData, setFormData] = useState(INITIAL_FORM_DATA);
     const [startYearMonth, setStartYearMonth] = useState('2026-11');
@@ -752,7 +752,7 @@ function WebClntReq000Modal({ isOpen = false, initialTab = 'REGULAR', onClose, o
                             dataUrl: p.dataUrl || p.url,
                         })));
                     }
-                    console.log('✅ [WEB-CLNT-REQ-000] 비회원 임시 저장 발주서 및 현장 사진 복원 완료');
+                    console.log('✅ [WEB-CLNT-REQ-010100] 비회원 임시 저장 발주서 및 현장 사진 복원 완료');
                 }
             }
         }
@@ -1187,7 +1187,7 @@ function WebClntReq000Modal({ isOpen = false, initialTab = 'REGULAR', onClose, o
         };
         setIsSubmitting(true);
         try {
-            const res = await fetch('/api/web/client/req_000', {
+            const res = await fetch('/api/web/client/req_010100', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload),
@@ -1231,7 +1231,7 @@ function WebClntReq000Modal({ isOpen = false, initialTab = 'REGULAR', onClose, o
                         React.createElement("span", { className: "inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-secondary-container text-on-secondary-container font-label-sm text-label-sm font-semibold" },
                             React.createElement("span", { className: "material-symbols-outlined text-[14px]" }, "price_check"),
                             "\uD655\uC815 \uC9C0\uC815\uAC00 \uBC1C\uC8FC \uC2DC\uC2A4\uD15C"),
-                        React.createElement("span", { className: "font-caption text-caption text-outline font-mono" }, "WEB-CLNT-REQ-000")),
+                        React.createElement("span", { className: "font-caption text-caption text-outline font-mono" }, "WEB-CLNT-REQ-010100")),
                     React.createElement("h2", { className: "font-headline-md text-headline-md text-on-surface font-bold mt-1 tracking-tight flex items-center gap-2", id: "modal-title" }, "\uCCAD\uC18C \uC11C\uBE44\uC2A4 \uC2E0\uCCAD \uBC0F \uBC1C\uC8FC\uC11C \uC791\uC131"),
                     React.createElement("p", { className: "font-caption text-caption text-on-surface-variant mt-0.5" }, "\uAC00\uACA9\uC744 \uD765\uC815\uD558\uC9C0 \uC54A\uACE0, \uC6D0\uD558\uB294 \uC870\uAC74\uACFC \uD655\uC815 \uB300\uAE08\uC744 \uC9C1\uC811 \uC785\uB825\uD558\uC5EC 1:1 \uC804\uB2F4 \uB9C8\uC2A4\uD130\uB97C \uBC14\uB85C \uB9E4\uCE6D\uBC1B\uC2B5\uB2C8\uB2E4.")),
                 React.createElement("button", { "aria-label": "\uB2EB\uAE30", className: "w-9 h-9 rounded-full bg-surface-container hover:bg-surface-container-high text-on-surface-variant hover:text-on-surface flex items-center justify-center transition-colors cursor-pointer", onClick: onClose, type: "button" },
@@ -1656,10 +1656,10 @@ function WebClntReq000Modal({ isOpen = false, initialTab = 'REGULAR', onClose, o
                     React.createElement("span", null, "\uD655\uC778 (\uB85C\uADF8\uC778 \uD654\uBA74\uC73C\uB85C \uC774\uB3D9)"),
                     React.createElement("span", { className: "material-symbols-outlined text-sm" }, "arrow_forward")))))));
 }
-const WebClntReq000 = WebClntReq000Modal;
+const WebClntReq010100 = WebClntReq010100Modal;
 /**
- * @file SseulDakGo_Web/Client/frontend/WEB-CLNT-ATH-000/index.jsx
- * @description 고객 및 시공사 회원 로그인 모달 컴포넌트 (WEB-CLNT-ATH-000)
+ * @file SseulDakGo_Web/Client/frontend/WEB-CLNT-ATH-010100/index.jsx
+ * @description 고객 및 시공사 회원 로그인 모달 컴포넌트 (WEB-CLNT-ATH-010100)
  *
  * Props:
  * - isOpen: 모달 노출 여부 (boolean)
@@ -1668,7 +1668,7 @@ const WebClntReq000 = WebClntReq000Modal;
  * - onOpenRegister: 회원가입 모달 전환 핸들러 () => void
  * - onOpenFindPwd: 비밀번호 찾기 모달 전환 핸들러 () => void
  */
-function WebClntAth000({ isOpen = false, onClose, onSuccessLogin, onOpenRegister, onOpenFindPwd }) {
+function WebClntAth010100({ isOpen = false, onClose, onSuccessLogin, onOpenRegister, onOpenFindPwd }) {
     // 1. 회원 구분 ('C': 고객 회원, 'S': 시공사 회원)
     const [role, setRole] = useState('C');
     // 2. 입력 필드 상태
@@ -1750,7 +1750,7 @@ function WebClntAth000({ isOpen = false, onClose, onSuccessLogin, onOpenRegister
         }
         setIsLoading(true);
         try {
-            const res = await fetch('/api/web/client/ath_000', {
+            const res = await fetch('/api/web/client/ath_010100', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -1817,7 +1817,7 @@ function WebClntAth000({ isOpen = false, onClose, onSuccessLogin, onOpenRegister
         setIsLoading(true);
         setErrorMsg('');
         try {
-            const res = await fetch('/api/web/client/ath_000', {
+            const res = await fetch('/api/web/client/ath_010100', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -1942,11 +1942,11 @@ function WebClntAth000({ isOpen = false, onClose, onSuccessLogin, onOpenRegister
                 React.createElement("button", { className: "text-primary font-bold hover:underline transition-colors", "data-action": "CALL_SIGNUP", onClick: onOpenRegister || (() => alert('회원가입 페이지 준비 중입니다.')), type: "button" }, "\uD68C\uC6D0\uAC00\uC785")))));
 }
 // ============================================================================
-// [모달 컴포넌트] WEB-CLNT-ATH-010 (통합 회원가입 및 4대 약관 정독 모달)
+// [모달 컴포넌트] WEB-CLNT-ATH-010200 (통합 회원가입 및 4대 약관 정독 모달)
 // ============================================================================
 /**
- * @file SseulDakGo_Web/Client/frontend/WEB-CLNT-ATH-010/index.jsx
- * @description 통합 회원가입 및 4대 약관 정독 모달 컴포넌트 (WEB-CLNT-ATH-010)
+ * @file SseulDakGo_Web/Client/frontend/WEB-CLNT-ATH-010200/index.jsx
+ * @description 통합 회원가입 및 4대 약관 정독 모달 컴포넌트 (WEB-CLNT-ATH-010200)
  *              - SNS(카카오, 네이버, Google, Apple) 연동 간편 가입 및 일반 이메일 가입
  *              - 자필 전자서명 캔버스 패드 & 서명 지우기 & PNG 파일 저장 연동
  *
@@ -1954,11 +1954,11 @@ function WebClntAth000({ isOpen = false, onClose, onSuccessLogin, onOpenRegister
  * - isOpen: 모달 표시 여부 (boolean)
  * - onClose: 모달 닫기 핸들러 () => void
  * - onSuccessRegister: 가입 완료 성공 콜백 (userData) => void
- * - onOpenLogin: 로그인 모달(WEB-CLNT-ATH-000) 전환 핸들러 () => void
+ * - onOpenLogin: 로그인 모달(WEB-CLNT-ATH-010100) 전환 핸들러 () => void
  */
 /**
- * @file SseulDakGo_Web/Client/frontend/WEB-CLNT-ATH-010/index.jsx
- * @description 통합 회원가입 및 4대 약관 정독 모달 컴포넌트 (WEB-CLNT-ATH-010)
+ * @file SseulDakGo_Web/Client/frontend/WEB-CLNT-ATH-010200/index.jsx
+ * @description 통합 회원가입 및 4대 약관 정독 모달 컴포넌트 (WEB-CLNT-ATH-010200)
  *              - SNS(카카오, 네이버, Google, Apple) 연동 간편 가입 및 일반 이메일 가입
  *              - 자필 전자서명 캔버스 패드 & 서명 지우기 & PNG 파일 저장 연동
  *
@@ -1966,9 +1966,9 @@ function WebClntAth000({ isOpen = false, onClose, onSuccessLogin, onOpenRegister
  * - isOpen: 모달 표시 여부 (boolean)
  * - onClose: 모달 닫기 핸들러 () => void
  * - onSuccessRegister: 가입 완료 성공 콜백 (userData) => void
- * - onOpenLogin: 로그인 모달(WEB-CLNT-ATH-000) 전환 핸들러 () => void
+ * - onOpenLogin: 로그인 모달(WEB-CLNT-ATH-010100) 전환 핸들러 () => void
  */
-function WebClntAth010({ isOpen = false, onClose, onSuccessRegister, onOpenLogin }) {
+function WebClntAth010200({ isOpen = false, onClose, onSuccessRegister, onOpenLogin }) {
     // 1. 회원 구분 ('C': 고객 회원, 'S': 시공사 회원)
     const [role, setRole] = useState('C');
     // 2. SNS 연동 정보
@@ -2212,7 +2212,7 @@ function WebClntAth010({ isOpen = false, onClose, onSuccessRegister, onOpenLogin
             return;
         }
         try {
-            const res = await fetch('/api/web/client/ath_010', {
+            const res = await fetch('/api/web/client/ath_010200', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -2416,7 +2416,7 @@ function WebClntAth010({ isOpen = false, onClose, onSuccessRegister, onOpenLogin
             }
         ];
         try {
-            const res = await fetch('/api/web/client/ath_010', {
+            const res = await fetch('/api/web/client/ath_010200', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -2470,7 +2470,7 @@ function WebClntAth010({ isOpen = false, onClose, onSuccessRegister, onOpenLogin
                 React.createElement("div", { className: "flex items-center gap-1.5 text-secondary font-label-sm text-label-sm" },
                     React.createElement("span", { className: "material-symbols-outlined text-[16px]" }, "verified_user"),
                     React.createElement("span", { className: "font-semibold tracking-tight" }, "KISA & \uAE08\uC735\uC704 \uAC00\uC774\uB4DC\uB77C\uC778 \uC900\uC218 \uC804\uC790\uC11C\uBA85 \uC138\uC158")),
-                React.createElement("span", { className: "text-on-surface-variant font-caption text-caption" }, "\uD654\uBA74 ID: WEB-CLNT-ATH-010")),
+                React.createElement("span", { className: "text-on-surface-variant font-caption text-caption" }, "\uD654\uBA74 ID: WEB-CLNT-ATH-010200")),
             React.createElement("div", { className: "overflow-y-auto px-6 sm:px-8 pt-6 pb-8 space-y-6 flex-1 scroll-smooth", id: "modal-scroll-pane" },
                 React.createElement("header", { className: "flex items-start justify-between gap-4" },
                     React.createElement("div", { className: "flex items-start gap-3.5" },
@@ -2702,7 +2702,7 @@ function WebClntAth010({ isOpen = false, onClose, onSuccessRegister, onOpenLogin
                         React.createElement("span", { className: "material-symbols-outlined text-[20px]" }, "arrow_forward")))),
                     React.createElement("div", { className: "text-center font-body-sm text-body-sm text-on-surface-variant flex items-center justify-center gap-1.5" },
                         React.createElement("span", null, "\uC774\uBBF8 \uACC4\uC815\uC774 \uC788\uC73C\uC2E0\uAC00\uC694?"),
-                        React.createElement("button", { className: "text-primary font-semibold hover:underline cursor-pointer", onClick: onOpenLogin || (() => { }), type: "button" }, "\uB85C\uADF8\uC778\uD558\uAE30 (WEB-CLNT-ATH-000)"))))),
+                        React.createElement("button", { className: "text-primary font-semibold hover:underline cursor-pointer", onClick: onOpenLogin || (() => { }), type: "button" }, "\uB85C\uADF8\uC778\uD558\uAE30 (WEB-CLNT-ATH-010100)"))))),
         alertModal.isOpen && (React.createElement("div", { className: "fixed inset-0 z-[120] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in", role: "dialog", "aria-modal": "true" },
             React.createElement("div", { className: "bg-surface-container-lowest rounded-2xl max-w-sm w-full p-6 shadow-2xl border border-slate-200/80 text-center animate-in zoom-in-95 space-y-4" },
                 React.createElement("div", { className: "w-12 h-12 rounded-full bg-error-container text-error flex items-center justify-center mx-auto shadow-sm" },
@@ -2730,7 +2730,7 @@ function WebClntAth010({ isOpen = false, onClose, onSuccessRegister, onOpenLogin
                     React.createElement("span", null, "\uD655\uC778 (\uB85C\uADF8\uC778 \uD654\uBA74\uC73C\uB85C \uC774\uB3D9)"),
                     React.createElement("span", { className: "material-symbols-outlined text-sm" }, "arrow_forward")))))));
 }
-function WebClntAth011({ isOpen = false, userInfo = null, onClose, onOpenRequestModal }) {
+function WebClntAth010200201({ isOpen = false, userInfo = null, onClose, onOpenRequestModal }) {
     const [profile, setProfile] = useState({
         userNo: userInfo?.userNo || userInfo?.USER_NO || 'C20261100001',
         userNm: userInfo?.userNm || userInfo?.USER_NM || '고객',
@@ -2755,7 +2755,7 @@ function WebClntAth011({ isOpen = false, userInfo = null, onClose, onOpenRequest
         const fetchUserInfo = async () => {
             try {
                 setIsLoading(true);
-                const res = await fetch('/api/web/client/ath_011', {
+                const res = await fetch('/api/web/client/ath_010200201', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ userNo: effectiveUserNo })
@@ -2778,7 +2778,7 @@ function WebClntAth011({ isOpen = false, userInfo = null, onClose, onOpenRequest
                 }
             }
             catch (err) {
-                console.warn('[WEB-CLNT-ATH-011] 회원 정보 및 약관 조회 실패:', err);
+                console.warn('[WEB-CLNT-ATH-010200201] 회원 정보 및 약관 조회 실패:', err);
             }
             finally {
                 setIsLoading(false);
@@ -2848,7 +2848,7 @@ function WebClntAth011({ isOpen = false, userInfo = null, onClose, onOpenRequest
         try {
             setIsUpdatingSign(true);
             const signDataUrl = canvas.toDataURL('image/png');
-            const res = await fetch('/api/web/client/ath_011', {
+            const res = await fetch('/api/web/client/ath_010200201', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -2884,7 +2884,7 @@ function WebClntAth011({ isOpen = false, userInfo = null, onClose, onOpenRequest
         if (typeof window !== 'undefined') {
             window.dispatchEvent(new CustomEvent('OPEN_CLEANING_REQUEST_MODAL', {
                 detail: {
-                    screenId: 'WEB-CLNT-REQ-000',
+                    screenId: 'WEB-CLNT-REQ-010100',
                     userNo: profile.userNo,
                     userNm: profile.userNm
                 }
@@ -3017,12 +3017,12 @@ function WebClntAth011({ isOpen = false, userInfo = null, onClose, onOpenRequest
                         React.createElement("button", { type: "button", onClick: handleSaveNewSignature, disabled: isUpdatingSign || !hasNewSignature, className: "px-4 py-1.5 text-sm rounded-lg bg-teal-600 hover:bg-teal-700 text-white font-semibold shadow disabled:opacity-50" }, isUpdatingSign ? '저장 중...' : '서명 갱신 저장'))))))));
 }
 /**
- * @file SseulDakGo_Web/Client/frontend/WEB-CLNT-ORD-000/index.jsx
- * @description 나의 청소 신청 현황 화면 컴포넌트 (WEB-CLNT-ORD-000)
+ * @file SseulDakGo_Web/Client/frontend/WEB-CLNT-ORD-010000/index.jsx
+ * @description 나의 청소 신청 현황 화면 컴포넌트 (WEB-CLNT-ORD-010000)
  *              - 고객 확정 지정가 발주 오더 실시간 목록 및 7일 청약 만료 카운트다운 타이머
  *              - 4대 핵심 발주 지표 (전체, 청약접수중, 계약체결/진행중, 청소완료)
  *              - 탭 필터링 (전체, 청약접수중, 계약확정, 진행중, 완료, 만료/취소)
- *              - 신규 청소 요청 모달(WEB-CLNT-REQ-000) 오픈 및 파트너 청약서 비교 연계
+ *              - 신규 청소 요청 모달(WEB-CLNT-REQ-010100) 오픈 및 파트너 청약서 비교 연계
  *              - .cursorrules 공식 브랜드 상표 로고(/logo.png) 반영
  *
  * Props:
@@ -3032,13 +3032,13 @@ function WebClntAth011({ isOpen = false, userInfo = null, onClose, onOpenRequest
  * @param {Object} currentUser 로그인 사용자 정보 ({ USER_NO, USER_NM, USER_ROLE_CD })
  */
 /**
- * @file SseulDakGo_Web/Client/frontend/WEB-CLNT-ORD-000/index.jsx
- * @description 나의 청소 신청 현황 메인 화면 컴포넌트 (WEB-CLNT-ORD-000)
+ * @file SseulDakGo_Web/Client/frontend/WEB-CLNT-ORD-010000/index.jsx
+ * @description 나의 청소 신청 현황 메인 화면 컴포넌트 (WEB-CLNT-ORD-010000)
  *              - 4대 요약 통계 집계 카드 (전체, 청약접수중, 계약체결/진행중, 완료)
- *              - 상태별 탭 필터링 및 POST /api/web/client/ord_000 비동기 데이터 바인딩
+ *              - 상태별 탭 필터링 및 POST /api/web/client/ord_010000 비동기 데이터 바인딩
  *              - 7일 만료 실시간 타이머 (BID_OPEN 건 매초 남은시간 계산 및 0초 시 BID_EXPIRED 자동 전이)
- *              - [파트너 청약서 비교 및 선택하기 >] 상세 화면(WEB-CLNT-ORD-001) 라우팅
- *              - [+ 신규 청소 요청 등록하기] 청소 신청 모달(WEB-CLNT-REQ-000) 연계
+ *              - [파트너 청약서 비교 및 선택하기 >] 상세 화면(WEB-CLNT-ORD-010100) 라우팅
+ *              - [+ 신규 청소 요청 등록하기] 청소 신청 모달(WEB-CLNT-REQ-010100) 연계
  *              - .cursorrules 2.5 공식 브랜드 로고(/logo.png) 반영
  *
  * Props:
@@ -3047,7 +3047,7 @@ function WebClntAth011({ isOpen = false, userInfo = null, onClose, onOpenRequest
  * @param {Function} onLogout 로그아웃 핸들러 () => void
  * @param {Object} currentUser 현재 로그인 사용자 정보 ({ USER_NO, USER_NM, USER_ROLE_CD })
  */
-function WebClntOrd000({ onNavigate, onOpenRequestModal, onLogout, currentUser = {
+function WebClntOrd010000({ onNavigate, onOpenRequestModal, onLogout, currentUser = {
     USER_NO: 'C20261000001',
     USER_NM: '홍길동',
     USER_ROLE_CD: 'C'
@@ -3064,11 +3064,11 @@ function WebClntOrd000({ onNavigate, onOpenRequestModal, onLogout, currentUser =
     const [timeLeftMap, setTimeLeftMap] = useState({});
     const [isLoading, setIsLoading] = useState(false);
     const effectiveUserNo = currentUser.USER_NO || 'C20261000001';
-    // 2. 백엔드 목록 조회 API 호출 (POST /api/web/client/ord_000)
+    // 2. 백엔드 목록 조회 API 호출 (POST /api/web/client/ord_010000)
     const fetchOrderData = useCallback(async (filterValue = currentFilter) => {
         try {
             setIsLoading(true);
-            const res = await fetch('/api/web/client/ord_000', {
+            const res = await fetch('/api/web/client/ord_010000', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -3096,7 +3096,7 @@ function WebClntOrd000({ onNavigate, onOpenRequestModal, onLogout, currentUser =
             }
         }
         catch (err) {
-            console.warn('[WEB-CLNT-ORD-000] 목록 조회 API 통신 오류 (시뮬레이션 유지):', err);
+            console.warn('[WEB-CLNT-ORD-010000] 목록 조회 API 통신 오류 (시뮬레이션 유지):', err);
         }
         finally {
             setIsLoading(false);
@@ -3156,14 +3156,14 @@ function WebClntOrd000({ onNavigate, onOpenRequestModal, onLogout, currentUser =
     };
     // 사용자 인터랙션: [파트너 청약서 비교 및 선택하기 >] 클릭 시 상세 화면 라우팅
     const handleNavigateToQuotes = (orderNo) => {
-        const targetUrl = `WEB-CLNT-ORD-001?orderNo=${encodeURIComponent(orderNo)}`;
-        console.log(`[WEB-CLNT-ORD-000] 라우팅 실행 -> ${targetUrl}`);
+        const targetUrl = `WEB-CLNT-ORD-010100?orderNo=${encodeURIComponent(orderNo)}`;
+        console.log(`[WEB-CLNT-ORD-010000] 라우팅 실행 -> ${targetUrl}`);
         if (onNavigate) {
             onNavigate(targetUrl);
         }
         else if (typeof window !== 'undefined') {
             window.location.hash = `#${targetUrl}`;
-            alert(`[WEB-CLNT-ORD-001 상세 이동]\n발주번호 ${orderNo}의 파트너 청약서 비교 화면으로 이동합니다.`);
+            alert(`[WEB-CLNT-ORD-010100 상세 이동]\n발주번호 ${orderNo}의 파트너 청약서 비교 화면으로 이동합니다.`);
         }
     };
     // 사용자 인터랙션: [+ 신규 청소 요청 등록하기] 클릭 시 모달 트리거
@@ -3173,7 +3173,7 @@ function WebClntOrd000({ onNavigate, onOpenRequestModal, onLogout, currentUser =
         }
         else if (typeof window !== 'undefined') {
             window.dispatchEvent(new CustomEvent('OPEN_CLEANING_REQUEST_MODAL', {
-                detail: { screenId: 'WEB-CLNT-REQ-000', userNo: effectiveUserNo }
+                detail: { screenId: 'WEB-CLNT-REQ-010100', userNo: effectiveUserNo }
             }));
         }
     };
@@ -3234,7 +3234,7 @@ function WebClntOrd000({ onNavigate, onOpenRequestModal, onLogout, currentUser =
                                 React.createElement("div", { className: "flex flex-col gap-1.5" },
                                     React.createElement("div", { className: "flex items-center gap-space-xs" },
                                         React.createElement("span", { className: "px-2.5 py-0.5 rounded-full bg-secondary-fixed text-on-secondary-fixed-variant font-label-sm text-label-sm font-semibold tracking-wide" }, "\uACE0\uAC1D \uBC1C\uC8FC \uD3EC\uD138"),
-                                        React.createElement("span", { className: "text-outline text-caption font-caption font-mono" }, "WEB-CLNT-ORD-000")),
+                                        React.createElement("span", { className: "text-outline text-caption font-caption font-mono" }, "WEB-CLNT-ORD-010000")),
                                     React.createElement("h1", { className: "font-headline-lg text-headline-lg text-primary tracking-tight font-bold" }, "\uB098\uC758 \uCCAD\uC18C \uC2E0\uCCAD \uD604\uD669"),
                                     React.createElement("p", { className: "font-body-md text-body-md text-on-surface-variant max-w-3xl leading-relaxed" }, "\uACE0\uAC1D\uB2D8\uC774 \uC9C1\uC811 \uC9C0\uC815\uAC00\uB85C \uBC1C\uC8FC\uD558\uC2E0 \uCCAD\uC18C \uAC74\uB4E4\uC758 \uC2E4\uC2DC\uAC04 \uB9E4\uCE6D \uC0C1\uD0DC\uC785\uB2C8\uB2E4. \uC5ED\uACBD\uB9E4 \uC5C6\uC774 \uC9C0\uC815\uAC00 \uADF8\uB300\uB85C \uAC80\uC99D\uB41C \uC2DC\uACF5 \uB9C8\uC2A4\uD130\uC640 \uB9E4\uCE6D\uB429\uB2C8\uB2E4.")),
                                 React.createElement("div", { className: "hidden lg:flex items-center gap-space-xs bg-surface-container-low px-4 py-2 rounded-xl text-on-surface shadow-xs" },
@@ -3474,7 +3474,7 @@ function WebClntOrd000({ onNavigate, onOpenRequestModal, onLogout, currentUser =
                                         isConfirmed && (React.createElement("div", { className: "flex items-center gap-2" },
                                             React.createElement("button", { className: "h-[42px] px-5 rounded-lg bg-secondary text-on-secondary font-label-md text-label-md font-semibold flex items-center gap-1.5 shadow-sm hover:shadow-md hover:bg-on-secondary-container active:scale-[0.98] transition-all cursor-pointer", onClick: () => {
                                                     if (onNavigate) {
-                                                        onNavigate(`WEB-CLNT-JOB-000?contractNo=${order.contractMaster?.contractNo || 'CNT2026103100001'}`);
+                                                        onNavigate(`WEB-CLNT-JOB-010100?contractNo=${order.contractMaster?.contractNo || 'CNT2026103100001'}`);
                                                     }
                                                 }, type: "button" },
                                                 React.createElement("span", { className: "material-symbols-outlined text-[18px]" }, "verified"),
@@ -3486,7 +3486,7 @@ function WebClntOrd000({ onNavigate, onOpenRequestModal, onLogout, currentUser =
                                         isCompleted && (React.createElement("div", { className: "flex items-center gap-2" },
                                             React.createElement("button", { className: "h-[42px] px-5 rounded-lg bg-surface-container-lowest text-primary font-label-md text-label-md font-semibold flex items-center gap-1.5 shadow-sm hover:shadow-md hover:bg-surface-container transition-all cursor-pointer border border-slate-200/80", onClick: () => {
                                                     if (onNavigate) {
-                                                        onNavigate(`WEB-CLNT-JOB-000?contractNo=${order.contractMaster?.contractNo || 'CNT2026103100001'}`);
+                                                        onNavigate(`WEB-CLNT-JOB-010100?contractNo=${order.contractMaster?.contractNo || 'CNT2026103100001'}`);
                                                     }
                                                 }, type: "button" },
                                                 React.createElement("span", { className: "material-symbols-outlined text-[18px]" }, "fact_check"),
@@ -3539,9 +3539,9 @@ function WebClntOrd000({ onNavigate, onOpenRequestModal, onLogout, currentUser =
                         React.createElement("p", { className: "font-caption text-caption text-outline text-right md:text-left" }, "\u00A9 2026 (\uC8FC)\uACF5\uAC04\uB2E4\uC6D0. All rights reserved. SseulDakGo Domestic Infrastructure Platform.")))))));
 }
 // ============================================================================
-// [메인 화면 컴포넌트] WEB-CLNT-COM-000 (고객 메인 홈)
+// [메인 화면 컴포넌트] WEB-CLNT-COM-010000 (고객 메인 홈)
 // ============================================================================
-function WebClntCom000({ onNavigate }) {
+function WebClntCom010000({ onNavigate }) {
     // 1. 필수 상태 관리 (요구사항 명세 100% 반영)
     const [feedList, setFeedList] = useState(INITIAL_FEED_LIST);
     const [regionInfo, setRegionInfo] = useState(INITIAL_REGION_INFO);
@@ -3586,10 +3586,10 @@ function WebClntCom000({ onNavigate }) {
         };
     });
     const [activeNavPath, setActiveNavPath] = useState('home');
-    // 2. 백엔드 API 호출 (POST /api/web/client/com_000)
+    // 2. 백엔드 API 호출 (POST /api/web/client/com_010000)
     const fetchHomeData = useCallback(async (targetRegion = regionInfo, targetUserNo = userInfo.USER_NO) => {
         try {
-            const response = await fetch('/api/web/client/com_000', {
+            const response = await fetch('/api/web/client/com_010000', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -3719,11 +3719,11 @@ function WebClntCom000({ onNavigate }) {
             React.createElement("span", { className: "w-1.5 h-1.5 rounded-full bg-secondary inline-block animate-ping" }),
             item.ORDER_STATUS_LABEL || `${item.ORDER_STATUS} (청약접수중)`));
     };
-    // 청소 시공 검수 및 현장 직불 완료 승인 (WEB-CLNT-JOB-000) 화면 전환
-    if (activeNavPath && (activeNavPath === "WEB-CLNT-JOB-000" || activeNavPath.startsWith("WEB-CLNT-JOB-000?") || activeNavPath === "inspection")) {
+    // 청소 시공 검수 및 현장 직불 완료 승인 (WEB-CLNT-JOB-010100) 화면 전환
+    if (activeNavPath && (activeNavPath === "WEB-CLNT-JOB-010100" || activeNavPath.startsWith("WEB-CLNT-JOB-010100?") || activeNavPath === "inspection")) {
         const urlParams = new URLSearchParams(activeNavPath.includes('?') ? activeNavPath.split('?')[1] : '');
         const contractNo = urlParams.get('contractNo') || 'CNT2026103100001';
-        return (React.createElement(WebClntJob000, { contractNo: contractNo, currentUser: userInfo, onLogout: () => {
+        return (React.createElement(WebClntJob010100, { contractNo: contractNo, currentUser: userInfo, onLogout: () => {
                 setUserInfo({
                     isGuest: true,
                     USER_NO: "GUEST",
@@ -3733,11 +3733,11 @@ function WebClntCom000({ onNavigate }) {
                 setActiveNavPath("home");
             }, onNavigate: (path) => setActiveNavPath(path) }));
     }
-    // 청소 요청 상세 및 파트너 청약서 비교/선택 (WEB-CLNT-ORD-001) 화면 전환
-    if (activeNavPath && (activeNavPath === "WEB-CLNT-ORD-001" || activeNavPath.startsWith("WEB-CLNT-ORD-001?"))) {
+    // 청소 요청 상세 및 파트너 청약서 비교/선택 (WEB-CLNT-ORD-010100) 화면 전환
+    if (activeNavPath && (activeNavPath === "WEB-CLNT-ORD-010100" || activeNavPath.startsWith("WEB-CLNT-ORD-010100?"))) {
         const urlParams = new URLSearchParams(activeNavPath.includes('?') ? activeNavPath.split('?')[1] : '');
         const orderNo = urlParams.get('orderNo') || 'ORD2026103100001';
-        return (React.createElement(WebClntOrd001, { orderNo: orderNo, currentUser: userInfo, onLogout: () => {
+        return (React.createElement(WebClntOrd010100, { orderNo: orderNo, currentUser: userInfo, onLogout: () => {
                 setUserInfo({
                     isGuest: true,
                     USER_NO: "GUEST",
@@ -3747,10 +3747,10 @@ function WebClntCom000({ onNavigate }) {
                 setActiveNavPath("home");
             }, onNavigate: (path) => setActiveNavPath(path) }));
     }
-    // 나의 신청현황(WEB-CLNT-ORD-000) 화면 전환
+    // 나의 신청현황(WEB-CLNT-ORD-010000) 화면 전환
     if (activeNavPath === "my-application-status" || activeNavPath === "my-requests") {
         return (React.createElement(React.Fragment, null,
-            React.createElement(WebClntOrd000, { currentUser: userInfo, onLogout: () => {
+            React.createElement(WebClntOrd010000, { currentUser: userInfo, onLogout: () => {
                     setUserInfo({
                         isGuest: true,
                         USER_NO: "GUEST",
@@ -3759,7 +3759,7 @@ function WebClntCom000({ onNavigate }) {
                     });
                     setActiveNavPath("home");
                 }, onNavigate: (path) => setActiveNavPath(path), onOpenRequestModal: () => setIsReqModalOpen(true) }),
-            React.createElement(WebClntReq000, { isOpen: isReqModalOpen, onClose: () => setIsReqModalOpen(false), onOrderCreated: handleOrderCreated })));
+            React.createElement(WebClntReq010100, { isOpen: isReqModalOpen, onClose: () => setIsReqModalOpen(false), onOrderCreated: handleOrderCreated })));
     }
     return (React.createElement("div", { className: "bg-surface font-body-md text-body-md text-on-surface antialiased min-h-screen flex flex-col" },
         React.createElement("style", null, `
@@ -3901,7 +3901,7 @@ function WebClntCom000({ onNavigate }) {
                         React.createElement("div", { className: "flex items-center gap-2" },
                             React.createElement("span", { className: "inline-flex items-center justify-center w-5 h-5 rounded-full bg-secondary text-on-secondary" },
                                 React.createElement("span", { className: "material-symbols-outlined text-[13px]" }, "bolt")),
-                            React.createElement("span", { className: "font-label-sm text-label-sm text-primary tracking-wide" }, "WEB-CLNT-COM-000"),
+                            React.createElement("span", { className: "font-label-sm text-label-sm text-primary tracking-wide" }, "WEB-CLNT-COM-010000"),
                             React.createElement("span", { className: "text-outline-variant" }, "\u2022"),
                             React.createElement("span", { className: "text-on-surface-variant font-body-sm text-body-sm" }, "\uACE0\uAC1D \uBA54\uC778 \uD648 \uD45C\uC900 \uB9C8\uCF13\uD50C\uB808\uC774\uC2A4")),
                         React.createElement("div", { className: "hidden sm:flex items-center gap-3" },
@@ -4037,11 +4037,11 @@ function WebClntCom000({ onNavigate }) {
                                 React.createElement("button", { className: "w-full sm:w-auto h-[52px] px-6 rounded-xl bg-secondary text-on-secondary font-label-lg text-label-lg font-bold flex items-center justify-center gap-2 hover:bg-secondary-container hover:text-on-secondary-container transition-colors shadow-md", onClick: () => openRequestModal('REGULAR'), type: "button" },
                                     React.createElement("span", { className: "material-symbols-outlined text-[20px]" }, "post_add"),
                                     React.createElement("span", null, "\uC6B0\uB9AC\uC9D1 \uCCAD\uC18C \uC694\uCCAD \uB4F1\uB85D\uD558\uAE30"))))),
-                    React.createElement(WebClntReq000, { initialTab: selectedCategory, isOpen: isReqModalOpen, onClose: () => setIsReqModalOpen(false), onOpenLogin: () => {
+                    React.createElement(WebClntReq010100, { initialTab: selectedCategory, isOpen: isReqModalOpen, onClose: () => setIsReqModalOpen(false), onOpenLogin: () => {
                             setIsReqModalOpen(false);
                             setIsLoginModalOpen(true);
                         }, onOrderCreated: handleOrderCreated, regionInfo: regionInfo, userNo: userInfo.USER_NO }),
-                    React.createElement(WebClntAth000, { isOpen: isLoginModalOpen, onClose: () => setIsLoginModalOpen(false), onOpenRegister: () => {
+                    React.createElement(WebClntAth010100, { isOpen: isLoginModalOpen, onClose: () => setIsLoginModalOpen(false), onOpenRegister: () => {
                             setIsLoginModalOpen(false);
                             setIsRegisterModalOpen(true);
                         }, onSuccessLogin: (userData) => {
@@ -4068,7 +4068,7 @@ function WebClntCom000({ onNavigate }) {
                                 setIsReqModalOpen(true);
                             }
                         } }),
-                    React.createElement(WebClntAth010, { isOpen: isRegisterModalOpen, onClose: () => setIsRegisterModalOpen(false), onOpenLogin: () => {
+                    React.createElement(WebClntAth010200, { isOpen: isRegisterModalOpen, onClose: () => setIsRegisterModalOpen(false), onOpenLogin: () => {
                             setIsRegisterModalOpen(false);
                             setIsLoginModalOpen(true);
                         }, onSuccessRegister: (userData) => {
@@ -4081,7 +4081,7 @@ function WebClntCom000({ onNavigate }) {
                                 setIsLoginModalOpen(true);
                             }
                         } }),
-                    React.createElement(WebClntAth011, { isOpen: isWelcomeModalOpen, userInfo: welcomeUserInfo, onClose: () => setIsWelcomeModalOpen(false), onOpenRequestModal: () => {
+                    React.createElement(WebClntAth010200201, { isOpen: isWelcomeModalOpen, userInfo: welcomeUserInfo, onClose: () => setIsWelcomeModalOpen(false), onOpenRequestModal: () => {
                             setIsWelcomeModalOpen(false);
                             setIsReqModalOpen(true);
                         } })))),
@@ -4116,11 +4116,11 @@ function WebClntCom000({ onNavigate }) {
 }
 // ==============================================================================
 // ==============================================================================
-// [WEB-CLNT-PAY-000] 고객 데이터 이용료 결제 및 배타적 계약 확정 모달 컴포넌트
+// [WEB-CLNT-PAY-010100] 고객 데이터 이용료 결제 및 배타적 계약 확정 모달 컴포넌트
 // ==============================================================================
 /**
- * @file SseulDakGo_Web/Client/frontend/WEB-CLNT-PAY-000/index.jsx
- * @description 고객 데이터 이용료 결제 및 배타적 계약 확정 모달 컴포넌트 (WEB-CLNT-PAY-000)
+ * @file SseulDakGo_Web/Client/frontend/WEB-CLNT-PAY-010100/index.jsx
+ * @description 고객 데이터 이용료 결제 및 배타적 계약 확정 모달 컴포넌트 (WEB-CLNT-PAY-010100)
  *              - "정기청소, 입주청소, 계절가전" 요청별 16,500원(VAT 포함) 비례 계산
  *                * 1개 요청 시: 16,500원 (공급가액 15,000원 + VAT 1,500원)
  *                * 2개 요청 시: 33,000원 (공급가액 30,000원 + VAT 3,000원)
@@ -4137,7 +4137,7 @@ function WebClntCom000({ onNavigate }) {
  * @param {Function} onClose 닫기 콜백 () => void
  * @param {Function} onPaymentSuccess 결제 및 체결 완료 콜백 (resultData) => void
  */
-function WebClntPay000({ isOpen = false, orderData = null, applyData = null, currentUser = { USER_NO: 'C20261000001', USER_NM: '홍길동' }, onClose, onPaymentSuccess }) {
+function WebClntPay010100({ isOpen = false, orderData = null, applyData = null, currentUser = { USER_NO: 'C20261000001', USER_NM: '홍길동' }, onClose, onPaymentSuccess }) {
     // 1. 발주 및 청약 기본 데이터 정규화
     const effectiveOrder = useMemo(() => {
         return {
@@ -4239,7 +4239,7 @@ function WebClntPay000({ isOpen = false, orderData = null, applyData = null, cur
                 onClose();
         }
     };
-    // 4. 결제 프로세스 실행 (POST /api/web/client/pay_000)
+    // 4. 결제 프로세스 실행 (POST /api/web/client/pay_010100)
     const handleExecutePayment = async () => {
         if (!isFormValid) {
             setAlertError('필수 계약 체결 및 결제 취소/위약금 규정에 모두 동의해 주세요.');
@@ -4252,7 +4252,7 @@ function WebClntPay000({ isOpen = false, orderData = null, applyData = null, cur
             // 가상 PG 결제 승인 지연 시뮬레이션
             await new Promise((resolve) => setTimeout(resolve, 600));
             setLoadingText('배타적 계약 체결 및 안심번호 발급 중...');
-            const response = await fetch('/api/web/client/pay_000', {
+            const response = await fetch('/api/web/client/pay_010100', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -4511,15 +4511,15 @@ function WebClntPay000({ isOpen = false, orderData = null, applyData = null, cur
                     "\uC548\uC804\uD55C \uC804\uC790\uACB0\uC81C\uB97C \uC704\uD574 \uACB0\uC81C \uC815\uBCF4\uB294 \uC554\uD638\uD654\uB418\uC5B4 PG\uC0AC\uB85C \uC804\uC1A1\uB429\uB2C8\uB2E4.")))));
 }
 // ==============================================================================
-// [WEB-CLNT-ORD-001] 청소 요청 상세 및 용역 청약서 비교/선택 화면 컴포넌트
+// [WEB-CLNT-ORD-010100] 청소 요청 상세 및 용역 청약서 비교/선택 화면 컴포넌트
 // ==============================================================================
 /**
- * @file SseulDakGo_Web/Client/frontend/WEB-CLNT-ORD-001/index.jsx
- * @description 청소 요청 상세 및 용역 청약서 비교/선택 화면 컴포넌트 (WEB-CLNT-ORD-001)
+ * @file SseulDakGo_Web/Client/frontend/WEB-CLNT-ORD-010100/index.jsx
+ * @description 청소 요청 상세 및 용역 청약서 비교/선택 화면 컴포넌트 (WEB-CLNT-ORD-010100)
  *              - 2열 비대칭 레이아웃 (38% 좌측 Sticky 발주 스펙 요약 / 62% 우측 파트너 청약서 비교 피드)
  *              - 가격 역경매 배제, 고객 확정 지정가(100% 수락) 기반 파트너 일정/역량/평점 비교
  *              - 7일 만료 실시간 타이머 및 정렬(추천순, 빠른시공순, 최신접수순) 지원
- *              - [이 파트너로 배차 확정하기 >] 클릭 시 전자계약 체결 모달(WEB-CLNT-PAY-000 연계) 오픈
+ *              - [이 파트너로 배차 확정하기 >] 클릭 시 전자계약 체결 모달(WEB-CLNT-PAY-010100 연계) 오픈
  *              - .cursorrules 2.5 공식 브랜드 상표 로고(/logo.png) 반영
  *
  * Props:
@@ -4528,7 +4528,7 @@ function WebClntPay000({ isOpen = false, orderData = null, applyData = null, cur
  * @param {Function} onLogout 로그아웃 핸들러 () => void
  * @param {Object} currentUser 로그인 사용자 정보 ({ USER_NO, USER_NM, USER_ROLE_CD })
  */
-function WebClntOrd001({ orderNo: propOrderNo, onNavigate, onLogout, currentUser = {
+function WebClntOrd010100({ orderNo: propOrderNo, onNavigate, onLogout, currentUser = {
     USER_NO: 'C20261000001',
     USER_NM: '홍길동',
     USER_ROLE_CD: 'C'
@@ -4542,7 +4542,7 @@ function WebClntOrd001({ orderNo: propOrderNo, onNavigate, onLogout, currentUser
             const queryOrderNo = urlParams.get('orderNo');
             if (queryOrderNo)
                 return queryOrderNo;
-            // Hash 파라미터 검사 (#WEB-CLNT-ORD-001?orderNo=...)
+            // Hash 파라미터 검사 (#WEB-CLNT-ORD-010100?orderNo=...)
             if (window.location.hash.includes('orderNo=')) {
                 const hashQuery = window.location.hash.split('?')[1];
                 const hashParams = new URLSearchParams(hashQuery);
@@ -4563,11 +4563,11 @@ function WebClntOrd001({ orderNo: propOrderNo, onNavigate, onLogout, currentUser
     const [currentTime, setCurrentTime] = useState(Date.now());
     const [isConfirming, setIsConfirming] = useState(false);
     const effectiveUserNo = currentUser.USER_NO || 'C20261000001';
-    // 3. 백엔드 API 상세 및 청약서 목록 호출 (POST /api/web/client/ord_001)
+    // 3. 백엔드 API 상세 및 청약서 목록 호출 (POST /api/web/client/ord_010100)
     const fetchOrderDetail = useCallback(async () => {
         try {
             setIsLoading(true);
-            const res = await fetch('/api/web/client/ord_001', {
+            const res = await fetch('/api/web/client/ord_010100', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -4582,7 +4582,7 @@ function WebClntOrd001({ orderNo: propOrderNo, onNavigate, onLogout, currentUser
             }
         }
         catch (err) {
-            console.warn('[WEB-CLNT-ORD-001] 청약서 상세 조회 실패 (시뮬레이션 유지):', err);
+            console.warn('[WEB-CLNT-ORD-010100] 청약서 상세 조회 실패 (시뮬레이션 유지):', err);
         }
         finally {
             setIsLoading(false);
@@ -4640,9 +4640,9 @@ function WebClntOrd001({ orderNo: propOrderNo, onNavigate, onLogout, currentUser
         setTimeout(() => {
             setIsConfirming(false);
             setIsPayModalOpen(false);
-            alert(`🎉 [배차 확정 완료]\n파트너사 "${selectedApply.companyNm}"(청약번호: ${selectedApply.applyNo}) 배차가 최종 확정되었습니다.\n\n표준 전자계약서 교부 및 결제 연동 페이지(WEB-CLNT-PAY-000)로 이동합니다.`);
+            alert(`🎉 [배차 확정 완료]\n파트너사 "${selectedApply.companyNm}"(청약번호: ${selectedApply.applyNo}) 배차가 최종 확정되었습니다.\n\n표준 전자계약서 교부 및 결제 연동 페이지(WEB-CLNT-PAY-010100)로 이동합니다.`);
             if (onNavigate) {
-                onNavigate('WEB-CLNT-PAY-000');
+                onNavigate('WEB-CLNT-PAY-010100');
             }
         }, 800);
     };
@@ -4749,7 +4749,7 @@ function WebClntOrd001({ orderNo: propOrderNo, onNavigate, onLogout, currentUser
                             React.createElement("div", { className: "flex items-center gap-2 mb-1" },
                                 React.createElement("span", { className: "font-label-sm text-label-sm uppercase tracking-wider text-secondary font-bold" }, "DISPATCH & SUBSCRIPTION COMPARISON"),
                                 React.createElement("span", { className: "w-1.5 h-1.5 rounded-full bg-secondary" }),
-                                React.createElement("span", { className: "font-caption text-caption text-outline font-mono" }, "WEB-CLNT-ORD-001")),
+                                React.createElement("span", { className: "font-caption text-caption text-outline font-mono" }, "WEB-CLNT-ORD-010100")),
                             React.createElement("h1", { className: "font-headline-lg text-headline-lg text-primary tracking-tight font-bold" }, "\uCCAD\uC18C \uC694\uCCAD \uC0C1\uC138 \uBC0F \uC6A9\uC5ED \uCCAD\uC57D\uC11C \uBE44\uAD50/\uC120\uD0DD")),
                         React.createElement("div", { className: "bg-surface-container-low px-4 py-2 rounded-xl flex items-center gap-2 text-on-surface-variant font-caption text-caption border border-slate-200/60" },
                             React.createElement("span", { className: "material-symbols-outlined text-[18px] text-secondary" }, "verified_user"),
@@ -4945,7 +4945,7 @@ function WebClntOrd001({ orderNo: propOrderNo, onNavigate, onLogout, currentUser
                                 React.createElement("div", { className: "flex flex-col" },
                                     React.createElement("h4", { className: "font-label-lg text-label-lg font-bold text-on-surface" }, "3\uAC1C\uC6D4 \uBB34\uC0C1 A/S \uBCF4\uC99D"),
                                     React.createElement("p", { className: "font-caption text-caption text-on-surface-variant mt-1 leading-relaxed" }, "\uC815\uAE30 \uACC4\uC57D \uAE30\uAC04 \uC911 \uBC1C\uC0DD\uD55C \uBBF8\uD761 \uAD6C\uAC04 \uBC0F \uD604\uC7A5 \uD074\uB808\uC784 \uBC1C\uC0DD \uC2DC 24\uC2DC\uAC04 \uB0B4 \uC7AC\uBC29\uBB38 \uC870\uCE58\uB97C \uC9C0\uC6D0\uD569\uB2C8\uB2E4.")))))))),
-        isPayModalOpen && selectedApply && (React.createElement(WebClntPay000, { isOpen: isPayModalOpen, orderData: {
+        isPayModalOpen && selectedApply && (React.createElement(WebClntPay010100, { isOpen: isPayModalOpen, orderData: {
                 ...order,
                 categories: [order.cleanLargeCd || 'REGULAR']
             }, applyData: selectedApply, currentUser: currentUser, onClose: () => setIsPayModalOpen(false), onPaymentSuccess: (contractData) => {
@@ -4991,8 +4991,8 @@ function WebClntOrd001({ orderNo: propOrderNo, onNavigate, onLogout, currentUser
                         React.createElement("p", { className: "font-caption text-caption text-outline text-right md:text-left" }, "\u00A9 2026 (\uC8FC)\uACF5\uAC04\uB2E4\uC6D0. All rights reserved. SseulDakGo Domestic Infrastructure Platform.")))))));
 }
 /**
- * @file SseulDakGo_Web/Client/frontend/WEB-CLNT-JOB-000/index.jsx
- * @description 청소 시공 검수 및 현장 직불 완료 승인 화면 컴포넌트 (WEB-CLNT-JOB-000)
+ * @file SseulDakGo_Web/Client/frontend/WEB-CLNT-JOB-010100/index.jsx
+ * @description 청소 시공 검수 및 현장 직불 완료 승인 화면 컴포넌트 (WEB-CLNT-JOB-010100)
  *              - 기사님이 실시간 업로드한 시공 전/후 사진 1:1 비교 갤러리 (BEFORE/AFTER 필터 및 라이트박스 확대)
  *              - 파트너 수취 지정 계좌 원터치 복사 및 현장 직불 안내 (에스크로 미보유)
  *              - 대면 검수 확인 체크 후 최종 완료 승인 트랜잭션 (SVC_COMPLETED) 연동
@@ -5004,7 +5004,7 @@ function WebClntOrd001({ orderNo: propOrderNo, onNavigate, onLogout, currentUser
  * @param {Function} onNavigate 화면 전환 핸들러 (path: string) => void
  * @param {Function} onLogout 로그아웃 핸들러 () => void
  */
-function WebClntJob000({ contractNo: propContractNo, currentUser = { USER_NO: 'C20261000001', USER_NM: '홍길동' }, onNavigate, onLogout }) {
+function WebClntJob010100({ contractNo: propContractNo, currentUser = { USER_NO: 'C20261000001', USER_NM: '홍길동' }, onNavigate, onLogout }) {
     // 1. 계약번호 추출 (Prop 또는 URL 쿼리/해시 파라미터)
     const contractNo = useMemo(() => {
         if (propContractNo)
@@ -5035,11 +5035,11 @@ function WebClntJob000({ contractNo: propContractNo, currentUser = { USER_NO: 'C
     const [copyFeedback, setCopyFeedback] = useState('복사');
     const [selectedPhotoUrl, setSelectedPhotoUrl] = useState(null); // 라이트박스 모달용
     const [isLoading, setIsLoading] = useState(true);
-    // 3. 백엔드 검수 데이터 조회 (POST /api/web/client/job_000, action: 'GET_INSPECT_DATA')
+    // 3. 백엔드 검수 데이터 조회 (POST /api/web/client/job_010100, action: 'GET_INSPECT_DATA')
     const fetchInspectData = useCallback(async () => {
         setIsLoading(true);
         try {
-            const response = await fetch('/api/web/client/job_000', {
+            const response = await fetch('/api/web/client/job_010100', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -5095,7 +5095,7 @@ function WebClntJob000({ contractNo: propContractNo, currentUser = { USER_NO: 'C
         }
         setIsSubmitting(true);
         try {
-            const response = await fetch('/api/web/client/job_000', {
+            const response = await fetch('/api/web/client/job_010100', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -5188,10 +5188,10 @@ function WebClntJob000({ contractNo: propContractNo, currentUser = { USER_NO: 'C
                     React.createElement("div", { className: "flex items-center justify-between" },
                         React.createElement("button", { type: "button", onClick: () => onNavigate ? onNavigate('my-requests') : (window.location.hash = '#my-requests'), className: "inline-flex items-center gap-1.5 text-on-surface-variant hover:text-primary font-label-md text-label-md transition-colors group cursor-pointer" },
                             React.createElement("span", { className: "material-symbols-outlined text-[18px] transition-transform group-hover:-translate-x-0.5" }, "arrow_back"),
-                            React.createElement("span", null, "\uB098\uC758 \uC2E0\uCCAD\uD604\uD669\uC73C\uB85C \uC774\uB3D9 (WEB-CLNT-ORD-000)")),
+                            React.createElement("span", null, "\uB098\uC758 \uC2E0\uCCAD\uD604\uD669\uC73C\uB85C \uC774\uB3D9 (WEB-CLNT-ORD-010000)")),
                         React.createElement("div", { className: "flex items-center gap-space-xs" },
                             React.createElement("span", { className: "text-on-surface-variant font-label-sm text-label-sm" }, "\uD654\uBA74 ID:"),
-                            React.createElement("span", { className: "font-mono font-semibold text-primary font-label-sm text-label-sm bg-surface-container-high px-2 py-0.5 rounded-full" }, "WEB-CLNT-JOB-000")))),
+                            React.createElement("span", { className: "font-mono font-semibold text-primary font-label-sm text-label-sm bg-surface-container-high px-2 py-0.5 rounded-full" }, "WEB-CLNT-JOB-010100")))),
                 React.createElement("section", { className: "max-w-[1200px] w-full mx-auto px-margin pb-space-lg" },
                     React.createElement("div", { className: "bg-surface-container-lowest rounded-2xl p-space-lg shadow-sm border border-slate-200/60 flex flex-col md:flex-row md:items-center justify-between gap-space-md" },
                         React.createElement("div", { className: "flex flex-col gap-space-xs" },
@@ -5461,21 +5461,21 @@ function WebClntJob000({ contractNo: propContractNo, currentUser = { USER_NO: 'C
 }
 
 if (typeof window !== 'undefined') {
-  window.WebClntCom000 = WebClntCom000;
-  window.WebClntReq000 = WebClntReq000;
-  window.WebClntAth000 = WebClntAth000;
-  window.WebClntAth010 = WebClntAth010;
-  window.WebClntAth011 = WebClntAth011;
-  window.WebClntOrd000 = WebClntOrd000;
-  window.WebClntOrd001 = WebClntOrd001;
-  window.WebClntPay000 = WebClntPay000;
-  window.WebClntJob000 = WebClntJob000;
+  window.WebClntCom010000 = WebClntCom010000;
+  window.WebClntReq010100 = WebClntReq010100;
+  window.WebClntAth010100 = WebClntAth010100;
+  window.WebClntAth010200 = WebClntAth010200;
+  window.WebClntAth010200201 = WebClntAth010200201;
+  window.WebClntOrd010000 = WebClntOrd010000;
+  window.WebClntOrd010100 = WebClntOrd010100;
+  window.WebClntPay010100 = WebClntPay010100;
+  window.WebClntJob010100 = WebClntJob010100;
   function mountApp() {
     const rootEl = document.getElementById('root');
     if (rootEl && window.ReactDOM) {
       const root = window.ReactDOM.createRoot(rootEl);
-      root.render(React.createElement(WebClntCom000));
-      console.log('✅ WEB-CLNT-COM-000 React App successfully mounted!');
+      root.render(React.createElement(WebClntCom010000));
+      console.log('✅ WEB-CLNT-COM-010000 React App successfully mounted!');
     } else {
       console.error('❌ Root element or ReactDOM not found');
     }

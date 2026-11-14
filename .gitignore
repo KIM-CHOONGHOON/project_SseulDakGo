@@ -1,6 +1,4 @@
-Set-Location "C:\GongGanDaWon_Project\project_SseulDakGo"
-@"
-# 1. 민감한 환경변수 및 설정 파일 (절대 업로드 금지)
+# 1. 민감한 환경변수 및 DB 설정 파일 (절대 업로드 금지)
 .env
 .env.*
 db.*
@@ -30,8 +28,10 @@ target/
 .DS_Store
 Thumbs.db
 
-# 5. 로그 파일
+# 5. 오피스(엑셀 등) 임시 잠금 파일
+~$*
+
+# 6. 로그 파일
 *.log
 npm-debug.log*
 logs/
-"@ | Out-File -FilePath ".gitignore" -Encoding utf8

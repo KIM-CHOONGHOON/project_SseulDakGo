@@ -43,42 +43,42 @@ const sendNativeMessage = (action, payload = {}) => {
             window.ReactNativeWebView.postMessage(message);
         }
         else if (typeof window !== 'undefined') {
-            window.postMessage({ source: 'APP-CLNT-COM-000', action, payload }, '*');
+            window.postMessage({ source: 'APP-CLNT-COM-010000', action, payload }, '*');
         }
     }
     catch (e) {
         console.warn('[NATIVE_BRIDGE_WARN]', e);
     }
 };
-function AppClntReq000(props) {
+function AppClntReq010100(props) {
     if (!props.visible)
         return null;
-    if (typeof window !== 'undefined' && window.AppClntReq000) {
-        return React.createElement(window.AppClntReq000, props);
+    if (typeof window !== 'undefined' && window.AppClntReq010100) {
+        return React.createElement(window.AppClntReq010100, props);
     }
     return null;
 }
-function AppClntAth000(props) {
+function AppClntAth010100(props) {
     if (!props.isOpen)
         return null;
-    if (typeof window !== 'undefined' && window.AppClntAth000) {
-        return React.createElement(window.AppClntAth000, props);
+    if (typeof window !== 'undefined' && window.AppClntAth010100) {
+        return React.createElement(window.AppClntAth010100, props);
     }
     return null;
 }
-function AppClntAth010(props) {
+function AppClntAth010200(props) {
     if (!props.isOpen)
         return null;
-    if (typeof window !== 'undefined' && window.AppClntAth010) {
-        return React.createElement(window.AppClntAth010, props);
+    if (typeof window !== 'undefined' && window.AppClntAth010200) {
+        return React.createElement(window.AppClntAth010200, props);
     }
     return null;
 }
-function AppClntAth011(props) {
+function AppClntAth010200201(props) {
     if (!props.isOpen)
         return null;
-    if (typeof window !== 'undefined' && window.AppClntAth011) {
-        return React.createElement(window.AppClntAth011, props);
+    if (typeof window !== 'undefined' && window.AppClntAth010200201) {
+        return React.createElement(window.AppClntAth010200201, props);
     }
     return null;
 }
@@ -118,7 +118,7 @@ function getInitialAuthUser() {
     }
     return null;
 }
-function AppClntCom000({ navigation, currentUser: initialUser = null, onNavigate, onOpenRequestModal }) {
+function AppClntCom010000({ navigation, currentUser: initialUser = null, onNavigate, onOpenRequestModal }) {
     // 1. 상태 관리 (useState, useEffect): clientInfo, currentRegion, feedList, isReqModalOpen, selectedCategory
     const [clientInfo, setClientInfo] = useState(() => {
         if (initialUser && initialUser.userNo && initialUser.userNo !== 'C20261000001') {
@@ -231,7 +231,7 @@ function AppClntCom000({ navigation, currentUser: initialUser = null, onNavigate
             regDtText: '3시간 전'
         }
     ]);
-    // 청소 요청 모달(APP-CLNT-REQ-000) 출력 여부 (Boolean)
+    // 청소 요청 모달(APP-CLNT-REQ-010100) 출력 여부 (Boolean)
     const [isReqModalOpen, setIsReqModalOpen] = useState(false);
     // 선택된 대분류 TAB ('REGULAR', 'APPLIANCE', 'MOVEIN')
     const [selectedCategory, setSelectedCategory] = useState('REGULAR');
@@ -241,20 +241,20 @@ function AppClntCom000({ navigation, currentUser: initialUser = null, onNavigate
     const [isAssuranceModalOpen, setIsAssuranceModalOpen] = useState(false);
     // 라우터 통합 헬퍼 (React Navigation 및 onNavigate 호환)
     const navigateScreen = useCallback((screenId, params) => {
-        if (screenId === 'APP-CLNT-ATH-000') {
+        if (screenId === 'APP-CLNT-ATH-010100') {
             setIsReqModalOpen(false);
             setIsRegisterModalOpen(false);
             setIsLoginModalOpen(true);
             return;
         }
-        if (screenId === 'APP-CLNT-ATH-010') {
+        if (screenId === 'APP-CLNT-ATH-010200') {
             setIsReqModalOpen(false);
             setIsLoginModalOpen(false);
             setIsWelcomeModalOpen(false);
             setIsRegisterModalOpen(true);
             return;
         }
-        if (screenId === 'APP-CLNT-ATH-011') {
+        if (screenId === 'APP-CLNT-ATH-010200201') {
             setIsReqModalOpen(false);
             setIsLoginModalOpen(false);
             setIsRegisterModalOpen(false);
@@ -329,7 +329,7 @@ function AppClntCom000({ navigation, currentUser: initialUser = null, onNavigate
         }
         setIsLoginLoading(true);
         try {
-            const res = await fetch('/api/web/client/ath_000', {
+            const res = await fetch('/api/web/client/ath_010100', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -401,10 +401,10 @@ function AppClntCom000({ navigation, currentUser: initialUser = null, onNavigate
         setCurrentUser(null);
         alert('로그아웃되었습니다.');
     };
-    // 4. 백엔드 데이터 동기화 (POST /api/app/client/com_000)
+    // 4. 백엔드 데이터 동기화 (POST /api/app/client/com_010000)
     const fetchAppHomeData = useCallback(async () => {
         try {
-            const response = await fetch('/api/app/client/com_000', {
+            const response = await fetch('/api/app/client/com_010000', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -479,14 +479,14 @@ function AppClntCom000({ navigation, currentUser: initialUser = null, onNavigate
         triggerHaptic('LIGHT');
         setSelectedCategory(category);
         setIsReqModalOpen(true);
-        sendNativeMessage('OPEN_MODAL', { modal: 'APP-CLNT-REQ-000', category });
+        sendNativeMessage('OPEN_MODAL', { modal: 'APP-CLNT-REQ-010100', category });
     };
     // 모달 닫기 핸들러
     const handleCloseCategoryModal = () => {
         triggerHaptic('LIGHT');
         setIsReqModalOpen(false);
     };
-    // 요청서 작성 시작 -> APP-CLNT-REQ-000 화면 진입
+    // 요청서 작성 시작 -> APP-CLNT-REQ-010100 화면 진입
     const handleStartRequest = () => {
         triggerHaptic('MEDIUM');
         setIsReqModalOpen(false);
@@ -494,7 +494,7 @@ function AppClntCom000({ navigation, currentUser: initialUser = null, onNavigate
             onOpenRequestModal(selectedCategory);
         }
         else {
-            navigateScreen('APP-CLNT-REQ-000', { category: selectedCategory });
+            navigateScreen('APP-CLNT-REQ-010100', { category: selectedCategory });
         }
     };
     // 지역 순환 토글 (일산동구 -> 일산서구 -> 덕양구 -> 서울 강남구)
@@ -520,7 +520,7 @@ function AppClntCom000({ navigation, currentUser: initialUser = null, onNavigate
                 setIsLoginModalOpen(true);
                 return;
             }
-            onNavigate?.('APP-CLNT-ORD-000');
+            onNavigate?.('APP-CLNT-ORD-010000');
         }
         else if (tab === 'usage-history') {
             if (!currentUser) {
@@ -528,7 +528,7 @@ function AppClntCom000({ navigation, currentUser: initialUser = null, onNavigate
                 setIsLoginModalOpen(true);
                 return;
             }
-            onNavigate?.('APP-CLNT-JOB-000');
+            onNavigate?.('APP-CLNT-JOB-010100');
         }
         else if (tab === 'my-page') {
             if (!currentUser) {
@@ -584,7 +584,7 @@ function AppClntCom000({ navigation, currentUser: initialUser = null, onNavigate
             isRefreshing && (React.createElement("div", { className: "w-full py-2 bg-secondary-container/40 text-on-secondary-container text-label-sm font-semibold flex items-center justify-center gap-2 animate-in fade-in" },
                 React.createElement("span", { className: "w-4 h-4 border-2 border-secondary border-t-transparent rounded-full animate-spin" }),
                 React.createElement("span", null, "\uC2E4\uC2DC\uAC04 \uC811\uC218 \uC815\uBCF4\uB97C \uC0C8\uB85C\uACE0\uCE68\uD558\uACE0 \uC788\uC2B5\uB2C8\uB2E4..."))),
-            React.createElement("div", { className: "flex flex-col w-full", id: "view-APP-CLNT-COM-000" },
+            React.createElement("div", { className: "flex flex-col w-full", id: "view-APP-CLNT-COM-010000" },
                 React.createElement("section", { className: "px-gutter-mobile pt-space-md pb-space-sm flex flex-col gap-space-sm" },
                     React.createElement("div", { className: "flex flex-col" },
                         React.createElement("h2", { className: "font-headline-lg-mobile text-headline-lg-mobile text-primary tracking-tight font-bold leading-tight" },
@@ -711,7 +711,7 @@ function AppClntCom000({ navigation, currentUser: initialUser = null, onNavigate
                 React.createElement("button", { type: "button", onClick: () => handleTabClick('my-page'), className: `flex flex-col items-center justify-center gap-0.5 w-16 h-11 transition-colors cursor-pointer ${activeNavTab === 'my-page' ? 'text-secondary font-bold' : 'text-on-surface-variant hover:text-on-surface'}` },
                     React.createElement("span", { className: "material-symbols-outlined text-headline-sm" }, "person"),
                     React.createElement("span", { className: "font-label-sm text-label-sm" }, currentUser ? '내정보' : '마이페이지')))),
-        React.createElement(AppClntReq000, { visible: isReqModalOpen, initialTab: selectedCategory, onClose: () => setIsReqModalOpen(false), onOpenLogin: () => {
+        React.createElement(AppClntReq010100, { visible: isReqModalOpen, initialTab: selectedCategory, onClose: () => setIsReqModalOpen(false), onOpenLogin: () => {
                 setIsReqModalOpen(false);
                 setIsLoginModalOpen(true);
             }, onNavigate: navigateScreen }),
@@ -735,7 +735,7 @@ function AppClntCom000({ navigation, currentUser: initialUser = null, onNavigate
                         React.createElement("br", null),
                         "\uD50C\uB7AB\uD3FC \uB9E4\uCE6D \uC218\uC218\uB8CC \uC678 \uC2DC\uACF5 \uB178\uBB34\uBE44 \uBCF8\uAE08\uC740 \uC2DC\uACF5 \uC804/\uD6C4 \uC0AC\uC9C4 \uAC80\uC218 \uC644\uB8CC \uD6C4 \uAE30\uC0AC\uB2D8\uAED8 \uC9C1\uC811 \uC1A1\uAE08 \uB610\uB294 \uC9C0\uAE09\uD569\uB2C8\uB2E4.")),
                 React.createElement("button", { type: "button", onClick: () => setIsAssuranceModalOpen(false), className: "h-11 bg-primary text-on-primary rounded-xl font-label-md font-bold mt-2 cursor-pointer" }, "\uD655\uC778")))),
-        React.createElement(AppClntAth000, { isOpen: isLoginModalOpen, onClose: () => setIsLoginModalOpen(false), onSuccessLogin: (userData) => {
+        React.createElement(AppClntAth010100, { isOpen: isLoginModalOpen, onClose: () => setIsLoginModalOpen(false), onSuccessLogin: (userData) => {
                 triggerHaptic('SUCCESS');
                 setCurrentUser(userData);
                 setClientInfo({
@@ -753,10 +753,10 @@ function AppClntCom000({ navigation, currentUser: initialUser = null, onNavigate
                 setIsLoginModalOpen(false);
                 setIsRegisterModalOpen(true);
                 if (onNavigate) {
-                    onNavigate('APP-CLNT-ATH-010');
+                    onNavigate('APP-CLNT-ATH-010200');
                 }
             }, onOpenFindPwd: () => alert('비밀번호 찾기 안내 메일이 발송됩니다.') }),
-        React.createElement(AppClntAth010, { isOpen: isRegisterModalOpen, onClose: () => setIsRegisterModalOpen(false), onSuccessRegister: (userData) => {
+        React.createElement(AppClntAth010200, { isOpen: isRegisterModalOpen, onClose: () => setIsRegisterModalOpen(false), onSuccessRegister: (userData) => {
                 triggerHaptic('SUCCESS');
                 setIsRegisterModalOpen(false);
                 setWelcomeUserData(userData);
@@ -765,7 +765,7 @@ function AppClntCom000({ navigation, currentUser: initialUser = null, onNavigate
                 setIsRegisterModalOpen(false);
                 setIsLoginModalOpen(true);
             } }),
-        React.createElement(AppClntAth011, { isOpen: isWelcomeModalOpen, userInfo: welcomeUserData || (currentUser ? {
+        React.createElement(AppClntAth010200201, { isOpen: isWelcomeModalOpen, userInfo: welcomeUserData || (currentUser ? {
                 userNo: currentUser.userNo,
                 userNm: currentUser.userNm,
                 userEmail: currentUser.userEmail || '',
@@ -780,15 +780,15 @@ function AppClntCom000({ navigation, currentUser: initialUser = null, onNavigate
 
 
 if (typeof window !== 'undefined') {
-  window.AppClntCom000 = AppClntCom000;
+  window.AppClntCom010000 = AppClntCom010000;
   function mountMobileApp() {
     const rootEl = document.getElementById('root');
     if (rootEl && window.ReactDOM && window.React) {
       const isReqScreen = window.location.pathname.includes('/req_000') || window.location.search.includes('screen=req');
       const isRegisterScreen = window.location.search.includes('screen=register') || window.location.search.includes('screen=ath_010');
-      let TargetComponent = window.AppClntCom000;
-      if (isReqScreen && window.AppClntReq000) TargetComponent = window.AppClntReq000;
-      if (isRegisterScreen && window.AppClntAth010) TargetComponent = window.AppClntAth010;
+      let TargetComponent = window.AppClntCom010000;
+      if (isReqScreen && window.AppClntReq010100) TargetComponent = window.AppClntReq010100;
+      if (isRegisterScreen && window.AppClntAth010200) TargetComponent = window.AppClntAth010200;
       const root = window.ReactDOM.createRoot(rootEl);
       root.render(window.React.createElement(TargetComponent));
       console.log('✅ Mounted component:', TargetComponent?.name || 'Mobile App');

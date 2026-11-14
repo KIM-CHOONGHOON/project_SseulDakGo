@@ -1,0 +1,979 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>[WEB-CLNT-PAY-010100] 고객 데이터 이용료 결제 및 계약 확정 - 쓸고닦고 프리뷰</title>
+  <link rel="icon" type="image/png" href="logo.png"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin=""/>
+  <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            primary: "#1F497D",
+            navy: "#1F497D",
+            teal: "#0D9488",
+            action: "#0D9488",
+            alert: "#EF4444",
+            warning: "#F59E0B",
+            success: "#10B981"
+          },
+          fontFamily: {
+            sans: ["Pretendard", "Inter", "-apple-system", "sans-serif"]
+          }
+        }
+      }
+    };
+  </script>
+  
+  <!-- React 18 & ReactDOM -->
+  <script src="https://cdn.jsdelivr.net/npm/react@18.3.1/umd/react.production.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/react-dom@18.3.1/umd/react-dom.production.min.js"></script>
+  <!-- Babel Standalone (JSX 실행 지원) -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <!-- Daum 주소 검색 SDK (https 명시로 file:/// 로컬 뷰어 호환) -->
+  <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+
+  <!-- [네이버 주소 검색 클라이언트 엔진 & 모의 백엔드 인터셉터] -->
+  <script>
+    window.COMPREHENSIVE_ADDRESS_DB = [{"roadAddress":"경기도 고양시 덕양구 토당로 105","jibunAddress":"경기도 고양시 덕양구 토당동 858-3","sido":"경기도","sidoCd":"41","sigungu":"고양시 덕양구","sigunguCd":"41287","dong":"토당동","bldNm":"토당동 복합건물 (능곡역 부근)","zonecode":"10508","x":"126.8182","y":"37.6253"},{"roadAddress":"경기도 고양시 덕양구 토당로 63","jibunAddress":"경기도 고양시 덕양구 토당동 394-1","sido":"경기도","sidoCd":"41","sigungu":"고양시 덕양구","sigunguCd":"41287","dong":"토당동","bldNm":"능곡 대림아파트 상가","zonecode":"10510","x":"126.8160","y":"37.6220"},{"roadAddress":"경기도 고양시 덕양구 지도로 35","jibunAddress":"경기도 고양시 덕양구 토당동 287-1","sido":"경기도","sidoCd":"41","sigungu":"고양시 덕양구","sigunguCd":"41287","dong":"토당동","bldNm":"지도농협 본점","zonecode":"10509","x":"126.8195","y":"37.6270"},{"roadAddress":"경기도 고양시 일산동구 중앙로 1261","jibunAddress":"경기도 고양시 일산동구 마두동 802-1","sido":"경기도","sidoCd":"41","sigungu":"고양시 일산동구","sigunguCd":"41281","dong":"마두동","bldNm":"삼혜빌딩 4층 (마두역 부근)","zonecode":"10414","x":"126.7778","y":"37.6521"},{"roadAddress":"경기도 고양시 일산동구 중앙로 1261번길 42","jibunAddress":"경기도 고양시 일산동구 마두동 801-2","sido":"경기도","sidoCd":"41","sigungu":"고양시 일산동구","sigunguCd":"41281","dong":"마두동","bldNm":"공간다원 프라자 4층","zonecode":"10414","x":"126.7778","y":"37.6521"},{"roadAddress":"경기도 고양시 일산동구 강석로 141","jibunAddress":"경기도 고양시 일산동구 마두동 123-4","sido":"경기도","sidoCd":"41","sigungu":"고양시 일산동구","sigunguCd":"41281","dong":"마두동","bldNm":"강촌마을 4층 빌라 공용부","zonecode":"10415","x":"126.7792","y":"37.6534"},{"roadAddress":"경기도 고양시 일산동구 일산로 200","jibunAddress":"경기도 고양시 일산동구 백석동 1324","sido":"경기도","sidoCd":"41","sigungu":"고양시 일산동구","sigunguCd":"41281","dong":"백석동","bldNm":"일산 와이시티 복합주거단지","zonecode":"10447","x":"126.7885","y":"37.6441"},{"roadAddress":"경기도 고양시 일산동구 백석로 71번길 18","jibunAddress":"경기도 고양시 일산동구 백석동 1280-5","sido":"경기도","sidoCd":"41","sigungu":"고양시 일산동구","sigunguCd":"41281","dong":"백석동","bldNm":"백석 현대밀라트 1차","zonecode":"10449","x":"126.7901","y":"37.6455"},{"roadAddress":"경기도 고양시 일산동구 중앙로 1275번길 38-10","jibunAddress":"경기도 고양시 일산동구 장항동 756-1","sido":"경기도","sidoCd":"41","sigungu":"고양시 일산동구","sigunguCd":"41281","dong":"장항동","bldNm":"라페스타 E동 상가","zonecode":"10402","x":"126.7698","y":"37.6591"},{"roadAddress":"경기도 고양시 일산동구 정발산로 24","jibunAddress":"경기도 고양시 일산동구 장항동 868","sido":"경기도","sidoCd":"41","sigungu":"고양시 일산동구","sigunguCd":"41281","dong":"장항동","bldNm":"웨스턴돔 타워 B동 1층 주차장 및 계단","zonecode":"10403","x":"126.7725","y":"37.6582"},{"roadAddress":"경기도 고양시 일산동구 무궁화로 37","jibunAddress":"경기도 고양시 일산동구 정발산동 1142","sido":"경기도","sidoCd":"41","sigungu":"고양시 일산동구","sigunguCd":"41281","dong":"정발산동","bldNm":"정발산 전원주택단지","zonecode":"10362","x":"126.7741","y":"37.6681"},{"roadAddress":"경기도 고양시 일산동구 위시티로 34","jibunAddress":"경기도 고양시 일산동구 식사동 1498","sido":"경기도","sidoCd":"41","sigungu":"고양시 일산동구","sigunguCd":"41281","dong":"식사동","bldNm":"위시티 일산 자이 2단지","zonecode":"10324","x":"126.8120","y":"37.6740"},{"roadAddress":"경기도 고양시 일산서구 중앙로 1422","jibunAddress":"경기도 고양시 일산서구 주엽동 102","sido":"경기도","sidoCd":"41","sigungu":"고양시 일산서구","sigunguCd":"41285","dong":"주엽동","bldNm":"문촌마을 삼익아파트","zonecode":"10387","x":"126.7612","y":"37.6698"},{"roadAddress":"경기도 고양시 일산서구 탄현로 136","jibunAddress":"경기도 고양시 일산서구 탄현동 1490","sido":"경기도","sidoCd":"41","sigungu":"고양시 일산서구","sigunguCd":"41285","dong":"탄현동","bldNm":"일산 두산위브더제니스 주상복합","zonecode":"10298","x":"126.7634","y":"37.6942"},{"roadAddress":"경기도 고양시 일산서구 킨텍스로 217-60","jibunAddress":"경기도 고양시 일산서구 대화동 2600","sido":"경기도","sidoCd":"41","sigungu":"고양시 일산서구","sigunguCd":"41285","dong":"대화동","bldNm":"킨텍스 제1전시장 본관","zonecode":"10390","x":"126.7510","y":"37.6650"},{"roadAddress":"경기도 고양시 덕양구 화신로 260번길 58","jibunAddress":"경기도 고양시 덕양구 화정동 966","sido":"경기도","sidoCd":"41","sigungu":"고양시 덕양구","sigunguCd":"41287","dong":"화정동","bldNm":"화정역 세이브존 문화센터","zonecode":"10497","x":"126.8329","y":"37.6345"},{"roadAddress":"경기도 고양시 덕양구 원당로 33","jibunAddress":"경기도 고양시 덕양구 주교동 603-1","sido":"경기도","sidoCd":"41","sigungu":"고양시 덕양구","sigunguCd":"41287","dong":"주교동","bldNm":"고양시청 제1별관","zonecode":"10460","x":"126.8315","y":"37.6583"},{"roadAddress":"경기도 고양시 덕양구 삼송로 193","jibunAddress":"경기도 고양시 덕양구 삼송동 315-1","sido":"경기도","sidoCd":"41","sigungu":"고양시 덕양구","sigunguCd":"41287","dong":"삼송동","bldNm":"힐스테이트 삼송역 상업시설","zonecode":"10565","x":"126.8967","y":"37.6531"},{"roadAddress":"서울특별시 마포구 월드컵북로 402","jibunAddress":"서울특별시 마포구 상암동 1602","sido":"서울특별시","sidoCd":"11","sigungu":"마포구","sigunguCd":"11440","dong":"상암동","bldNm":"DMC 첨단산업센터 7층","zonecode":"03925","x":"126.8821","y":"37.5794"},{"roadAddress":"서울특별시 강남구 테헤란로 152","jibunAddress":"서울특별시 강남구 역삼동 737","sido":"서울특별시","sidoCd":"11","sigungu":"강남구","sigunguCd":"11680","dong":"역삼동","bldNm":"강남파이낸스센터 (GFC)","zonecode":"06236","x":"127.0365","y":"37.5000"},{"roadAddress":"서울특별시 서초구 강남대로 373","jibunAddress":"서울특별시 서초구 서초동 1318-2","sido":"서울특별시","sidoCd":"11","sigungu":"서초구","sigunguCd":"11650","dong":"서초동","bldNm":"홍우빌딩 9층","zonecode":"06612","x":"127.0278","y":"37.4979"},{"roadAddress":"경기도 고양시 덕양구 화수로14번길 55","jibunAddress":"경기도 고양시 덕양구 화정동 697-24","sido":"경기도","sidoCd":"41","sigungu":"고양시 덕양구","sigunguCd":"41287","dong":"화정동","bldNm":"명지병원 (고양본원 종합병원)","zonecode":"10475","x":"126.8322","y":"37.6436"},{"roadAddress":"충청북도 제천시 고암로 265","jibunAddress":"충청북도 제천시 고암동 566-12","sido":"충청북도","sidoCd":"43","sigungu":"제천시","sigunguCd":"43150","dong":"고암동","bldNm":"명지병원 (제천)","zonecode":"27137","x":"128.2245","y":"37.1510"},{"roadAddress":"서울특별시 서대문구 연세로 50-1","jibunAddress":"서울특별시 서대문구 신촌동 134","sido":"서울특별시","sidoCd":"11","sigungu":"서대문구","sigunguCd":"11410","dong":"신촌동","bldNm":"연세대학교 신촌세브란스병원 본관","zonecode":"03722","x":"126.9416","y":"37.5623"},{"roadAddress":"서울특별시 강남구 언주로 211","jibunAddress":"서울특별시 강남구 도곡동 146-92","sido":"서울특별시","sidoCd":"11","sigungu":"강남구","sigunguCd":"11680","dong":"도곡동","bldNm":"강남세브란스병원","zonecode":"06273","x":"127.0463","y":"37.4928"},{"roadAddress":"경기도 용인시 기흥구 동백죽전대로 363","jibunAddress":"경기도 용인시 기흥구 중동 724-1","sido":"경기도","sidoCd":"41","sigungu":"용인시 기흥구","sigunguCd":"41463","dong":"중동","bldNm":"용인세브란스병원","zonecode":"16995","x":"127.1517","y":"37.2842"},{"roadAddress":"경기도 고양시 일산동구 일산로 323","jibunAddress":"경기도 고양시 일산동구 마두동 809","sido":"경기도","sidoCd":"41","sigungu":"고양시 일산동구","sigunguCd":"41281","dong":"마두동","bldNm":"국립암센터","zonecode":"10408","x":"126.7820","y":"37.6625"},{"roadAddress":"경기도 고양시 일산동구 일산로 100","jibunAddress":"경기도 고양시 일산동구 백석동 1232","sido":"경기도","sidoCd":"41","sigungu":"고양시 일산동구","sigunguCd":"41281","dong":"백석동","bldNm":"국민건강보험 일산병원","zonecode":"10444","x":"126.7915","y":"37.6430"},{"roadAddress":"경기도 고양시 일산서구 주화로 170","jibunAddress":"경기도 고양시 일산서구 대화동 2240","sido":"경기도","sidoCd":"41","sigungu":"고양시 일산서구","sigunguCd":"41285","dong":"대화동","bldNm":"인제대학교 일산백병원","zonecode":"10380","x":"126.7525","y":"37.6740"},{"roadAddress":"경기도 고양시 일산동구 동국로 27","jibunAddress":"경기도 고양시 일산동구 식사동 814","sido":"경기도","sidoCd":"41","sigungu":"고양시 일산동구","sigunguCd":"41281","dong":"식사동","bldNm":"동국대학교 일산병원","zonecode":"10326","x":"126.8090","y":"37.6780"},{"roadAddress":"경기도 고양시 일산동구 중앙로 1205","jibunAddress":"경기도 고양시 일산동구 장항동 889","sido":"경기도","sidoCd":"41","sigungu":"고양시 일산동구","sigunguCd":"41281","dong":"장항동","bldNm":"일산차병원 (차병원 글로벌라이프센터)","zonecode":"10414","x":"126.7750","y":"37.6538"},{"roadAddress":"서울특별시 종로구 대학로 101","jibunAddress":"서울특별시 종로구 연건동 28","sido":"서울특별시","sidoCd":"11","sigungu":"종로구","sigunguCd":"11110","dong":"연건동","bldNm":"서울대학교병원 (본원)","zonecode":"03080","x":"126.9995","y":"37.5796"},{"roadAddress":"경기도 성남시 분당구 구미로173번길 82","jibunAddress":"경기도 성남시 분당구 구미동 300","sido":"경기도","sidoCd":"41","sigungu":"성남시 분당구","sigunguCd":"41135","dong":"구미동","bldNm":"분당서울대학교병원","zonecode":"13620","x":"127.1230","y":"37.3515"},{"roadAddress":"서울특별시 송파구 올림픽로43길 88","jibunAddress":"서울특별시 송파구 풍납동 388-1","sido":"서울특별시","sidoCd":"11","sigungu":"송파구","sigunguCd":"11710","dong":"풍납동","bldNm":"서울아산병원","zonecode":"05505","x":"127.1082","y":"37.5265"},{"roadAddress":"서울특별시 강남구 일원로 81","jibunAddress":"서울특별시 강남구 일원동 50","sido":"서울특별시","sidoCd":"11","sigungu":"강남구","sigunguCd":"11680","dong":"일원동","bldNm":"삼성서울병원","zonecode":"06351","x":"127.0852","y":"37.4882"},{"roadAddress":"서울특별시 서초구 반포대로 222","jibunAddress":"서울특별시 서초구 반포동 505","sido":"서울특별시","sidoCd":"11","sigungu":"서초구","sigunguCd":"11650","dong":"반포동","bldNm":"가톨릭대학교 서울성모병원","zonecode":"06591","x":"127.0048","y":"37.5020"},{"roadAddress":"서울특별시 성북구 고려대로 73","jibunAddress":"서울특별시 성북구 안암동5가 126-1","sido":"서울특별시","sidoCd":"11","sigungu":"성북구","sigunguCd":"11290","dong":"안암동5가","bldNm":"고려대학교 안암병원","zonecode":"02841","x":"127.0265","y":"37.5872"},{"roadAddress":"서울특별시 구로구 구로동로 148","jibunAddress":"서울특별시 구로구 구로동 80","sido":"서울특별시","sidoCd":"11","sigungu":"구로구","sigunguCd":"11530","dong":"구로동","bldNm":"고려대학교 구로병원","zonecode":"08308","x":"126.8850","y":"37.4925"},{"roadAddress":"경기도 수원시 영통구 월드컵로 164","jibunAddress":"경기도 수원시 영통구 원천동 산5","sido":"경기도","sidoCd":"41","sigungu":"수원시 영통구","sigunguCd":"41117","dong":"원천동","bldNm":"아주대학교병원","zonecode":"16499","x":"127.0475","y":"37.2800"},{"roadAddress":"인천광역시 중구 인항로 27","jibunAddress":"인천광역시 중구 신흥동3가 7-206","sido":"인천광역시","sidoCd":"28","sigungu":"중구","sigunguCd":"28110","dong":"신흥동3가","bldNm":"인하대학교병원","zonecode":"22332","x":"126.6345","y":"37.4585"},{"roadAddress":"인천광역시 남동구 남동대로 774번길 21","jibunAddress":"인천광역시 남동구 구월동 1198","sido":"인천광역시","sidoCd":"28","sigungu":"남동구","sigunguCd":"28200","dong":"구월동","bldNm":"가천대 길병원","zonecode":"21565","x":"126.7090","y":"37.4525"},{"roadAddress":"부산광역시 해운대구 달맞이길 30","jibunAddress":"부산광역시 해운대구 중동 1829","sido":"부산광역시","sidoCd":"26","sigungu":"해운대구","sigunguCd":"26350","dong":"중동","bldNm":"엘시티 랜드마크타워","zonecode":"48099","x":"129.1685","y":"35.1601"},{"roadAddress":"부산광역시 해운대구 센텀중앙로 78","jibunAddress":"부산광역시 해운대구 우동 1466-2","sido":"부산광역시","sidoCd":"26","sigungu":"해운대구","sigunguCd":"26350","dong":"우동","bldNm":"센텀시티 신세계백화점","zonecode":"48058","x":"129.1300","y":"35.1690"},{"roadAddress":"부산광역시 동구 중앙대로 206","jibunAddress":"부산광역시 동구 초량동 1187-1","sido":"부산광역시","sidoCd":"26","sigungu":"동구","sigunguCd":"26170","dong":"초량동","bldNm":"부산역 (KTX)","zonecode":"48720","x":"129.0416","y":"35.1152"},{"roadAddress":"부산광역시 서구 구덕로 179","jibunAddress":"부산광역시 서구 아미동1가 10","sido":"부산광역시","sidoCd":"26","sigungu":"서구","sigunguCd":"26140","dong":"아미동1가","bldNm":"부산대학교병원 (본원)","zonecode":"49241","x":"129.0185","y":"35.1012"},{"roadAddress":"대구광역시 중구 달구벌대로 2077","jibunAddress":"대구광역시 중구 계산동2가 200","sido":"대구광역시","sidoCd":"27","sigungu":"중구","sigunguCd":"27110","dong":"계산동2가","bldNm":"더현대 대구 (현대백화점)","zonecode":"41933","x":"128.5910","y":"35.8670"},{"roadAddress":"대구광역시 동구 동대구로 550","jibunAddress":"대구광역시 동구 신천동 329-3","sido":"대구광역시","sidoCd":"27","sigungu":"동구","sigunguCd":"27140","dong":"신천동","bldNm":"동대구역 신세계백화점 대구점","zonecode":"41295","x":"128.6285","y":"35.8778"},{"roadAddress":"대구광역시 중구 동덕로 130","jibunAddress":"대구광역시 중구 삼덕동2가 50","sido":"대구광역시","sidoCd":"27","sigungu":"중구","sigunguCd":"27110","dong":"삼덕동2가","bldNm":"경북대학교병원 (본원)","zonecode":"41944","x":"128.6045","y":"35.8660"},{"roadAddress":"대전광역시 서구 대덕대로 211","jibunAddress":"대전광역시 서구 둔산동 1036","sido":"대전광역시","sidoCd":"30","sigungu":"서구","sigunguCd":"30170","dong":"둔산동","bldNm":"갤러리아백화점 타임월드","zonecode":"35229","x":"127.3785","y":"36.3520"},{"roadAddress":"대전광역시 중구 문화로 282","jibunAddress":"대전광역시 중구 대사동 640","sido":"대전광역시","sidoCd":"30","sigungu":"중구","sigunguCd":"30140","dong":"대사동","bldNm":"충남대학교병원","zonecode":"35015","x":"127.4140","y":"36.3175"},{"roadAddress":"광주광역시 서구 무진대로 932","jibunAddress":"광주광역시 서구 광천동 49-1","sido":"광주광역시","sidoCd":"29","sigungu":"서구","sigunguCd":"29140","dong":"광천동","bldNm":"유스퀘어 광주종합버스터미널","zonecode":"61986","x":"126.8820","y":"35.1600"},{"roadAddress":"광주광역시 동구 제봉로 42","jibunAddress":"광주광역시 동구 학동 8","sido":"광주광역시","sidoCd":"29","sigungu":"동구","sigunguCd":"29110","dong":"학동","bldNm":"전남대학교병원","zonecode":"61469","x":"126.9240","y":"35.1415"},{"roadAddress":"울산광역시 남구 삼산로 288","jibunAddress":"울산광역시 남구 삼산동 1569-1","sido":"울산광역시","sidoCd":"31","sigungu":"남구","sigunguCd":"31140","dong":"삼산동","bldNm":"현대백화점 울산점","zonecode":"44706","x":"129.3360","y":"35.5390"},{"roadAddress":"세종특별자치시 한누리대로 411","jibunAddress":"세종특별자치시 어진동 539","sido":"세종특별자치시","sidoCd":"36","sigungu":"세종특별자치시","sigunguCd":"36110","dong":"어진동","bldNm":"정부세종청사","zonecode":"30114","x":"127.2610","y":"36.5040"},{"roadAddress":"제주특별자치도 제주시 공항로 2","jibunAddress":"제주특별자치도 제주시 용담이동 2002","sido":"제주특별자치도","sidoCd":"50","sigungu":"제주시","sigunguCd":"50110","dong":"용담이동","bldNm":"제주공항 (제주국제공항 여객청사)","zonecode":"63115","x":"126.4930","y":"33.5065"},{"roadAddress":"서울특별시 강서구 하늘길 38","jibunAddress":"서울특별시 강서구 방화동 886","sido":"서울특별시","sidoCd":"11","sigungu":"강서구","sigunguCd":"11500","dong":"방화동","bldNm":"김포공항 (김포국제공항)","zonecode":"07505","x":"126.7978","y":"37.5585"},{"roadAddress":"인천광역시 중구 공항로 272","jibunAddress":"인천광역시 중구 운서동 2851","sido":"인천광역시","sidoCd":"28","sigungu":"중구","sigunguCd":"28110","dong":"운서동","bldNm":"인천국제공항 제1여객터미널","zonecode":"22382","x":"126.4407","y":"37.4602"},{"roadAddress":"제주특별자치도 제주시 아란13길 15","jibunAddress":"제주특별자치도 제주시 아라일동 1753-3","sido":"제주특별자치도","sidoCd":"50","sigungu":"제주시","sigunguCd":"50110","dong":"아라일동","bldNm":"제주대학교병원","zonecode":"63241","x":"126.5450","y":"33.4670"},{"roadAddress":"제주특별자치도 제주시 첨단로 242","jibunAddress":"제주특별자치도 제주시 영평동 2181","sido":"제주특별자치도","sidoCd":"50","sigungu":"제주시","sigunguCd":"50110","dong":"영평동","bldNm":"제주스페이스닷원 (카카오)","zonecode":"63309","x":"126.5708","y":"33.4507"},{"roadAddress":"서울특별시 마포구 성미산로 27","jibunAddress":"서울특별시 마포구 성산동 249-1","sido":"서울특별시","sidoCd":"11","sigungu":"마포구","sigunguCd":"11440","dong":"성산동","bldNm":"서울성산초등학교","zonecode":"03975","x":"126.9150","y":"37.5615"},{"roadAddress":"강원특별자치도 강릉시 성산면 구산길 61","jibunAddress":"강원특별자치도 강릉시 성산면 구산리 323","sido":"강원특별자치도","sidoCd":"42","sigungu":"강릉시","sigunguCd":"42150","dong":"성산면","bldNm":"성산초등학교 (강릉)","zonecode":"25615","x":"128.8245","y":"37.7180"},{"roadAddress":"대구광역시 달서구 성산로 43","jibunAddress":"대구광역시 달서구 신당동 1810","sido":"대구광역시","sidoCd":"27","sigungu":"달서구","sigunguCd":"27290","dong":"신당동","bldNm":"대구성산초등학교","zonecode":"42603","x":"128.4985","y":"35.8525"},{"roadAddress":"제주특별자치도 서귀포시 성산읍 일주동로 4282","jibunAddress":"제주특별자치도 서귀포시 성산읍 고성리 1198-1","sido":"제주특별자치도","sidoCd":"50","sigungu":"서귀포시","sigunguCd":"50130","dong":"성산읍","bldNm":"성산초등학교 (제주)","zonecode":"63640","x":"126.9155","y":"33.4510"},{"roadAddress":"경기도 고양시 일산서구 일산로 594","jibunAddress":"경기도 고양시 일산서구 일산동 1060","sido":"경기도","sidoCd":"41","sigungu":"고양시 일산서구","sigunguCd":"41285","dong":"일산동","bldNm":"일산초등학교","zonecode":"10355","x":"126.7710","y":"37.6880"},{"roadAddress":"경기도 고양시 덕양구 능곡로 38","jibunAddress":"경기도 고양시 덕양구 토당동 384","sido":"경기도","sidoCd":"41","sigungu":"고양시 덕양구","sigunguCd":"41287","dong":"토당동","bldNm":"능곡초등학교","zonecode":"10511","x":"126.8210","y":"37.6215"},{"roadAddress":"강원특별자치도 춘천시 백령로 156","jibunAddress":"강원특별자치도 춘천시 효자동 17-1","sido":"강원특별자치도","sidoCd":"42","sigungu":"춘천시","sigunguCd":"42110","dong":"효자동","bldNm":"강원대학교병원","zonecode":"24289","x":"127.7450","y":"37.8745"},{"roadAddress":"강원특별자치도 원주시 일산로 20","jibunAddress":"강원특별자치도 원주시 일산동 162-1","sido":"강원특별자치도","sidoCd":"42","sigungu":"원주시","sigunguCd":"42130","dong":"일산동","bldNm":"원주세브란스기독병원","zonecode":"26426","x":"127.9450","y":"37.3485"}];
+    window.searchNaverAddressClient = function(query) {
+      const rawTrimmed = String(query || '').trim();
+      if (!rawTrimmed) return [];
+      const compactQ = rawTrimmed.replace(/[\s\-_,.]+/g, '').toLowerCase();
+
+      const poiExact = [];
+      const poiPartial = [];
+      for (const item of window.COMPREHENSIVE_ADDRESS_DB) {
+        const compactBld = (item.bldNm || '').replace(/[\s\-_,.]+/g, '').toLowerCase();
+        const compactRoad = (item.roadAddress || '').replace(/[\s\-_,.]+/g, '').toLowerCase();
+        const compactJibun = (item.jibunAddress || '').replace(/[\s\-_,.]+/g, '').toLowerCase();
+        if (compactBld.includes(compactQ) || compactQ.includes(compactBld)) {
+          poiExact.push(item);
+        } else if (compactRoad.includes(compactQ) || compactJibun.includes(compactQ)) {
+          poiPartial.push(item);
+        }
+      }
+
+      const tokens = rawTrimmed.toLowerCase().split(/\s+/).filter(Boolean);
+      const tokenMatched = window.COMPREHENSIVE_ADDRESS_DB.filter((item) => {
+        const fullText = (item.roadAddress + ' ' + (item.jibunAddress || '') + ' ' + (item.bldNm || '') + ' ' + item.dong + ' ' + item.sigungu + ' ' + item.sido).toLowerCase();
+        return tokens.every((token) => fullText.includes(token)) ||
+          tokens.some((token) => token.length >= 2 && (
+            (item.bldNm && item.bldNm.toLowerCase().includes(token)) ||
+            item.roadAddress.toLowerCase().includes(token) ||
+            (item.jibunAddress && item.jibunAddress.toLowerCase().includes(token)) ||
+            item.dong.toLowerCase().includes(token)
+          ));
+      });
+
+      const combined = [...poiExact, ...poiPartial, ...tokenMatched];
+      const seen = new Set();
+      const result = [];
+      for (const it of combined) {
+        const key = it.roadAddress + '_' + it.bldNm;
+        if (!seen.has(key)) {
+          seen.add(key);
+          result.push(it);
+        }
+      }
+      return result;
+    };
+
+    // Global fetch interceptor for standalone preview (Chrome local viewing)
+    (function() {
+      const originalFetch = window.fetch;
+      window.fetch = async function(url, options) {
+        const urlStr = String(url || '');
+
+        // 1. 네이버 주소 검색 목업 인터셉트
+        if (urlStr.includes('/api/web/client/search_address') || (urlStr.includes('/api/web/client/com_010000') && options?.body && String(options.body).includes('SEARCH_NAVER_ADDRESS'))) {
+          try {
+            const body = options?.body ? JSON.parse(options.body) : {};
+            const q = body.query || body.keyword || '';
+            const items = window.searchNaverAddressClient(q);
+            return new Response(JSON.stringify({
+              success: true,
+              provider: 'NAVER_MAPS_GEOCODE_LOCAL',
+              query: q,
+              total: items.length,
+              items: items
+            }), {
+              status: 200,
+              headers: { 'Content-Type': 'application/json' }
+            });
+          } catch (e) {
+            console.warn('Address mock fetch error:', e);
+          }
+        }
+
+        // 2. 통합 회원가입 & 약관동의 목업 인터셉트 (/api/web/client/ath_010200)
+        if (urlStr.includes('/api/web/client/ath_010200')) {
+          try {
+            const body = options?.body ? JSON.parse(options.body) : {};
+            if (body.action === 'CHECK_EMAIL') {
+              return new Response(JSON.stringify({
+                success: true,
+                code: 'OK',
+                message: '사용 가능한 이메일입니다.'
+              }), { status: 200, headers: { 'Content-Type': 'application/json' } });
+            }
+            if (body.action === 'GET_TERMS') {
+              return new Response(JSON.stringify({
+                success: true,
+                code: 'OK',
+                data: [
+                  { TERMS_CD: 'SERVICE', TERMS_VER: 'v1.0', TERMS_TITLE: '서비스 이용약관', MANDATORY_YN: 'Y' },
+                  { TERMS_CD: 'PRIVACY', TERMS_VER: 'v1.0', TERMS_TITLE: '개인정보 수집 및 이용 동의', MANDATORY_YN: 'Y' },
+                  { TERMS_CD: 'LOCATION', TERMS_VER: 'v1.0', TERMS_TITLE: '위치기반 서비스 이용약관', MANDATORY_YN: 'Y' },
+                  { TERMS_CD: 'FINANCE', TERMS_VER: 'v1.0', TERMS_TITLE: '전자금융거래 기본약관', MANDATORY_YN: 'Y' },
+                  { TERMS_CD: 'SIGNATURE', TERMS_VER: 'v1.0', TERMS_TITLE: '전자거래 및 자필 전자서명 보증 동의', MANDATORY_YN: 'Y' }
+                ]
+              }), { status: 200, headers: { 'Content-Type': 'application/json' } });
+            }
+            // REGISTER 액션
+            const userNo = 'C' + Date.now().toString().slice(-8);
+            const registeredUser = {
+              userNo: userNo,
+              userNm: body.userNm || '신규회원',
+              userEmail: body.userEmail || 'customer@example.com',
+              userRoleCd: body.userRoleCd || 'CUSTOMER',
+              userTel: body.userTel || '010-1234-5678',
+              socialProvider: body.socialProvider || null
+            };
+            try { localStorage.setItem('sseuldakgo_user', JSON.stringify(registeredUser)); } catch(e){}
+            return new Response(JSON.stringify({
+              success: true,
+              code: 'OK',
+              message: '쓸고닦고 통합 회원가입 및 전자서명이 성공적으로 접수되었습니다.',
+              data: registeredUser
+            }), { status: 200, headers: { 'Content-Type': 'application/json' } });
+          } catch (e) {
+            console.warn('ath_010200 mock error:', e);
+          }
+        }
+
+        // 3. 고객 및 시공사 로그인 목업 인터셉트 (/api/web/client/ath_010100)
+        if (urlStr.includes('/api/web/client/ath_010100')) {
+          try {
+            const body = options?.body ? JSON.parse(options.body) : {};
+            const userNo = 'C' + Date.now().toString().slice(-8);
+            const loggedInUser = {
+              userNo: userNo,
+              userNm: '홍길동',
+              userEmail: body.userEmail || body.email || 'hong.gd@example.com',
+              userRoleCd: body.userRoleCd || 'CUSTOMER',
+              userTel: '010-8921-5459'
+            };
+            try { localStorage.setItem('sseuldakgo_token', 'mock_jwt_token_12345'); } catch(e){}
+            try { localStorage.setItem('sseuldakgo_user', JSON.stringify(loggedInUser)); } catch(e){}
+            return new Response(JSON.stringify({
+              success: true,
+              code: 'OK',
+              message: '로그인에 성공했습니다.',
+              token: 'mock_jwt_token_12345',
+              data: loggedInUser
+            }), { status: 200, headers: { 'Content-Type': 'application/json' } });
+          } catch (e) {
+            console.warn('ath_010100 mock error:', e);
+          }
+        }
+
+        // 4. 청소 서비스 신청 발주 등록 (/api/web/client/req_010100)
+        if (urlStr.includes('/api/web/client/req_010100')) {
+          try {
+            const orderNo = 'ORD-' + new Date().toISOString().slice(0, 10).replace(/-/g, '') + '-' + Math.floor(1000 + Math.random() * 9000);
+            return new Response(JSON.stringify({
+              success: true,
+              code: 'OK',
+              orderNo: orderNo,
+              message: '청소 서비스 신청 및 확정 발주서 작성이 성공적으로 접수되었습니다.'
+            }), { status: 200, headers: { 'Content-Type': 'application/json' } });
+          } catch (e) {
+            console.warn('req_010100 mock error:', e);
+          }
+        }
+
+        // 5. 결제 승인 (/api/web/client/pay_010100)
+        if (urlStr.includes('/api/web/client/pay_010100')) {
+          try {
+            return new Response(JSON.stringify({
+              success: true,
+              code: 'OK',
+              paymentId: 'PAY-' + Date.now(),
+              message: '데이터 이용료 결제 및 배타적 단일 계약 체결이 완료되었습니다.'
+            }), { status: 200, headers: { 'Content-Type': 'application/json' } });
+          } catch (e) {
+            console.warn('pay_010100 mock error:', e);
+          }
+        }
+
+        // 6. 시공 검수 완료 승인 (/api/web/client/job_010100)
+        if (urlStr.includes('/api/web/client/job_010100')) {
+          try {
+            return new Response(JSON.stringify({
+              success: true,
+              code: 'OK',
+              message: '청소 시공 검수 및 현장 직불 완료 승인이 처리되었습니다.'
+            }), { status: 200, headers: { 'Content-Type': 'application/json' } });
+          } catch (e) {
+            console.warn('job_010100 mock error:', e);
+          }
+        }
+
+        // 7. 가입 환영 안내 (/api/web/client/ath_010201)
+        if (urlStr.includes('/api/web/client/ath_010201') || urlStr.includes('/api/web/client/ath_010200201')) {
+          return new Response(JSON.stringify({
+            success: true,
+            code: 'OK',
+            data: {
+              userNo: 'C202611130001',
+              userNm: '홍길동',
+              userEmail: 'hong.gd@example.com',
+              userRoleCd: 'CUSTOMER'
+            }
+          }), { status: 200, headers: { 'Content-Type': 'application/json' } });
+        }
+
+        // 실제 fetch 시도 (서버가 띄워져 있는 환경용) 및 통신 실패 시 모의 폴백
+        try {
+          return await originalFetch(url, options);
+        } catch (err) {
+          if (urlStr.includes('/api/web/client/')) {
+            console.warn('[PREVIEW_FALLBACK] Backend server offline, returning mock response for:', urlStr);
+            return new Response(JSON.stringify({
+              success: true,
+              code: 'OK',
+              message: '로컬 크롬 프리뷰 오프라인 모의 응답이 성공적으로 반환되었습니다.',
+              data: { status: 'MOCK_SUCCESS' }
+            }), {
+              status: 200,
+              headers: { 'Content-Type': 'application/json' }
+            });
+          }
+          throw err;
+        }
+      };
+    })();
+  </script>
+
+  <style>
+    body { font-family: 'Pretendard', 'Inter', sans-serif; margin: 0; padding: 0; }
+    /* 스크롤바 미려하게 처리 */
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: #F1F5F9; }
+    ::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #94A3B8; }
+  </style>
+</head>
+<body class="bg-[#F8FAFC] text-[#0F172A] antialiased">
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useEffect, useMemo, useCallback } = React;
+const ReactHooks = { useState, useEffect, useMemo, useCallback };
+
+/**
+ * @file SseulDakGo_Web/Client/frontend/WEB-CLNT-PAY-010100/index.jsx
+ * @description 고객 데이터 이용료 결제 및 배타적 계약 확정 모달 컴포넌트 (WEB-CLNT-PAY-010100)
+ *              - "정기청소, 입주청소, 계절가전" 요청별 16,500원(VAT 포함) 비례 계산
+ *                * 1개 요청 시: 16,500원 (공급가액 15,000원 + VAT 1,500원)
+ *                * 2개 요청 시: 33,000원 (공급가액 30,000원 + VAT 3,000원)
+ *                * 3개 요청 시: 49,500원 (공급가액 45,000원 + VAT 4,500원)
+ *              - 파트너 1인 선정 시 배타적 전속 계약 체결 및 안심번호(0507-XXXX-XXXX) 즉시 발급
+ *              - 불합리한 노무비 에스크로 제로: 시공비(예: 720,000원)는 현장 검수 후 파트너에게 100% 직불
+ *              - 전자서명 증적 및 위약금 50% / 7일 규정 동의
+ * 
+ * Props:
+ * @param {boolean} isOpen 모달 렌더링 여부
+ * @param {Object} orderData 발주 기본 정보 ({ orderNo, proposedPrice, cleanLargeCd, cleanMidCd, categories, allianceCd })
+ * @param {Object} applyData 고객이 선택한 청약서 ({ applyNo, serviceUserNo, companyNm, userNm, proposedDate, startTime, proposedPrice })
+ * @param {Object} currentUser 로그인 고객 정보 ({ USER_NO, USER_NM })
+ * @param {Function} onClose 닫기 콜백 () => void
+ * @param {Function} onPaymentSuccess 결제 및 체결 완료 콜백 (resultData) => void
+ */
+function WebClntPay010100({
+  isOpen = false,
+  orderData = null,
+  applyData = null,
+  currentUser = { USER_NO: 'C20261000001', USER_NM: '홍길동' },
+  onClose,
+  onPaymentSuccess
+}) {
+  // 1. 발주 및 청약 기본 데이터 정규화
+  const effectiveOrder = useMemo(() => {
+    return {
+      orderNo: orderData?.orderNo || 'ORD-20261102-0941',
+      orderDtlNo: orderData?.orderDtlNo || 'ORD-20261102-094101',
+      cleanLargeCd: orderData?.cleanLargeCd || 'REGULAR',
+      cleanLargeNm: orderData?.cleanLargeNm || (orderData?.cleanLargeCd === 'MOVEIN' ? '입주청소' : orderData?.cleanLargeCd === 'APPLIANCE' ? '계절가전' : '정기청소'),
+      cleanMidNm: orderData?.cleanMidNm || '빌라 공용부 (계단·복도·주차장)',
+      totalServiceAmt: orderData?.proposedPrice || applyData?.proposedPrice || 720000,
+      allianceCd: orderData?.allianceCd || null,
+      categories: Array.isArray(orderData?.categories) && orderData.categories.length > 0
+        ? orderData.categories
+        : [orderData?.cleanLargeCd || 'REGULAR']
+    };
+  }, [orderData, applyData]);
+
+  const effectiveApply = useMemo(() => {
+    return {
+      applyNo: applyData?.applyNo || 'APP-20261102-001',
+      serviceUserNo: applyData?.serviceUserNo || 'S20261000001',
+      companyNm: applyData?.companyNm || '반짝빌라클린',
+      userNm: applyData?.userNm || '이*수 마스터',
+      confirmedDate: applyData?.proposedDate || '2026.11.02(월)',
+      confirmedTime: applyData?.startTime || '10:00 (오전)',
+      totalServiceAmt: applyData?.proposedPrice || effectiveOrder.totalServiceAmt
+    };
+  }, [applyData, effectiveOrder]);
+
+  // 2. 카테고리 수에 따른 플랫폼 데이터 이용료 계산
+  // "정기청소, 입주청소, 계절가전" 요청별 16,500원(VAT 포함)
+  const [selectedCats, setSelectedCats] = useState(effectiveOrder.categories);
+
+  useEffect(() => {
+    if (effectiveOrder.categories && effectiveOrder.categories.length > 0) {
+      setSelectedCats(effectiveOrder.categories);
+    }
+  }, [effectiveOrder.categories]);
+
+  // 카테고리 라벨 맵
+  const categoryLabels = {
+    REGULAR: '정기청소',
+    MOVEIN: '입주청소',
+    APPLIANCE: '계절가전'
+  };
+
+  const feeCalculation = useMemo(() => {
+    const count = Math.min(3, Math.max(1, selectedCats.length));
+    const supplyPrice = count * 15000;
+    const vat = count * 1500;
+    const totalPrice = count * 16500;
+
+    return {
+      categoryCount: count,
+      supplyPrice,
+      vat,
+      totalPrice
+    };
+  }, [selectedCats]);
+
+  // 3. 결제 수단 및 약관 동의 상태
+  const [payMethod, setPayMethod] = useState('CARD'); // 'CARD' | 'KAKAOPAY' | 'NAVERPAY' | 'TOSSPAY'
+  const [agreements, setAgreements] = useState({
+    exclusive: true,
+    cancellation: true
+  });
+  const [isLoading, setIsLoading] = useState(false);
+  const [loadingText, setLoadingText] = useState('PG 결제 모듈 호출 중...');
+  const [alertError, setAlertError] = useState(null);
+
+  // 모달 닫기 시 상태 초기화
+  useEffect(() => {
+    if (!isOpen) {
+      setIsLoading(false);
+      setAlertError(null);
+      setAgreements({ exclusive: true, cancellation: true });
+    }
+  }, [isOpen]);
+
+  // ESC 키 닫기 이벤트 핸들러
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape' && isOpen && !isLoading) {
+        handleModalClose();
+      }
+    };
+    if (isOpen) {
+      window.addEventListener('keydown', handleKeyDown);
+    }
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isOpen, isLoading]);
+
+  // 전체 동의 토글
+  const handleToggleAllAgreements = () => {
+    const allChecked = agreements.exclusive && agreements.cancellation;
+    setAgreements({
+      exclusive: !allChecked,
+      cancellation: !allChecked
+    });
+  };
+
+  const isFormValid = agreements.exclusive && agreements.cancellation;
+
+  // 닫기 확인
+  const handleModalClose = () => {
+    if (isLoading) return;
+    if (window.confirm('결제를 중단하고 청약서 비교 화면으로 돌아가시겠습니까?\n배타적 매칭은 완료되지 않습니다.')) {
+      if (onClose) onClose();
+    }
+  };
+
+  // 4. 결제 프로세스 실행 (POST /api/web/client/pay_010100)
+  const handleExecutePayment = async () => {
+    if (!isFormValid) {
+      setAlertError('필수 계약 체결 및 결제 취소/위약금 규정에 모두 동의해 주세요.');
+      return;
+    }
+
+    setIsLoading(true);
+    setLoadingText('안심 결제 모듈 암호화 통신 중...');
+    setAlertError(null);
+
+    try {
+      // 가상 PG 결제 승인 지연 시뮬레이션
+      await new Promise((resolve) => setTimeout(resolve, 600));
+      setLoadingText('배타적 계약 체결 및 안심번호 발급 중...');
+
+      const response = await fetch('/api/web/client/pay_010100', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          orderNo: effectiveOrder.orderNo,
+          orderDtlNo: effectiveOrder.orderDtlNo,
+          clientUserNo: currentUser?.USER_NO || 'C20261000001',
+          applyNo: effectiveApply.applyNo,
+          serviceUserNo: effectiveApply.serviceUserNo,
+          payMethod: payMethod,
+          pgProviderCd: payMethod === 'CARD' ? 'TOSS_PAYMENTS' : payMethod,
+          pgTid: `pg_${payMethod.toLowerCase()}_${Date.now()}`,
+          actualPaidAmt: feeCalculation.totalPrice,
+          categoryCount: feeCalculation.categoryCount,
+          categories: selectedCats,
+          totalServiceAmt: effectiveApply.totalServiceAmt,
+          confirmedDate: effectiveApply.confirmedDate,
+          confirmedTime: effectiveApply.confirmedTime,
+          allianceCd: effectiveOrder.allianceCd
+        })
+      });
+
+      const resData = await response.json();
+
+      if (response.ok && resData.success) {
+        const contractInfo = resData.data;
+        alert(
+          `[결제 및 배차 확정 완료]\n` +
+          `• 결제 승인 금액: ₩${feeCalculation.totalPrice.toLocaleString()}원 (VAT 포함)\n` +
+          `• 계약 관리번호: ${contractInfo.contractNo}\n` +
+          `• 시공 파트너: ${effectiveApply.companyNm} (${effectiveApply.userNm})\n` +
+          `• 배차 확정 일정: ${effectiveApply.confirmedDate} ${effectiveApply.confirmedTime}\n` +
+          `• 발급 안심번호: ${contractInfo.safeTelNo}\n\n` +
+          `※ 시공 완료 후 현장 검수를 마치신 후, 확정 청소대금(₩${Number(effectiveApply.totalServiceAmt).toLocaleString()}원)을 마스터 계좌로 직접 송금해 주시기 바랍니다.`
+        );
+
+        if (onPaymentSuccess) {
+          onPaymentSuccess(contractInfo);
+        }
+        if (onClose) {
+          onClose();
+        }
+      } else {
+        setAlertError(resData.message || '결제 승인 중 오류가 발생했습니다. 다시 시도해 주세요.');
+      }
+    } catch (err) {
+      console.warn('[PAY_FALLBACK_SIMULATION]', err);
+      // 오프라인 / 네트워크 지연 시뮬레이션
+      const mockContractNo = `CNT20261102${Math.floor(10000 + Math.random() * 90000)}`;
+      const mockSafeTel = `0507-${Math.floor(1000 + Math.random() * 9000)}-${Math.floor(1000 + Math.random() * 9000)}`;
+
+      alert(
+        `[결제 및 배차 확정 완료 (시뮬레이션)]\n` +
+        `• 결제 승인 금액: ₩${feeCalculation.totalPrice.toLocaleString()}원\n` +
+        `• 계약 관리번호: ${mockContractNo}\n` +
+        `• 파트너: ${effectiveApply.companyNm}\n` +
+        `• 발급 안심번호: ${mockSafeTel}\n\n` +
+        `배차가 최종 확정되었습니다.`
+      );
+
+      if (onPaymentSuccess) {
+        onPaymentSuccess({
+          contractNo: mockContractNo,
+          safeTelNo: mockSafeTel,
+          orderStatus: 'CNTR_CONFIRMED',
+          actualPaidAmt: feeCalculation.totalPrice
+        });
+      }
+      if (onClose) {
+        onClose();
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/65 backdrop-blur-sm p-4 overflow-y-auto animate-in fade-in duration-200"
+      id="payment-modal-overlay"
+      role="dialog"
+      aria-labelledby="modal-headline"
+      aria-modal="true"
+    >
+      {/* MODAL CONTAINER (max-w-[540px]) */}
+      <div className="max-w-[540px] w-full max-h-[92vh] flex flex-col bg-surface-container-lowest rounded-2xl shadow-2xl overflow-hidden my-auto border border-slate-200/60 animate-in zoom-in-95">
+        
+        {/* 1. MODAL HEADER (Sticky Top) */}
+        <header className="p-6 bg-surface-container-lowest sticky top-0 z-20 flex items-start justify-between border-b border-slate-100 shadow-sm">
+          <div className="flex flex-col">
+            <span className="font-label-sm text-label-sm bg-secondary-container text-on-secondary-fixed font-semibold px-2.5 py-1 rounded-full inline-flex items-center gap-1 mb-1.5 w-fit">
+              <span className="material-symbols-outlined text-[14px]">gavel</span>
+              전자계약 체결 및 에스크로 미적용 직불 안내
+            </span>
+            <h1 className="font-headline-md text-headline-md text-primary font-bold tracking-tight" id="modal-headline">
+              매칭 확정 및 이용료 결제
+            </h1>
+            <p className="font-body-sm text-body-sm text-on-surface-variant mt-0.5">
+              선택하신 파트너와 최종 매칭을 위해 플랫폼 데이터 이용료를 결제합니다.
+            </p>
+          </div>
+          <button
+            aria-label="닫기"
+            className="text-outline hover:text-on-surface p-2 rounded-xl hover:bg-surface-container-low transition-colors cursor-pointer shrink-0"
+            onClick={handleModalClose}
+            type="button"
+          >
+            <span className="material-symbols-outlined text-2xl">close</span>
+          </button>
+        </header>
+
+        {/* 2. MODAL INNER BODY (Scrollable, p-6 space-y-5) */}
+        <div className="p-6 overflow-y-auto space-y-5">
+          
+          {/* 오류 알림 배너 */}
+          {alertError && (
+            <div className="p-3.5 bg-error-container text-on-error-container rounded-xl flex items-start gap-2 text-xs animate-in fade-in">
+              <span className="material-symbols-outlined text-error text-base shrink-0 mt-0.5">error</span>
+              <p className="leading-relaxed font-medium">{alertError}</p>
+            </div>
+          )}
+
+          {/* SECTION A: 최종 매칭 파트너 및 시공 일정 요약 카드 (Navy Box) */}
+          <section className="bg-primary text-on-primary rounded-xl p-5 shadow-inner flex flex-col relative overflow-hidden">
+            <div className="absolute right-0 top-0 w-32 h-32 bg-secondary/10 rounded-full blur-2xl pointer-events-none"></div>
+
+            {/* Top: Partner Info */}
+            <div className="flex items-start justify-between gap-space-sm pb-2 border-b border-white/10">
+              <div>
+                <span className="font-label-sm text-label-sm text-secondary-fixed block mb-0.5">최종 선정 시공 파트너</span>
+                <div className="flex items-center gap-1.5 flex-wrap">
+                  <strong className="font-headline-sm text-headline-sm text-on-primary font-bold" data-field="COMPANY_NM">
+                    {effectiveApply.companyNm}
+                  </strong>
+                  <span className="font-body-sm text-body-sm text-primary-fixed opacity-90" data-field="USER_NM">
+                    ({effectiveApply.userNm})
+                  </span>
+                </div>
+              </div>
+              <div className="flex items-center gap-1">
+                <span className="bg-secondary/40 text-secondary-fixed font-label-sm text-label-sm px-2 py-0.5 rounded font-semibold" data-field="CLEAN_LARGE_CD">
+                  {effectiveOrder.cleanLargeNm}
+                </span>
+                <span className="font-caption text-caption text-primary-fixed-dim bg-primary-container px-2 py-0.5 rounded" data-field="CLEAN_MID_CD">
+                  {effectiveOrder.cleanMidNm}
+                </span>
+              </div>
+            </div>
+
+            {/* Middle: Schedule Box */}
+            <div className="bg-white/10 rounded-lg p-3.5 my-3 flex flex-col gap-1.5 backdrop-blur-sm">
+              <div className="flex items-center justify-between text-xs">
+                <span className="font-label-sm text-label-sm text-surface-container-highest flex items-center gap-1">
+                  <span className="material-symbols-outlined text-sm text-secondary-fixed">calendar_month</span>
+                  확정 시공일정
+                </span>
+                <span className="font-caption text-caption text-secondary-fixed font-medium bg-secondary/20 px-2 py-0.5 rounded">
+                  배타적 전속 예약
+                </span>
+              </div>
+              <div className="flex items-baseline gap-2">
+                <strong className="font-headline-sm text-headline-sm text-secondary-fixed font-bold tracking-tight" data-field="CONFIRMED_DATE">
+                  {effectiveApply.confirmedDate}
+                </strong>
+                <span className="font-label-lg text-label-lg text-secondary-fixed-dim font-medium" data-field="CONFIRMED_TIME">
+                  {effectiveApply.confirmedTime}
+                </span>
+              </div>
+              <div className="pt-1 flex items-center gap-1 border-t border-white/10 mt-1">
+                <span className="material-symbols-outlined text-sm text-primary-fixed">phonelink_lock</span>
+                <span className="font-caption text-caption text-primary-fixed">안심번호:</span>
+                <span className="font-caption text-caption text-on-primary font-mono font-medium" data-field="SAFE_TEL_NO">
+                  0507-****-1234 (결제 완료 즉시 양방향 통화 개방)
+                </span>
+              </div>
+            </div>
+
+            {/* Bottom: On-site Direct Labor Fee Notice */}
+            <div className="pt-1 flex flex-col gap-0.5">
+              <div className="flex items-center justify-between">
+                <span className="font-label-md text-label-md text-surface-container-highest">현장 직불 확정 시공대금</span>
+                <strong className="font-headline-md text-headline-md text-on-primary font-bold font-mono" data-field="TOTAL_SERVICE_AMT">
+                  ₩{Number(effectiveApply.totalServiceAmt).toLocaleString()}원
+                </strong>
+              </div>
+              <p className="font-caption text-caption text-secondary-fixed-dim text-right">
+                (시공 완료 후 현장 검수 후 기사님 계좌로 100% 직접 송금 지급)
+              </p>
+            </div>
+          </section>
+
+          {/* SECTION B: 플랫폼 데이터 이용료 결제 금액 상세 (카테고리별 비례 계산 반영) */}
+          <section className="rounded-xl p-4 bg-surface-container-low shadow-sm flex flex-col gap-2.5 border border-slate-200/50">
+            <div className="flex items-center justify-between mb-0.5">
+              <h2 className="font-label-md text-label-md text-on-surface font-bold flex items-center gap-1.5">
+                <span className="material-symbols-outlined text-secondary text-base">receipt_long</span>
+                플랫폼 데이터 이용료 정산
+              </h2>
+              <span className="font-caption text-caption text-secondary font-semibold bg-secondary-container/40 px-2 py-0.5 rounded">
+                요청 유형별 16,500원(VAT포함) 표준 과금제
+              </span>
+            </div>
+
+            {/* 요청 유형 배지 목록 */}
+            <div className="p-2.5 bg-surface-container-lowest rounded-lg border border-slate-200/70 flex flex-col gap-2">
+              <div className="flex items-center justify-between">
+                <span className="font-caption text-caption text-on-surface-variant font-medium">
+                  발주 청소 유형 ({feeCalculation.categoryCount}개 항목 신청)
+                </span>
+                <span className="font-caption text-caption text-secondary font-bold">
+                  개당 ₩16,500원
+                </span>
+              </div>
+              <div className="flex items-center gap-1.5 flex-wrap">
+                {['REGULAR', 'MOVEIN', 'APPLIANCE'].map((catKey) => {
+                  const isChecked = selectedCats.includes(catKey);
+                  return (
+                    <button
+                      key={catKey}
+                      type="button"
+                      onClick={() => {
+                        if (isChecked) {
+                          if (selectedCats.length > 1) {
+                            setSelectedCats(selectedCats.filter((c) => c !== catKey));
+                          } else {
+                            alert('최소 1개 이상의 청소 유형이 선택되어야 합니다.');
+                          }
+                        } else {
+                          setSelectedCats([...selectedCats, catKey]);
+                        }
+                      }}
+                      className={`px-2.5 py-1 rounded-lg font-caption text-caption font-semibold flex items-center gap-1 transition-all cursor-pointer ${
+                        isChecked
+                          ? 'bg-secondary text-on-secondary shadow-xs'
+                          : 'bg-surface-container text-on-surface-variant hover:bg-surface-container-high'
+                      }`}
+                    >
+                      <span className="material-symbols-outlined text-[14px]">
+                        {isChecked ? 'check_circle' : 'add_circle'}
+                      </span>
+                      <span>{categoryLabels[catKey] || catKey}</span>
+                      <span className="opacity-80 text-[10px]">(+16,500원)</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* 정산 테이블 */}
+            <div className="space-y-1.5 pt-1">
+              <div className="flex items-center justify-between text-xs py-0.5">
+                <span className="text-on-surface-variant">공급가액 ({feeCalculation.categoryCount}건 × 15,000원)</span>
+                <span className="font-label-md text-label-md text-on-surface font-mono">
+                  ₩{feeCalculation.supplyPrice.toLocaleString()}원
+                </span>
+              </div>
+              <div className="flex items-center justify-between text-xs py-0.5">
+                <span className="text-on-surface-variant">부가가치세 (VAT 10%)</span>
+                <span className="font-label-md text-label-md text-on-surface font-mono">
+                  ₩{feeCalculation.vat.toLocaleString()}원
+                </span>
+              </div>
+              <div className="h-[1px] bg-slate-200 my-1"></div>
+              <div className="flex items-baseline justify-between pt-1">
+                <div className="flex items-baseline gap-1.5">
+                  <span className="font-label-lg text-label-lg text-on-surface font-bold">최종 결제 금액</span>
+                  <span className="font-caption text-caption text-secondary font-medium">
+                    ({feeCalculation.categoryCount === 1 ? '단일 유형' : `${feeCalculation.categoryCount}개 복합 유형`})
+                  </span>
+                </div>
+                <div className="text-right">
+                  <strong className="font-headline-md text-headline-md text-secondary font-bold font-mono" data-field="CLIENT_FEE_AMT">
+                    ₩{feeCalculation.totalPrice.toLocaleString()}원
+                  </strong>
+                </div>
+              </div>
+            </div>
+
+            {/* Fee Explanation Notice Callout */}
+            <div className="mt-1 p-3 bg-primary-fixed/30 rounded-lg text-on-primary-fixed text-xs leading-relaxed flex items-start gap-2">
+              <span className="material-symbols-outlined text-primary text-base shrink-0 mt-0.5">info</span>
+              <p className="font-caption text-caption text-on-surface">
+                위 <strong className="font-semibold text-primary">₩{feeCalculation.totalPrice.toLocaleString()}원</strong>은 안심번호 발급, 거래 계약 체결 보증 및 매칭 데이터 이용료이며, 현장 시공 대금(₩{Number(effectiveApply.totalServiceAmt).toLocaleString()}원)과 완전히 별개입니다.
+              </p>
+            </div>
+          </section>
+
+          {/* SECTION C: 결제 수단 선택 (Radio / Grid Style) */}
+          <section className="flex flex-col gap-2" data-field="PG_PROVIDER_CD">
+            <label className="font-label-md text-label-md text-on-surface font-bold block">
+              결제 수단 선택
+            </label>
+            <div aria-label="결제 수단" className="grid grid-cols-2 gap-2.5" role="radiogroup">
+              
+              {/* Option 1: Credit Card */}
+              <label
+                className={`payment-method-card cursor-pointer p-3 rounded-xl bg-surface-container-lowest shadow-sm flex items-center gap-2.5 transition-all relative overflow-hidden border ${
+                  payMethod === 'CARD' ? 'border-secondary ring-1 ring-secondary bg-secondary-container/20' : 'border-slate-200/80 hover:bg-surface-container-low'
+                }`}
+                data-method="CARD"
+              >
+                <input
+                  checked={payMethod === 'CARD'}
+                  className="accent-secondary h-4 w-4 shrink-0"
+                  name="pg_provider"
+                  onChange={() => setPayMethod('CARD')}
+                  type="radio"
+                  value="CARD"
+                />
+                <div className="flex items-center gap-2">
+                  <span className="material-symbols-outlined text-secondary text-lg">credit_card</span>
+                  <span className="font-label-md text-label-md text-on-surface font-medium">신용·체크카드</span>
+                </div>
+                {payMethod === 'CARD' && (
+                  <div className="selection-indicator absolute inset-x-0 bottom-0 h-0.5 bg-secondary"></div>
+                )}
+              </label>
+
+              {/* Option 2: Kakao Pay */}
+              <label
+                className={`payment-method-card cursor-pointer p-3 rounded-xl bg-surface-container-lowest shadow-sm flex items-center gap-2.5 transition-all relative overflow-hidden border ${
+                  payMethod === 'KAKAOPAY' ? 'border-secondary ring-1 ring-secondary bg-secondary-container/20' : 'border-slate-200/80 hover:bg-surface-container-low'
+                }`}
+                data-method="KAKAOPAY"
+              >
+                <input
+                  checked={payMethod === 'KAKAOPAY'}
+                  className="accent-secondary h-4 w-4 shrink-0"
+                  name="pg_provider"
+                  onChange={() => setPayMethod('KAKAOPAY')}
+                  type="radio"
+                  value="KAKAOPAY"
+                />
+                <div className="flex items-center gap-2">
+                  <span className="w-4 h-4 rounded-full bg-[#FEE500] text-[#191919] flex items-center justify-center font-bold text-[10px] leading-none shrink-0">K</span>
+                  <span className="font-label-md text-label-md text-on-surface font-medium">카카오페이</span>
+                </div>
+                {payMethod === 'KAKAOPAY' && (
+                  <div className="selection-indicator absolute inset-x-0 bottom-0 h-0.5 bg-secondary"></div>
+                )}
+              </label>
+
+              {/* Option 3: Naver Pay */}
+              <label
+                className={`payment-method-card cursor-pointer p-3 rounded-xl bg-surface-container-lowest shadow-sm flex items-center gap-2.5 transition-all relative overflow-hidden border ${
+                  payMethod === 'NAVERPAY' ? 'border-secondary ring-1 ring-secondary bg-secondary-container/20' : 'border-slate-200/80 hover:bg-surface-container-low'
+                }`}
+                data-method="NAVERPAY"
+              >
+                <input
+                  checked={payMethod === 'NAVERPAY'}
+                  className="accent-secondary h-4 w-4 shrink-0"
+                  name="pg_provider"
+                  onChange={() => setPayMethod('NAVERPAY')}
+                  type="radio"
+                  value="NAVERPAY"
+                />
+                <div className="flex items-center gap-2">
+                  <span className="w-4 h-4 rounded bg-[#03C75A] text-white flex items-center justify-center font-bold text-[10px] leading-none shrink-0">N</span>
+                  <span className="font-label-md text-label-md text-on-surface font-medium">네이버페이</span>
+                </div>
+                {payMethod === 'NAVERPAY' && (
+                  <div className="selection-indicator absolute inset-x-0 bottom-0 h-0.5 bg-secondary"></div>
+                )}
+              </label>
+
+              {/* Option 4: Toss Pay */}
+              <label
+                className={`payment-method-card cursor-pointer p-3 rounded-xl bg-surface-container-lowest shadow-sm flex items-center gap-2.5 transition-all relative overflow-hidden border ${
+                  payMethod === 'TOSSPAY' ? 'border-secondary ring-1 ring-secondary bg-secondary-container/20' : 'border-slate-200/80 hover:bg-surface-container-low'
+                }`}
+                data-method="TOSSPAY"
+              >
+                <input
+                  checked={payMethod === 'TOSSPAY'}
+                  className="accent-secondary h-4 w-4 shrink-0"
+                  name="pg_provider"
+                  onChange={() => setPayMethod('TOSSPAY')}
+                  type="radio"
+                  value="TOSSPAY"
+                />
+                <div className="flex items-center gap-2">
+                  <span className="w-4 h-4 rounded-full bg-[#0064FF] text-white flex items-center justify-center font-bold text-[10px] leading-none shrink-0">T</span>
+                  <span className="font-label-md text-label-md text-on-surface font-medium">토스페이</span>
+                </div>
+                {payMethod === 'TOSSPAY' && (
+                  <div className="selection-indicator absolute inset-x-0 bottom-0 h-0.5 bg-secondary"></div>
+                )}
+              </label>
+
+            </div>
+          </section>
+
+          {/* SECTION D: 배타적 계약 확정 및 취소/환불 규정 동의 (Checkboxes) */}
+          <section className="flex flex-col gap-2.5 pt-1">
+            <div className="flex items-center justify-between">
+              <span className="font-label-md text-label-md text-on-surface font-bold">계약 체결 및 규정 동의</span>
+              <button
+                className="font-caption text-caption text-secondary font-semibold hover:underline cursor-pointer"
+                onClick={handleToggleAllAgreements}
+                type="button"
+              >
+                모두 동의
+              </button>
+            </div>
+            <div className="space-y-2.5">
+              
+              {/* Agree 1: Exclusive Matching */}
+              <label className="flex items-start gap-2.5 p-3 rounded-xl bg-surface-container-low cursor-pointer hover:bg-surface-container transition-colors border border-slate-200/50">
+                <input
+                  checked={agreements.exclusive}
+                  className="accent-secondary h-4 w-4 mt-0.5 shrink-0 rounded cursor-pointer"
+                  id="agree-exclusive"
+                  name="agree_exclusive"
+                  onChange={(e) => setAgreements({ ...agreements, exclusive: e.target.checked })}
+                  required
+                  type="checkbox"
+                />
+                <div className="flex flex-col">
+                  <span className="font-label-md text-label-md text-on-surface font-semibold flex items-center gap-1">
+                    <span className="text-error font-bold">[필수]</span>
+                    배타적 계약 확정 안내 동의
+                  </span>
+                  <p className="font-caption text-caption text-on-surface-variant mt-1 leading-relaxed">
+                    본 결제 승인 즉시 선택하신 파트너 1인과 배타적 계약이 체결되며, 동일 발주 내 다른 청약 건들은 일괄 자동 마감(청약대기종료)됩니다.
+                  </p>
+                </div>
+              </label>
+
+              {/* Agree 2: Cancellation & Penalty */}
+              <label className="flex items-start gap-2.5 p-3 rounded-xl bg-surface-container-low cursor-pointer hover:bg-surface-container transition-colors border border-slate-200/50">
+                <input
+                  checked={agreements.cancellation}
+                  className="accent-secondary h-4 w-4 mt-0.5 shrink-0 rounded cursor-pointer"
+                  id="agree-cancellation"
+                  name="agree_cancellation"
+                  onChange={(e) => setAgreements({ ...agreements, cancellation: e.target.checked })}
+                  required
+                  type="checkbox"
+                />
+                <div className="flex flex-col">
+                  <span className="font-label-md text-label-md text-on-surface font-semibold flex items-center gap-1">
+                    <span className="text-error font-bold">[필수]</span>
+                    결제 취소 및 위약금 규정 동의
+                  </span>
+                  <p className="font-caption text-caption text-on-surface-variant mt-1 leading-relaxed">
+                    배차 확정 후 7일 이내 일방 취소 시 이용료의 50%가 위약금으로 차감되며, 계정이 7일간 정지될 수 있습니다.
+                  </p>
+                </div>
+              </label>
+
+            </div>
+          </section>
+
+          {/* Legal Escrow Disclaimer Callout Box */}
+          <div className="p-3.5 bg-error-container/40 border border-error/20 rounded-xl flex items-start gap-2">
+            <span className="material-symbols-outlined text-error text-base shrink-0 mt-0.5">warning</span>
+            <p className="font-caption text-caption text-tertiary-container leading-relaxed">
+              <strong>에스크로 미적용 고지:</strong> 당사는 직무 노무 제공 플랫폼으로 인건비 결제 대금을 대리 수령하거나 에스크로로 예치하지 않습니다. 모든 작업 실비는 시공 검수 완료 후 파트너 계좌로 직접 정산하셔야 합니다.
+            </p>
+          </div>
+
+        </div>
+
+        {/* 3. MODAL FOOTER ACTION (Sticky Bottom) */}
+        <footer className="p-5 bg-surface-container-lowest sticky bottom-0 z-20 border-t border-slate-100 shadow-md flex flex-col">
+          <button
+            className="w-full h-[52px] bg-secondary hover:bg-[#005049] active:scale-[0.99] text-on-secondary font-label-lg text-label-lg font-bold rounded-xl shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+            disabled={!isFormValid || isLoading}
+            id="btn-submit-payment"
+            onClick={handleExecutePayment}
+            type="button"
+          >
+            {isLoading ? (
+              <>
+                <span className="inline-block w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                <span>{loadingText}</span>
+              </>
+            ) : (
+              <>
+                <span className="material-symbols-outlined text-xl">lock</span>
+                <span>{feeCalculation.totalPrice.toLocaleString()}원 결제하고 배차 확정하기</span>
+              </>
+            )}
+          </button>
+          <p className="font-caption text-caption text-center text-outline mt-2.5 flex items-center justify-center gap-1">
+            <span className="material-symbols-outlined text-xs">encrypted</span>
+            안전한 전자결제를 위해 결제 정보는 암호화되어 PG사로 전송됩니다.
+          </p>
+        </footer>
+
+      </div>
+    </div>
+  );
+}
+
+
+
+    
+      function AppWrapper() {
+        const [isOpen, setIsOpen] = React.useState(true);
+        return (
+          <div className="min-h-screen bg-slate-900/30 flex flex-col items-center justify-center p-4">
+            {!isOpen && (
+              <div className="bg-white p-8 rounded-2xl shadow-2xl text-center max-w-md w-full border border-slate-200">
+                <div className="w-16 h-16 bg-blue-50 text-[#1F497D] rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">
+                  ✓
+                </div>
+                <h3 className="text-xl font-bold text-slate-800 mb-2">고객 데이터 이용료 결제 및 계약 확정</h3>
+                <p className="text-sm text-slate-500 mb-6">모달이 닫힌 상태입니다. 아래 버튼을 눌러 다시 열 수 있습니다.</p>
+                <button
+                  onClick={() => setIsOpen(true)}
+                  className="w-full py-3 bg-[#1F497D] text-white font-bold rounded-xl shadow hover:bg-[#16365c] transition-all"
+                >
+                  [WEB-CLNT-PAY-010100] 모달 다시 열기
+                </button>
+              </div>
+            )}
+            <WebClntPay010100 
+              isOpen={isOpen} 
+              onClose={() => setIsOpen(false)}
+              onSuccessLogin={() => alert('로그인 성공 이벤트 감지')}
+              onNavigate={(url) => console.log('Navigate to:', url)}
+              duplicateTabs={['REGULAR', 'MOVEIN']}
+              tabAddresses={{
+                REGULAR: { addrText: '경기 고양시 일산동구 마두동 802-1', addrDetail: '삼혜빌딩 4층 402호' },
+                MOVEIN: { addrText: '경기 고양시 일산동구 마두동 802-1', addrDetail: '삼혜빌딩 4층 402호' },
+                APPLIANCE: { addrText: '경기 고양시 일산동구 마두동 802-1', addrDetail: '삼혜빌딩 4층 402호' },
+              }}
+              onConfirmContinue={() => alert('[네 (계속 등록)] 클릭 감지: 동일 주소로 발주 등록 계속 진행')}
+              onSelectChangeTab={(t) => alert('[주소 변경 탭 선택] 감지: ' + t + ' 탭 주소 검색 실행')}
+            />
+          </div>
+        );
+      }
+      ReactDOM.createRoot(document.getElementById('root')).render(<AppWrapper />);
+    
+  </script>
+</body>
+</html>

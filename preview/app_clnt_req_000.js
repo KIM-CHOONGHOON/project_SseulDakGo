@@ -282,7 +282,7 @@ const APPLIANCE_CATALOG = [
     },
 ];
 // ============================================================================
-// 2. 기본 의뢰 폼 초기 상태 (WEB-CLNT-REQ-000 동일)
+// 2. 기본 의뢰 폼 초기 상태 (WEB-CLNT-REQ-010100 동일)
 // ============================================================================
 const INITIAL_FORM_DATA = {
     companyOrOrgNm: '(주)공간다원',
@@ -445,9 +445,9 @@ function compressImageToDataUrl(file, maxWidth = 1024, quality = 0.75) {
     });
 }
 // ============================================================================
-// 3. 메인 모바일 스크린 컴포넌트: AppClntReq000
+// 3. 메인 모바일 스크린 컴포넌트: AppClntReq010100
 // ============================================================================
-function AppClntReq000({ visible = true, initialTab = 'REGULAR', onClose, onOpenLogin, onNavigate, navigation, route, onSuccess, }) {
+function AppClntReq010100({ visible = true, initialTab = 'REGULAR', onClose, onOpenLogin, onNavigate, navigation, route, onSuccess, }) {
     const paramTab = route?.params?.category || initialTab;
     const [activeTab, setActiveTab] = useState(paramTab === 'APPLIANCE' || paramTab === 'MOVEIN' ? paramTab : 'REGULAR');
     const [formData, setFormData] = useState(INITIAL_FORM_DATA);
@@ -489,10 +489,10 @@ function AppClntReq000({ visible = true, initialTab = 'REGULAR', onClose, onOpen
             onOpenLogin();
         }
         else if (onNavigate) {
-            onNavigate('APP-CLNT-ATH-000', { hasTempReq: true, activeTab });
+            onNavigate('APP-CLNT-ATH-010100', { hasTempReq: true, activeTab });
         }
         else if (navigation?.navigate) {
-            navigation.navigate('APP-CLNT-ATH-000', { hasTempReq: true, activeTab });
+            navigation.navigate('APP-CLNT-ATH-010100', { hasTempReq: true, activeTab });
         }
         window.dispatchEvent(new CustomEvent('OPEN_LOGIN_MODAL', {
             detail: { hasTempReq: true, activeTab },
@@ -539,7 +539,7 @@ function AppClntReq000({ visible = true, initialTab = 'REGULAR', onClose, onOpen
                     if (Array.isArray(parsed.photos) && parsed.photos.length > 0) {
                         setPhotoFiles(parsed.photos);
                     }
-                    console.log('✅ [APP-CLNT-REQ-000] 비회원 임시 저장 발주서 및 현장 사진 복원 완료');
+                    console.log('✅ [APP-CLNT-REQ-010100] 비회원 임시 저장 발주서 및 현장 사진 복원 완료');
                 }
             }
         }
@@ -617,7 +617,7 @@ function AppClntReq000({ visible = true, initialTab = 'REGULAR', onClose, onOpen
     const handleFieldChange = (field, value) => {
         setFormData((prev) => ({ ...prev, [field]: value }));
     };
-    // 정기청소 시작일 변경 시 90일 후 종료일 자동 계산 (WEB-CLNT-REQ-000 동일)
+    // 정기청소 시작일 변경 시 90일 후 종료일 자동 계산 (WEB-CLNT-REQ-010100 동일)
     const handleStartDateChange = (newStartDt) => {
         if (!newStartDt)
             return;
@@ -1019,7 +1019,7 @@ function AppClntReq000({ visible = true, initialTab = 'REGULAR', onClose, onOpen
         };
         setIsSubmitting(true);
         try {
-            const res = await fetch('/api/app/client/req_000', {
+            const res = await fetch('/api/app/client/req_010100', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload),
@@ -1541,10 +1541,10 @@ function AppClntReq000({ visible = true, initialTab = 'REGULAR', onClose, onOpen
                             onSuccess(submitSuccessResult);
                         }
                         if (onNavigate) {
-                            onNavigate('APP-CLNT-ORD-000', { orderNo: submitSuccessResult.orderNo });
+                            onNavigate('APP-CLNT-ORD-010000', { orderNo: submitSuccessResult.orderNo });
                         }
                         else if (navigation?.navigate) {
-                            navigation.navigate('APP-CLNT-ORD-000', { orderNo: submitSuccessResult.orderNo });
+                            navigation.navigate('APP-CLNT-ORD-010000', { orderNo: submitSuccessResult.orderNo });
                         }
                     }, className: "w-full h-12 bg-secondary text-on-secondary rounded-xl font-label-md text-label-md font-bold hover:bg-secondary/90 transition-colors cursor-pointer shadow-sm" }, "\uB098\uC758 \uC2E0\uCCAD \uD604\uD669 \uD655\uC778\uD558\uAE30")))),
         guestNoticeModal.isOpen && (React.createElement("div", { className: "fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200" },
@@ -1557,11 +1557,11 @@ function AppClntReq000({ visible = true, initialTab = 'REGULAR', onClose, onOpen
                     React.createElement("span", null, "\uD655\uC778 (\uB85C\uADF8\uC778 \uD654\uBA74\uC73C\uB85C \uC774\uB3D9)"),
                     React.createElement("span", { className: "material-symbols-outlined text-sm" }, "arrow_forward")))))));
 }
-AppClntReq000;
+AppClntReq010100;
 
 if (typeof window !== 'undefined') {
-  window.AppClntReq000 = AppClntReq000;
-  console.log('✅ APP-CLNT-REQ-000 Mobile Screen registered to window.AppClntReq000');
+  window.AppClntReq010100 = AppClntReq010100;
+  console.log('✅ APP-CLNT-REQ-010100 Mobile Screen registered to window.AppClntReq010100');
 }
 
 })();

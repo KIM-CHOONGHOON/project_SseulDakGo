@@ -24,7 +24,7 @@ function triggerHaptic(style = 'LIGHT') {
         // 햅틱 미지원 무시
     }
 }
-function AppClntAth010({ isOpen = false, visible, onClose, onSuccessRegister, onOpenLogin, navigation, onNavigate, }) {
+function AppClntAth010200({ isOpen = false, visible, onClose, onSuccessRegister, onOpenLogin, navigation, onNavigate, }) {
     // 모달 모드 또는 독립 스크린 모드 모두 지원
     const isModalOpen = visible !== undefined ? visible : isOpen;
     // 1. 회원 구분 ('C': 고객 회원, 'S': 시공사 회원)
@@ -270,7 +270,7 @@ function AppClntAth010({ isOpen = false, visible, onClose, onSuccessRegister, on
             return;
         }
         try {
-            const res = await fetch('/api/app/client/ath_010', {
+            const res = await fetch('/api/app/client/ath_010200', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -392,10 +392,10 @@ function AppClntAth010({ isOpen = false, visible, onClose, onSuccessRegister, on
             onOpenLogin();
         }
         else if (onNavigate) {
-            onNavigate('APP-CLNT-ATH-000');
+            onNavigate('APP-CLNT-ATH-010100');
         }
         else if (navigation?.navigate) {
-            navigation.navigate('APP-CLNT-ATH-000');
+            navigation.navigate('APP-CLNT-ATH-010100');
         }
         else if (onClose) {
             onClose();
@@ -408,7 +408,7 @@ function AppClntAth010({ isOpen = false, visible, onClose, onSuccessRegister, on
             onClose();
         }
         else if (onNavigate) {
-            onNavigate('APP-CLNT-COM-000');
+            onNavigate('APP-CLNT-COM-010000');
         }
         else if (navigation?.goBack) {
             navigation.goBack();
@@ -513,7 +513,7 @@ function AppClntAth010({ isOpen = false, visible, onClose, onSuccessRegister, on
             },
         ];
         try {
-            const res = await fetch('/api/app/client/ath_010', {
+            const res = await fetch('/api/app/client/ath_010200', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -573,7 +573,7 @@ function AppClntAth010({ isOpen = false, visible, onClose, onSuccessRegister, on
                 React.createElement("div", { className: "flex items-center gap-1.5 text-secondary font-label-sm text-label-sm" },
                     React.createElement("span", { className: "material-symbols-outlined text-[16px]" }, "verified_user"),
                     React.createElement("span", { className: "font-semibold tracking-tight" }, "KISA & \uAE08\uC735\uC704 \uAC00\uC774\uB4DC\uB77C\uC778 \uC900\uC218 \uC804\uC790\uC11C\uBA85")),
-                React.createElement("span", { className: "text-on-surface-variant font-caption text-caption" }, "\uD654\uBA74 ID: APP-CLNT-ATH-010")),
+                React.createElement("span", { className: "text-on-surface-variant font-caption text-caption" }, "\uD654\uBA74 ID: APP-CLNT-ATH-010200")),
             React.createElement("div", { className: "overflow-y-auto px-5 sm:px-7 pt-5 pb-8 space-y-5 flex-1 scroll-smooth", id: "app-modal-scroll-pane" },
                 React.createElement("header", { className: "flex items-start justify-between gap-3" },
                     React.createElement("div", { className: "flex items-start gap-3" },
@@ -807,7 +807,7 @@ function AppClntAth010({ isOpen = false, visible, onClose, onSuccessRegister, on
                         React.createElement("span", { className: "material-symbols-outlined text-[20px]" }, "arrow_forward")))),
                     React.createElement("div", { className: "text-center font-body-sm text-body-sm text-on-surface-variant flex items-center justify-center gap-1.5 pb-2" },
                         React.createElement("span", null, "\uC774\uBBF8 \uACC4\uC815\uC774 \uC788\uC73C\uC2E0\uAC00\uC694?"),
-                        React.createElement("button", { className: "text-primary font-semibold hover:underline cursor-pointer", onClick: handleGoToLogin, type: "button" }, "\uB85C\uADF8\uC778\uD558\uAE30 (APP-CLNT-ATH-000)"))))),
+                        React.createElement("button", { className: "text-primary font-semibold hover:underline cursor-pointer", onClick: handleGoToLogin, type: "button" }, "\uB85C\uADF8\uC778\uD558\uAE30 (APP-CLNT-ATH-010100)"))))),
         alertModal.isOpen && (React.createElement("div", { className: "fixed inset-0 z-[120] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in", role: "dialog", "aria-modal": "true" },
             React.createElement("div", { className: "bg-surface-container-lowest rounded-3xl max-w-sm w-full p-6 shadow-2xl border border-slate-200/80 text-center animate-in zoom-in-95 space-y-4" },
                 React.createElement("div", { className: "w-12 h-12 rounded-full bg-error-container text-error flex items-center justify-center mx-auto shadow-sm" },
@@ -838,8 +838,8 @@ function AppClntAth010({ isOpen = false, visible, onClose, onSuccessRegister, on
 }
 
 if (typeof window !== 'undefined') {
-  window.AppClntAth010 = AppClntAth010;
-  console.log('✅ APP-CLNT-ATH-010 Mobile Screen registered to window.AppClntAth010');
+  window.AppClntAth010200 = AppClntAth010200;
+  console.log('✅ APP-CLNT-ATH-010200 Mobile Screen registered to window.AppClntAth010200');
 }
 
 })();

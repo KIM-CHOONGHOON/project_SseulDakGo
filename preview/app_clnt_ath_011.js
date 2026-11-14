@@ -1,7 +1,7 @@
 (function() {
 const { useState, useEffect, useRef } = window.React;
 const React = window.React;
-function AppClntAth011({ isOpen = true, visible, userInfo = null, onClose, onOpenRequestModal, onNavigate, navigation }) {
+function AppClntAth010200201({ isOpen = true, visible, userInfo = null, onClose, onOpenRequestModal, onNavigate, navigation }) {
     const [profile, setProfile] = useState({
         userNo: userInfo?.userNo || 'C20261100001',
         userNm: userInfo?.userNm || '고객',
@@ -48,7 +48,7 @@ function AppClntAth011({ isOpen = true, visible, userInfo = null, onClose, onOpe
         const fetchUserInfo = async () => {
             try {
                 setIsLoading(true);
-                const res = await fetch('/api/app/client/ath_011', {
+                const res = await fetch('/api/app/client/ath_010200201', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ userNo: effectiveUserNo })
@@ -71,7 +71,7 @@ function AppClntAth011({ isOpen = true, visible, userInfo = null, onClose, onOpe
                 }
             }
             catch (err) {
-                console.warn('[APP-CLNT-ATH-011] 모바일 회원 정보 및 약관 조회 실패:', err);
+                console.warn('[APP-CLNT-ATH-010200201] 모바일 회원 정보 및 약관 조회 실패:', err);
             }
             finally {
                 setIsLoading(false);
@@ -146,7 +146,7 @@ function AppClntAth011({ isOpen = true, visible, userInfo = null, onClose, onOpe
             setIsUpdatingSign(true);
             triggerHaptic('MEDIUM');
             const signDataUrl = canvas.toDataURL('image/png');
-            const res = await fetch('/api/app/client/ath_011', {
+            const res = await fetch('/api/app/client/ath_010200201', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -183,10 +183,10 @@ function AppClntAth011({ isOpen = true, visible, userInfo = null, onClose, onOpe
             onOpenRequestModal();
         }
         else if (onNavigate) {
-            onNavigate('APP-CLNT-REQ-000');
+            onNavigate('APP-CLNT-REQ-010100');
         }
         else if (navigation?.navigate) {
-            navigation.navigate('APP-CLNT-REQ-000');
+            navigation.navigate('APP-CLNT-REQ-010100');
         }
     };
     const handleDismiss = () => {
@@ -195,7 +195,7 @@ function AppClntAth011({ isOpen = true, visible, userInfo = null, onClose, onOpe
             onClose();
         }
         else if (onNavigate) {
-            onNavigate('APP-CLNT-COM-000');
+            onNavigate('APP-CLNT-COM-010000');
         }
         else if (navigation?.goBack) {
             navigation.goBack();
@@ -341,8 +341,8 @@ function AppClntAth011({ isOpen = true, visible, userInfo = null, onClose, onOpe
 }
 
 if (typeof window !== 'undefined') {
-  window.AppClntAth011 = AppClntAth011;
-  console.log('✅ APP-CLNT-ATH-011 Mobile Screen registered to window.AppClntAth011');
+  window.AppClntAth010200201 = AppClntAth010200201;
+  console.log('✅ APP-CLNT-ATH-010200201 Mobile Screen registered to window.AppClntAth010200201');
 }
 
 })();

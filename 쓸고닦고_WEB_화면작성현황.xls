@@ -1,0 +1,320 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?mso-application progid="Excel.Sheet"?>
+<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
+ xmlns:o="urn:schemas-microsoft-com:office:office"
+ xmlns:x="urn:schemas-microsoft-com:office:excel"
+ xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"
+ xmlns:html="http://www.w3.org/TR/REC-html40">
+ <Styles>
+  <Style ss:ID="Default" ss:Name="Normal"><Font ss:FontName="맑은 고딕" ss:Size="10"/></Style>
+  <Style ss:ID="sTitle"><Font ss:FontName="맑은 고딕" ss:Size="14" ss:Bold="1" ss:Color="#1F497D"/></Style>
+  <Style ss:ID="sHeader"><Font ss:FontName="맑은 고딕" ss:Size="10" ss:Bold="1" ss:Color="#FFFFFF"/><Interior ss:Color="#1F497D" ss:Pattern="Solid"/><Alignment ss:Horizontal="Center" ss:Vertical="Center"/><Borders><Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/><Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/><Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/><Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/></Borders></Style>
+  <Style ss:ID="sCenter"><Alignment ss:Horizontal="Center" ss:Vertical="Center"/><Borders><Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/><Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/><Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/><Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/></Borders></Style>
+  <Style ss:ID="sLeft"><Alignment ss:Horizontal="Left" ss:Vertical="Center"/><Borders><Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/><Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/><Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/><Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/></Borders></Style>
+  <Style ss:ID="sTotal"><Font ss:FontName="맑은 고딕" ss:Size="10" ss:Bold="1"/><Interior ss:Color="#E2E8F0" ss:Pattern="Solid"/><Alignment ss:Horizontal="Center" ss:Vertical="Center"/><Borders><Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/><Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/><Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/><Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/></Borders></Style>
+ </Styles>
+ <Worksheet ss:Name="전체현황요약">
+  <Table ss:DefaultRowHeight="20">
+   <Column ss:Width="160"/>
+   <Column ss:Width="120"/>
+   <Column ss:Width="100"/>
+   <Column ss:Width="100"/>
+   <Column ss:Width="100"/>
+   <Row ss:Height="30"><Cell ss:StyleID="sTitle"><Data ss:Type="String">■ [쓸고닦고] WEB 프론트엔드 전체 화면 작성 현황 요약</Data></Cell></Row>
+   <Row><Cell><Data ss:Type="String">기준일시: 2026-11-13 | 전체 대상 화면: 총 28개</Data></Cell></Row>
+   <Row ss:Height="10"/>
+   <Row ss:Height="25">
+    <Cell ss:StyleID="sHeader"><Data ss:Type="String">도메인 구분</Data></Cell>
+    <Cell ss:StyleID="sHeader"><Data ss:Type="String">전체 대상 화면 수</Data></Cell>
+    <Cell ss:StyleID="sHeader"><Data ss:Type="String">화면작성완료</Data></Cell>
+    <Cell ss:StyleID="sHeader"><Data ss:Type="String">미완료</Data></Cell>
+    <Cell ss:StyleID="sHeader"><Data ss:Type="String">진척도</Data></Cell>
+   </Row>
+   <Row><Cell ss:StyleID="sCenter"><Data ss:Type="String">1. 고객 영역 (Client)</Data></Cell><Cell ss:StyleID="sCenter"><Data ss:Type="Number">10</Data></Cell><Cell ss:StyleID="sCenter"><Data ss:Type="Number">9</Data></Cell><Cell ss:StyleID="sCenter"><Data ss:Type="Number">1</Data></Cell><Cell ss:StyleID="sCenter"><Data ss:Type="String">90.0%</Data></Cell></Row>
+   <Row><Cell ss:StyleID="sCenter"><Data ss:Type="String">2. 용역 영역 (Service)</Data></Cell><Cell ss:StyleID="sCenter"><Data ss:Type="Number">10</Data></Cell><Cell ss:StyleID="sCenter"><Data ss:Type="Number">0</Data></Cell><Cell ss:StyleID="sCenter"><Data ss:Type="Number">10</Data></Cell><Cell ss:StyleID="sCenter"><Data ss:Type="String">0.0%</Data></Cell></Row>
+   <Row><Cell ss:StyleID="sCenter"><Data ss:Type="String">3. 관리자 영역 (Admin)</Data></Cell><Cell ss:StyleID="sCenter"><Data ss:Type="Number">8</Data></Cell><Cell ss:StyleID="sCenter"><Data ss:Type="Number">0</Data></Cell><Cell ss:StyleID="sCenter"><Data ss:Type="Number">8</Data></Cell><Cell ss:StyleID="sCenter"><Data ss:Type="String">0.0%</Data></Cell></Row>
+   <Row ss:Height="24"><Cell ss:StyleID="sTotal"><Data ss:Type="String">합계</Data></Cell><Cell ss:StyleID="sTotal"><Data ss:Type="Number">28</Data></Cell><Cell ss:StyleID="sTotal"><Data ss:Type="Number">9</Data></Cell><Cell ss:StyleID="sTotal"><Data ss:Type="Number">19</Data></Cell><Cell ss:StyleID="sTotal"><Data ss:Type="String">32.1%</Data></Cell></Row>
+  </Table>
+ </Worksheet>
+ <Worksheet ss:Name="고객영역(Client)">
+  <Table ss:DefaultRowHeight="20">
+   <Column ss:Width="50"/>
+   <Column ss:Width="140"/>
+   <Column ss:Width="100"/>
+   <Column ss:Width="260"/>
+   <Column ss:Width="380"/>
+   <Column ss:Width="100"/>
+   <Row ss:Height="30"><Cell ss:StyleID="sTitle"><Data ss:Type="String">■ 고객영역(Client) 목록</Data></Cell></Row>
+   <Row ss:Height="25">
+    <Cell ss:StyleID="sHeader"><Data ss:Type="String">No</Data></Cell>
+    <Cell ss:StyleID="sHeader"><Data ss:Type="String">화면 ID</Data></Cell>
+    <Cell ss:StyleID="sHeader"><Data ss:Type="String">화면 구분</Data></Cell>
+    <Cell ss:StyleID="sHeader"><Data ss:Type="String">화면명</Data></Cell>
+    <Cell ss:StyleID="sHeader"><Data ss:Type="String">프론트엔드 파일 경로</Data></Cell>
+    <Cell ss:StyleID="sHeader"><Data ss:Type="String">작성 상태</Data></Cell>
+   </Row>
+   <Row>
+    <Cell ss:StyleID="sCenter"><Data ss:Type="Number">1</Data></Cell>
+    <Cell ss:StyleID="sCenter"><Data ss:Type="String">WEB-CLNT-COM-010000</Data></Cell>
+    <Cell ss:StyleID="sCenter"><Data ss:Type="String">Main</Data></Cell>
+    <Cell ss:StyleID="sLeft"><Data ss:Type="String">고객 메인 홈</Data></Cell>
+    <Cell ss:StyleID="sLeft"><Data ss:Type="String">SseulDakGo_Web/Client/frontend/WEB-CLNT-COM-010000/index.jsx</Data></Cell>
+    <Cell ss:StyleID="sCenter"><Data ss:Type="String">화면작성완료</Data></Cell>
+   </Row>
+   <Row>
+    <Cell ss:StyleID="sCenter"><Data ss:Type="Number">2</Data></Cell>
+    <Cell ss:StyleID="sCenter"><Data ss:Type="String">WEB-CLNT-REQ-010100</Data></Cell>
+    <Cell ss:StyleID="sCenter"><Data ss:Type="String">Sub (모달)</Data></Cell>
+    <Cell ss:StyleID="sLeft"><Data ss:Type="String">청소 서비스 신청 (발주서 작성)</Data></Cell>
+    <Cell ss:StyleID="sLeft"><Data ss:Type="String">SseulDakGo_Web/Client/frontend/WEB-CLNT-REQ-010100/index.jsx</Data></Cell>
+    <Cell ss:StyleID="sCenter"><Data ss:Type="String">화면작성완료</Data></Cell>
+   </Row>
+   <Row>
+    <Cell ss:StyleID="sCenter"><Data ss:Type="Number">3</Data></Cell>
+    <Cell ss:StyleID="sCenter"><Data ss:Type="String">WEB-CLNT-REQ-010101</Data></Cell>
+    <Cell ss:StyleID="sCenter"><Data ss:Type="String">Sub (모달)</Data></Cell>
+    <Cell ss:StyleID="sLeft"><Data ss:Type="String">동일 시공 현장 주소 확인 및 변경 안내</Data></Cell>
+    <Cell ss:StyleID="sLeft"><Data ss:Type="String">SseulDakGo_Web/Client/frontend/WEB-CLNT-REQ-010101/index.jsx</Data></Cell>
+    <Cell ss:StyleID="sCenter"><Data ss:Type="String">화면작성완료</Data></Cell>
+   </Row>
+   <Row>
+    <Cell ss:StyleID="sCenter"><Data ss:Type="Number">4</Data></Cell>
+    <Cell ss:StyleID="sCenter"><Data ss:Type="String">WEB-CLNT-ATH-010100</Data></Cell>
+    <Cell ss:StyleID="sCenter"><Data ss:Type="String">Sub (모달)</Data></Cell>
+    <Cell ss:StyleID="sLeft"><Data ss:Type="String">고객 로그인</Data></Cell>
+    <Cell ss:StyleID="sLeft"><Data ss:Type="String">SseulDakGo_Web/Client/frontend/WEB-CLNT-ATH-010100/index.jsx</Data></Cell>
+    <Cell ss:StyleID="sCenter"><Data ss:Type="String">화면작성완료</Data></Cell>
+   </Row>
+   <Row>
+    <Cell ss:StyleID="sCenter"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="sCenter"><Data ss:Type="String">WEB-CLNT-ATH-010200</Data></Cell>
+    <Cell ss:StyleID="sCenter"><Data ss:Type="String">Sub (모달)</Data></Cell>
+    <Cell ss:StyleID="sLeft"><Data ss:Type="String">통합 회원가입 및 약관동의 서명</Data></Cell>
+    <Cell ss:StyleID="sLeft"><Data ss:Type="String">SseulDakGo_Web/Client/frontend/WEB-CLNT-ATH-010200/index.jsx</Data></Cell>
+    <Cell ss:StyleID="sCenter"><Data ss:Type="String">화면작성완료</Data></Cell>
+   </Row>
+   <Row>
+    <Cell ss:StyleID="sCenter"><Data ss:Type="Number">6</Data></Cell>
+    <Cell ss:StyleID="sCenter"><Data ss:Type="String">WEB-CLNT-ATH-010201</Data></Cell>
+    <Cell ss:StyleID="sCenter"><Data ss:Type="String">Sub (모달)</Data></Cell>
+    <Cell ss:StyleID="sLeft"><Data ss:Type="String">고객 가입 완료 환영 안내</Data></Cell>
+    <Cell ss:StyleID="sLeft"><Data ss:Type="String">SseulDakGo_Web/Client/frontend/WEB-CLNT-ATH-010201/index.jsx</Data></Cell>
+    <Cell ss:StyleID="sCenter"><Data ss:Type="String">화면작성완료</Data></Cell>
+   </Row>
+   <Row>
+    <Cell ss:StyleID="sCenter"><Data ss:Type="Number">7</Data></Cell>
+    <Cell ss:StyleID="sCenter"><Data ss:Type="String">WEB-CLNT-ORD-010000</Data></Cell>
+    <Cell ss:StyleID="sCenter"><Data ss:Type="String">Main</Data></Cell>
+    <Cell ss:StyleID="sLeft"><Data ss:Type="String">나의 청소 신청 현황</Data></Cell>
+    <Cell ss:StyleID="sLeft"><Data ss:Type="String">SseulDakGo_Web/Client/frontend/WEB-CLNT-ORD-010000/index.jsx</Data></Cell>
+    <Cell ss:StyleID="sCenter"><Data ss:Type="String">화면작성완료</Data></Cell>
+   </Row>
+   <Row>
+    <Cell ss:StyleID="sCenter"><Data ss:Type="Number">8</Data></Cell>
+    <Cell ss:StyleID="sCenter"><Data ss:Type="String">WEB-CLNT-ORD-010100</Data></Cell>
+    <Cell ss:StyleID="sCenter"><Data ss:Type="String">Sub</Data></Cell>
+    <Cell ss:StyleID="sLeft"><Data ss:Type="String">청소 요청 상세 및 용역 청약서 비교/선택</Data></Cell>
+    <Cell ss:StyleID="sLeft"><Data ss:Type="String">SseulDakGo_Web/Client/frontend/WEB-CLNT-ORD-010100/index.jsx</Data></Cell>
+    <Cell ss:StyleID="sCenter"><Data ss:Type="String">화면작성완료</Data></Cell>
+   </Row>
+   <Row>
+    <Cell ss:StyleID="sCenter"><Data ss:Type="Number">9</Data></Cell>
+    <Cell ss:StyleID="sCenter"><Data ss:Type="String">WEB-CLNT-PAY-010100</Data></Cell>
+    <Cell ss:StyleID="sCenter"><Data ss:Type="String">Sub (모달)</Data></Cell>
+    <Cell ss:StyleID="sLeft"><Data ss:Type="String">고객 데이터 이용료 결제 및 배타적 계약 확정</Data></Cell>
+    <Cell ss:StyleID="sLeft"><Data ss:Type="String">SseulDakGo_Web/Client/frontend/WEB-CLNT-PAY-010100/index.jsx</Data></Cell>
+    <Cell ss:StyleID="sCenter"><Data ss:Type="String">화면작성완료</Data></Cell>
+   </Row>
+   <Row>
+    <Cell ss:StyleID="sCenter"><Data ss:Type="Number">10</Data></Cell>
+    <Cell ss:StyleID="sCenter"><Data ss:Type="String">WEB-CLNT-JOB-010100</Data></Cell>
+    <Cell ss:StyleID="sCenter"><Data ss:Type="String">Sub</Data></Cell>
+    <Cell ss:StyleID="sLeft"><Data ss:Type="String">청소 시공 검수 및 현장 직불 완료 승인</Data></Cell>
+    <Cell ss:StyleID="sLeft"><Data ss:Type="String">SseulDakGo_Web/Client/frontend/WEB-CLNT-JOB-010100/index.jsx</Data></Cell>
+    <Cell ss:StyleID="sCenter"><Data ss:Type="String">화면작성완료</Data></Cell>
+   </Row>
+  </Table>
+ </Worksheet>
+ <Worksheet ss:Name="용역영역(Service)">
+  <Table ss:DefaultRowHeight="20">
+   <Column ss:Width="50"/>
+   <Column ss:Width="140"/>
+   <Column ss:Width="100"/>
+   <Column ss:Width="260"/>
+   <Column ss:Width="380"/>
+   <Column ss:Width="100"/>
+   <Row ss:Height="30"><Cell ss:StyleID="sTitle"><Data ss:Type="String">■ 용역영역(Service) 목록</Data></Cell></Row>
+   <Row ss:Height="25">
+    <Cell ss:StyleID="sHeader"><Data ss:Type="String">No</Data></Cell>
+    <Cell ss:StyleID="sHeader"><Data ss:Type="String">화면 ID</Data></Cell>
+    <Cell ss:StyleID="sHeader"><Data ss:Type="String">화면 구분</Data></Cell>
+    <Cell ss:StyleID="sHeader"><Data ss:Type="String">화면명</Data></Cell>
+    <Cell ss:StyleID="sHeader"><Data ss:Type="String">프론트엔드 파일 경로</Data></Cell>
+    <Cell ss:StyleID="sHeader"><Data ss:Type="String">작성 상태</Data></Cell>
+   </Row>
+   <Row>
+    <Cell ss:StyleID="sCenter"><Data ss:Type="Number">1</Data></Cell>
+    <Cell ss:StyleID="sCenter"><Data ss:Type="String">WEB-SRVC-MAIN-010000</Data></Cell>
+    <Cell ss:StyleID="sCenter"><Data ss:Type="String">Main</Data></Cell>
+    <Cell ss:StyleID="sLeft"><Data ss:Type="String">용역 서비스 메인 홈</Data></Cell>
+    <Cell ss:StyleID="sLeft"><Data ss:Type="String">SseulDakGo_Web/Service/frontend/WEB-SRVC-MAIN-010000/index.jsx</Data></Cell>
+    <Cell ss:StyleID="sCenter"><Data ss:Type="String">미완료</Data></Cell>
+   </Row>
+   <Row>
+    <Cell ss:StyleID="sCenter"><Data ss:Type="Number">2</Data></Cell>
+    <Cell ss:StyleID="sCenter"><Data ss:Type="String">WEB-SRVC-ATH-010100</Data></Cell>
+    <Cell ss:StyleID="sCenter"><Data ss:Type="String">Sub (모달)</Data></Cell>
+    <Cell ss:StyleID="sLeft"><Data ss:Type="String">용역 서비스 로그인</Data></Cell>
+    <Cell ss:StyleID="sLeft"><Data ss:Type="String">SseulDakGo_Web/Service/frontend/WEB-SRVC-ATH-010100/index.jsx</Data></Cell>
+    <Cell ss:StyleID="sCenter"><Data ss:Type="String">미완료</Data></Cell>
+   </Row>
+   <Row>
+    <Cell ss:StyleID="sCenter"><Data ss:Type="Number">3</Data></Cell>
+    <Cell ss:StyleID="sCenter"><Data ss:Type="String">WEB-SRVC-ATH-020000</Data></Cell>
+    <Cell ss:StyleID="sCenter"><Data ss:Type="String">Main</Data></Cell>
+    <Cell ss:StyleID="sLeft"><Data ss:Type="String">사업자등록증 원본 업로드 및 OCR AI 진위 검증</Data></Cell>
+    <Cell ss:StyleID="sLeft"><Data ss:Type="String">SseulDakGo_Web/Service/frontend/WEB-SRVC-ATH-020000/index.jsx</Data></Cell>
+    <Cell ss:StyleID="sCenter"><Data ss:Type="String">미완료</Data></Cell>
+   </Row>
+   <Row>
+    <Cell ss:StyleID="sCenter"><Data ss:Type="Number">4</Data></Cell>
+    <Cell ss:StyleID="sCenter"><Data ss:Type="String">WEB-SRVC-ATH-030000</Data></Cell>
+    <Cell ss:StyleID="sCenter"><Data ss:Type="String">Main</Data></Cell>
+    <Cell ss:StyleID="sLeft"><Data ss:Type="String">용역 위탁계약서 및 전자서명</Data></Cell>
+    <Cell ss:StyleID="sLeft"><Data ss:Type="String">SseulDakGo_Web/Service/frontend/WEB-SRVC-ATH-030000/index.jsx</Data></Cell>
+    <Cell ss:StyleID="sCenter"><Data ss:Type="String">미완료</Data></Cell>
+   </Row>
+   <Row>
+    <Cell ss:StyleID="sCenter"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="sCenter"><Data ss:Type="String">WEB-SRVC-ORD-010000</Data></Cell>
+    <Cell ss:StyleID="sCenter"><Data ss:Type="String">Main</Data></Cell>
+    <Cell ss:StyleID="sLeft"><Data ss:Type="String">실시간 청소 발주 공고 목록</Data></Cell>
+    <Cell ss:StyleID="sLeft"><Data ss:Type="String">SseulDakGo_Web/Service/frontend/WEB-SRVC-ORD-010000/index.jsx</Data></Cell>
+    <Cell ss:StyleID="sCenter"><Data ss:Type="String">미완료</Data></Cell>
+   </Row>
+   <Row>
+    <Cell ss:StyleID="sCenter"><Data ss:Type="Number">6</Data></Cell>
+    <Cell ss:StyleID="sCenter"><Data ss:Type="String">WEB-SRVC-ORD-010100</Data></Cell>
+    <Cell ss:StyleID="sCenter"><Data ss:Type="String">Sub (모달)</Data></Cell>
+    <Cell ss:StyleID="sLeft"><Data ss:Type="String">청소 발주 상세 정보 (고객 확정가 확인)</Data></Cell>
+    <Cell ss:StyleID="sLeft"><Data ss:Type="String">SseulDakGo_Web/Service/frontend/WEB-SRVC-ORD-010100/index.jsx</Data></Cell>
+    <Cell ss:StyleID="sCenter"><Data ss:Type="String">미완료</Data></Cell>
+   </Row>
+   <Row>
+    <Cell ss:StyleID="sCenter"><Data ss:Type="Number">7</Data></Cell>
+    <Cell ss:StyleID="sCenter"><Data ss:Type="String">WEB-SRVC-QOT-010100</Data></Cell>
+    <Cell ss:StyleID="sCenter"><Data ss:Type="String">Sub (모달)</Data></Cell>
+    <Cell ss:StyleID="sLeft"><Data ss:Type="String">청약서 작성 및 방문 일정 제안</Data></Cell>
+    <Cell ss:StyleID="sLeft"><Data ss:Type="String">SseulDakGo_Web/Service/frontend/WEB-SRVC-QOT-010100/index.jsx</Data></Cell>
+    <Cell ss:StyleID="sCenter"><Data ss:Type="String">미완료</Data></Cell>
+   </Row>
+   <Row>
+    <Cell ss:StyleID="sCenter"><Data ss:Type="Number">8</Data></Cell>
+    <Cell ss:StyleID="sCenter"><Data ss:Type="String">WEB-SRVC-JOB-010000</Data></Cell>
+    <Cell ss:StyleID="sCenter"><Data ss:Type="String">Main</Data></Cell>
+    <Cell ss:StyleID="sLeft"><Data ss:Type="String">시공 작업 관리 및 캘린더</Data></Cell>
+    <Cell ss:StyleID="sLeft"><Data ss:Type="String">SseulDakGo_Web/Service/frontend/WEB-SRVC-JOB-010000/index.jsx</Data></Cell>
+    <Cell ss:StyleID="sCenter"><Data ss:Type="String">미완료</Data></Cell>
+   </Row>
+   <Row>
+    <Cell ss:StyleID="sCenter"><Data ss:Type="Number">9</Data></Cell>
+    <Cell ss:StyleID="sCenter"><Data ss:Type="String">WEB-SRVC-JOB-010100</Data></Cell>
+    <Cell ss:StyleID="sCenter"><Data ss:Type="String">Sub</Data></Cell>
+    <Cell ss:StyleID="sLeft"><Data ss:Type="String">시공 전/후 사진 등록 및 검수 요청</Data></Cell>
+    <Cell ss:StyleID="sLeft"><Data ss:Type="String">SseulDakGo_Web/Service/frontend/WEB-SRVC-JOB-010100/index.jsx</Data></Cell>
+    <Cell ss:StyleID="sCenter"><Data ss:Type="String">미완료</Data></Cell>
+   </Row>
+   <Row>
+    <Cell ss:StyleID="sCenter"><Data ss:Type="Number">10</Data></Cell>
+    <Cell ss:StyleID="sCenter"><Data ss:Type="String">WEB-SRVC-SET-010000</Data></Cell>
+    <Cell ss:StyleID="sCenter"><Data ss:Type="String">Main</Data></Cell>
+    <Cell ss:StyleID="sLeft"><Data ss:Type="String">용역 정산 및 활동 지역 설정</Data></Cell>
+    <Cell ss:StyleID="sLeft"><Data ss:Type="String">SseulDakGo_Web/Service/frontend/WEB-SRVC-SET-010000/index.jsx</Data></Cell>
+    <Cell ss:StyleID="sCenter"><Data ss:Type="String">미완료</Data></Cell>
+   </Row>
+  </Table>
+ </Worksheet>
+ <Worksheet ss:Name="관리자영역(Admin)">
+  <Table ss:DefaultRowHeight="20">
+   <Column ss:Width="50"/>
+   <Column ss:Width="140"/>
+   <Column ss:Width="100"/>
+   <Column ss:Width="260"/>
+   <Column ss:Width="380"/>
+   <Column ss:Width="100"/>
+   <Row ss:Height="30"><Cell ss:StyleID="sTitle"><Data ss:Type="String">■ 관리자영역(Admin) 목록</Data></Cell></Row>
+   <Row ss:Height="25">
+    <Cell ss:StyleID="sHeader"><Data ss:Type="String">No</Data></Cell>
+    <Cell ss:StyleID="sHeader"><Data ss:Type="String">화면 ID</Data></Cell>
+    <Cell ss:StyleID="sHeader"><Data ss:Type="String">화면 구분</Data></Cell>
+    <Cell ss:StyleID="sHeader"><Data ss:Type="String">화면명</Data></Cell>
+    <Cell ss:StyleID="sHeader"><Data ss:Type="String">프론트엔드 파일 경로</Data></Cell>
+    <Cell ss:StyleID="sHeader"><Data ss:Type="String">작성 상태</Data></Cell>
+   </Row>
+   <Row>
+    <Cell ss:StyleID="sCenter"><Data ss:Type="Number">1</Data></Cell>
+    <Cell ss:StyleID="sCenter"><Data ss:Type="String">WEB-ADMN-DSH-010000</Data></Cell>
+    <Cell ss:StyleID="sCenter"><Data ss:Type="String">Main</Data></Cell>
+    <Cell ss:StyleID="sLeft"><Data ss:Type="String">전국 종합 관제 대시보드</Data></Cell>
+    <Cell ss:StyleID="sLeft"><Data ss:Type="String">SseulDakGo_Web/Admin/frontend/WEB-ADMN-DSH-010000/index.jsx</Data></Cell>
+    <Cell ss:StyleID="sCenter"><Data ss:Type="String">미완료</Data></Cell>
+   </Row>
+   <Row>
+    <Cell ss:StyleID="sCenter"><Data ss:Type="Number">2</Data></Cell>
+    <Cell ss:StyleID="sCenter"><Data ss:Type="String">WEB-ADMN-ATH-010000</Data></Cell>
+    <Cell ss:StyleID="sCenter"><Data ss:Type="String">Main</Data></Cell>
+    <Cell ss:StyleID="sLeft"><Data ss:Type="String">관리자 보안 로그인 (OTP 2차 인증)</Data></Cell>
+    <Cell ss:StyleID="sLeft"><Data ss:Type="String">SseulDakGo_Web/Admin/frontend/WEB-ADMN-ATH-010000/index.jsx</Data></Cell>
+    <Cell ss:StyleID="sCenter"><Data ss:Type="String">미완료</Data></Cell>
+   </Row>
+   <Row>
+    <Cell ss:StyleID="sCenter"><Data ss:Type="Number">3</Data></Cell>
+    <Cell ss:StyleID="sCenter"><Data ss:Type="String">WEB-ADMN-ORD-010000</Data></Cell>
+    <Cell ss:StyleID="sCenter"><Data ss:Type="String">Main</Data></Cell>
+    <Cell ss:StyleID="sLeft"><Data ss:Type="String">청소 발주 및 계약 체결 관제</Data></Cell>
+    <Cell ss:StyleID="sLeft"><Data ss:Type="String">SseulDakGo_Web/Admin/frontend/WEB-ADMN-ORD-010000/index.jsx</Data></Cell>
+    <Cell ss:StyleID="sCenter"><Data ss:Type="String">미완료</Data></Cell>
+   </Row>
+   <Row>
+    <Cell ss:StyleID="sCenter"><Data ss:Type="Number">4</Data></Cell>
+    <Cell ss:StyleID="sCenter"><Data ss:Type="String">WEB-ADMN-ALC-010000</Data></Cell>
+    <Cell ss:StyleID="sCenter"><Data ss:Type="String">Main</Data></Cell>
+    <Cell ss:StyleID="sLeft"><Data ss:Type="String">외부 플랫폼 제휴 및 정보이용료 정산 관제</Data></Cell>
+    <Cell ss:StyleID="sLeft"><Data ss:Type="String">SseulDakGo_Web/Admin/frontend/WEB-ADMN-ALC-010000/index.jsx</Data></Cell>
+    <Cell ss:StyleID="sCenter"><Data ss:Type="String">미완료</Data></Cell>
+   </Row>
+   <Row>
+    <Cell ss:StyleID="sCenter"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="sCenter"><Data ss:Type="String">WEB-ADMN-ALC-010100</Data></Cell>
+    <Cell ss:StyleID="sCenter"><Data ss:Type="String">Sub (모달)</Data></Cell>
+    <Cell ss:StyleID="sLeft"><Data ss:Type="String">제휴 거래 상세 내역 및 정산 산출 근거</Data></Cell>
+    <Cell ss:StyleID="sLeft"><Data ss:Type="String">SseulDakGo_Web/Admin/frontend/WEB-ADMN-ALC-010100/index.jsx</Data></Cell>
+    <Cell ss:StyleID="sCenter"><Data ss:Type="String">미완료</Data></Cell>
+   </Row>
+   <Row>
+    <Cell ss:StyleID="sCenter"><Data ss:Type="Number">6</Data></Cell>
+    <Cell ss:StyleID="sCenter"><Data ss:Type="String">WEB-ADMN-PTN-010000</Data></Cell>
+    <Cell ss:StyleID="sCenter"><Data ss:Type="String">Main</Data></Cell>
+    <Cell ss:StyleID="sLeft"><Data ss:Type="String">용역 서비스 입점 심사 및 서류 검증</Data></Cell>
+    <Cell ss:StyleID="sLeft"><Data ss:Type="String">SseulDakGo_Web/Admin/frontend/WEB-ADMN-PTN-010000/index.jsx</Data></Cell>
+    <Cell ss:StyleID="sCenter"><Data ss:Type="String">미완료</Data></Cell>
+   </Row>
+   <Row>
+    <Cell ss:StyleID="sCenter"><Data ss:Type="Number">7</Data></Cell>
+    <Cell ss:StyleID="sCenter"><Data ss:Type="String">WEB-ADMN-DSP-010000</Data></Cell>
+    <Cell ss:StyleID="sCenter"><Data ss:Type="String">Main</Data></Cell>
+    <Cell ss:StyleID="sLeft"><Data ss:Type="String">거래 취소 및 분쟁 중재 콘솔</Data></Cell>
+    <Cell ss:StyleID="sLeft"><Data ss:Type="String">SseulDakGo_Web/Admin/frontend/WEB-ADMN-DSP-010000/index.jsx</Data></Cell>
+    <Cell ss:StyleID="sCenter"><Data ss:Type="String">미완료</Data></Cell>
+   </Row>
+   <Row>
+    <Cell ss:StyleID="sCenter"><Data ss:Type="Number">8</Data></Cell>
+    <Cell ss:StyleID="sCenter"><Data ss:Type="String">WEB-ADMN-SYS-010000</Data></Cell>
+    <Cell ss:StyleID="sCenter"><Data ss:Type="String">Main</Data></Cell>
+    <Cell ss:StyleID="sLeft"><Data ss:Type="String">시스템 공통 코드 및 정책 설정</Data></Cell>
+    <Cell ss:StyleID="sLeft"><Data ss:Type="String">SseulDakGo_Web/Admin/frontend/WEB-ADMN-SYS-010000/index.jsx</Data></Cell>
+    <Cell ss:StyleID="sCenter"><Data ss:Type="String">미완료</Data></Cell>
+   </Row>
+  </Table>
+ </Worksheet>
+</Workbook>

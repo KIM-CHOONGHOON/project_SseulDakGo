@@ -24,7 +24,7 @@ function triggerHaptic(style = 'LIGHT') {
         // 햅틱 미지원 무시
     }
 }
-function AppClntAth000({ isOpen = false, visible, onClose, onSuccessLogin, onOpenRegister, onOpenFindPwd, navigation, onNavigate, }) {
+function AppClntAth010100({ isOpen = false, visible, onClose, onSuccessLogin, onOpenRegister, onOpenFindPwd, navigation, onNavigate, }) {
     const isModalOpen = visible !== undefined ? visible : isOpen;
     // 1. 회원 구분 ('C': 고객 회원, 'S': 시공사 회원)
     const [role, setRole] = useState('C');
@@ -114,7 +114,7 @@ function AppClntAth000({ isOpen = false, visible, onClose, onSuccessLogin, onOpe
         }
         setIsLoading(true);
         try {
-            const res = await fetch('/api/app/client/ath_000', {
+            const res = await fetch('/api/app/client/ath_010100', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -213,7 +213,7 @@ function AppClntAth000({ isOpen = false, visible, onClose, onSuccessLogin, onOpe
         setIsLoading(true);
         setErrorMsg('');
         try {
-            const res = await fetch('/api/app/client/ath_000', {
+            const res = await fetch('/api/app/client/ath_010100', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -372,17 +372,17 @@ function AppClntAth000({ isOpen = false, visible, onClose, onSuccessLogin, onOpe
                         if (onOpenRegister)
                             onOpenRegister();
                         else if (onNavigate)
-                            onNavigate('APP-CLNT-ATH-010');
+                            onNavigate('APP-CLNT-ATH-010200');
                         else if (navigation?.navigate)
-                            navigation.navigate('APP-CLNT-ATH-010');
+                            navigation.navigate('APP-CLNT-ATH-010200');
                         else
                             alert('회원가입 페이지로 이동합니다.');
                     }, type: "button" }, "\uD68C\uC6D0\uAC00\uC785")))));
 }
 
 if (typeof window !== 'undefined') {
-  window.AppClntAth000 = AppClntAth000;
-  console.log('✅ APP-CLNT-ATH-000 Mobile Screen registered to window.AppClntAth000');
+  window.AppClntAth010100 = AppClntAth010100;
+  console.log('✅ APP-CLNT-ATH-010100 Mobile Screen registered to window.AppClntAth010100');
 }
 
 })();

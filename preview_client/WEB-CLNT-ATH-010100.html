@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>[WEB-CLNT-ATH-010100] 고객 로그인 - 쓸고닦고 프리뷰</title>
+  <link rel="icon" type="image/png" href="logo.png"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin=""/>
+  <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            primary: "#1F497D",
+            navy: "#1F497D",
+            teal: "#0D9488",
+            action: "#0D9488",
+            alert: "#EF4444",
+            warning: "#F59E0B",
+            success: "#10B981"
+          },
+          fontFamily: {
+            sans: ["Pretendard", "Inter", "-apple-system", "sans-serif"]
+          }
+        }
+      }
+    };
+  </script>
+  
+  <!-- React 18 & ReactDOM -->
+  <script src="https://cdn.jsdelivr.net/npm/react@18.3.1/umd/react.production.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/react-dom@18.3.1/umd/react-dom.production.min.js"></script>
+  <!-- Babel Standalone (JSX 실행 지원) -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <!-- Daum 주소 검색 SDK (https 명시로 file:/// 로컬 뷰어 호환) -->
+  <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+
+  <!-- [네이버 주소 검색 클라이언트 엔진 & 모의 백엔드 인터셉터] -->
+  <script>
+    window.COMPREHENSIVE_ADDRESS_DB = [{"roadAddress":"경기도 고양시 덕양구 토당로 105","jibunAddress":"경기도 고양시 덕양구 토당동 858-3","sido":"경기도","sidoCd":"41","sigungu":"고양시 덕양구","sigunguCd":"41287","dong":"토당동","bldNm":"토당동 복합건물 (능곡역 부근)","zonecode":"10508","x":"126.8182","y":"37.6253"},{"roadAddress":"경기도 고양시 덕양구 토당로 63","jibunAddress":"경기도 고양시 덕양구 토당동 394-1","sido":"경기도","sidoCd":"41","sigungu":"고양시 덕양구","sigunguCd":"41287","dong":"토당동","bldNm":"능곡 대림아파트 상가","zonecode":"10510","x":"126.8160","y":"37.6220"},{"roadAddress":"경기도 고양시 덕양구 지도로 35","jibunAddress":"경기도 고양시 덕양구 토당동 287-1","sido":"경기도","sidoCd":"41","sigungu":"고양시 덕양구","sigunguCd":"41287","dong":"토당동","bldNm":"지도농협 본점","zonecode":"10509","x":"126.8195","y":"37.6270"},{"roadAddress":"경기도 고양시 일산동구 중앙로 1261","jibunAddress":"경기도 고양시 일산동구 마두동 802-1","sido":"경기도","sidoCd":"41","sigungu":"고양시 일산동구","sigunguCd":"41281","dong":"마두동","bldNm":"삼혜빌딩 4층 (마두역 부근)","zonecode":"10414","x":"126.7778","y":"37.6521"},{"roadAddress":"경기도 고양시 일산동구 중앙로 1261번길 42","jibunAddress":"경기도 고양시 일산동구 마두동 801-2","sido":"경기도","sidoCd":"41","sigungu":"고양시 일산동구","sigunguCd":"41281","dong":"마두동","bldNm":"공간다원 프라자 4층","zonecode":"10414","x":"126.7778","y":"37.6521"},{"roadAddress":"경기도 고양시 일산동구 강석로 141","jibunAddress":"경기도 고양시 일산동구 마두동 123-4","sido":"경기도","sidoCd":"41","sigungu":"고양시 일산동구","sigunguCd":"41281","dong":"마두동","bldNm":"강촌마을 4층 빌라 공용부","zonecode":"10415","x":"126.7792","y":"37.6534"},{"roadAddress":"경기도 고양시 일산동구 일산로 200","jibunAddress":"경기도 고양시 일산동구 백석동 1324","sido":"경기도","sidoCd":"41","sigungu":"고양시 일산동구","sigunguCd":"41281","dong":"백석동","bldNm":"일산 와이시티 복합주거단지","zonecode":"10447","x":"126.7885","y":"37.6441"},{"roadAddress":"경기도 고양시 일산동구 백석로 71번길 18","jibunAddress":"경기도 고양시 일산동구 백석동 1280-5","sido":"경기도","sidoCd":"41","sigungu":"고양시 일산동구","sigunguCd":"41281","dong":"백석동","bldNm":"백석 현대밀라트 1차","zonecode":"10449","x":"126.7901","y":"37.6455"},{"roadAddress":"경기도 고양시 일산동구 중앙로 1275번길 38-10","jibunAddress":"경기도 고양시 일산동구 장항동 756-1","sido":"경기도","sidoCd":"41","sigungu":"고양시 일산동구","sigunguCd":"41281","dong":"장항동","bldNm":"라페스타 E동 상가","zonecode":"10402","x":"126.7698","y":"37.6591"},{"roadAddress":"경기도 고양시 일산동구 정발산로 24","jibunAddress":"경기도 고양시 일산동구 장항동 868","sido":"경기도","sidoCd":"41","sigungu":"고양시 일산동구","sigunguCd":"41281","dong":"장항동","bldNm":"웨스턴돔 타워 B동 1층 주차장 및 계단","zonecode":"10403","x":"126.7725","y":"37.6582"},{"roadAddress":"경기도 고양시 일산동구 무궁화로 37","jibunAddress":"경기도 고양시 일산동구 정발산동 1142","sido":"경기도","sidoCd":"41","sigungu":"고양시 일산동구","sigunguCd":"41281","dong":"정발산동","bldNm":"정발산 전원주택단지","zonecode":"10362","x":"126.7741","y":"37.6681"},{"roadAddress":"경기도 고양시 일산동구 위시티로 34","jibunAddress":"경기도 고양시 일산동구 식사동 1498","sido":"경기도","sidoCd":"41","sigungu":"고양시 일산동구","sigunguCd":"41281","dong":"식사동","bldNm":"위시티 일산 자이 2단지","zonecode":"10324","x":"126.8120","y":"37.6740"},{"roadAddress":"경기도 고양시 일산서구 중앙로 1422","jibunAddress":"경기도 고양시 일산서구 주엽동 102","sido":"경기도","sidoCd":"41","sigungu":"고양시 일산서구","sigunguCd":"41285","dong":"주엽동","bldNm":"문촌마을 삼익아파트","zonecode":"10387","x":"126.7612","y":"37.6698"},{"roadAddress":"경기도 고양시 일산서구 탄현로 136","jibunAddress":"경기도 고양시 일산서구 탄현동 1490","sido":"경기도","sidoCd":"41","sigungu":"고양시 일산서구","sigunguCd":"41285","dong":"탄현동","bldNm":"일산 두산위브더제니스 주상복합","zonecode":"10298","x":"126.7634","y":"37.6942"},{"roadAddress":"경기도 고양시 일산서구 킨텍스로 217-60","jibunAddress":"경기도 고양시 일산서구 대화동 2600","sido":"경기도","sidoCd":"41","sigungu":"고양시 일산서구","sigunguCd":"41285","dong":"대화동","bldNm":"킨텍스 제1전시장 본관","zonecode":"10390","x":"126.7510","y":"37.6650"},{"roadAddress":"경기도 고양시 덕양구 화신로 260번길 58","jibunAddress":"경기도 고양시 덕양구 화정동 966","sido":"경기도","sidoCd":"41","sigungu":"고양시 덕양구","sigunguCd":"41287","dong":"화정동","bldNm":"화정역 세이브존 문화센터","zonecode":"10497","x":"126.8329","y":"37.6345"},{"roadAddress":"경기도 고양시 덕양구 원당로 33","jibunAddress":"경기도 고양시 덕양구 주교동 603-1","sido":"경기도","sidoCd":"41","sigungu":"고양시 덕양구","sigunguCd":"41287","dong":"주교동","bldNm":"고양시청 제1별관","zonecode":"10460","x":"126.8315","y":"37.6583"},{"roadAddress":"경기도 고양시 덕양구 삼송로 193","jibunAddress":"경기도 고양시 덕양구 삼송동 315-1","sido":"경기도","sidoCd":"41","sigungu":"고양시 덕양구","sigunguCd":"41287","dong":"삼송동","bldNm":"힐스테이트 삼송역 상업시설","zonecode":"10565","x":"126.8967","y":"37.6531"},{"roadAddress":"서울특별시 마포구 월드컵북로 402","jibunAddress":"서울특별시 마포구 상암동 1602","sido":"서울특별시","sidoCd":"11","sigungu":"마포구","sigunguCd":"11440","dong":"상암동","bldNm":"DMC 첨단산업센터 7층","zonecode":"03925","x":"126.8821","y":"37.5794"},{"roadAddress":"서울특별시 강남구 테헤란로 152","jibunAddress":"서울특별시 강남구 역삼동 737","sido":"서울특별시","sidoCd":"11","sigungu":"강남구","sigunguCd":"11680","dong":"역삼동","bldNm":"강남파이낸스센터 (GFC)","zonecode":"06236","x":"127.0365","y":"37.5000"},{"roadAddress":"서울특별시 서초구 강남대로 373","jibunAddress":"서울특별시 서초구 서초동 1318-2","sido":"서울특별시","sidoCd":"11","sigungu":"서초구","sigunguCd":"11650","dong":"서초동","bldNm":"홍우빌딩 9층","zonecode":"06612","x":"127.0278","y":"37.4979"},{"roadAddress":"경기도 고양시 덕양구 화수로14번길 55","jibunAddress":"경기도 고양시 덕양구 화정동 697-24","sido":"경기도","sidoCd":"41","sigungu":"고양시 덕양구","sigunguCd":"41287","dong":"화정동","bldNm":"명지병원 (고양본원 종합병원)","zonecode":"10475","x":"126.8322","y":"37.6436"},{"roadAddress":"충청북도 제천시 고암로 265","jibunAddress":"충청북도 제천시 고암동 566-12","sido":"충청북도","sidoCd":"43","sigungu":"제천시","sigunguCd":"43150","dong":"고암동","bldNm":"명지병원 (제천)","zonecode":"27137","x":"128.2245","y":"37.1510"},{"roadAddress":"서울특별시 서대문구 연세로 50-1","jibunAddress":"서울특별시 서대문구 신촌동 134","sido":"서울특별시","sidoCd":"11","sigungu":"서대문구","sigunguCd":"11410","dong":"신촌동","bldNm":"연세대학교 신촌세브란스병원 본관","zonecode":"03722","x":"126.9416","y":"37.5623"},{"roadAddress":"서울특별시 강남구 언주로 211","jibunAddress":"서울특별시 강남구 도곡동 146-92","sido":"서울특별시","sidoCd":"11","sigungu":"강남구","sigunguCd":"11680","dong":"도곡동","bldNm":"강남세브란스병원","zonecode":"06273","x":"127.0463","y":"37.4928"},{"roadAddress":"경기도 용인시 기흥구 동백죽전대로 363","jibunAddress":"경기도 용인시 기흥구 중동 724-1","sido":"경기도","sidoCd":"41","sigungu":"용인시 기흥구","sigunguCd":"41463","dong":"중동","bldNm":"용인세브란스병원","zonecode":"16995","x":"127.1517","y":"37.2842"},{"roadAddress":"경기도 고양시 일산동구 일산로 323","jibunAddress":"경기도 고양시 일산동구 마두동 809","sido":"경기도","sidoCd":"41","sigungu":"고양시 일산동구","sigunguCd":"41281","dong":"마두동","bldNm":"국립암센터","zonecode":"10408","x":"126.7820","y":"37.6625"},{"roadAddress":"경기도 고양시 일산동구 일산로 100","jibunAddress":"경기도 고양시 일산동구 백석동 1232","sido":"경기도","sidoCd":"41","sigungu":"고양시 일산동구","sigunguCd":"41281","dong":"백석동","bldNm":"국민건강보험 일산병원","zonecode":"10444","x":"126.7915","y":"37.6430"},{"roadAddress":"경기도 고양시 일산서구 주화로 170","jibunAddress":"경기도 고양시 일산서구 대화동 2240","sido":"경기도","sidoCd":"41","sigungu":"고양시 일산서구","sigunguCd":"41285","dong":"대화동","bldNm":"인제대학교 일산백병원","zonecode":"10380","x":"126.7525","y":"37.6740"},{"roadAddress":"경기도 고양시 일산동구 동국로 27","jibunAddress":"경기도 고양시 일산동구 식사동 814","sido":"경기도","sidoCd":"41","sigungu":"고양시 일산동구","sigunguCd":"41281","dong":"식사동","bldNm":"동국대학교 일산병원","zonecode":"10326","x":"126.8090","y":"37.6780"},{"roadAddress":"경기도 고양시 일산동구 중앙로 1205","jibunAddress":"경기도 고양시 일산동구 장항동 889","sido":"경기도","sidoCd":"41","sigungu":"고양시 일산동구","sigunguCd":"41281","dong":"장항동","bldNm":"일산차병원 (차병원 글로벌라이프센터)","zonecode":"10414","x":"126.7750","y":"37.6538"},{"roadAddress":"서울특별시 종로구 대학로 101","jibunAddress":"서울특별시 종로구 연건동 28","sido":"서울특별시","sidoCd":"11","sigungu":"종로구","sigunguCd":"11110","dong":"연건동","bldNm":"서울대학교병원 (본원)","zonecode":"03080","x":"126.9995","y":"37.5796"},{"roadAddress":"경기도 성남시 분당구 구미로173번길 82","jibunAddress":"경기도 성남시 분당구 구미동 300","sido":"경기도","sidoCd":"41","sigungu":"성남시 분당구","sigunguCd":"41135","dong":"구미동","bldNm":"분당서울대학교병원","zonecode":"13620","x":"127.1230","y":"37.3515"},{"roadAddress":"서울특별시 송파구 올림픽로43길 88","jibunAddress":"서울특별시 송파구 풍납동 388-1","sido":"서울특별시","sidoCd":"11","sigungu":"송파구","sigunguCd":"11710","dong":"풍납동","bldNm":"서울아산병원","zonecode":"05505","x":"127.1082","y":"37.5265"},{"roadAddress":"서울특별시 강남구 일원로 81","jibunAddress":"서울특별시 강남구 일원동 50","sido":"서울특별시","sidoCd":"11","sigungu":"강남구","sigunguCd":"11680","dong":"일원동","bldNm":"삼성서울병원","zonecode":"06351","x":"127.0852","y":"37.4882"},{"roadAddress":"서울특별시 서초구 반포대로 222","jibunAddress":"서울특별시 서초구 반포동 505","sido":"서울특별시","sidoCd":"11","sigungu":"서초구","sigunguCd":"11650","dong":"반포동","bldNm":"가톨릭대학교 서울성모병원","zonecode":"06591","x":"127.0048","y":"37.5020"},{"roadAddress":"서울특별시 성북구 고려대로 73","jibunAddress":"서울특별시 성북구 안암동5가 126-1","sido":"서울특별시","sidoCd":"11","sigungu":"성북구","sigunguCd":"11290","dong":"안암동5가","bldNm":"고려대학교 안암병원","zonecode":"02841","x":"127.0265","y":"37.5872"},{"roadAddress":"서울특별시 구로구 구로동로 148","jibunAddress":"서울특별시 구로구 구로동 80","sido":"서울특별시","sidoCd":"11","sigungu":"구로구","sigunguCd":"11530","dong":"구로동","bldNm":"고려대학교 구로병원","zonecode":"08308","x":"126.8850","y":"37.4925"},{"roadAddress":"경기도 수원시 영통구 월드컵로 164","jibunAddress":"경기도 수원시 영통구 원천동 산5","sido":"경기도","sidoCd":"41","sigungu":"수원시 영통구","sigunguCd":"41117","dong":"원천동","bldNm":"아주대학교병원","zonecode":"16499","x":"127.0475","y":"37.2800"},{"roadAddress":"인천광역시 중구 인항로 27","jibunAddress":"인천광역시 중구 신흥동3가 7-206","sido":"인천광역시","sidoCd":"28","sigungu":"중구","sigunguCd":"28110","dong":"신흥동3가","bldNm":"인하대학교병원","zonecode":"22332","x":"126.6345","y":"37.4585"},{"roadAddress":"인천광역시 남동구 남동대로 774번길 21","jibunAddress":"인천광역시 남동구 구월동 1198","sido":"인천광역시","sidoCd":"28","sigungu":"남동구","sigunguCd":"28200","dong":"구월동","bldNm":"가천대 길병원","zonecode":"21565","x":"126.7090","y":"37.4525"},{"roadAddress":"부산광역시 해운대구 달맞이길 30","jibunAddress":"부산광역시 해운대구 중동 1829","sido":"부산광역시","sidoCd":"26","sigungu":"해운대구","sigunguCd":"26350","dong":"중동","bldNm":"엘시티 랜드마크타워","zonecode":"48099","x":"129.1685","y":"35.1601"},{"roadAddress":"부산광역시 해운대구 센텀중앙로 78","jibunAddress":"부산광역시 해운대구 우동 1466-2","sido":"부산광역시","sidoCd":"26","sigungu":"해운대구","sigunguCd":"26350","dong":"우동","bldNm":"센텀시티 신세계백화점","zonecode":"48058","x":"129.1300","y":"35.1690"},{"roadAddress":"부산광역시 동구 중앙대로 206","jibunAddress":"부산광역시 동구 초량동 1187-1","sido":"부산광역시","sidoCd":"26","sigungu":"동구","sigunguCd":"26170","dong":"초량동","bldNm":"부산역 (KTX)","zonecode":"48720","x":"129.0416","y":"35.1152"},{"roadAddress":"부산광역시 서구 구덕로 179","jibunAddress":"부산광역시 서구 아미동1가 10","sido":"부산광역시","sidoCd":"26","sigungu":"서구","sigunguCd":"26140","dong":"아미동1가","bldNm":"부산대학교병원 (본원)","zonecode":"49241","x":"129.0185","y":"35.1012"},{"roadAddress":"대구광역시 중구 달구벌대로 2077","jibunAddress":"대구광역시 중구 계산동2가 200","sido":"대구광역시","sidoCd":"27","sigungu":"중구","sigunguCd":"27110","dong":"계산동2가","bldNm":"더현대 대구 (현대백화점)","zonecode":"41933","x":"128.5910","y":"35.8670"},{"roadAddress":"대구광역시 동구 동대구로 550","jibunAddress":"대구광역시 동구 신천동 329-3","sido":"대구광역시","sidoCd":"27","sigungu":"동구","sigunguCd":"27140","dong":"신천동","bldNm":"동대구역 신세계백화점 대구점","zonecode":"41295","x":"128.6285","y":"35.8778"},{"roadAddress":"대구광역시 중구 동덕로 130","jibunAddress":"대구광역시 중구 삼덕동2가 50","sido":"대구광역시","sidoCd":"27","sigungu":"중구","sigunguCd":"27110","dong":"삼덕동2가","bldNm":"경북대학교병원 (본원)","zonecode":"41944","x":"128.6045","y":"35.8660"},{"roadAddress":"대전광역시 서구 대덕대로 211","jibunAddress":"대전광역시 서구 둔산동 1036","sido":"대전광역시","sidoCd":"30","sigungu":"서구","sigunguCd":"30170","dong":"둔산동","bldNm":"갤러리아백화점 타임월드","zonecode":"35229","x":"127.3785","y":"36.3520"},{"roadAddress":"대전광역시 중구 문화로 282","jibunAddress":"대전광역시 중구 대사동 640","sido":"대전광역시","sidoCd":"30","sigungu":"중구","sigunguCd":"30140","dong":"대사동","bldNm":"충남대학교병원","zonecode":"35015","x":"127.4140","y":"36.3175"},{"roadAddress":"광주광역시 서구 무진대로 932","jibunAddress":"광주광역시 서구 광천동 49-1","sido":"광주광역시","sidoCd":"29","sigungu":"서구","sigunguCd":"29140","dong":"광천동","bldNm":"유스퀘어 광주종합버스터미널","zonecode":"61986","x":"126.8820","y":"35.1600"},{"roadAddress":"광주광역시 동구 제봉로 42","jibunAddress":"광주광역시 동구 학동 8","sido":"광주광역시","sidoCd":"29","sigungu":"동구","sigunguCd":"29110","dong":"학동","bldNm":"전남대학교병원","zonecode":"61469","x":"126.9240","y":"35.1415"},{"roadAddress":"울산광역시 남구 삼산로 288","jibunAddress":"울산광역시 남구 삼산동 1569-1","sido":"울산광역시","sidoCd":"31","sigungu":"남구","sigunguCd":"31140","dong":"삼산동","bldNm":"현대백화점 울산점","zonecode":"44706","x":"129.3360","y":"35.5390"},{"roadAddress":"세종특별자치시 한누리대로 411","jibunAddress":"세종특별자치시 어진동 539","sido":"세종특별자치시","sidoCd":"36","sigungu":"세종특별자치시","sigunguCd":"36110","dong":"어진동","bldNm":"정부세종청사","zonecode":"30114","x":"127.2610","y":"36.5040"},{"roadAddress":"제주특별자치도 제주시 공항로 2","jibunAddress":"제주특별자치도 제주시 용담이동 2002","sido":"제주특별자치도","sidoCd":"50","sigungu":"제주시","sigunguCd":"50110","dong":"용담이동","bldNm":"제주공항 (제주국제공항 여객청사)","zonecode":"63115","x":"126.4930","y":"33.5065"},{"roadAddress":"서울특별시 강서구 하늘길 38","jibunAddress":"서울특별시 강서구 방화동 886","sido":"서울특별시","sidoCd":"11","sigungu":"강서구","sigunguCd":"11500","dong":"방화동","bldNm":"김포공항 (김포국제공항)","zonecode":"07505","x":"126.7978","y":"37.5585"},{"roadAddress":"인천광역시 중구 공항로 272","jibunAddress":"인천광역시 중구 운서동 2851","sido":"인천광역시","sidoCd":"28","sigungu":"중구","sigunguCd":"28110","dong":"운서동","bldNm":"인천국제공항 제1여객터미널","zonecode":"22382","x":"126.4407","y":"37.4602"},{"roadAddress":"제주특별자치도 제주시 아란13길 15","jibunAddress":"제주특별자치도 제주시 아라일동 1753-3","sido":"제주특별자치도","sidoCd":"50","sigungu":"제주시","sigunguCd":"50110","dong":"아라일동","bldNm":"제주대학교병원","zonecode":"63241","x":"126.5450","y":"33.4670"},{"roadAddress":"제주특별자치도 제주시 첨단로 242","jibunAddress":"제주특별자치도 제주시 영평동 2181","sido":"제주특별자치도","sidoCd":"50","sigungu":"제주시","sigunguCd":"50110","dong":"영평동","bldNm":"제주스페이스닷원 (카카오)","zonecode":"63309","x":"126.5708","y":"33.4507"},{"roadAddress":"서울특별시 마포구 성미산로 27","jibunAddress":"서울특별시 마포구 성산동 249-1","sido":"서울특별시","sidoCd":"11","sigungu":"마포구","sigunguCd":"11440","dong":"성산동","bldNm":"서울성산초등학교","zonecode":"03975","x":"126.9150","y":"37.5615"},{"roadAddress":"강원특별자치도 강릉시 성산면 구산길 61","jibunAddress":"강원특별자치도 강릉시 성산면 구산리 323","sido":"강원특별자치도","sidoCd":"42","sigungu":"강릉시","sigunguCd":"42150","dong":"성산면","bldNm":"성산초등학교 (강릉)","zonecode":"25615","x":"128.8245","y":"37.7180"},{"roadAddress":"대구광역시 달서구 성산로 43","jibunAddress":"대구광역시 달서구 신당동 1810","sido":"대구광역시","sidoCd":"27","sigungu":"달서구","sigunguCd":"27290","dong":"신당동","bldNm":"대구성산초등학교","zonecode":"42603","x":"128.4985","y":"35.8525"},{"roadAddress":"제주특별자치도 서귀포시 성산읍 일주동로 4282","jibunAddress":"제주특별자치도 서귀포시 성산읍 고성리 1198-1","sido":"제주특별자치도","sidoCd":"50","sigungu":"서귀포시","sigunguCd":"50130","dong":"성산읍","bldNm":"성산초등학교 (제주)","zonecode":"63640","x":"126.9155","y":"33.4510"},{"roadAddress":"경기도 고양시 일산서구 일산로 594","jibunAddress":"경기도 고양시 일산서구 일산동 1060","sido":"경기도","sidoCd":"41","sigungu":"고양시 일산서구","sigunguCd":"41285","dong":"일산동","bldNm":"일산초등학교","zonecode":"10355","x":"126.7710","y":"37.6880"},{"roadAddress":"경기도 고양시 덕양구 능곡로 38","jibunAddress":"경기도 고양시 덕양구 토당동 384","sido":"경기도","sidoCd":"41","sigungu":"고양시 덕양구","sigunguCd":"41287","dong":"토당동","bldNm":"능곡초등학교","zonecode":"10511","x":"126.8210","y":"37.6215"},{"roadAddress":"강원특별자치도 춘천시 백령로 156","jibunAddress":"강원특별자치도 춘천시 효자동 17-1","sido":"강원특별자치도","sidoCd":"42","sigungu":"춘천시","sigunguCd":"42110","dong":"효자동","bldNm":"강원대학교병원","zonecode":"24289","x":"127.7450","y":"37.8745"},{"roadAddress":"강원특별자치도 원주시 일산로 20","jibunAddress":"강원특별자치도 원주시 일산동 162-1","sido":"강원특별자치도","sidoCd":"42","sigungu":"원주시","sigunguCd":"42130","dong":"일산동","bldNm":"원주세브란스기독병원","zonecode":"26426","x":"127.9450","y":"37.3485"}];
+    window.searchNaverAddressClient = function(query) {
+      const rawTrimmed = String(query || '').trim();
+      if (!rawTrimmed) return [];
+      const compactQ = rawTrimmed.replace(/[\s\-_,.]+/g, '').toLowerCase();
+
+      const poiExact = [];
+      const poiPartial = [];
+      for (const item of window.COMPREHENSIVE_ADDRESS_DB) {
+        const compactBld = (item.bldNm || '').replace(/[\s\-_,.]+/g, '').toLowerCase();
+        const compactRoad = (item.roadAddress || '').replace(/[\s\-_,.]+/g, '').toLowerCase();
+        const compactJibun = (item.jibunAddress || '').replace(/[\s\-_,.]+/g, '').toLowerCase();
+        if (compactBld.includes(compactQ) || compactQ.includes(compactBld)) {
+          poiExact.push(item);
+        } else if (compactRoad.includes(compactQ) || compactJibun.includes(compactQ)) {
+          poiPartial.push(item);
+        }
+      }
+
+      const tokens = rawTrimmed.toLowerCase().split(/\s+/).filter(Boolean);
+      const tokenMatched = window.COMPREHENSIVE_ADDRESS_DB.filter((item) => {
+        const fullText = (item.roadAddress + ' ' + (item.jibunAddress || '') + ' ' + (item.bldNm || '') + ' ' + item.dong + ' ' + item.sigungu + ' ' + item.sido).toLowerCase();
+        return tokens.every((token) => fullText.includes(token)) ||
+          tokens.some((token) => token.length >= 2 && (
+            (item.bldNm && item.bldNm.toLowerCase().includes(token)) ||
+            item.roadAddress.toLowerCase().includes(token) ||
+            (item.jibunAddress && item.jibunAddress.toLowerCase().includes(token)) ||
+            item.dong.toLowerCase().includes(token)
+          ));
+      });
+
+      const combined = [...poiExact, ...poiPartial, ...tokenMatched];
+      const seen = new Set();
+      const result = [];
+      for (const it of combined) {
+        const key = it.roadAddress + '_' + it.bldNm;
+        if (!seen.has(key)) {
+          seen.add(key);
+          result.push(it);
+        }
+      }
+      return result;
+    };
+
+    // Global fetch interceptor for standalone preview (Chrome local viewing)
+    (function() {
+      const originalFetch = window.fetch;
+      window.fetch = async function(url, options) {
+        const urlStr = String(url || '');
+
+        // 1. 네이버 주소 검색 목업 인터셉트
+        if (urlStr.includes('/api/web/client/search_address') || (urlStr.includes('/api/web/client/com_010000') && options?.body && String(options.body).includes('SEARCH_NAVER_ADDRESS'))) {
+          try {
+            const body = options?.body ? JSON.parse(options.body) : {};
+            const q = body.query || body.keyword || '';
+            const items = window.searchNaverAddressClient(q);
+            return new Response(JSON.stringify({
+              success: true,
+              provider: 'NAVER_MAPS_GEOCODE_LOCAL',
+              query: q,
+              total: items.length,
+              items: items
+            }), {
+              status: 200,
+              headers: { 'Content-Type': 'application/json' }
+            });
+          } catch (e) {
+            console.warn('Address mock fetch error:', e);
+          }
+        }
+
+        // 2. 통합 회원가입 & 약관동의 목업 인터셉트 (/api/web/client/ath_010200)
+        if (urlStr.includes('/api/web/client/ath_010200')) {
+          try {
+            const body = options?.body ? JSON.parse(options.body) : {};
+            if (body.action === 'CHECK_EMAIL') {
+              return new Response(JSON.stringify({
+                success: true,
+                code: 'OK',
+                message: '사용 가능한 이메일입니다.'
+              }), { status: 200, headers: { 'Content-Type': 'application/json' } });
+            }
+            if (body.action === 'GET_TERMS') {
+              return new Response(JSON.stringify({
+                success: true,
+                code: 'OK',
+                data: [
+                  { TERMS_CD: 'SERVICE', TERMS_VER: 'v1.0', TERMS_TITLE: '서비스 이용약관', MANDATORY_YN: 'Y' },
+                  { TERMS_CD: 'PRIVACY', TERMS_VER: 'v1.0', TERMS_TITLE: '개인정보 수집 및 이용 동의', MANDATORY_YN: 'Y' },
+                  { TERMS_CD: 'LOCATION', TERMS_VER: 'v1.0', TERMS_TITLE: '위치기반 서비스 이용약관', MANDATORY_YN: 'Y' },
+                  { TERMS_CD: 'FINANCE', TERMS_VER: 'v1.0', TERMS_TITLE: '전자금융거래 기본약관', MANDATORY_YN: 'Y' },
+                  { TERMS_CD: 'SIGNATURE', TERMS_VER: 'v1.0', TERMS_TITLE: '전자거래 및 자필 전자서명 보증 동의', MANDATORY_YN: 'Y' }
+                ]
+              }), { status: 200, headers: { 'Content-Type': 'application/json' } });
+            }
+            // REGISTER 액션
+            const userNo = 'C' + Date.now().toString().slice(-8);
+            const registeredUser = {
+              userNo: userNo,
+              userNm: body.userNm || '신규회원',
+              userEmail: body.userEmail || 'customer@example.com',
+              userRoleCd: body.userRoleCd || 'CUSTOMER',
+              userTel: body.userTel || '010-1234-5678',
+              socialProvider: body.socialProvider || null
+            };
+            try { localStorage.setItem('sseuldakgo_user', JSON.stringify(registeredUser)); } catch(e){}
+            return new Response(JSON.stringify({
+              success: true,
+              code: 'OK',
+              message: '쓸고닦고 통합 회원가입 및 전자서명이 성공적으로 접수되었습니다.',
+              data: registeredUser
+            }), { status: 200, headers: { 'Content-Type': 'application/json' } });
+          } catch (e) {
+            console.warn('ath_010200 mock error:', e);
+          }
+        }
+
+        // 3. 고객 및 시공사 로그인 목업 인터셉트 (/api/web/client/ath_010100)
+        if (urlStr.includes('/api/web/client/ath_010100')) {
+          try {
+            const body = options?.body ? JSON.parse(options.body) : {};
+            const userNo = 'C' + Date.now().toString().slice(-8);
+            const loggedInUser = {
+              userNo: userNo,
+              userNm: '홍길동',
+              userEmail: body.userEmail || body.email || 'hong.gd@example.com',
+              userRoleCd: body.userRoleCd || 'CUSTOMER',
+              userTel: '010-8921-5459'
+            };
+            try { localStorage.setItem('sseuldakgo_token', 'mock_jwt_token_12345'); } catch(e){}
+            try { localStorage.setItem('sseuldakgo_user', JSON.stringify(loggedInUser)); } catch(e){}
+            return new Response(JSON.stringify({
+              success: true,
+              code: 'OK',
+              message: '로그인에 성공했습니다.',
+              token: 'mock_jwt_token_12345',
+              data: loggedInUser
+            }), { status: 200, headers: { 'Content-Type': 'application/json' } });
+          } catch (e) {
+            console.warn('ath_010100 mock error:', e);
+          }
+        }
+
+        // 4. 청소 서비스 신청 발주 등록 (/api/web/client/req_010100)
+        if (urlStr.includes('/api/web/client/req_010100')) {
+          try {
+            const orderNo = 'ORD-' + new Date().toISOString().slice(0, 10).replace(/-/g, '') + '-' + Math.floor(1000 + Math.random() * 9000);
+            return new Response(JSON.stringify({
+              success: true,
+              code: 'OK',
+              orderNo: orderNo,
+              message: '청소 서비스 신청 및 확정 발주서 작성이 성공적으로 접수되었습니다.'
+            }), { status: 200, headers: { 'Content-Type': 'application/json' } });
+          } catch (e) {
+            console.warn('req_010100 mock error:', e);
+          }
+        }
+
+        // 5. 결제 승인 (/api/web/client/pay_010100)
+        if (urlStr.includes('/api/web/client/pay_010100')) {
+          try {
+            return new Response(JSON.stringify({
+              success: true,
+              code: 'OK',
+              paymentId: 'PAY-' + Date.now(),
+              message: '데이터 이용료 결제 및 배타적 단일 계약 체결이 완료되었습니다.'
+            }), { status: 200, headers: { 'Content-Type': 'application/json' } });
+          } catch (e) {
+            console.warn('pay_010100 mock error:', e);
+          }
+        }
+
+        // 6. 시공 검수 완료 승인 (/api/web/client/job_010100)
+        if (urlStr.includes('/api/web/client/job_010100')) {
+          try {
+            return new Response(JSON.stringify({
+              success: true,
+              code: 'OK',
+              message: '청소 시공 검수 및 현장 직불 완료 승인이 처리되었습니다.'
+            }), { status: 200, headers: { 'Content-Type': 'application/json' } });
+          } catch (e) {
+            console.warn('job_010100 mock error:', e);
+          }
+        }
+
+        // 7. 가입 환영 안내 (/api/web/client/ath_010201)
+        if (urlStr.includes('/api/web/client/ath_010201') || urlStr.includes('/api/web/client/ath_010200201')) {
+          return new Response(JSON.stringify({
+            success: true,
+            code: 'OK',
+            data: {
+              userNo: 'C202611130001',
+              userNm: '홍길동',
+              userEmail: 'hong.gd@example.com',
+              userRoleCd: 'CUSTOMER'
+            }
+          }), { status: 200, headers: { 'Content-Type': 'application/json' } });
+        }
+
+        // 실제 fetch 시도 (서버가 띄워져 있는 환경용) 및 통신 실패 시 모의 폴백
+        try {
+          return await originalFetch(url, options);
+        } catch (err) {
+          if (urlStr.includes('/api/web/client/')) {
+            console.warn('[PREVIEW_FALLBACK] Backend server offline, returning mock response for:', urlStr);
+            return new Response(JSON.stringify({
+              success: true,
+              code: 'OK',
+              message: '로컬 크롬 프리뷰 오프라인 모의 응답이 성공적으로 반환되었습니다.',
+              data: { status: 'MOCK_SUCCESS' }
+            }), {
+              status: 200,
+              headers: { 'Content-Type': 'application/json' }
+            });
+          }
+          throw err;
+        }
+      };
+    })();
+  </script>
+
+  <style>
+    body { font-family: 'Pretendard', 'Inter', sans-serif; margin: 0; padding: 0; }
+    /* 스크롤바 미려하게 처리 */
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: #F1F5F9; }
+    ::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #94A3B8; }
+  </style>
+</head>
+<body class="bg-[#F8FAFC] text-[#0F172A] antialiased">
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useEffect } = React;
+const ReactHooks = { useState, useEffect };
+
+/**
+ * @file SseulDakGo_Web/Client/frontend/WEB-CLNT-ATH-010100/index.jsx
+ * @description 고객 및 시공사 회원 로그인 모달 컴포넌트 (WEB-CLNT-ATH-010100)
+ * 
+ * Props:
+ * - isOpen: 모달 노출 여부 (boolean)
+ * - onClose: 모달 닫기 핸들러 () => void
+ * - onSuccessLogin: 로그인 성공 콜백 (userData: { userNo, userNm, userEmail, userRoleCd, hasTempReq }) => void
+ * - onOpenRegister: 회원가입 모달 전환 핸들러 () => void
+ * - onOpenFindPwd: 비밀번호 찾기 모달 전환 핸들러 () => void
+ */
+function WebClntAth010100({
+  isOpen = false,
+  onClose,
+  onSuccessLogin,
+  onOpenRegister,
+  onOpenFindPwd
+}) {
+  // 1. 회원 구분 ('C': 고객 회원, 'S': 시공사 회원)
+  const [role, setRole] = useState('C');
+
+  // 2. 입력 필드 상태
+  const [email, setEmail] = useState('');
+  const [pwd, setPwd] = useState('');
+  const [showPwd, setShowPwd] = useState(false);
+  const [saveId, setSaveId] = useState(true);
+  const [keepLogin, setKeepLogin] = useState(true);
+
+  // 3. UI 처리 상태
+  const [hasTempReq, setHasTempReq] = useState(false);
+  const [errorMsg, setErrorMsg] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+
+  // 모달 오픈 시 초기화 및 로컬스토리지 검사
+  useEffect(() => {
+    if (!isOpen) {
+      setErrorMsg('');
+      setIsLoading(false);
+      return;
+    }
+
+    // A. 비회원 임시 요청서 감지
+    try {
+      const guestReq = localStorage.getItem('SSEULDAKGO_GUEST_TEMP_REQ');
+      const draftReq = localStorage.getItem('SSEUL_DRAFT_ORDER');
+      if (guestReq || draftReq) {
+        setHasTempReq(true);
+      } else {
+        setHasTempReq(false);
+      }
+    } catch (e) {
+      setHasTempReq(false);
+    }
+
+    // B. 아이디 저장 복원
+    try {
+      const savedUserStr = localStorage.getItem('SSEULDAKGO_SAVED_USER');
+      if (savedUserStr) {
+        const saved = JSON.parse(savedUserStr);
+        if (saved && saved.email) {
+          setEmail(saved.email);
+          if (saved.role) setRole(saved.role);
+          setSaveId(true);
+        }
+      }
+    } catch (e) {
+      // ignore JSON parse error
+    }
+  }, [isOpen]);
+
+  // ESC 키 닫기 이벤트 핸들러
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape' && isOpen && onClose) {
+        onClose();
+      }
+    };
+    if (isOpen) {
+      window.addEventListener('keydown', handleKeyDown);
+    }
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isOpen, onClose]);
+
+  if (!isOpen) return null;
+
+  // 로그인 제출 처리
+  const handleSubmit = async (e) => {
+    if (e) e.preventDefault();
+    setErrorMsg('');
+
+    if (!email.trim()) {
+      setErrorMsg('이메일 주소를 입력해 주세요.');
+      return;
+    }
+    if (!pwd.trim()) {
+      setErrorMsg('비밀번호를 입력해 주세요.');
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      const res = await fetch('/api/web/client/ath_010100', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          userRoleCd: role,
+          userEmail: email.trim(),
+          userPwd: pwd,
+          keepLogin
+        })
+      });
+
+      const data = await res.json();
+
+      if (res.ok && data.success) {
+        // 아이디 저장 처리
+        if (saveId) {
+          localStorage.setItem(
+            'SSEULDAKGO_SAVED_USER',
+            JSON.stringify({ role, email: email.trim() })
+          );
+        } else {
+          localStorage.removeItem('SSEULDAKGO_SAVED_USER');
+        }
+
+        // 로그인 세션 및 성공 콜백 전달
+        if (onSuccessLogin) {
+          onSuccessLogin({
+            ...data.data,
+            hasTempReq,
+            keepLogin,
+            saveId
+          });
+        }
+        if (onClose) onClose();
+      } else {
+        setErrorMsg(data.message || '로그인에 실패했습니다. 이메일과 비밀번호를 확인해 주세요.');
+      }
+    } catch (err) {
+      console.warn('[LOGIN_FALLBACK_SIMULATION]', err);
+      // 오프라인 / 네트워크 지연 시 모의 로그인 폴백
+      if (saveId) {
+        localStorage.setItem(
+          'SSEULDAKGO_SAVED_USER',
+          JSON.stringify({ role, email: email.trim() })
+        );
+      }
+      const mockData = {
+        userNo: role === 'C' ? 'C20261000001' : 'S20261000001',
+        userNm: role === 'C' ? '홍길동' : '김반장 (마스터)',
+        userEmail: email.trim(),
+        userRoleCd: role,
+        accessToken: `mock_jwt_token_${Date.now()}`,
+        hasTempReq,
+        keepLogin,
+        saveId
+      };
+      if (onSuccessLogin) onSuccessLogin(mockData);
+      if (onClose) onClose();
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // 소셜 간편 로그인 (네이버 OAuth 2.0 공식 연동 및 간편 로그인)
+  const handleSocialLogin = async (provider) => {
+    setIsLoading(true);
+    setErrorMsg('');
+
+    // 네이버 연동 로그인 시 실제 Naver OAuth 2.0 공식 팝업/인증 플로우 실행
+    if (provider === 'NAVER' && typeof window !== 'undefined') {
+      try {
+        const authRes = await fetch(`/api/auth/naver/authorize?userRoleCd=${role}`);
+        const authJson = await authRes.json();
+        if (authJson.success && authJson.authUrl) {
+          const onNaverMessage = (e) => {
+            if (e.data?.type === 'NAVER_AUTH_SUCCESS') {
+              window.removeEventListener('message', onNaverMessage);
+              setIsLoading(false);
+              const authData = e.data.data;
+              if (onSuccessLogin) {
+                onSuccessLogin({
+                  ...authData.user,
+                  hasTempReq
+                });
+              }
+              if (onClose) onClose();
+            } else if (e.data?.type === 'NAVER_AUTH_NEW_USER') {
+              window.removeEventListener('message', onNaverMessage);
+              setIsLoading(false);
+              const authData = e.data.data;
+              if (onOpenRegister) {
+                onOpenRegister({ naverProfile: authData.profile });
+              } else {
+                sessionStorage.setItem('SSEULDAKGO_NAVER_PREFILL', JSON.stringify(authData.profile));
+                alert(`네이버 계정(${authData.profile?.name || '고객'}) 인증 완료! 회원가입 화면에서 약관 동의 후 가입을 완료해 주세요.`);
+                if (onClose) onClose();
+              }
+            }
+          };
+          window.addEventListener('message', onNaverMessage);
+
+          const width = 480;
+          const height = 640;
+          const left = window.screenX + (window.outerWidth - width) / 2;
+          const top = window.screenY + (window.outerHeight - height) / 2;
+          const popup = window.open(authJson.authUrl, 'naver_oauth_popup', `width=${width},height=${height},left=${left},top=${top},scrollbars=yes`);
+
+          if (!popup || popup.closed || typeof popup.closed === 'undefined') {
+            window.location.href = authJson.authUrl;
+          }
+          return;
+        }
+      } catch (oauthErr) {
+        console.warn('[NAVER_OAUTH_POPUP_FALLBACK]', oauthErr);
+      }
+    }
+
+    try {
+      const res = await fetch('/api/web/client/ath_010100', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userRoleCd: role,
+          socialProvider: provider,
+          socialUid: `demo_${provider.toLowerCase()}_${Date.now()}`
+        })
+      });
+      const data = await res.json();
+      if (data && data.success) {
+        if (onSuccessLogin) {
+          onSuccessLogin({
+            ...data.data,
+            hasTempReq
+          });
+        }
+        if (onClose) onClose();
+      }
+    } catch (err) {
+      // Fallback
+      const mockData = {
+        userNo: role === 'C' ? 'C20261000001' : 'S20261000001',
+        userNm: `${provider} 사용자`,
+        userEmail: `${provider.toLowerCase()}@example.com`,
+        userRoleCd: role,
+        accessToken: `mock_social_token_${Date.now()}`,
+        hasTempReq
+      };
+      if (onSuccessLogin) onSuccessLogin(mockData);
+      if (onClose) onClose();
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm animate-in fade-in duration-200"
+      onClick={(e) => {
+        if (e.target === e.currentTarget && onClose) onClose();
+      }}
+    >
+      <div
+        aria-labelledby="modal-login-title"
+        aria-modal="true"
+        className="relative w-full max-w-[440px] bg-surface-container-lowest rounded-2xl p-6 sm:p-8 shadow-2xl flex flex-col transition-all overflow-hidden border border-slate-200/80 animate-in zoom-in-95 duration-200"
+        role="dialog"
+      >
+        {/* 상단 브랜드 컬러 바 (Navy & Clean Mint) */}
+        <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-primary via-primary-container to-secondary"></div>
+
+        {/* 닫기 (X) 버튼 */}
+        <button
+          aria-label="닫기"
+          className="absolute top-4 right-4 w-9 h-9 rounded-full flex items-center justify-center text-outline hover:text-on-surface hover:bg-surface-container transition-colors"
+          id="btn-modal-close"
+          onClick={onClose}
+          type="button"
+        >
+          <span className="material-symbols-outlined text-[20px]">close</span>
+        </button>
+
+        {/* 1. Modal Header & Logo Emblem */}
+        <div className="flex flex-col items-center text-center mt-1 mb-4">
+          <div className="w-14 h-14 rounded-full overflow-hidden shadow-md ring-4 ring-secondary-container/40 mb-3 flex items-center justify-center bg-white">
+            <img
+              src="/logo.png"
+              alt="쓸고닦고 로고"
+              className="w-full h-full object-cover rounded-full"
+            />
+          </div>
+          <h2
+            className="font-headline-md text-headline-md text-on-surface font-bold tracking-tight"
+            id="modal-login-title"
+          >
+            로그인
+          </h2>
+          <p className="font-body-sm text-body-sm text-on-surface-variant mt-1">
+            쓸고닦고 서비스 이용을 위해 로그인해 주세요.
+          </p>
+        </div>
+
+        {/* 2. 회원 구분 라디오 (USER_ROLE_CD) */}
+        <div
+          aria-label="회원 유형 선택"
+          className="w-full bg-surface-container-low p-1 rounded-xl grid grid-cols-2 gap-1 mb-3"
+          data-field="USER_ROLE_CD"
+          role="radiogroup"
+        >
+          <button
+            aria-checked={role === 'C'}
+            className={`flex items-center justify-center gap-1.5 h-10 rounded-lg font-label-md text-label-md transition-all ${
+              role === 'C'
+                ? 'bg-surface-container-lowest text-primary shadow-sm font-bold'
+                : 'text-on-surface-variant hover:text-on-surface'
+            }`}
+            data-role="C"
+            id="role-client"
+            onClick={() => setRole('C')}
+            role="radio"
+            type="button"
+          >
+            <span className={`material-symbols-outlined text-[16px] ${role === 'C' ? 'text-secondary' : 'text-outline'}`}>
+              {role === 'C' ? 'radio_button_checked' : 'radio_button_unchecked'}
+            </span>
+            <span>고객 회원</span>
+          </button>
+          <button
+            aria-checked={role === 'S'}
+            className={`flex items-center justify-center gap-1.5 h-10 rounded-lg font-label-md text-label-md transition-all ${
+              role === 'S'
+                ? 'bg-surface-container-lowest text-primary shadow-sm font-bold'
+                : 'text-on-surface-variant hover:text-on-surface'
+            }`}
+            data-role="S"
+            id="role-partner"
+            onClick={() => setRole('S')}
+            role="radio"
+            type="button"
+          >
+            <span className={`material-symbols-outlined text-[16px] ${role === 'S' ? 'text-secondary' : 'text-outline'}`}>
+              {role === 'S' ? 'radio_button_checked' : 'radio_button_unchecked'}
+            </span>
+            <span>시공사 회원</span>
+          </button>
+        </div>
+
+        {/* 3. 비회원 임시 요청서 감지 배너 (조건부 노출) */}
+        {hasTempReq && (
+          <div
+            className="w-full bg-secondary-container/30 border border-secondary/20 rounded-xl p-3 flex items-start gap-2.5 my-2 animate-in fade-in"
+            data-notice="SSEULDAKGO_GUEST_TEMP_REQ"
+          >
+            <div className="w-6 h-6 rounded-full bg-secondary text-on-secondary flex items-center justify-center shrink-0 mt-0.5">
+              <span className="material-symbols-outlined text-[14px]">auto_fix_high</span>
+            </div>
+            <div className="flex flex-col min-w-0">
+              <span className="font-label-sm text-label-sm text-on-secondary-container font-semibold">
+                비회원 임시 요청서 감지
+              </span>
+              <p className="font-caption text-caption text-on-secondary-container leading-relaxed">
+                작성 중이던 청소 요청 정보가 있습니다. 로그인 즉시 자동으로 복원됩니다.
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* 4. SNS 간편 로그인 */}
+        <div className="flex flex-col w-full my-2">
+          <span className="font-label-sm text-label-sm text-on-surface-variant font-semibold mb-2.5 text-center">
+            SNS 계정으로 간편 로그인
+          </span>
+          <div className="grid grid-cols-4 gap-2 w-full">
+            {/* Kakao */}
+            <button
+              className="h-11 rounded-xl bg-[#FEE500] hover:brightness-95 flex flex-col items-center justify-center transition-transform active:scale-95 shadow-sm group"
+              data-field="SOCIAL_PROVIDER"
+              data-val="KAKAO"
+              onClick={() => handleSocialLogin('KAKAO')}
+              title="카카오 로그인"
+              type="button"
+            >
+              <svg aria-hidden="true" className="w-4 h-4 fill-[#3C1E1E]" viewBox="0 0 24 24">
+                <path d="M12 3C6.477 3 2 6.48 2 10.772c0 2.76 1.848 5.178 4.636 6.53l-.946 3.52c-.084.312.247.568.52.387l4.22-2.793c.516.052 1.042.086 1.57.086 5.523 0 10-3.48 10-7.772C22 6.48 17.523 3 12 3z"></path>
+              </svg>
+              <span className="font-caption text-[11px] text-[#3C1E1E] font-semibold mt-0.5 leading-none">카카오</span>
+            </button>
+
+            {/* Naver */}
+            <button
+              className="h-11 rounded-xl bg-[#03C75A] hover:brightness-95 flex flex-col items-center justify-center transition-transform active:scale-95 shadow-sm group"
+              data-field="SOCIAL_PROVIDER"
+              data-val="NAVER"
+              onClick={() => handleSocialLogin('NAVER')}
+              title="네이버 로그인"
+              type="button"
+            >
+              <svg aria-hidden="true" className="w-3.5 h-3.5 fill-white" viewBox="0 0 24 24">
+                <path d="M16.273 12.845 7.371 0H0v24h7.727V11.155L16.629 24H24V0h-7.727z"></path>
+              </svg>
+              <span className="font-caption text-[11px] text-white font-semibold mt-0.5 leading-none">네이버</span>
+            </button>
+
+            {/* Google */}
+            <button
+              className="h-11 rounded-xl bg-surface-container-lowest border border-outline-variant/60 hover:bg-surface-container-low flex flex-col items-center justify-center transition-transform active:scale-95 shadow-sm group"
+              data-field="SOCIAL_PROVIDER"
+              data-val="GOOGLE"
+              onClick={() => handleSocialLogin('GOOGLE')}
+              title="Google 로그인"
+              type="button"
+            >
+              <svg aria-hidden="true" className="w-3.5 h-3.5" viewBox="0 0 24 24">
+                <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"></path>
+                <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"></path>
+                <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" fill="#FBBC05"></path>
+                <path d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.24 6.58l4.04 3.15c.95-2.83 3.6-4.98 6.72-4.98z" fill="#EA4335"></path>
+              </svg>
+              <span className="font-caption text-[11px] text-on-surface font-semibold mt-0.5 leading-none">Google</span>
+            </button>
+
+            {/* Apple */}
+            <button
+              className="h-11 rounded-xl bg-[#000000] hover:bg-neutral-900 flex flex-col items-center justify-center transition-transform active:scale-95 shadow-sm group"
+              data-field="SOCIAL_PROVIDER"
+              data-val="APPLE"
+              onClick={() => handleSocialLogin('APPLE')}
+              title="Apple 로그인"
+              type="button"
+            >
+              <svg aria-hidden="true" className="w-3.5 h-3.5 fill-white" viewBox="0 0 24 24">
+                <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 6.84c.66-.82 1.11-1.96.99-3.1-.96.04-2.13.64-2.82 1.45-.61.71-1.14 1.87-1 2.98 1.08.08 2.17-.51 2.83-1.33z"></path>
+              </svg>
+              <span className="font-caption text-[11px] text-white font-semibold mt-0.5 leading-none">Apple</span>
+            </button>
+          </div>
+
+          {/* Divider */}
+          <div className="relative flex items-center justify-center my-4">
+            <div className="w-full h-[1px] bg-surface-container-highest"></div>
+            <span className="absolute bg-surface-container-lowest px-3 font-caption text-caption text-outline">
+              또는 이메일로 로그인
+            </span>
+          </div>
+        </div>
+
+        {/* 에러 메시지 고지 */}
+        {errorMsg && (
+          <div className="mb-3 p-3 bg-error-container/50 border border-error/30 rounded-xl flex items-center gap-2 text-on-error-container font-caption text-caption animate-in fade-in">
+            <span className="material-symbols-outlined text-[16px] text-error shrink-0">error</span>
+            <span>{errorMsg}</span>
+          </div>
+        )}
+
+        {/* 5. 이메일 & 비밀번호 폼 */}
+        <form className="flex flex-col gap-3 w-full" id="customer-login-form" onSubmit={handleSubmit}>
+          {/* Email */}
+          <div className="flex flex-col gap-1 w-full">
+            <label className="font-label-sm text-label-sm text-on-surface-variant" htmlFor="input-user-email">
+              이메일 주소
+            </label>
+            <div className="relative flex items-center">
+              <input
+                autoComplete="email"
+                className="w-full h-11 px-3.5 rounded-xl bg-surface-container-lowest text-on-surface font-body-md text-body-md border border-slate-200 shadow-sm outline-none placeholder:text-outline/70 focus:border-secondary focus:ring-2 focus:ring-secondary/20 transition-all"
+                data-field="USER_EMAIL"
+                id="input-user-email"
+                name="USER_EMAIL"
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="이메일 주소를 입력하세요 (example@domain.com)"
+                required
+                type="email"
+                value={email}
+              />
+            </div>
+          </div>
+
+          {/* Password */}
+          <div className="flex flex-col gap-1 w-full">
+            <label className="font-label-sm text-label-sm text-on-surface-variant" htmlFor="input-user-pwd">
+              비밀번호
+            </label>
+            <div className="relative flex items-center">
+              <input
+                autoComplete="current-password"
+                className="w-full h-11 pl-3.5 pr-11 rounded-xl bg-surface-container-lowest text-on-surface font-body-md text-body-md border border-slate-200 shadow-sm outline-none placeholder:text-outline/70 focus:border-secondary focus:ring-2 focus:ring-secondary/20 transition-all"
+                data-field="USER_PWD_HASH"
+                id="input-user-pwd"
+                name="USER_PWD_HASH"
+                onChange={(e) => setPwd(e.target.value)}
+                placeholder="비밀번호를 입력하세요"
+                required
+                type={showPwd ? 'text' : 'password'}
+                value={pwd}
+              />
+              <button
+                aria-label="비밀번호 보기 토글"
+                className="absolute right-2.5 w-8 h-8 rounded-lg flex items-center justify-center text-outline hover:text-on-surface transition-colors"
+                data-action="toggle-pwd"
+                id="btn-toggle-pwd"
+                onClick={() => setShowPwd(!showPwd)}
+                type="button"
+              >
+                <span className="material-symbols-outlined text-[18px]">
+                  {showPwd ? 'visibility' : 'visibility_off'}
+                </span>
+              </button>
+            </div>
+          </div>
+
+          {/* 아이디 저장 & 로그인 상태 유지 */}
+          <div className="flex items-center justify-between font-caption text-caption text-on-surface-variant pt-1 pb-1">
+            <label className="flex items-center gap-1.5 cursor-pointer select-none">
+              <input
+                checked={saveId}
+                className="w-4 h-4 rounded text-secondary focus:ring-secondary/30 bg-surface-container-low accent-secondary cursor-pointer"
+                data-field="SAVE_ID_YN"
+                onChange={(e) => setSaveId(e.target.checked)}
+                type="checkbox"
+              />
+              <span>아이디 저장</span>
+            </label>
+            <label className="flex items-center gap-1.5 cursor-pointer select-none">
+              <input
+                checked={keepLogin}
+                className="w-4 h-4 rounded text-secondary focus:ring-secondary/30 bg-surface-container-low accent-secondary cursor-pointer"
+                data-field="KEEP_LOGIN_YN"
+                onChange={(e) => setKeepLogin(e.target.checked)}
+                type="checkbox"
+              />
+              <span>로그인 상태 유지</span>
+            </label>
+          </div>
+
+          {/* 6. 로그인 제출 버튼 */}
+          <button
+            className="w-full h-12 mt-1 rounded-xl bg-secondary hover:bg-[#005049] text-white font-label-lg text-label-lg shadow-md hover:shadow-lg active:scale-[0.99] transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            data-action="SUBMIT_LOGIN"
+            disabled={isLoading}
+            type="submit"
+          >
+            {isLoading ? (
+              <span className="inline-block w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+            ) : (
+              <>
+                <span>로그인</span>
+                <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
+              </>
+            )}
+          </button>
+        </form>
+
+        {/* 하단 링크 */}
+        <div className="flex items-center justify-center gap-3 font-caption text-caption text-outline mt-5 pt-3 border-t border-slate-100">
+          <button
+            className="hover:text-on-surface transition-colors"
+            data-action="CALL_FIND_PWD"
+            onClick={onOpenFindPwd || (() => alert('비밀번호 찾기 페이지 준비 중입니다.'))}
+            type="button"
+          >
+            비밀번호 찾기
+          </button>
+          <span className="text-surface-container-highest">|</span>
+          <button
+            className="text-primary font-bold hover:underline transition-colors"
+            data-action="CALL_SIGNUP"
+            onClick={onOpenRegister || (() => alert('회원가입 페이지 준비 중입니다.'))}
+            type="button"
+          >
+            회원가입
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+
+
+    
+      function AppWrapper() {
+        const [isOpen, setIsOpen] = React.useState(true);
+        return (
+          <div className="min-h-screen bg-slate-900/30 flex flex-col items-center justify-center p-4">
+            {!isOpen && (
+              <div className="bg-white p-8 rounded-2xl shadow-2xl text-center max-w-md w-full border border-slate-200">
+                <div className="w-16 h-16 bg-blue-50 text-[#1F497D] rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">
+                  ✓
+                </div>
+                <h3 className="text-xl font-bold text-slate-800 mb-2">고객 로그인</h3>
+                <p className="text-sm text-slate-500 mb-6">모달이 닫힌 상태입니다. 아래 버튼을 눌러 다시 열 수 있습니다.</p>
+                <button
+                  onClick={() => setIsOpen(true)}
+                  className="w-full py-3 bg-[#1F497D] text-white font-bold rounded-xl shadow hover:bg-[#16365c] transition-all"
+                >
+                  [WEB-CLNT-ATH-010100] 모달 다시 열기
+                </button>
+              </div>
+            )}
+            <WebClntAth010100 
+              isOpen={isOpen} 
+              onClose={() => setIsOpen(false)}
+              onSuccessLogin={() => alert('로그인 성공 이벤트 감지')}
+              onNavigate={(url) => console.log('Navigate to:', url)}
+              duplicateTabs={['REGULAR', 'MOVEIN']}
+              tabAddresses={{
+                REGULAR: { addrText: '경기 고양시 일산동구 마두동 802-1', addrDetail: '삼혜빌딩 4층 402호' },
+                MOVEIN: { addrText: '경기 고양시 일산동구 마두동 802-1', addrDetail: '삼혜빌딩 4층 402호' },
+                APPLIANCE: { addrText: '경기 고양시 일산동구 마두동 802-1', addrDetail: '삼혜빌딩 4층 402호' },
+              }}
+              onConfirmContinue={() => alert('[네 (계속 등록)] 클릭 감지: 동일 주소로 발주 등록 계속 진행')}
+              onSelectChangeTab={(t) => alert('[주소 변경 탭 선택] 감지: ' + t + ' 탭 주소 검색 실행')}
+            />
+          </div>
+        );
+      }
+      ReactDOM.createRoot(document.getElementById('root')).render(<AppWrapper />);
+    
+  </script>
+</body>
+</html>
