@@ -57,3 +57,6 @@ Logo_*.jpg
 # 9. 소스 내 로그인 및 인증 관련 파일 (보안)
 lib/google-login.ts
 lib/google-login.js
+
+# 10. 프로그램 개발 가이드 (민감 정보 포함)
+guide/

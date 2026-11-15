@@ -1,0 +1,177 @@
+import fs from 'fs';
+import path from 'path';
+
+// 1. preview/naver_oauth_popup.html 개선
+const naverPopupHtml = `<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>네이버 아이디로 로그인 | 쓸고닦고</title>
+  <link rel="icon" type="image/png" href="logo.png"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin=""/>
+  <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif; }
+  </style>
+</head>
+<body class="bg-[#F8F9FA] text-slate-800 min-h-screen flex flex-col justify-between p-4 antialiased select-none">
+
+  <!-- 상단 네이버 헤더 -->
+  <header class="bg-white border-b border-slate-200 px-5 py-3 -mx-4 -mt-4 shadow-xs flex items-center justify-between">
+    <div class="flex items-center gap-2">
+      <div class="w-7 h-7 bg-[#03C75A] rounded flex items-center justify-center text-white font-extrabold text-[15px] tracking-tight">
+        N
+      </div>
+      <span class="font-extrabold text-[#03C75A] text-lg tracking-tight">NAVER</span>
+      <span class="text-xs text-slate-400 font-medium ml-1">아이디로 로그인</span>
+    </div>
+    <span class="text-[11px] font-mono px-2 py-0.5 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded font-semibold">
+      OAuth 2.0 공식연동
+    </span>
+  </header>
+
+  <!-- 메인 인증 영역 -->
+  <main class="flex-1 max-w-md mx-auto w-full py-2 space-y-3">
+    
+    <!-- 서비스 연동 안내 카드 -->
+    <div class="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm text-center">
+      <div class="flex items-center justify-center gap-2.5 mb-2">
+        <div class="w-10 h-10 rounded-2xl bg-slate-50 border border-slate-200 p-1 flex items-center justify-center shadow-xs">
+          <img src="logo.png" alt="쓸고닦고" class="w-full h-full object-contain" onerror="this.src='../public/logo.png'"/>
+        </div>
+        <span class="text-slate-300 font-bold text-base">+</span>
+        <div class="w-10 h-10 rounded-2xl bg-[#03C75A] flex items-center justify-center text-white font-extrabold text-xl shadow-xs">
+          N
+        </div>
+      </div>
+      <h1 class="text-sm font-extrabold text-slate-900 mb-0.5">
+        <span class="text-[#003262]">쓸고닦고</span> 서비스 제공을 위한<br/>
+        네이버 개인정보 제3자 제공 동의
+      </h1>
+      <p class="text-[11px] text-slate-500">
+        네이버 회원 계정으로 시공 발주 및 거래 서비스를 안전하게 이용합니다.
+      </p>
+    </div>
+
+    <!-- 네이버 로그인 프로필 및 제공 항목 컴팩트 카드 -->
+    <div class="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm space-y-2.5">
+      <div class="flex items-center justify-between pb-2 border-b border-slate-100 text-xs">
+        <span class="font-bold text-slate-500">연동 로그인 계정</span>
+        <div class="flex items-center gap-1.5 text-slate-900 font-semibold">
+          <span class="w-2 h-2 rounded-full bg-[#03C75A]"></span>
+          <span id="inputEmail" class="text-xs text-slate-800 font-bold font-mono">gonggandawon_corp@naver.com</span>
+        </div>
+      </div>
+
+      <div class="bg-slate-50 p-3 rounded-xl border border-slate-200/80 space-y-1.5 text-xs">
+        <div class="flex items-center justify-between">
+          <span class="font-bold text-slate-700">제공 동의 항목</span>
+          <span class="text-[10px] font-semibold text-emerald-600 bg-emerald-50 px-1.5 py-0.2 rounded border border-emerald-200">
+            필수 동의
+          </span>
+        </div>
+        <p class="font-semibold text-slate-800 text-[11px] flex items-center gap-1 pt-0.5">
+          <span class="text-emerald-500 font-bold">✓</span> 회원 식별 정보 (성명, 이메일, 휴대전화번호)
+        </p>
+        <p class="text-[10.5px] text-slate-500 leading-tight">
+          네이버 실명인증 회원 정보로 본인확인 및 계약 체결 시공 알림톡이 발송됩니다.
+        </p>
+      </div>
+
+      <div class="bg-emerald-50 p-2.5 rounded-xl border border-emerald-200 text-[11px] text-emerald-800 leading-snug flex items-center gap-1.5">
+        <span class="font-bold text-emerald-600 shrink-0">🔒</span>
+        <span>네이버 안전 암호화 통신을 통해 즉시 연동됩니다.</span>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- 하단 액션 버튼군 (한눈에 바로 보이도록 배치) -->
+  <footer class="max-w-md mx-auto w-full space-y-2 pt-1 pb-1">
+    <button
+      id="btnAgree"
+      onclick="handleAgreeAndSend()"
+      type="button"
+      class="w-full h-12 bg-[#03C75A] hover:bg-[#02B351] active:scale-[0.99] text-white font-bold text-sm rounded-xl transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer"
+    >
+      <div class="w-4 h-4 bg-white rounded-full flex items-center justify-center text-[#03C75A] font-black text-[10px]">✓</div>
+      <span>동의하고 계속하기 (회원정보 자동 연동)</span>
+    </button>
+
+    <div class="flex items-center justify-center text-xs text-slate-500 pt-0.5">
+      <button onclick="window.close()" type="button" class="hover:text-slate-800 underline text-[11px]">
+        취소하고 창 닫기
+      </button>
+    </div>
+  </footer>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const role = params.get('userRoleCd') || 'S';
+
+    function handleAgreeAndSend() {
+      const email = 'gonggandawon_corp@naver.com';
+      const name = '공간다원';
+      const phone = '010-8286-3457';
+      const uid = 'naver_1794696351819';
+
+      const profileData = {
+        id: uid,
+        email: email,
+        name: name,
+        mobile: phone,
+        userRoleCd: role,
+        provider: 'NAVER'
+      };
+
+      const btn = document.getElementById('btnAgree');
+      btn.innerHTML = '<span>로그인 처리 중... 잠시만 기다려 주세요</span>';
+      btn.className = 'w-full h-12 bg-emerald-700 text-white font-bold text-sm rounded-xl flex items-center justify-center';
+
+      // 1. postMessage 전송
+      try {
+        if (window.opener && !window.opener.closed) {
+          window.opener.postMessage({
+            type: 'NAVER_AUTH_SUCCESS',
+            provider: 'NAVER',
+            profile: profileData,
+            data: {
+              success: true,
+              isRegisteredUser: true,
+              profile: profileData
+            }
+          }, '*');
+        }
+      } catch (err) {
+        console.warn('postMessage fail:', err);
+      }
+
+      // 2. localStorage Bridge 안전장치 (postMessage 유실 대비)
+      try {
+        localStorage.setItem('SSEULDAKGO_SOCIAL_LOGIN_BRIDGE', JSON.stringify({
+          timestamp: Date.now(),
+          provider: 'NAVER',
+          userRoleCd: role,
+          profile: profileData
+        }));
+      } catch (e) {}
+
+      setTimeout(() => {
+        window.close();
+      }, 400);
+    }
+  </script>
+</body>
+</html>
+`;
+
+fs.writeFileSync(path.join(process.cwd(), 'preview', 'naver_oauth_popup.html'), naverPopupHtml, 'utf8');
+console.log('Saved preview/naver_oauth_popup.html');
+
+if (fs.existsSync(path.join(process.cwd(), 'preview_client', 'naver_oauth_popup.html'))) {
+  fs.writeFileSync(path.join(process.cwd(), 'preview_client', 'naver_oauth_popup.html'), naverPopupHtml, 'utf8');
+  console.log('Synced to preview_client/naver_oauth_popup.html');
+}

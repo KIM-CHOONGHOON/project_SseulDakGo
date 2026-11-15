@@ -59,13 +59,14 @@ export async function processWebClntAth010200100(payload = {}) {
 
       if (db && typeof db.executeQuery === 'function') {
         const cleanEmail = userEmail ? userEmail.trim().toLowerCase() : '';
-        // 1) 소셜 고유 ID 또는 (동일 SOCIAL_PROVIDER 내 이메일)로 TB_USER 기존 회원 여부 엄격 조회
+        // 1) 소셜 고유 ID 또는 소셜 이메일로 TB_USER 기존 회원 여부 엄격 조회 (역할 불일치 시에도 가입된 고유 계정 우선 인식)
         const rows = await db.executeQuery(
           `SELECT USER_NO, USER_ROLE_CD, USER_EMAIL, USER_NM, USER_STAT_CD, SUSPEND_EXPIRE_DT, SOCIAL_PROVIDER, SOCIAL_UID
            FROM TB_USER
-           WHERE ((SOCIAL_PROVIDER = ? AND SOCIAL_UID = ?) OR (SOCIAL_PROVIDER = ? AND USER_EMAIL = ? AND USER_ROLE_CD = ?))
+           WHERE SOCIAL_PROVIDER = ? AND (SOCIAL_UID = ? OR (USER_EMAIL = ? AND USER_EMAIL != ''))
+           ORDER BY (USER_ROLE_CD = ?) DESC, USER_NO DESC
            LIMIT 1`,
-          [socialProvider, socialUid || '', socialProvider, cleanEmail, normalizedRole]
+          [socialProvider, socialUid || '', cleanEmail, normalizedRole]
         );
 
         if (rows && rows.length > 0) {

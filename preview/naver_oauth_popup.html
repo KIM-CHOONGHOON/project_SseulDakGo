@@ -16,7 +16,7 @@
 <body class="bg-[#F8F9FA] text-slate-800 min-h-screen flex flex-col justify-between p-4 antialiased select-none">
 
   <!-- 상단 네이버 헤더 -->
-  <header class="bg-white border-b border-slate-200 px-5 py-3.5 -mx-4 -mt-4 shadow-xs flex items-center justify-between">
+  <header class="bg-white border-b border-slate-200 px-5 py-3 -mx-4 -mt-4 shadow-xs flex items-center justify-between">
     <div class="flex items-center gap-2">
       <div class="w-7 h-7 bg-[#03C75A] rounded flex items-center justify-center text-white font-extrabold text-[15px] tracking-tight">
         N
@@ -30,82 +30,63 @@
   </header>
 
   <!-- 메인 인증 영역 -->
-  <main class="flex-1 max-w-md mx-auto w-full py-4 space-y-4">
+  <main class="flex-1 max-w-md mx-auto w-full py-2 space-y-3">
     
     <!-- 서비스 연동 안내 카드 -->
-    <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm text-center">
-      <div class="flex items-center justify-center gap-3 mb-3">
-        <div class="w-12 h-12 rounded-2xl bg-slate-50 border border-slate-200 p-1 flex items-center justify-center shadow-xs">
+    <div class="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm text-center">
+      <div class="flex items-center justify-center gap-2.5 mb-2">
+        <div class="w-10 h-10 rounded-2xl bg-slate-50 border border-slate-200 p-1 flex items-center justify-center shadow-xs">
           <img src="logo.png" alt="쓸고닦고" class="w-full h-full object-contain" onerror="this.src='../public/logo.png'"/>
         </div>
-        <span class="text-slate-300 font-bold text-lg">+</span>
-        <div class="w-12 h-12 rounded-2xl bg-[#03C75A] flex items-center justify-center text-white font-extrabold text-2xl shadow-xs">
+        <span class="text-slate-300 font-bold text-base">+</span>
+        <div class="w-10 h-10 rounded-2xl bg-[#03C75A] flex items-center justify-center text-white font-extrabold text-xl shadow-xs">
           N
         </div>
       </div>
-      <h1 class="text-base font-extrabold text-slate-900 mb-1">
+      <h1 class="text-sm font-extrabold text-slate-900 mb-0.5">
         <span class="text-[#003262]">쓸고닦고</span> 서비스 제공을 위한<br/>
-        개인정보 제3자 제공 동의
+        네이버 개인정보 제3자 제공 동의
       </h1>
-      <p class="text-xs text-slate-500">
-        네이버 회원 계정으로 간편하게 가입하고 청소 시공 및 거래 서비스를 안전하게 이용하실 수 있습니다.
+      <p class="text-[11px] text-slate-500">
+        네이버 회원 계정으로 시공 발주 및 거래 서비스를 안전하게 이용합니다.
       </p>
     </div>
 
-    <!-- 네이버 로그인 프로필 확인란 -->
-    <div class="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm space-y-3">
-      <div class="flex items-center justify-between pb-2.5 border-b border-slate-100 text-xs">
-        <span class="font-bold text-slate-500">네이버 로그인 계정 (이메일)</span>
+    <!-- 네이버 로그인 프로필 및 제공 항목 컴팩트 카드 -->
+    <div class="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm space-y-2.5">
+      <div class="flex items-center justify-between pb-2 border-b border-slate-100 text-xs">
+        <span class="font-bold text-slate-500">연동 로그인 계정</span>
         <div class="flex items-center gap-1.5 text-slate-900 font-semibold">
           <span class="w-2 h-2 rounded-full bg-[#03C75A]"></span>
-          <input id="inputEmail" type="email" value="chunggiwa@naver.com" class="text-xs text-slate-800 font-bold bg-white border border-slate-300 rounded px-2 py-0.5 focus:outline-none focus:ring-1 focus:ring-[#03C75A]" title="이메일 직접 수정 가능"/>
+          <span id="inputEmail" class="text-xs text-slate-800 font-bold font-mono">gonggandawon_corp@naver.com</span>
         </div>
       </div>
 
-      <!-- 제공받는 항목 목록 (쓸고닦고 필수 4대 정보) -->
-      <div>
-        <div class="flex items-center justify-between mb-2">
-          <span class="text-xs font-bold text-slate-800">제공 항목 (필수 4개)</span>
-          <span class="text-[11px] text-[#03C75A] font-semibold">전체 동의 필수</span>
+      <div class="bg-slate-50 p-3 rounded-xl border border-slate-200/80 space-y-1.5 text-xs">
+        <div class="flex items-center justify-between">
+          <span class="font-bold text-slate-700">제공 동의 항목</span>
+          <span class="text-[10px] font-semibold text-emerald-600 bg-emerald-50 px-1.5 py-0.2 rounded border border-emerald-200">
+            필수 동의
+          </span>
         </div>
-        <div class="space-y-2 text-xs">
-          <div class="flex items-center justify-between p-2.5 bg-slate-50 rounded-xl border border-slate-100">
-            <span class="font-medium text-slate-700">1. 네이버 고유 회원 식별자 (ID)</span>
-            <span class="text-[10px] font-bold text-emerald-600 bg-emerald-100 px-1.5 py-0.5 rounded">필수</span>
-          </div>
-          <div class="flex items-center justify-between p-2.5 bg-slate-50 rounded-xl border border-slate-100">
-            <div class="flex flex-col">
-              <span class="font-medium text-slate-700">2. 로그인 이메일 (계정 ID)</span>
-              <span class="text-[11px] text-slate-500 font-mono">상단 입력 이메일 연동</span>
-            </div>
-            <span class="text-[10px] font-bold text-emerald-600 bg-emerald-100 px-1.5 py-0.5 rounded">필수</span>
-          </div>
-          <div class="flex items-center justify-between p-2.5 bg-slate-50 rounded-xl border border-slate-100">
-            <div class="flex flex-col">
-              <span class="font-medium text-slate-700">3. 성명 (실명)</span>
-              <input id="inputName" type="text" value="김충훈" class="text-xs text-slate-800 font-bold bg-white border border-slate-200 rounded px-1.5 py-0.5 mt-0.5 focus:outline-none focus:ring-1 focus:ring-[#03C75A]" title="실명 수정 가능"/>
-            </div>
-            <span class="text-[10px] font-bold text-emerald-600 bg-emerald-100 px-1.5 py-0.5 rounded">필수</span>
-          </div>
-          <div class="flex items-center justify-between p-2.5 bg-slate-50 rounded-xl border border-slate-100">
-            <div class="flex flex-col">
-              <span class="font-medium text-slate-700">4. 휴대폰 번호 (본인명의 실명확인)</span>
-              <input id="inputPhone" type="text" value="010-8286-3457" class="text-xs text-slate-800 font-bold bg-white border border-slate-200 rounded px-1.5 py-0.5 mt-0.5 focus:outline-none focus:ring-1 focus:ring-[#03C75A]" title="휴대폰 번호 수정 가능"/>
-            </div>
-            <span class="text-[10px] font-bold text-emerald-600 bg-emerald-100 px-1.5 py-0.5 rounded">필수</span>
-          </div>
-        </div>
+        <p class="font-semibold text-slate-800 text-[11px] flex items-center gap-1 pt-0.5">
+          <span class="text-emerald-500 font-bold">✓</span> 회원 식별 정보 (성명, 이메일, 휴대전화번호)
+        </p>
+        <p class="text-[10.5px] text-slate-500 leading-tight">
+          네이버 실명인증 회원 정보로 본인확인 및 계약 체결 시공 알림톡이 발송됩니다.
+        </p>
       </div>
 
-      <p class="text-[11px] text-slate-400 leading-relaxed pt-1">
-        * 제공된 정보는 쓸고닦고 회원 식별, 계약 체결 및 시공 알림톡 발송 목적으로만 이용되며, 회원 탈퇴 시 즉시 파기됩니다.
-      </p>
+      <div class="bg-emerald-50 p-2.5 rounded-xl border border-emerald-200 text-[11px] text-emerald-800 leading-snug flex items-center gap-1.5">
+        <span class="font-bold text-emerald-600 shrink-0">🔒</span>
+        <span>네이버 안전 암호화 통신을 통해 즉시 연동됩니다.</span>
+      </div>
     </div>
 
   </main>
 
-  <!-- 하단 액션 버튼군 -->
-  <footer class="max-w-md mx-auto w-full space-y-2 pt-2">
+  <!-- 하단 액션 버튼군 (한눈에 바로 보이도록 배치) -->
+  <footer class="max-w-md mx-auto w-full space-y-2 pt-1 pb-1">
     <button
       id="btnAgree"
       onclick="handleAgreeAndSend()"
@@ -116,56 +97,37 @@
       <span>동의하고 계속하기 (회원정보 자동 연동)</span>
     </button>
 
-    <div class="flex items-center justify-between text-xs text-slate-500 px-1">
-      <button onclick="window.close()" type="button" class="hover:text-slate-800 underline">
+    <div class="flex items-center justify-center text-xs text-slate-500 pt-0.5">
+      <button onclick="window.close()" type="button" class="hover:text-slate-800 underline text-[11px]">
         취소하고 창 닫기
       </button>
-      <a id="btnRealOAuth" href="#" target="_self" class="text-slate-400 hover:text-emerald-700 text-[11px] flex items-center gap-0.5">
-        <span>실제 네이버 서버(nid.naver.com)로 전환</span>
-        <span>→</span>
-      </a>
     </div>
   </footer>
 
   <script>
     const params = new URLSearchParams(window.location.search);
-    const clientId = params.get('client_id') || 'IFXxPCUqMk1EUp2OqRIp';
-    const state = params.get('state') || Math.random().toString(36).substring(2);
-    const redirectUri = params.get('redirect_uri') || (window.location.origin + '/api/auth/naver/callback');
-
-    // 이전에 가입/로그인된 회원 정보가 있으면 자동 연동
-    try {
-      const savedUser = JSON.parse(localStorage.getItem('SSEULDAKGO_AUTH_USER') || 'null');
-      if (savedUser) {
-        if (savedUser.userEmail) document.getElementById('inputEmail').value = savedUser.userEmail;
-        if (savedUser.userNm) document.getElementById('inputName').value = savedUser.userNm;
-        if (savedUser.userTel) document.getElementById('inputPhone').value = savedUser.userTel;
-      }
-    } catch (e) {}
-
-    const realAuthUrl = `https://nid.naver.com/oauth2.0/authorize?response_type=code&client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&state=${state}`;
-    document.getElementById('btnRealOAuth').href = realAuthUrl;
+    const role = params.get('userRoleCd') || 'S';
 
     function handleAgreeAndSend() {
-      const name = document.getElementById('inputName').value.trim() || '김충훈';
-      const phone = document.getElementById('inputPhone').value.trim() || '010-8286-3457';
-      const email = (document.getElementById('inputEmail')?.value || 'chunggiwa@naver.com').trim();
-      
-      let uid = 'naver_1794646365093';
-      try {
-        const savedUser = JSON.parse(localStorage.getItem('SSEULDAKGO_AUTH_USER') || '{}');
-        if (savedUser.socialUid) uid = savedUser.socialUid;
-      } catch (e) {}
+      const email = 'gonggandawon_corp@naver.com';
+      const name = '공간다원';
+      const phone = '010-8286-3457';
+      const uid = 'naver_1794696351819';
 
       const profileData = {
         id: uid,
         email: email,
         name: name,
         mobile: phone,
-        userRoleCd: 'C',
+        userRoleCd: role,
         provider: 'NAVER'
       };
 
+      const btn = document.getElementById('btnAgree');
+      btn.innerHTML = '<span>로그인 처리 중... 잠시만 기다려 주세요</span>';
+      btn.className = 'w-full h-12 bg-emerald-700 text-white font-bold text-sm rounded-xl flex items-center justify-center';
+
+      // 1. postMessage 전송
       try {
         if (window.opener && !window.opener.closed) {
           window.opener.postMessage({
@@ -174,31 +136,29 @@
             profile: profileData,
             data: {
               success: true,
-              isRegisteredUser: false,
+              isRegisteredUser: true,
               profile: profileData
             }
           }, '*');
         }
       } catch (err) {
-        console.warn('postMessage to opener fail:', err);
+        console.warn('postMessage fail:', err);
       }
 
+      // 2. localStorage Bridge 안전장치 (postMessage 유실 대비)
       try {
-        localStorage.setItem('SSEULDAKGO_NAVER_AUTH_BRIDGE', JSON.stringify({
+        localStorage.setItem('SSEULDAKGO_SOCIAL_LOGIN_BRIDGE', JSON.stringify({
           timestamp: Date.now(),
+          provider: 'NAVER',
+          userRoleCd: role,
           profile: profileData
         }));
       } catch (e) {}
 
-      const btn = document.getElementById('btnAgree');
-      btn.innerHTML = '<span>연동 완료! 창을 닫습니다...</span>';
-      btn.className = 'w-full h-12 bg-emerald-700 text-white font-bold text-sm rounded-xl flex items-center justify-center';
-      
       setTimeout(() => {
         window.close();
-      }, 350);
+      }, 400);
     }
   </script>
 </body>
 </html>
-

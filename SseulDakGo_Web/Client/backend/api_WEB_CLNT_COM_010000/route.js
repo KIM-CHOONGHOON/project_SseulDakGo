@@ -40,7 +40,7 @@ export const SQL_SELECT_CLIENT_USER = `
     USER_ROLE_CD
   FROM TB_USER
   WHERE USER_NO = ?
-    AND USER_ROLE_CD = 'C'
+    AND USER_ROLE_CD IN ('C', 'S')
     AND (ACTIVE_STATUS_YN = 'Y' OR USER_STAT_CD = 'NORMAL')
   LIMIT 1;
 `;
@@ -273,9 +273,9 @@ async function executeDatabaseQueries({ userNo, sidoCd, sigunguCd }) {
       return null;
     }
 
-    // 1. 사용자 인증/정보 확인 (TB_USER)
+    // 1. 사용자 인증/정보 확인 (TB_USER: 고객 C 및 시공사 S)
     let userRow = null;
-    if (userNo && userNo !== 'GUEST' && String(userNo).startsWith('C')) {
+    if (userNo && userNo !== 'GUEST' && (String(userNo).startsWith('C') || String(userNo).startsWith('S'))) {
       const userRows = await executeQuery(SQL_SELECT_CLIENT_USER, [userNo]);
       if (Array.isArray(userRows) && userRows.length > 0) {
         userRow = userRows[0];
@@ -319,11 +319,11 @@ export async function processWebClntCom010000(body = {}) {
   const sidoCd = body.sidoCd || body.SIDO_CD || '41';
   const sigunguCd = body.sigunguCd || body.SIGUNGU_CD || '41281';
 
-  // 1. 회원 / 비회원(GUEST) 판별 및 Role Prefix('C') 검증
+  // 1. 회원 / 비회원(GUEST) 판별 및 Role Prefix('C' 고객, 'S' 시공사) 검증
   const isGuest =
     !rawUserNo ||
     String(rawUserNo).toUpperCase() === 'GUEST' ||
-    !String(rawUserNo).startsWith('C');
+    !(String(rawUserNo).startsWith('C') || String(rawUserNo).startsWith('S'));
 
   // DB 조회 시도 (환경변수 존재 시)
   const dbResult = await executeDatabaseQueries({
@@ -336,8 +336,8 @@ export async function processWebClntCom010000(body = {}) {
   let userInfo = {
     isGuest,
     USER_NO: isGuest ? 'GUEST' : String(rawUserNo),
-    USER_NM: isGuest ? '비회원' : (rawUserNo === 'C20261100001' ? '김충훈' : '고객'),
-    USER_ROLE_CD: isGuest ? 'GUEST' : 'C',
+    USER_NM: isGuest ? '비회원' : (String(rawUserNo).startsWith('S') ? '시공사회원' : '고객'),
+    USER_ROLE_CD: isGuest ? 'GUEST' : (String(rawUserNo).startsWith('S') ? 'S' : 'C'),
   };
 
   if (!isGuest) {

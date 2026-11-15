@@ -18,8 +18,9 @@ import path from 'path';
 
 /**
  * 모바일 자필 전자서명 PNG 파일 디스크 저장 함수
+ * 저장 경로: C:\SseulDakGo_Storage\signatures\{client|partner}\{userNo}\sign_{userNo}_{timestamp}.png
  */
-function saveSignaturePng(signDataUrl, userNo) {
+function saveSignaturePng(signDataUrl, userNo, roleCd) {
   if (!signDataUrl || typeof signDataUrl !== 'string' || !signDataUrl.includes('base64,')) {
     return { fileName: null, filePath: null, fileUrl: null };
   }
@@ -28,19 +29,29 @@ function saveSignaturePng(signDataUrl, userNo) {
     const base64Data = signDataUrl.replace(/^data:image\/\w+;base64,/, '');
     const buffer = Buffer.from(base64Data, 'base64');
 
-    const date = new Date();
-    const yyyymm = `${date.getFullYear()}${String(date.getMonth() + 1).padStart(2, '0')}`;
-    const uploadDir = path.join(process.cwd(), 'public', 'uploads', 'signatures', yyyymm);
+    // 1. 외부 로컬 스토리지 루트 경로 (기본값: C:\SseulDakGo_Storage)
+    const storageRoot = process.env.STORAGE_LOCAL_ROOT || 'C:\\SseulDakGo_Storage';
+
+    // 2. 회원 역할별 하위 경로 (시공사/용역: partner, 고객: client)
+    const isPartner = roleCd === 'S' || roleCd === 'P' || (typeof userNo === 'string' && (userNo.startsWith('S') || userNo.startsWith('P')));
+    const roleType = isPartner ? 'partner' : 'client';
+
+    // 3. 회원번호 하위 디렉터리 경로 보장
+    const uploadDir = path.join(storageRoot, 'signatures', roleType, userNo);
 
     if (!fs.existsSync(uploadDir)) {
       fs.mkdirSync(uploadDir, { recursive: true });
+      console.log(`📁 [FOLDER_AUTO_CREATED_APP_011] 모바일 서명 보관 폴더 생성 완료: ${uploadDir}`);
     }
 
-    const fileName = `sign_app_${userNo}_${Date.now()}.png`;
+    // 4. 고유 서명 파일명 및 물리 파일 저장
+    const fileName = `sign_${userNo}_${Date.now()}.png`;
     const filePath = path.join(uploadDir, fileName);
     fs.writeFileSync(filePath, buffer);
 
-    const fileUrl = `/uploads/signatures/${yyyymm}/${fileName}`;
+    // 5. 웹/앱 접근 URL 생성 (/storage 마운트 엔드포인트 연동)
+    const fileUrl = `/storage/signatures/${roleType}/${userNo}/${fileName}`;
+
     return { fileName, filePath, fileUrl };
   } catch (err) {
     console.error('[SIGNATURE_SAVE_FAIL_APP_011]', err);

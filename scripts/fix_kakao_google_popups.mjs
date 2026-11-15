@@ -1,0 +1,350 @@
+import fs from 'fs';
+import path from 'path';
+
+// 1. preview/kakao_oauth_popup.html
+const kakaoPopupHtml = `<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>카카오 계정으로 로그인 | 쓸고닦고</title>
+  <link rel="icon" type="image/png" href="logo.png"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin=""/>
+  <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif; }
+  </style>
+</head>
+<body class="bg-[#FCFCFC] text-slate-800 min-h-screen flex flex-col justify-between p-4 antialiased select-none">
+
+  <!-- 상단 카카오 헤더 -->
+  <header class="bg-[#FEE500] px-5 py-3 -mx-4 -mt-4 shadow-xs flex items-center justify-between text-slate-900">
+    <div class="flex items-center gap-2">
+      <div class="w-6 h-6 bg-[#3C1E1E] rounded-full flex items-center justify-center text-[#FEE500] font-black text-xs">
+        💬
+      </div>
+      <span class="font-extrabold text-slate-900 text-lg tracking-tight">kakao</span>
+      <span class="text-xs font-semibold opacity-90 ml-1">계정으로 로그인</span>
+    </div>
+    <span class="text-[10px] font-mono px-2 py-0.5 bg-black/10 text-slate-900 rounded font-semibold">
+      비즈 앱 (ID 1650108)
+    </span>
+  </header>
+
+  <!-- 메인 인증 영역 -->
+  <main class="flex-1 max-w-md mx-auto w-full py-2 space-y-3">
+    
+    <!-- 서비스 연동 안내 카드 -->
+    <div class="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm text-center">
+      <div class="flex items-center justify-center gap-2.5 mb-2">
+        <div class="w-10 h-10 rounded-2xl bg-amber-50 border border-amber-200 p-1 flex items-center justify-center shadow-xs">
+          <img src="logo.png" alt="쓸고닦고" class="w-full h-full object-contain" onerror="this.src='../public/logo.png'"/>
+        </div>
+        <span class="text-slate-300 font-bold text-base">+</span>
+        <div class="w-10 h-10 rounded-2xl bg-[#FEE500] flex items-center justify-center text-slate-900 font-extrabold text-xl shadow-xs">
+          💬
+        </div>
+      </div>
+      <h1 class="text-sm font-extrabold text-slate-900 mb-0.5">
+        <span class="text-[#003262]">쓸고닦고</span> 서비스 제공을 위한<br/>
+        카카오 개인정보 제3자 제공 동의
+      </h1>
+      <p class="text-[11px] text-slate-500">
+        카카오 비즈 앱 인증 회원 정보로 시공 발주 및 거래 서비스를 안전하게 이용합니다.
+      </p>
+    </div>
+
+    <!-- 카카오 로그인 프로필 및 제공 항목 컴팩트 카드 -->
+    <div class="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm space-y-2.5">
+      <div class="flex items-center justify-between pb-2 border-b border-slate-100 text-xs">
+        <span class="font-bold text-slate-500">연동 로그인 계정</span>
+        <div class="flex items-center gap-1.5 text-slate-900 font-semibold">
+          <span class="w-2 h-2 rounded-full bg-[#FEE500] border border-[#3C1E1E]"></span>
+          <span id="inputEmail" class="text-xs text-slate-800 font-bold font-mono">gonggandawon_corp@kakao.com</span>
+        </div>
+      </div>
+
+      <div class="bg-amber-50/60 p-3 rounded-xl border border-amber-200/80 space-y-1.5 text-xs">
+        <div class="flex items-center justify-between">
+          <span class="font-bold text-amber-900">제공 동의 항목</span>
+          <span class="text-[10px] font-semibold text-amber-800 bg-amber-100 px-1.5 py-0.2 rounded border border-amber-300">
+            필수 동의
+          </span>
+        </div>
+        <p class="font-semibold text-slate-800 text-[11px] flex items-center gap-1 pt-0.5">
+          <span class="text-amber-500 font-bold">✓</span> 회원 식별 정보 (성명, 이메일, 휴대전화번호)
+        </p>
+        <p class="text-[10.5px] text-slate-500 leading-tight">
+          카카오 비즈 인증 정보로 본인확인 및 계약 체결 시공 알림톡이 발송됩니다.
+        </p>
+      </div>
+
+      <div class="bg-amber-50 p-2.5 rounded-xl border border-amber-200 text-[11px] text-amber-900 leading-snug flex items-center gap-1.5">
+        <span class="font-bold text-amber-600 shrink-0">🔒</span>
+        <span>카카오 비즈 암호화 통신을 통해 즉시 연동됩니다.</span>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- 하단 액션 버튼군 (한눈에 바로 보이도록 배치) -->
+  <footer class="max-w-md mx-auto w-full space-y-2 pt-1 pb-1">
+    <button
+      id="btnAgree"
+      onclick="handleAgreeAndSend()"
+      type="button"
+      class="w-full h-12 bg-[#FEE500] hover:bg-[#ebd200] active:scale-[0.99] text-slate-900 font-bold text-sm rounded-xl transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer"
+    >
+      <div class="w-4 h-4 bg-[#3C1E1E] rounded-full flex items-center justify-center text-[#FEE500] font-black text-[10px]">✓</div>
+      <span>동의하고 계속하기 (회원정보 자동 연동)</span>
+    </button>
+
+    <div class="flex items-center justify-center text-xs text-slate-500 pt-0.5">
+      <button onclick="window.close()" type="button" class="hover:text-slate-800 underline text-[11px]">
+        취소하고 창 닫기
+      </button>
+    </div>
+  </footer>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const role = params.get('userRoleCd') || 'S';
+
+    function handleAgreeAndSend() {
+      const email = 'gonggandawon_corp@kakao.com';
+      const name = '공간다원';
+      const phone = '010-8286-3457';
+      const uid = 'kakao_1794696351819';
+
+      const profileData = {
+        id: uid,
+        email: email,
+        name: name,
+        mobile: phone,
+        userRoleCd: role,
+        provider: 'KAKAO'
+      };
+
+      const btn = document.getElementById('btnAgree');
+      btn.innerHTML = '<span>로그인 처리 중... 잠시만 기다려 주세요</span>';
+
+      try {
+        if (window.opener && !window.opener.closed) {
+          window.opener.postMessage({
+            type: 'KAKAO_AUTH_SUCCESS',
+            provider: 'KAKAO',
+            profile: profileData,
+            data: {
+              success: true,
+              isRegisteredUser: true,
+              profile: profileData
+            }
+          }, '*');
+        }
+      } catch (err) {
+        console.warn('postMessage fail:', err);
+      }
+
+      try {
+        localStorage.setItem('SSEULDAKGO_SOCIAL_LOGIN_BRIDGE', JSON.stringify({
+          timestamp: Date.now(),
+          provider: 'KAKAO',
+          userRoleCd: role,
+          profile: profileData
+        }));
+      } catch (e) {}
+
+      setTimeout(() => {
+        window.close();
+      }, 400);
+    }
+  </script>
+</body>
+</html>
+`;
+
+fs.writeFileSync(path.join(process.cwd(), 'preview', 'kakao_oauth_popup.html'), kakaoPopupHtml, 'utf8');
+if (fs.existsSync(path.join(process.cwd(), 'preview_client', 'kakao_oauth_popup.html'))) {
+  fs.writeFileSync(path.join(process.cwd(), 'preview_client', 'kakao_oauth_popup.html'), kakaoPopupHtml, 'utf8');
+}
+console.log('Saved preview/kakao_oauth_popup.html');
+
+// 2. preview/google_oauth_popup.html
+const googlePopupHtml = `<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Google 계정으로 로그인 | 쓸고닦고</title>
+  <link rel="icon" type="image/png" href="logo.png"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin=""/>
+  <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif; }
+  </style>
+</head>
+<body class="bg-[#FFFFFF] text-slate-800 min-h-screen flex flex-col justify-between p-4 antialiased select-none">
+
+  <!-- 상단 Google 헤더 -->
+  <header class="bg-slate-50 border-b border-slate-200 px-5 py-3 -mx-4 -mt-4 shadow-xs flex items-center justify-between text-slate-900">
+    <div class="flex items-center gap-2">
+      <svg class="w-5 h-5" viewBox="0 0 24 24">
+        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" />
+        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" />
+      </svg>
+      <span class="font-extrabold text-slate-800 text-lg tracking-tight">Google</span>
+      <span class="text-xs font-semibold text-slate-500 ml-1">계정으로 로그인</span>
+    </div>
+    <span class="text-[10px] font-mono px-2 py-0.5 bg-blue-50 text-blue-700 rounded font-semibold border border-blue-200">
+      OAuth 2.0
+    </span>
+  </header>
+
+  <!-- 메인 인증 영역 -->
+  <main class="flex-1 max-w-md mx-auto w-full py-2 space-y-3">
+    
+    <!-- 서비스 연동 안내 카드 -->
+    <div class="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm text-center">
+      <div class="flex items-center justify-center gap-2.5 mb-2">
+        <div class="w-10 h-10 rounded-2xl bg-blue-50 border border-blue-200 p-1 flex items-center justify-center shadow-xs">
+          <img src="logo.png" alt="쓸고닦고" class="w-full h-full object-contain" onerror="this.src='../public/logo.png'"/>
+        </div>
+        <span class="text-slate-300 font-bold text-base">+</span>
+        <div class="w-10 h-10 rounded-2xl bg-white border border-slate-200 flex items-center justify-center shadow-xs">
+          <svg class="w-6 h-6" viewBox="0 0 24 24">
+            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" />
+            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" />
+          </svg>
+        </div>
+      </div>
+      <h1 class="text-sm font-extrabold text-slate-900 mb-0.5">
+        <span class="text-[#003262]">쓸고닦고</span> 서비스 제공을 위한<br/>
+        Google 개인정보 제공 동의
+      </h1>
+      <p class="text-[11px] text-slate-500">
+        Google 계정 정보로 시공 발주 및 거래 서비스를 안전하게 이용합니다.
+      </p>
+    </div>
+
+    <!-- Google 로그인 프로필 및 제공 항목 컴팩트 카드 -->
+    <div class="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm space-y-2.5">
+      <div class="flex items-center justify-between pb-2 border-b border-slate-100 text-xs">
+        <span class="font-bold text-slate-500">연동 로그인 계정</span>
+        <div class="flex items-center gap-1.5 text-slate-900 font-semibold">
+          <span class="w-2 h-2 rounded-full bg-blue-500"></span>
+          <span id="inputEmail" class="text-xs text-slate-800 font-bold font-mono">gonggandawon.corp@gmail.com</span>
+        </div>
+      </div>
+
+      <div class="bg-slate-50 p-3 rounded-xl border border-slate-200/80 space-y-1.5 text-xs">
+        <div class="flex items-center justify-between">
+          <span class="font-bold text-slate-700">제공 동의 항목</span>
+          <span class="text-[10px] font-semibold text-blue-600 bg-blue-50 px-1.5 py-0.2 rounded border border-blue-200">
+            필수 동의
+          </span>
+        </div>
+        <p class="font-semibold text-slate-800 text-[11px] flex items-center gap-1 pt-0.5">
+          <span class="text-blue-500 font-bold">✓</span> 회원 식별 정보 (성명, 이메일, 휴대전화번호)
+        </p>
+        <p class="text-[10.5px] text-slate-500 leading-tight">
+          Google 계정 정보로 본인확인 및 계약 체결 시공 알림톡이 발송됩니다.
+        </p>
+      </div>
+
+      <div class="bg-blue-50 p-2.5 rounded-xl border border-blue-200 text-[11px] text-blue-800 leading-snug flex items-center gap-1.5">
+        <span class="font-bold text-blue-600 shrink-0">🔒</span>
+        <span>Google 보안 암호화 통신을 통해 즉시 연동됩니다.</span>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- 하단 액션 버튼군 (한눈에 바로 보이도록 배치) -->
+  <footer class="max-w-md mx-auto w-full space-y-2 pt-1 pb-1">
+    <button
+      id="btnAgree"
+      onclick="handleAgreeAndSend()"
+      type="button"
+      class="w-full h-12 bg-white border border-slate-300 hover:bg-slate-50 active:scale-[0.99] text-slate-800 font-bold text-sm rounded-xl transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer"
+    >
+      <div class="w-4 h-4 bg-blue-600 rounded-full flex items-center justify-center text-white font-black text-[10px]">✓</div>
+      <span>동의하고 계속하기 (회원정보 자동 연동)</span>
+    </button>
+
+    <div class="flex items-center justify-center text-xs text-slate-500 pt-0.5">
+      <button onclick="window.close()" type="button" class="hover:text-slate-800 underline text-[11px]">
+        취소하고 창 닫기
+      </button>
+    </div>
+  </footer>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const role = params.get('userRoleCd') || 'S';
+
+    function handleAgreeAndSend() {
+      const email = 'gonggandawon.corp@gmail.com';
+      const name = '공간다원';
+      const phone = '010-8286-3457';
+      const uid = 'google_1794696351819';
+
+      const profileData = {
+        id: uid,
+        email: email,
+        name: name,
+        mobile: phone,
+        userRoleCd: role,
+        provider: 'GOOGLE'
+      };
+
+      const btn = document.getElementById('btnAgree');
+      btn.innerHTML = '<span>로그인 처리 중... 잠시만 기다려 주세요</span>';
+
+      try {
+        if (window.opener && !window.opener.closed) {
+          window.opener.postMessage({
+            type: 'GOOGLE_AUTH_SUCCESS',
+            provider: 'GOOGLE',
+            profile: profileData,
+            data: {
+              success: true,
+              isRegisteredUser: true,
+              profile: profileData
+            }
+          }, '*');
+        }
+      } catch (err) {
+        console.warn('postMessage fail:', err);
+      }
+
+      try {
+        localStorage.setItem('SSEULDAKGO_SOCIAL_LOGIN_BRIDGE', JSON.stringify({
+          timestamp: Date.now(),
+          provider: 'GOOGLE',
+          userRoleCd: role,
+          profile: profileData
+        }));
+      } catch (e) {}
+
+      setTimeout(() => {
+        window.close();
+      }, 400);
+    }
+  </script>
+</body>
+</html>
+`;
+
+fs.writeFileSync(path.join(process.cwd(), 'preview', 'google_oauth_popup.html'), googlePopupHtml, 'utf8');
+if (fs.existsSync(path.join(process.cwd(), 'preview_client', 'google_oauth_popup.html'))) {
+  fs.writeFileSync(path.join(process.cwd(), 'preview_client', 'google_oauth_popup.html'), googlePopupHtml, 'utf8');
+}
+console.log('Saved preview/google_oauth_popup.html');

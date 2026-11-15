@@ -11,6 +11,7 @@ import { processWebClntOrd010000 } from '../SseulDakGo_Web/Client/backend/api_WE
 import { processWebClntOrd010100 } from '../SseulDakGo_Web/Client/backend/api_WEB_CLNT_ORD_010100/route.js';
 import { processWebClntPay010100 } from '../SseulDakGo_Web/Client/backend/api_WEB_CLNT_PAY_010100/route.js';
 import { processWebClntJob010100 } from '../SseulDakGo_Web/Client/backend/api_WEB_CLNT_JOB_010100/route.js';
+import { processWebClntMyp010100 } from '../SseulDakGo_Web/Client/backend/api_WEB_CLNT_MYP_010100/route.js';
 import { processAppClntCom010000 } from '../SseulDakGo_App/Client/backend/api_APP_CLNT_COM_010000/route.js';
 import { processAppClntReq010100 } from '../SseulDakGo_App/Client/backend/api_APP_CLNT_REQ_010100/route.js';
 import { processAppClntReq010101 } from '../SseulDakGo_App/Client/backend/api_APP_CLNT_REQ_010101/route.js';
@@ -762,6 +763,24 @@ app.post('/api/web/client/job_010100', async (req, res) => {
 });
 
 // ============================================================================
+// [API 라우트] ALL /api/web/client/myp_010100 (WEB-CLNT-MYP-010100 내정보 프로필 및 통계)
+// ============================================================================
+app.all('/api/web/client/myp_010100', async (req, res) => {
+  try {
+    const userNo = req.query.userNo || req.body?.userNo || 'C20261100001';
+    const result = await processWebClntMyp010100({ userNo });
+    return res.status(result.success ? 200 : 500).json(result);
+  } catch (error) {
+    console.error('❌ API Error (/api/web/client/myp_010100):', error);
+    return res.status(500).json({
+      success: false,
+      code: 'ERR_INTERNAL_SERVER',
+      message: error?.message || '내정보 조회 중 오류가 발생했습니다.',
+    });
+  }
+});
+
+// ============================================================================
 // [API 라우트] POST /api/app/client/com_010000 (APP-CLNT-COM-010000 고객 모바일 앱 홈)
 // ============================================================================
 app.post('/api/app/client/com_010000', async (req, res) => {
@@ -870,8 +889,8 @@ app.use('/public', express.static(path.join(__dirname, '../public')));
 app.use('/uploads', express.static(path.join(__dirname, '../public/uploads')));
 app.use('/preview_client', express.static(path.join(__dirname, '../preview_client')));
 
-// D 드라이브 외부 스토리지 마운트 서빙 (업계 표준 스토리지 격리 원칙)
-const externalStoragePath = process.env.STORAGE_LOCAL_ROOT || 'D:\\SseulDakGo_Storage';
+// C 드라이브 외부 스토리지 마운트 서빙 (업계 표준 스토리지 격리 원칙)
+const externalStoragePath = process.env.STORAGE_LOCAL_ROOT || 'C:\\SseulDakGo_Storage';
 import fs from 'fs';
 if (fs.existsSync(externalStoragePath)) {
   app.use('/storage', express.static(externalStoragePath));
