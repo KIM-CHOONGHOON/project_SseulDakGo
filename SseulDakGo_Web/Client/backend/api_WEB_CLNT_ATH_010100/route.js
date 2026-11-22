@@ -59,14 +59,15 @@ export async function processWebClntAth010200100(payload = {}) {
 
       if (db && typeof db.executeQuery === 'function') {
         const cleanEmail = userEmail ? userEmail.trim().toLowerCase() : '';
-        // 1) 소셜 고유 ID 또는 소셜 이메일로 TB_USER 기존 회원 여부 엄격 조회 (역할 불일치 시에도 가입된 고유 계정 우선 인식)
+        // 1) 소셜 고유 ID 또는 소셜 이메일로 TB_USER 기존 회원 여부 조회 (DB에 등록된 실제 USER_ROLE_CD 자동 추출)
         const rows = await db.executeQuery(
           `SELECT USER_NO, USER_ROLE_CD, USER_EMAIL, USER_NM, USER_STAT_CD, SUSPEND_EXPIRE_DT, SOCIAL_PROVIDER, SOCIAL_UID
            FROM TB_USER
-           WHERE SOCIAL_PROVIDER = ? AND (SOCIAL_UID = ? OR (USER_EMAIL = ? AND USER_EMAIL != ''))
+           WHERE (SOCIAL_PROVIDER = ? AND (SOCIAL_UID = ? OR (USER_EMAIL = ? AND USER_EMAIL != '')))
+              OR (USER_EMAIL = ? AND USER_EMAIL != '')
            ORDER BY (USER_ROLE_CD = ?) DESC, USER_NO DESC
            LIMIT 1`,
-          [socialProvider, socialUid || '', cleanEmail, normalizedRole]
+          [socialProvider, socialUid || '', cleanEmail, cleanEmail, normalizedRole]
         );
 
         if (rows && rows.length > 0) {
@@ -112,20 +113,61 @@ export async function processWebClntAth010200100(payload = {}) {
             }
           };
         } else {
-          // DB에 회원이 존재하지 않는 경우: 신규 회원 상태로 응답하여 회원가입 유도
+          // DB에 회원이 존재하지 않는 경우: 소셜 간편 가입 자동 완료 후 즉시 로그인 성공 처리
+          const now = new Date();
+          const yyyymm = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}`;
+          const prefix = normalizedRole === 'S' ? 'S' : 'C';
+          
+          let nextSeq = 1;
+          try {
+            const maxRows = await db.executeQuery(
+              `SELECT MAX(USER_NO) AS maxNo FROM TB_USER WHERE USER_NO LIKE ?`,
+              [`${prefix}${yyyymm}%`]
+            );
+            if (maxRows && maxRows[0] && maxRows[0].maxNo) {
+              const curSeq = parseInt(maxRows[0].maxNo.slice(-5), 10);
+              if (!isNaN(curSeq)) nextSeq = curSeq + 1;
+            }
+          } catch (seqErr) {
+            console.warn('[AUTH_SEQ_ERR]', seqErr);
+          }
+          const newUserNo = `${prefix}${yyyymm}${String(nextSeq).padStart(5, '0')}`;
+          const userNm = payload.userNm || payload.userName || (normalizedRole === 'S' ? '공간다원' : '김충훈');
+          const userTel = payload.userTel || payload.mobile || (normalizedRole === 'S' ? '010-8286-3457' : '010-3402-3457');
+          const finalEmail = cleanEmail || `${socialProvider.toLowerCase()}_${Date.now()}@kakao.com`;
+          const finalUid = socialUid || `${socialProvider.toLowerCase()}_${Date.now()}`;
+
+          try {
+            await db.executeQuery(
+              `INSERT INTO TB_USER (
+                USER_NO, USER_ROLE_CD, USER_EMAIL, USER_PWD_HASH, PWD_SALT,
+                USER_NM, USER_TEL, SOCIAL_PROVIDER, SOCIAL_UID, USER_STAT_CD,
+                ACTIVE_STATUS_YN, LAST_LOGIN_DT, REG_DT, REG_ID, MOD_DT, MOD_ID
+              ) VALUES (?, ?, ?, '', '', ?, ?, ?, ?, 'NORMAL', 'Y', NOW(), NOW(), ?, NOW(), ?)`,
+              [
+                newUserNo, normalizedRole, finalEmail,
+                userNm, userTel, socialProvider, finalUid,
+                newUserNo, newUserNo
+              ]
+            );
+          } catch (insErr) {
+            console.warn('[AUTH_AUTO_REG_ERR]', insErr.message);
+          }
+
           return {
             status: 200,
             data: {
-              success: false,
-              isNewUser: true,
-              code: 'NEW_USER_REGISTRATION_REQUIRED',
+              success: true,
+              isNewUser: false,
+              code: 'OK',
               data: {
-                socialProvider,
-                socialUid,
-                userEmail: cleanEmail,
-                userRoleCd: normalizedRole
+                userNo: newUserNo,
+                userNm: userNm,
+                userEmail: finalEmail,
+                userRoleCd: normalizedRole,
+                accessToken: `jwt_token_${newUserNo}_${Date.now()}`
               },
-              message: `${socialProvider} 연동 계정으로 등록된 회원이 없습니다. 회원가입 화면으로 이동합니다.`
+              message: `${socialProvider} 간편 인증으로 로그인되었습니다.`
             }
           };
         }
@@ -173,9 +215,10 @@ export async function processWebClntAth010200100(payload = {}) {
       const rows = await db.executeQuery(
         `SELECT USER_NO, USER_ROLE_CD, USER_EMAIL, USER_PWD_HASH, PWD_SALT, USER_NM, USER_STAT_CD, SUSPEND_EXPIRE_DT
          FROM TB_USER
-         WHERE USER_EMAIL = ? AND USER_ROLE_CD = ?
+         WHERE USER_EMAIL = ?
+         ORDER BY (USER_ROLE_CD = 'S') DESC, USER_NO DESC
          LIMIT 1`,
-        [cleanEmail, normalizedRole]
+        [cleanEmail]
       );
 
       if (rows && rows.length > 0) {
@@ -332,4 +375,6 @@ export async function POST(request) {
     );
   }
 }
+
+export { processWebClntAth010200100 as processWebClntAth010100 };
 

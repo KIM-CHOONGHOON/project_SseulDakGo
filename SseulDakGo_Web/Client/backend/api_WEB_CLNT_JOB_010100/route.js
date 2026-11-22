@@ -319,7 +319,7 @@ export async function processWebClntJob010100(payload = {}) {
         // 3. 중분류 상세 상태 전이
         await db.executeQuery(
           `UPDATE TB_ORDER_DTL
-           SET SERVICE_STATUS = 'APPR_CONTRACT', DETAIL_STATUS = 'SERVICE_DONE'
+           SET SERVICE_STATUS = 'COMPLETED'
            WHERE ORDER_DTL_NO = ?`,
           [ORDER_DTL_NO]
         );

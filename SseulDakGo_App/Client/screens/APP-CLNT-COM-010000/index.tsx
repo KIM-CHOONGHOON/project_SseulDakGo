@@ -686,7 +686,7 @@ export default function AppClntCom010000({
               <img
                 alt="엠블럼"
                 className="w-full h-full object-cover"
-                src="/logo.png"
+                src="/storage/project/brand/Logo_쓸고딱고.jpg"
                 onError={(e) => {
                   (e.target as HTMLImageElement).src =
                     'https://lh3.googleusercontent.com/aida-public/AB6AXuD_JxHm0Bzno0xmsjfqXLrOutj75uRZrgum8mJS4iWYFnNEnaMJJd4_HMzgnnedTERR-zT_eyVay8IXxdmANniACDO_jMnsn9VWxbRQZuPZ7hfIHYopiWcU_U1kXwXFrKJgMaR7-DiZpPw2yd6VwCV3uUSx6FgTSvwc2AsrnLY5HfojeYF04E-q6gOanr8mhM4JOzBGOTKl9XkOJzEMGXXFvkBu32EsLLKYrFcdU0J-K45Sn7J5cprv';

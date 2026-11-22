@@ -593,3 +593,6 @@ export async function POST(request) {
   }
 }
 
+export { processAppClntAth010200200 as processAppClntAth010200 };
+
+

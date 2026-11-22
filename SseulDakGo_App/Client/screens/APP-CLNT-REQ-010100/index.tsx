@@ -1032,14 +1032,10 @@ export function AppClntReq010100({
     setPhotoFiles((prev) => prev.filter((p) => p.seq !== seq));
   };
 
-  // 금액 천단위 포맷팅 핸들러
+  // 금액 천단위/세자리 콤마 포맷팅 핸들러
   const handlePriceChange = (val: string) => {
     const rawNumber = val.replace(/[^0-9]/g, '');
-    if (!rawNumber) {
-      setFormData((prev) => ({ ...prev, proposedPrice: '0' }));
-      return;
-    }
-    const formatted = Number(rawNumber).toLocaleString('ko-KR');
+    const formatted = rawNumber ? Number(rawNumber).toLocaleString('ko-KR') : '';
     setFormData((prev) => ({ ...prev, proposedPrice: formatted }));
   };
 

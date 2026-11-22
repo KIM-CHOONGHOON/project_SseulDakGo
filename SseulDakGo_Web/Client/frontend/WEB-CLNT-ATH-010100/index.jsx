@@ -110,7 +110,7 @@ export default function WebClntAth010100({
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          userRoleCd: role,
+          userRoleCd: (profile.userRoleCd || role),
           userEmail: email.trim(),
           userPwd: pwd,
           keepLogin
@@ -156,7 +156,7 @@ export default function WebClntAth010100({
         userNo: role === 'C' ? 'C20261000001' : 'S20261000001',
         userNm: role === 'C' ? '홍길동' : '김반장 (마스터)',
         userEmail: email.trim(),
-        userRoleCd: role,
+        userRoleCd: (profile.userRoleCd || role),
         accessToken: `mock_jwt_token_${Date.now()}`,
         hasTempReq,
         keepLogin,
@@ -174,55 +174,83 @@ export default function WebClntAth010100({
     setIsLoading(true);
     setErrorMsg('');
 
-    // 카카오 / 네이버 / Google 공식 OAuth 2.0 연동
-    if ((provider === 'NAVER' || provider === 'KAKAO' || provider === 'GOOGLE') && typeof window !== 'undefined') {
+    if (typeof window !== 'undefined') {
       const providerLower = provider.toLowerCase();
-      try {
-        const authRes = await fetch(`/api/auth/${providerLower}/authorize?userRoleCd=${role}`);
-        const authJson = await authRes.json();
-        if (authJson.success && authJson.authUrl) {
-          const onSocialMessage = (e) => {
-            if (e.data?.type === `${provider}_AUTH_SUCCESS`) {
-              window.removeEventListener('message', onSocialMessage);
-              setIsLoading(false);
-              const authData = e.data.data;
-              if (onSuccessLogin) {
-                onSuccessLogin({
-                  ...authData.user,
-                  hasTempReq
-                });
-              }
-              if (onClose) onClose();
-            } else if (e.data?.type === `${provider}_AUTH_NEW_USER`) {
-              window.removeEventListener('message', onSocialMessage);
-              setIsLoading(false);
-              const authData = e.data.data;
-              if (onOpenRegister) {
-                onOpenRegister({ socialProfile: authData.profile, provider });
-              } else {
-                sessionStorage.setItem(`SSEULDAKGO_${provider}_PREFILL`, JSON.stringify(authData.profile));
-                const providerLabel = provider === 'KAKAO' ? '카카오' : provider === 'GOOGLE' ? 'Google' : '네이버';
-                alert(`${providerLabel} 계정(${authData.profile?.name || '고객'}) 인증 완료! 회원가입 화면에서 약관 동의 후 가입을 완료해 주세요.`);
-                if (onClose) onClose();
-              }
-            }
-          };
-          window.addEventListener('message', onSocialMessage);
-
-          const width = 480;
-          const height = 640;
-          const left = window.screenX + (window.outerWidth - width) / 2;
-          const top = window.screenY + (window.outerHeight - height) / 2;
-          const popup = window.open(authJson.authUrl, `${providerLower}_oauth_popup`, `width=${width},height=${height},left=${left},top=${top},scrollbars=yes`);
-
-          if (!popup || popup.closed || typeof popup.closed === 'undefined') {
-            window.location.href = authJson.authUrl;
-          }
-          return;
-        }
-      } catch (oauthErr) {
-        console.warn(`[${provider}_OAUTH_POPUP_FALLBACK]`, oauthErr);
+      let popupUrl = `./${providerLower}_oauth_popup.html?action=login&userRoleCd=${role}`;
+      if (window.location.protocol.startsWith('http')) {
+        popupUrl = `/preview/${providerLower}_oauth_popup.html?action=login&userRoleCd=${role}`;
       }
+
+      const width = 480;
+      const height = 640;
+      const left = window.screenX + (window.outerWidth - width) / 2;
+      const top = window.screenY + (window.outerHeight - height) / 2;
+
+      let bridgeCompleted = false;
+
+      const doProcessLogin = async (profile) => {
+        if (bridgeCompleted) return;
+        bridgeCompleted = true;
+        setIsLoading(true);
+        try {
+          const checkRes = await fetch('/api/web/client/ath_010100', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              userRoleCd: (profile.userRoleCd || role),
+              socialProvider: provider,
+              socialUid: profile.id,
+              userEmail: profile.email,
+              userNm: profile.name,
+              userTel: profile.mobile,
+            }),
+          });
+          const checkData = await checkRes.json();
+          setIsLoading(false);
+
+          if (checkData.success) {
+            const loginUser = {
+              ...checkData.data,
+              hasTempReq,
+            };
+            localStorage.setItem('SSEULDAKGO_AUTH_USER', JSON.stringify(loginUser));
+            localStorage.setItem('SSEULDAKGO_KEEP_LOGIN', 'Y');
+            if (onSuccessLogin) onSuccessLogin(loginUser);
+            if (onClose) onClose();
+          } else {
+            setErrorMsg(checkData.message || '소셜 로그인 처리에 실패했습니다.');
+          }
+        } catch (err) {
+          console.error('Web social login error:', err);
+          setIsLoading(false);
+        }
+      };
+
+      const onMsg = (e) => {
+        if (e.data && e.data.type === `${provider}_AUTH_SUCCESS` && e.data.profile) {
+          window.removeEventListener('message', onMsg);
+          doProcessLogin(e.data.profile);
+        }
+      };
+      window.addEventListener('message', onMsg);
+
+      const checkStorage = setInterval(() => {
+        try {
+          const raw = localStorage.getItem('SSEULDAKGO_SOCIAL_LOGIN_BRIDGE');
+          if (raw) {
+            const parsed = JSON.parse(raw);
+            if (parsed.provider === provider && Date.now() - parsed.timestamp < 10000) {
+              localStorage.removeItem('SSEULDAKGO_SOCIAL_LOGIN_BRIDGE');
+              clearInterval(checkStorage);
+              doProcessLogin(parsed.profile);
+            }
+          }
+        } catch (e) {}
+      }, 300);
+      setTimeout(() => clearInterval(checkStorage), 60000);
+
+      window.open(popupUrl, `${providerLower}_oauth_popup`, `width=${width},height=${height},left=${left},top=${top},scrollbars=yes`);
+      return;
     }
 
     try {
@@ -230,7 +258,7 @@ export default function WebClntAth010100({
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          userRoleCd: role,
+          userRoleCd: (profile.userRoleCd || role),
           socialProvider: provider,
           socialUid: `demo_${provider.toLowerCase()}_${Date.now()}`
         })
@@ -251,7 +279,7 @@ export default function WebClntAth010100({
         userNo: role === 'C' ? 'C20261000001' : 'S20261000001',
         userNm: `${provider} 사용자`,
         userEmail: `${provider.toLowerCase()}@example.com`,
-        userRoleCd: role,
+        userRoleCd: (profile.userRoleCd || role),
         accessToken: `mock_social_token_${Date.now()}`,
         hasTempReq
       };
@@ -293,7 +321,7 @@ export default function WebClntAth010100({
         <div className="flex flex-col items-center text-center mt-1 mb-4">
           <div className="w-14 h-14 rounded-full overflow-hidden shadow-md ring-4 ring-secondary-container/40 mb-3 flex items-center justify-center bg-white">
             <img
-              src="/logo.png"
+              src="/storage/project/brand/Logo_쓸고딱고.jpg"
               alt="쓸고닦고 로고"
               className="w-full h-full object-cover rounded-full"
             />
@@ -309,50 +337,7 @@ export default function WebClntAth010100({
           </p>
         </div>
 
-        {/* 2. 회원 구분 라디오 (USER_ROLE_CD) */}
-        <div
-          aria-label="회원 유형 선택"
-          className="w-full bg-surface-container-low p-1 rounded-xl grid grid-cols-2 gap-1 mb-3"
-          data-field="USER_ROLE_CD"
-          role="radiogroup"
-        >
-          <button
-            aria-checked={role === 'C'}
-            className={`flex items-center justify-center gap-1.5 h-10 rounded-lg font-label-md text-label-md transition-all ${
-              role === 'C'
-                ? 'bg-surface-container-lowest text-primary shadow-sm font-bold'
-                : 'text-on-surface-variant hover:text-on-surface'
-            }`}
-            data-role="C"
-            id="role-client"
-            onClick={() => setRole('C')}
-            role="radio"
-            type="button"
-          >
-            <span className={`material-symbols-outlined text-[16px] ${role === 'C' ? 'text-secondary' : 'text-outline'}`}>
-              {role === 'C' ? 'radio_button_checked' : 'radio_button_unchecked'}
-            </span>
-            <span>고객 회원</span>
-          </button>
-          <button
-            aria-checked={role === 'S'}
-            className={`flex items-center justify-center gap-1.5 h-10 rounded-lg font-label-md text-label-md transition-all ${
-              role === 'S'
-                ? 'bg-surface-container-lowest text-primary shadow-sm font-bold'
-                : 'text-on-surface-variant hover:text-on-surface'
-            }`}
-            data-role="S"
-            id="role-partner"
-            onClick={() => setRole('S')}
-            role="radio"
-            type="button"
-          >
-            <span className={`material-symbols-outlined text-[16px] ${role === 'S' ? 'text-secondary' : 'text-outline'}`}>
-              {role === 'S' ? 'radio_button_checked' : 'radio_button_unchecked'}
-            </span>
-            <span>시공사 회원</span>
-          </button>
-        </div>
+        {/* 2. 회원 구분 라디오는 삭제됨: 로그인 시 TB_USER의 USER_ROLE_CD에 따라 고객/시공사로 자동 분기 */}
 
         {/* 3. 비회원 임시 요청서 감지 배너 (조건부 노출) */}
         {hasTempReq && (

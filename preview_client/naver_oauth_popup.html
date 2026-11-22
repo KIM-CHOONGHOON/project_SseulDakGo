@@ -1,50 +1,60 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>네이버 아이디로 로그인 | 쓸고닦고</title>
-  <link rel="icon" type="image/png" href="logo.png"/>
-  <link rel="preconnect" href="https://fonts.googleapis.com"/>
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin=""/>
-  <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <link rel="icon" type="image/png" href="logo.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
+  <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet" />
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    body { font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif; }
+    body {
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
   </style>
 </head>
+
 <body class="bg-[#F8F9FA] text-slate-800 min-h-screen flex flex-col justify-between p-4 antialiased select-none">
 
   <!-- 상단 네이버 헤더 -->
   <header class="bg-white border-b border-slate-200 px-5 py-3 -mx-4 -mt-4 shadow-xs flex items-center justify-between">
     <div class="flex items-center gap-2">
-      <div class="w-7 h-7 bg-[#03C75A] rounded flex items-center justify-center text-white font-extrabold text-[15px] tracking-tight">
+      <div
+        class="w-7 h-7 bg-[#03C75A] rounded flex items-center justify-center text-white font-extrabold text-[15px] tracking-tight">
         N
       </div>
       <span class="font-extrabold text-[#03C75A] text-lg tracking-tight">NAVER</span>
       <span class="text-xs text-slate-400 font-medium ml-1">아이디로 로그인</span>
     </div>
-    <span class="text-[11px] font-mono px-2 py-0.5 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded font-semibold">
+    <span
+      class="text-[11px] font-mono px-2 py-0.5 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded font-semibold">
       OAuth 2.0 공식연동
     </span>
   </header>
 
   <!-- 메인 인증 영역 -->
   <main class="flex-1 max-w-md mx-auto w-full py-2 space-y-3">
-    
+
     <!-- 서비스 연동 안내 카드 -->
     <div class="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm text-center">
       <div class="flex items-center justify-center gap-2.5 mb-2">
-        <div class="w-10 h-10 rounded-2xl bg-slate-50 border border-slate-200 p-1 flex items-center justify-center shadow-xs">
-          <img src="logo.png" alt="쓸고닦고" class="w-full h-full object-contain" onerror="this.src='../public/logo.png'"/>
+        <div
+          class="w-10 h-10 rounded-2xl bg-slate-50 border border-slate-200 p-1 flex items-center justify-center shadow-xs">
+          <img src="/storage/project/brand/Logo_쓸고딱고.jpg" alt="쓸고닦고" class="w-full h-full object-contain"
+            onerror="this.src='/storage/project/brand/Logo_쓸고딱고.jpg'" />
         </div>
         <span class="text-slate-300 font-bold text-base">+</span>
-        <div class="w-10 h-10 rounded-2xl bg-[#03C75A] flex items-center justify-center text-white font-extrabold text-xl shadow-xs">
+        <div
+          class="w-10 h-10 rounded-2xl bg-[#03C75A] flex items-center justify-center text-white font-extrabold text-xl shadow-xs">
           N
         </div>
       </div>
       <h1 class="text-sm font-extrabold text-slate-900 mb-0.5">
-        <span class="text-[#003262]">쓸고닦고</span> 서비스 제공을 위한<br/>
+        <span class="text-[#003262]">쓸고닦고</span> 서비스 제공을 위한<br />
         네이버 개인정보 제3자 제공 동의
       </h1>
       <p class="text-[11px] text-slate-500">
@@ -54,18 +64,33 @@
 
     <!-- 네이버 로그인 프로필 및 제공 항목 컴팩트 카드 -->
     <div class="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm space-y-2.5">
-      <div class="flex items-center justify-between pb-2 border-b border-slate-100 text-xs">
-        <span class="font-bold text-slate-500">연동 로그인 계정</span>
-        <div class="flex items-center gap-1.5 text-slate-900 font-semibold">
-          <span class="w-2 h-2 rounded-full bg-[#03C75A]"></span>
-          <span id="inputEmail" class="text-xs text-slate-800 font-bold font-mono">gonggandawon_corp@naver.com</span>
+      <!-- 연동 테스트 계정 선택 카드 (고객 vs 시공사) -->
+      <div class="space-y-1.5">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-bold text-slate-800">연동 테스트 계정 선택</span>
+          <span class="text-[10px] bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded font-medium">TB_USER 연동</span>
+        </div>
+        <div class="grid grid-cols-2 gap-2 text-left">
+          <button type="button" id="btnRoleC" onclick="selectRole('C')"
+            class="p-2.5 rounded-xl border-2 transition-all cursor-pointer flex flex-col gap-0.5">
+            <span class="text-[11px] font-extrabold text-blue-700">👤 고객 회원</span>
+            <span class="text-[11px] font-bold text-slate-800">홍길동</span>
+            <span class="text-[9.5px] text-slate-500 font-mono truncate">hong@naver.com</span>
+          </button>
+          <button type="button" id="btnRoleS" onclick="selectRole('S')"
+            class="p-2.5 rounded-xl border transition-all cursor-pointer flex flex-col gap-0.5">
+            <span class="text-[11px] font-extrabold text-emerald-700">🏢 시공사 파트너</span>
+            <span class="text-[11px] font-bold text-slate-800">공간다원</span>
+            <span class="text-[9.5px] text-slate-500 font-mono truncate">gonggandawon_corp@naver.com</span>
+          </button>
         </div>
       </div>
 
       <div class="bg-slate-50 p-3 rounded-xl border border-slate-200/80 space-y-1.5 text-xs">
         <div class="flex items-center justify-between">
           <span class="font-bold text-slate-700">제공 동의 항목</span>
-          <span class="text-[10px] font-semibold text-emerald-600 bg-emerald-50 px-1.5 py-0.2 rounded border border-emerald-200">
+          <span
+            class="text-[10px] font-semibold text-emerald-600 bg-emerald-50 px-1.5 py-0.2 rounded border border-emerald-200">
             필수 동의
           </span>
         </div>
@@ -77,7 +102,8 @@
         </p>
       </div>
 
-      <div class="bg-emerald-50 p-2.5 rounded-xl border border-emerald-200 text-[11px] text-emerald-800 leading-snug flex items-center gap-1.5">
+      <div
+        class="bg-emerald-50 p-2.5 rounded-xl border border-emerald-200 text-[11px] text-emerald-800 leading-snug flex items-center gap-1.5">
         <span class="font-bold text-emerald-600 shrink-0">🔒</span>
         <span>네이버 안전 암호화 통신을 통해 즉시 연동됩니다.</span>
       </div>
@@ -87,13 +113,10 @@
 
   <!-- 하단 액션 버튼군 (한눈에 바로 보이도록 배치) -->
   <footer class="max-w-md mx-auto w-full space-y-2 pt-1 pb-1">
-    <button
-      id="btnAgree"
-      onclick="handleAgreeAndSend()"
-      type="button"
-      class="w-full h-12 bg-[#03C75A] hover:bg-[#02B351] active:scale-[0.99] text-white font-bold text-sm rounded-xl transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer"
-    >
-      <div class="w-4 h-4 bg-white rounded-full flex items-center justify-center text-[#03C75A] font-black text-[10px]">✓</div>
+    <button id="btnAgree" onclick="handleAgreeAndSend()" type="button"
+      class="w-full h-12 bg-[#03C75A] hover:bg-[#02B351] active:scale-[0.99] text-white font-bold text-sm rounded-xl transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer">
+      <div class="w-4 h-4 bg-white rounded-full flex items-center justify-center text-[#03C75A] font-black text-[10px]">
+        ✓</div>
       <span>동의하고 계속하기 (회원정보 자동 연동)</span>
     </button>
 
@@ -106,20 +129,40 @@
 
   <script>
     const params = new URLSearchParams(window.location.search);
-    const role = params.get('userRoleCd') || 'S';
+    let currentRole = params.get('userRoleCd') || 'C';
+
+    function updateRoleUI() {
+      const btnC = document.getElementById('btnRoleC');
+      const btnS = document.getElementById('btnRoleS');
+      if (currentRole === 'S') {
+        btnS.className = 'p-2.5 rounded-xl border-2 border-emerald-500 bg-emerald-50/50 transition-all cursor-pointer flex flex-col gap-0.5 shadow-xs';
+        btnC.className = 'p-2.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 transition-all cursor-pointer flex flex-col gap-0.5 opacity-60';
+      } else {
+        btnC.className = 'p-2.5 rounded-xl border-2 border-blue-500 bg-blue-50/50 transition-all cursor-pointer flex flex-col gap-0.5 shadow-xs';
+        btnS.className = 'p-2.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 transition-all cursor-pointer flex flex-col gap-0.5 opacity-60';
+      }
+    }
+
+    function selectRole(role) {
+      currentRole = role;
+      updateRoleUI();
+    }
+
+    updateRoleUI();
 
     function handleAgreeAndSend() {
-      const email = 'gonggandawon_corp@naver.com';
-      const name = '공간다원';
-      const phone = '010-8286-3457';
-      const uid = 'naver_1794696351819';
+      const isPartner = currentRole === 'S';
+      const email = isPartner ? 'gonggandawon_corp@naver.com' : 'hong@naver.com';
+      const name = isPartner ? '공간다원' : '홍길동';
+      const phone = isPartner ? '010-8286-3457' : '010-3402-3457';
+      const uid = isPartner ? 'naver_partner_001' : 'naver_client_001';
 
       const profileData = {
         id: uid,
         email: email,
         name: name,
         mobile: phone,
-        userRoleCd: role,
+        userRoleCd: currentRole,
         provider: 'NAVER'
       };
 
@@ -153,7 +196,7 @@
           userRoleCd: role,
           profile: profileData
         }));
-      } catch (e) {}
+      } catch (e) { }
 
       setTimeout(() => {
         window.close();
@@ -161,4 +204,5 @@
     }
   </script>
 </body>
+
 </html>

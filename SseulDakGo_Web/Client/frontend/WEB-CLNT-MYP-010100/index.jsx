@@ -56,6 +56,7 @@ export default function WebClntMyp010100({
     userName: isContractor ? '공간다원 대표 김충훈' : '김충훈',
     email: isContractor ? 'gonggandawon_corp@naver.com' : 'ch.kim@sseuldakgo.com',
     phone: isContractor ? '010-8286-3457' : '010-8942-9114',
+    snsProvider: isContractor ? 'NAVER' : 'KAKAO',
     bizNo: '120-88-29401',
     bizName: '공간다원',
     bizVerifiedDt: '2026-11-15',
@@ -68,6 +69,98 @@ export default function WebClntMyp010100({
     perfectRatingCount: 27,
     trustRate: '99.4%'
   });
+
+  // 알림 센터 상태 관리
+  const [isNotiOpen, setIsNotiOpen] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(3);
+  const [notiList, setNotiList] = useState([
+    {
+      notiId: 'NT20261100001',
+      notiType: 'NEW_ORDER',
+      title: '새로운 발주 요청 등록',
+      content: '경기 고양시 일산동구 에어컨 분해세척 (제안가: 180,000원) 청약이 가능합니다.',
+      targetUrl: '/preview_client/WEB-CLNT-ORD-010100.html?orderNo=ORD202611180001',
+      isRead: 'N',
+      regDt: '10분 전'
+    },
+    {
+      notiId: 'NT20261100002',
+      notiType: 'NEW_ORDER',
+      title: '신규 입주 청소 청약 공고',
+      content: '서울 강서구 마곡동 34평 아파트 입주청소 (제안가: 360,000원) 건이 접수되었습니다.',
+      targetUrl: '/preview_client/WEB-CLNT-ORD-010100.html?orderNo=ORD202611180002',
+      isRead: 'N',
+      regDt: '1시간 전'
+    },
+    {
+      notiId: 'NT20261100003',
+      notiType: 'MATCHING_CONFIRMED',
+      title: '시공사 서류 검증 승인 완료',
+      content: '제출하신 사업자등록증 및 자격증 원본 서류 심사가 승인 완료되었습니다.',
+      targetUrl: '/preview/myp_020100.html',
+      isRead: 'N',
+      regDt: '어제'
+    }
+  ]);
+
+  // 알림 목록 조회 함수
+  const fetchNotifications = async (uNo) => {
+    try {
+      const targetUser = uNo || profileData.userNo;
+      const res = await fetch(`/api/common/notifications?userNo=${targetUser}`);
+      if (res.ok) {
+        const data = await res.json();
+        if (data && data.success) {
+          setUnreadCount(typeof data.unreadCount === 'number' ? data.unreadCount : 0);
+          if (Array.isArray(data.list) && data.list.length > 0) {
+            setNotiList(data.list);
+          }
+        }
+      }
+    } catch (e) {
+      console.warn('알림 로드 실패 (기본값 유지):', e);
+    }
+  };
+
+  // 단건 알림 읽음 처리
+  const handleReadNoti = async (noti) => {
+    if (noti.isRead === 'N') {
+      try {
+        await fetch('/api/common/notifications/read', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ notiId: noti.notiId, userNo: profileData.userNo })
+        });
+      } catch (e) {
+        console.warn('읽음 처리 실패:', e);
+      }
+      setNotiList(prev => prev.map(item => item.notiId === noti.notiId ? { ...item, isRead: 'Y' } : item));
+      setUnreadCount(prev => Math.max(0, prev - 1));
+    }
+    if (noti.targetUrl) {
+      setIsNotiOpen(false);
+      showToast(`'${noti.title}' 상세 화면으로 이동합니다.`);
+      setTimeout(() => {
+        window.location.href = noti.targetUrl;
+      }, 400);
+    }
+  };
+
+  // 전체 알림 모두 읽음 처리
+  const handleReadAllNoti = async () => {
+    try {
+      await fetch('/api/common/notifications/read-all', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userNo: profileData.userNo })
+      });
+    } catch (e) {
+      console.warn('모두 읽음 실패:', e);
+    }
+    setNotiList(prev => prev.map(item => ({ ...item, isRead: 'Y' })));
+    setUnreadCount(0);
+    showToast('모든 알림을 확인 처리하였습니다.');
+  };
 
   // 역할 뷰 전환 핸들러
   const handleToggleRoleView = (role) => {
@@ -144,150 +237,47 @@ export default function WebClntMyp010100({
       }
     };
     fetchProfile();
+    fetchNotifications(profileData.userNo);
   }, [profileData.userNo]);
 
   return (
-    <div className="bg-[#f7f9fb] text-[#191c1e] min-h-screen flex flex-col font-sans antialiased">
+    <div className="bg-[#f7f9fb] text-[#191c1e] h-screen flex flex-col font-sans antialiased overflow-hidden">
       {/* ─────────────────────────────────────────────────────────────
-          1. Header (쓸닦고 상단 GNB 네비게이션)
+          1. Header: 내정보 관리 페이지 자체 헤더는 일체 사용하지 않으며,
+             공통 GNB 네비게이션 헤더가 상단에 단일하게 적용됩니다.
       ───────────────────────────────────────────────────────────── */}
-      <header className="sticky top-0 left-0 w-full z-40 bg-white/95 backdrop-blur-md shadow-sm border-b border-slate-200/80">
-        <div className="h-20 max-w-[1440px] mx-auto px-6 sm:px-8 flex items-center justify-between gap-6">
-          <div className="flex items-center gap-8">
-            <a
-              className="flex items-center gap-2 group cursor-pointer"
-              onClick={() => onNavigate?.('home')}
-            >
-              <div className="w-10 h-10 rounded-xl bg-slate-50 border border-slate-200/60 shadow-xs flex items-center justify-center">
-                <span className="material-symbols-outlined text-[#003d9b] text-[24px]">auto_awesome</span>
-              </div>
-              <div className="flex flex-col">
-                <span className="text-xl font-extrabold text-[#003d9b] tracking-tight leading-none">SseulDakGo</span>
-                <span className="text-xs text-[#006a61] font-semibold leading-tight mt-0.5">쓸닦고 공간케어</span>
-              </div>
-            </a>
-            <nav className="hidden xl:flex items-center gap-6">
-              <a className="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors py-2 cursor-pointer" onClick={() => onNavigate?.('home')}>홈 (Home)</a>
-              <a className="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors py-2 cursor-pointer" onClick={() => onNavigate?.('services')}>청소·시공 매칭</a>
-              <a className="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors py-2 cursor-pointer" onClick={() => onNavigate?.('quotes')}>견적 요청</a>
-              <a className="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors py-2 cursor-pointer" onClick={() => onNavigate?.('showcase')}>시공 갤러리</a>
-              <a className="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors py-2 cursor-pointer" onClick={() => onNavigate?.('reviews')}>이용후기</a>
-              <a className="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors py-2 cursor-pointer" onClick={() => onNavigate?.('support')}>고객센터</a>
-            </nav>
-          </div>
-
-          <div className="flex items-center gap-4">
-            {/* Quick Segment Indicator */}
-            <div className="hidden md:flex items-center bg-slate-100 p-1 rounded-full shadow-inner border border-slate-200">
-              <button
-                type="button"
-                onClick={() => handleToggleRoleView('client')}
-                className={`text-xs px-3 py-1 rounded-full transition-all duration-150 ${
-                  !isContractor
-                    ? 'bg-[#006a61] text-white font-bold shadow-xs'
-                    : 'text-slate-600 hover:text-slate-900'
-                }`}
-              >
-                일반 고객
-              </button>
-              <button
-                type="button"
-                onClick={() => handleToggleRoleView('contractor')}
-                className={`text-xs px-3 py-1 rounded-full transition-all duration-150 ${
-                  isContractor
-                    ? 'bg-[#006a61] text-white font-bold shadow-xs'
-                    : 'text-slate-600 hover:text-slate-900'
-                }`}
-              >
-                시공사 파트너
-              </button>
-            </div>
-
-            {/* Notification Bell */}
-            <button
-              aria-label="알림"
-              className="relative w-10 h-10 rounded-xl flex items-center justify-center text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors border border-slate-200/60"
-              type="button"
-              onClick={() => showToast('새로운 알림이 2건 있습니다.')}
-            >
-              <span className="material-symbols-outlined text-[22px]">notifications</span>
-              <span className="absolute top-2.5 right-2.5 w-2 h-2 rounded-full bg-red-500 ring-2 ring-white"></span>
-            </button>
-
-            {/* User Profile Pill */}
-            <div className="flex items-center gap-2 pl-1">
-              <div className="flex items-center gap-2 p-1.5 pr-3 rounded-xl bg-slate-100/90 border border-slate-200/80 cursor-default">
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white ${isContractor ? 'bg-[#006a61]' : 'bg-[#003d9b]'}`}>
-                  <span className="material-symbols-outlined text-[18px]">{isContractor ? 'verified' : 'person'}</span>
-                </div>
-                <div className="hidden sm:flex flex-col text-left">
-                  <span className="text-xs font-bold text-slate-800 leading-tight">{profileData.userName} 님</span>
-                  <span className="text-[11px] text-[#006a61] font-semibold leading-none mt-0.5">
-                    {isContractor ? '내정보 (시공사)' : '내정보 (My Page)'}
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </header>
 
       {/* ─────────────────────────────────────────────────────────────
           2. Main Body Content
       ───────────────────────────────────────────────────────────── */}
-      <main className="w-full flex-1">
+      <main className="w-full flex-1 overflow-y-auto">
         <div className="w-full max-w-[1440px] mx-auto px-6 sm:px-8 py-8 flex flex-col gap-6">
 
           {/* 1. Breadcrumb, Header & Dual-view Mode Switcher */}
           <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-4">
             <div className="flex flex-col gap-1.5">
               <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-slate-500 text-xs font-medium">
-                <a className="hover:text-[#003d9b] transition-colors cursor-pointer" onClick={() => onNavigate?.('home')}>홈</a>
-                <span className="material-symbols-outlined text-[14px] text-slate-400">chevron_right</span>
-                <a className="hover:text-[#003d9b] transition-colors cursor-pointer" onClick={() => onNavigate?.('my-page')}>마이페이지</a>
+                <a className="hover:text-[#003d9b] transition-colors cursor-pointer font-bold text-slate-700" onClick={() => onNavigate?.('home')}>
+                  {isContractor ? '시공사 메인 홈' : '고객 메인 홈'}
+                </a>
+                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-slate-100 text-[#006a61] text-xs font-semibold border border-slate-200">
+                  <span className="material-symbols-outlined text-[14px]">location_on</span>
+                  경기 고양시 일산동구
+                </span>
                 <span className="material-symbols-outlined text-[14px] text-slate-400">chevron_right</span>
                 <span className="text-slate-900 font-bold">내정보 (프로필 및 통계)</span>
               </nav>
               <div className="flex items-baseline gap-3 mt-1">
                 <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">내정보 관리</h1>
-                <span className="text-xs sm:text-sm text-[#006a61] font-bold uppercase tracking-wider">
-                  {isContractor ? 'Contractor Partner Dashboard' : 'Profile & Dashboard'}
-                </span>
               </div>
               <p className="text-xs sm:text-sm text-slate-600">
                 {isContractor
-                  ? '시공 파트너 계정 정보, 사업자등록증 및 세금계산서 정보, 수주/시공 통계, 보안 설정을 한곳에서 통합 관리합니다.'
+                  ? '시공 파트너 계정 정보, 사업자등록증 정보, 수주/시공 통계, 보안 설정을 한곳에서 통합 관리합니다.'
                   : '계정 정보 확인, 시공 및 의뢰 현황 통계, 보안 설정을 한곳에서 통합 관리합니다.'}
               </p>
             </div>
 
-            {/* Dual Role Selector Toggle Pill */}
-            <div className="bg-slate-200/70 p-1.5 rounded-full flex items-center shadow-inner border border-slate-300/80 w-fit">
-              <button
-                type="button"
-                onClick={() => handleToggleRoleView('client')}
-                className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold transition-all duration-200 ${
-                  !isContractor
-                    ? 'bg-white text-[#003d9b] shadow-sm font-extrabold ring-1 ring-slate-200'
-                    : 'text-slate-600 hover:text-slate-900'
-                }`}
-              >
-                {!isContractor && <span className="w-2 h-2 rounded-full bg-[#003d9b] animate-pulse"></span>}
-                <span>일반 고객 뷰 (김충훈)</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => handleToggleRoleView('contractor')}
-                className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold transition-all duration-200 ${
-                  isContractor
-                    ? 'bg-white text-[#006a61] shadow-sm font-extrabold ring-1 ring-slate-200'
-                    : 'text-slate-600 hover:text-slate-900'
-                }`}
-              >
-                <span className="material-symbols-outlined text-[16px] text-[#006a61]">verified</span>
-                <span>인증 시공사 뷰 (공간다원)</span>
-              </button>
-            </div>
+
           </div>
 
           {/* 2. Top Profile Hero Card */}
@@ -318,43 +308,55 @@ export default function WebClntMyp010100({
                   <span className="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight">
                     {profileData.userName}
                   </span>
-                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-blue-100 text-[#003d9b] border border-blue-200">
-                    <span className="material-symbols-outlined text-[13px]">auto_awesome</span>
-                    일반 고객 (C)
-                  </span>
-                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-100 text-[#006a61] border border-emerald-200">
-                    <span className="material-symbols-outlined text-[13px]">verified</span>
-                    인증 시공사 (S) · 파트너
-                  </span>
+                  {isContractor ? (
+                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-100 text-[#006a61] border border-emerald-200">
+                      <span className="material-symbols-outlined text-[13px]">verified</span>
+                      인증 시공사 (S) · 파트너
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-blue-100 text-[#003d9b] border border-blue-200">
+                      <span className="material-symbols-outlined text-[13px]">auto_awesome</span>
+                      일반 고객 (C)
+                    </span>
+                  )}
                 </div>
 
-                {/* Metadata Pill Badges */}
-                <div className="flex flex-wrap items-center gap-2 text-slate-600 text-xs">
-                  <div className="inline-flex items-center gap-1.5 bg-slate-100 px-3 py-1.5 rounded-lg border border-slate-200/80">
-                    <span className="text-slate-500 font-bold uppercase text-[10px]">회원번호</span>
-                    <span className="font-mono font-bold text-slate-900">{profileData.userNo}</span>
-                    <button
-                      className="text-slate-400 hover:text-[#003d9b] transition-colors flex items-center cursor-pointer"
-                      onClick={handleCopyMemberNo}
-                      title="회원번호 복사"
-                      type="button"
-                    >
-                      <span className="material-symbols-outlined text-[14px]">content_copy</span>
-                    </button>
+                {/* Metadata Pill Badges (2단 줄바꿈 구성) */}
+                <div className="flex flex-col gap-1.5 text-slate-600 text-xs">
+                  {/* Line 1: 회원번호 & 휴대전화번호 */}
+                  <div className="flex flex-wrap items-center gap-2">
+                    <div className="inline-flex items-center gap-1.5 bg-slate-100 px-3 py-1.5 rounded-lg border border-slate-200/80">
+                      <span className="text-slate-500 font-bold uppercase text-[10px]">회원번호</span>
+                      <span className="font-mono font-bold text-slate-900">{profileData.userNo}</span>
+                      <button
+                        className="text-slate-400 hover:text-[#003d9b] transition-colors flex items-center cursor-pointer"
+                        onClick={handleCopyMemberNo}
+                        title="회원번호 복사"
+                        type="button"
+                      >
+                        <span className="material-symbols-outlined text-[14px]">content_copy</span>
+                      </button>
+                    </div>
+                    <div className="inline-flex items-center gap-1.5 bg-slate-100 px-3 py-1.5 rounded-lg border border-slate-200/80">
+                      <span className="material-symbols-outlined text-[16px] text-[#006a61]">check_circle</span>
+                      <span>{profileData.phone}</span>
+                      <span className="text-[11px] text-[#006a61] font-bold">(인증완료)</span>
+                    </div>
                   </div>
-                  <div className="inline-flex items-center gap-1.5 bg-slate-100 px-3 py-1.5 rounded-lg border border-slate-200/80">
-                    <span className="material-symbols-outlined text-[16px] text-slate-400">mail</span>
-                    <span>{profileData.email}</span>
-                  </div>
-                  <div className="inline-flex items-center gap-1.5 bg-slate-100 px-3 py-1.5 rounded-lg border border-slate-200/80">
-                    <span className="material-symbols-outlined text-[16px] text-[#006a61]">check_circle</span>
-                    <span>{profileData.phone}</span>
-                    <span className="text-[11px] text-[#006a61] font-bold">(인증완료)</span>
-                  </div>
-                  <div className="inline-flex items-center gap-1.5 bg-slate-100 px-3 py-1.5 rounded-lg border border-slate-200/80">
-                    <span className="text-slate-500 text-[10px] font-bold">간편로그인</span>
-                    <span className="px-1.5 py-0.5 rounded text-[10px] bg-yellow-400 text-yellow-950 font-bold leading-tight">KAKAO</span>
-                    <span className="px-1.5 py-0.5 rounded text-[10px] bg-emerald-600 text-white font-bold leading-tight">NAVER</span>
+                  {/* Line 2: 이메일 & 간편로그인 (실제 간편인증 SNS만 출력) */}
+                  <div className="flex flex-wrap items-center gap-2">
+                    <div className="inline-flex items-center gap-1.5 bg-slate-100 px-3 py-1.5 rounded-lg border border-slate-200/80">
+                      <span className="material-symbols-outlined text-[16px] text-slate-400">mail</span>
+                      <span>{profileData.email}</span>
+                    </div>
+                    <div className="inline-flex items-center gap-1.5 bg-slate-100 px-3 py-1.5 rounded-lg border border-slate-200/80">
+                      <span className="text-slate-500 text-[10px] font-bold">간편로그인 :</span>
+                      {profileData.snsProvider === 'KAKAO' ? (
+                        <span className="px-2 py-0.5 rounded text-[10px] bg-[#fee500] text-[#3c1e1e] font-extrabold leading-tight">카카오</span>
+                      ) : (
+                        <span className="px-2 py-0.5 rounded text-[10px] bg-[#03c75a] text-white font-extrabold leading-tight">네이버</span>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -384,50 +386,6 @@ export default function WebClntMyp010100({
               </div>
             </div>
           </div>
-
-          {/* 3. Contractor Verification Status Banner (오직 시공사 S 일 때만 노출) */}
-          {isContractor && (
-            <div className="w-full bg-emerald-50/70 border border-emerald-200/80 rounded-2xl p-5 sm:p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-xs animate-in fade-in duration-200">
-              <div className="flex items-start sm:items-center gap-4">
-                <div className="w-12 h-12 rounded-2xl bg-[#006a61] text-white flex items-center justify-center shrink-0 shadow-sm">
-                  <span className="material-symbols-outlined text-[28px]">verified_user</span>
-                </div>
-                <div className="flex flex-col gap-1">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <span className="text-base font-extrabold text-slate-900">사업자 인증 상태: 인증완료</span>
-                    <span className="text-[11px] px-2.5 py-0.5 rounded-full bg-emerald-200/70 text-[#006a61] font-bold">
-                      인증일 2026-11-15
-                    </span>
-                    <span className="text-xs text-slate-600">
-                      사업자등록번호: <strong className="text-slate-900 font-bold">120-88-29401</strong> (공간다원)
-                    </span>
-                  </div>
-                  <p className="text-xs text-slate-600 flex items-center gap-1 mt-0.5">
-                    <span className="material-symbols-outlined text-[16px] text-[#006a61]">workspace_premium</span>
-                    전문분야: 특수 입주청소 · 상가 바닥 왁싱 코팅 · 피톤치드 살균 소독 방역
-                  </p>
-                </div>
-              </div>
-              <div className="flex items-center gap-3 self-end md:self-auto shrink-0">
-                <button
-                  type="button"
-                  onClick={() => onOpenBizModal ? onOpenBizModal() : showToast('사업자등록증 원본 모달을 호출합니다.')}
-                  className="px-3 py-2 text-[#006a61] hover:text-[#004f48] text-xs font-bold flex items-center gap-1 transition-colors cursor-pointer"
-                >
-                  <span className="material-symbols-outlined text-[16px]">visibility</span>
-                  사업자등록증 원본 조회
-                </button>
-                <span className="text-slate-300">|</span>
-                <button
-                  type="button"
-                  onClick={() => showToast('인증 갱신 가이드 안내문이 발송되었습니다.')}
-                  className="px-3 py-2 text-slate-600 hover:text-slate-900 text-xs font-bold transition-colors cursor-pointer"
-                >
-                  인증 갱신 안내
-                </button>
-              </div>
-            </div>
-          )}
 
           {/* 4. Quick Summary Metric Cards (4 Bento Grid Columns) */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
@@ -517,39 +475,85 @@ export default function WebClntMyp010100({
               </a>
             </div>
 
-            {/* Card 4: Coupons & Points */}
-            <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200/80 flex flex-col justify-between hover:shadow-md transition-shadow relative overflow-hidden group">
-              <div className="absolute top-0 left-0 w-1.5 h-full bg-amber-500"></div>
-              <div className="flex flex-col gap-1.5">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold text-slate-500">
-                    {isContractor ? '정산 예치금 / 수익 포인트' : '보유 쿠폰 / 포인트'}
-                  </span>
-                  <div className="w-8 h-8 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center">
-                    <span className="material-symbols-outlined text-[20px]">toll</span>
+            {/* Card 4: 시공사일 때 '사업자 인증 상태' (Card 3과 동일 크기), 일반 고객일 때 '보유 쿠폰/포인트' */}
+            {isContractor ? (
+              <div className="bg-emerald-50/50 rounded-2xl p-6 shadow-sm border border-emerald-200/80 flex flex-col justify-between hover:shadow-md transition-shadow relative overflow-hidden group">
+                <div className="absolute top-0 left-0 w-1.5 h-full bg-[#006a61]"></div>
+                <div className="flex flex-col gap-2">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-xs font-bold text-slate-900">사업자 인증 상태: 인증완료</span>
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-200/80 text-[#006a61]">
+                        인증일 2026-11-15
+                      </span>
+                    </div>
+                    <div className="w-8 h-8 rounded-lg bg-[#006a61] text-white flex items-center justify-center shadow-xs">
+                      <span className="material-symbols-outlined text-[18px]">verified_user</span>
+                    </div>
+                  </div>
+                  <div className="flex flex-col gap-0.5 text-xs text-slate-600 mt-1">
+                    <div>
+                      사업자등록번호: <strong className="text-slate-800 font-bold">120-88-29401</strong> (공간다원)
+                    </div>
+                    <p className="text-[11px] text-slate-500 line-clamp-2 flex items-start gap-1 mt-1 leading-snug" title="전문분야: 특수 입주청소 · 상가 바닥 왁싱 코팅 · 피톤치드 살균 소독 방역">
+                      <span className="material-symbols-outlined text-[14px] text-[#006a61] shrink-0 mt-0.5">workspace_premium</span>
+                      <span>전문분야: 특수 입주청소 · 상가 바닥 왁싱 코팅 · 피톤치드 살균 소독 방역</span>
+                    </p>
                   </div>
                 </div>
-                <div className="flex items-baseline gap-1 mt-1">
-                  <span className="text-3xl font-extrabold text-amber-600 tracking-tight">
-                    {profileData.points.toLocaleString()}
-                  </span>
-                  <span className="text-base font-bold text-slate-800">P</span>
+                <div className="mt-4 pt-3 border-t border-emerald-100/90 flex items-center justify-between text-xs font-bold">
+                  <button
+                    type="button"
+                    onClick={() => onOpenBizModal ? onOpenBizModal() : showToast('사업자등록증 원본 모달을 호출합니다.')}
+                    className="text-[#006a61] hover:text-[#004f48] flex items-center gap-1 transition-colors cursor-pointer"
+                  >
+                    <span className="material-symbols-outlined text-[15px]">visibility</span>
+                    <span>사업자등록증 원본 조회</span>
+                  </button>
+                  <span className="text-slate-300">|</span>
+                  <button
+                    type="button"
+                    onClick={() => showToast('인증 갱신 가이드 안내문이 발송되었습니다.')}
+                    className="text-slate-500 hover:text-slate-800 transition-colors cursor-pointer text-[11px]"
+                  >
+                    인증 갱신 안내
+                  </button>
                 </div>
-                <p className="text-xs text-slate-500">
-                  {isContractor ? '익월 정산 예정액 1,850,000원' : '즉시 사용 가능 쿠폰 2장'}
-                </p>
               </div>
-              <div className="mt-5 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-bold">
-                <button
-                  className="text-amber-600 hover:text-amber-700 flex items-center gap-1 cursor-pointer"
-                  type="button"
-                  onClick={() => showToast('포인트 내역 페이지로 이동합니다.')}
-                >
-                  <span>{isContractor ? '정산금 출금 신청' : '포인트 충전/내역'}</span>
-                  <span className="material-symbols-outlined text-[16px]">chevron_right</span>
-                </button>
+            ) : (
+              <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200/80 flex flex-col justify-between hover:shadow-md transition-shadow relative overflow-hidden group">
+                <div className="absolute top-0 left-0 w-1.5 h-full bg-amber-500"></div>
+                <div className="flex flex-col gap-1.5">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold text-slate-500">
+                      보유 쿠폰 / 포인트
+                    </span>
+                    <div className="w-8 h-8 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center">
+                      <span className="material-symbols-outlined text-[20px]">toll</span>
+                    </div>
+                  </div>
+                  <div className="flex items-baseline gap-1 mt-1">
+                    <span className="text-3xl font-extrabold text-amber-600 tracking-tight">
+                      {profileData.points.toLocaleString()}
+                    </span>
+                    <span className="text-base font-bold text-slate-800">P</span>
+                  </div>
+                  <p className="text-xs text-slate-500">
+                    즉시 사용 가능 쿠폰 2장
+                  </p>
+                </div>
+                <div className="mt-5 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-bold">
+                  <button
+                    className="text-amber-600 hover:text-amber-700 flex items-center gap-1 cursor-pointer"
+                    type="button"
+                    onClick={() => showToast('포인트 내역 페이지로 이동합니다.')}
+                  >
+                    <span>포인트 충전/내역</span>
+                    <span className="material-symbols-outlined text-[16px]">chevron_right</span>
+                  </button>
+                </div>
               </div>
-            </div>
+            )}
           </div>
 
           {/* 5. Active Space Care Snapshot Card */}
@@ -730,53 +734,7 @@ export default function WebClntMyp010100({
                     </button>
                   </div>
 
-                  {/* Item 3: Contractor Tax Profile (WEB-CLNT-MYP-020100) -> 오직 시공사(S)일 때만 표시! */}
-                  {isContractor && (
-                    <div className="py-3 flex items-center justify-between hover:bg-emerald-50/60 px-2 rounded-xl transition-colors">
-                      <div className="flex items-center gap-3">
-                        <span className="material-symbols-outlined text-[20px] text-[#006a61]">description</span>
-                        <div className="flex flex-col">
-                          <div className="flex items-center gap-1.5">
-                            <span className="text-xs font-bold text-slate-900">사업자등록증 &amp; 전자세금계산서 정보</span>
-                            <span className="text-[10px] bg-emerald-100 text-[#006a61] px-1.5 py-0.2 rounded font-bold">시공사 전용</span>
-                          </div>
-                          <span className="text-[11px] text-slate-500">공간다원 (tax@clean-space.kr) 전자발행 연동</span>
-                        </div>
-                      </div>
-                      <button
-                        onClick={() => onOpenBizModal ? onOpenBizModal() : showToast('사업자등록증 모달(WEB-CLNT-MYP-020100) 호출')}
-                        className="px-3 py-1.5 rounded-lg bg-emerald-100 text-[#006a61] text-xs font-bold hover:bg-emerald-200 transition-colors border border-emerald-200/80 cursor-pointer"
-                        type="button"
-                      >
-                        관리
-                      </button>
-                    </div>
-                  )}
 
-                  {/* Item 4: 2FA Auth */}
-                  <div className="py-3 flex items-center justify-between hover:bg-slate-50 px-2 rounded-xl transition-colors">
-                    <div className="flex items-center gap-3">
-                      <span className="material-symbols-outlined text-[20px] text-[#003d9b]">fingerprint</span>
-                      <div className="flex flex-col">
-                        <span className="text-xs font-bold text-slate-800">2단계 안심 로그인 설정</span>
-                        <span className="text-[11px] text-[#006a61] font-semibold">
-                          {twoFactorAuth ? '생체인증 / SMS OTP 2중 보안 가동중 (ON)' : '2단계 인증이 꺼져 있습니다 (OFF)'}
-                        </span>
-                      </div>
-                    </div>
-                    <label className="relative inline-flex items-center cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={twoFactorAuth}
-                        onChange={(e) => {
-                          setTwoFactorAuth(e.target.checked);
-                          showToast(e.target.checked ? '2단계 보안 인증이 활성화되었습니다.' : '2단계 인증이 해제되었습니다.');
-                        }}
-                        className="sr-only peer"
-                      />
-                      <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#003d9b]"></div>
-                    </label>
-                  </div>
                 </div>
               </div>
 
@@ -889,7 +847,7 @@ export default function WebClntMyp010100({
       {/* ─────────────────────────────────────────────────────────────
           3. Footer
       ───────────────────────────────────────────────────────────── */}
-      <footer className="w-full bg-white shadow-xs border-t border-slate-200/80 mt-12">
+      <footer className="shrink-0 w-full bg-white shadow-[0_-4px_16px_rgba(0,0,0,0.04)] border-t border-slate-200/80 z-30">
         <div className="max-w-[1440px] mx-auto px-6 sm:px-8 py-8">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
             <div className="md:col-span-2 flex flex-col gap-2">
@@ -915,7 +873,7 @@ export default function WebClntMyp010100({
             <div className="flex flex-col gap-1.5">
               <span className="text-xs font-extrabold text-slate-800">고객지원 센터</span>
               <span className="text-2xl font-extrabold text-[#003d9b]">1588-7824</span>
-              <p className="text-xs text-slate-500">운영시간: 평일 08:30 ~ 18:30<br/>주말/공휴일 긴급 위생지원 가동</p>
+              <p className="text-xs text-slate-500">운영시간: 평일 08:30 ~ 18:30<br />주말/공휴일 긴급 위생지원 가동</p>
             </div>
 
             <div className="flex flex-col gap-1.5">
@@ -943,9 +901,8 @@ export default function WebClntMyp010100({
           4. Interactive Toast Notification
       ───────────────────────────────────────────────────────────── */}
       <div
-        className={`fixed bottom-6 right-6 bg-slate-900 text-white px-4 py-3 rounded-xl shadow-2xl flex items-center gap-2.5 transition-all duration-300 z-[999] ${
-          toast.show ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2 pointer-events-none'
-        }`}
+        className={`fixed bottom-6 right-6 bg-slate-900 text-white px-4 py-3 rounded-xl shadow-2xl flex items-center gap-2.5 transition-all duration-300 z-[999] ${toast.show ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2 pointer-events-none'
+          }`}
       >
         <span className="material-symbols-outlined text-[20px] text-emerald-400">check_circle</span>
         <span className="text-xs font-bold">{toast.message}</span>

@@ -1,0 +1,1238 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <meta charset="utf-8" />
+  <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+  <meta content="web_standard" name="shell-type" />
+  <title>[WEB-CLNT-MYP-020100] 자격증 · 수료증 · 경력 검증 관리 - 쓸고닦고 B2B</title>
+  <link rel="icon" type="image/png" href="/logo.png" />
+  <link href="https://fonts.googleapis.com" rel="preconnect" />
+  <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Plus+Jakarta+Sans:wght@600;700;800&amp;display=swap"
+    rel="stylesheet" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
+    rel="stylesheet" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+    rel="stylesheet" />
+  <style>
+    @layer base {
+
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        overscroll-behavior: none;
+      }
+
+      main>:first-child {
+        margin-top: 0 !important;
+      }
+
+      main>:last-child {
+        margin-bottom: 0 !important;
+      }
+    }
+
+    ::-webkit-scrollbar {
+      display: none;
+    }
+  </style>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script id="tailwind-config">
+    tailwind.config = { "darkMode": "class", "theme": { "extend": { "colors": { "primary-fixed-dim": "#b2c5ff", "surface-container-low": "#f2f4f6", "inverse-surface": "#2d3133", "secondary-fixed": "#89f5e7", "on-primary-fixed": "#001848", "primary-fixed": "#dae2ff", "on-tertiary-fixed-variant": "#3f465c", "surface-tint": "#0c56d0", "surface-dim": "#d8dadc", "inverse-on-surface": "#eff1f3", "on-secondary": "#ffffff", "tertiary-fixed": "#dae2fd", "surface-bright": "#f7f9fb", "error-container": "#ffdad6", "error": "#ba1a1a", "surface-container-lowest": "#ffffff", "tertiary": "#3b4358", "tertiary-fixed-dim": "#bec6e0", "on-tertiary-container": "#cbd2ec", "on-error": "#ffffff", "surface": "#f7f9fb", "on-primary": "#ffffff", "inverse-primary": "#b2c5ff", "surface-container-highest": "#e0e3e5", "background": "#f7f9fb", "on-primary-container": "#c4d2ff", "primary": "#003d9b", "on-background": "#191c1e", "tertiary-container": "#535a70", "on-secondary-container": "#006f66", "on-error-container": "#93000a", "secondary-fixed-dim": "#6bd8cb", "secondary": "#006a61", "surface-variant": "#e0e3e5", "on-secondary-fixed-variant": "#005049", "surface-container-high": "#e6e8ea", "on-tertiary": "#ffffff", "on-primary-fixed-variant": "#0040a2", "on-tertiary-fixed": "#131b2e", "surface-container": "#eceef0", "outline-variant": "#c3c6d6", "outline": "#737685", "on-surface": "#191c1e", "secondary-container": "#86f2e4", "on-secondary-fixed": "#00201d", "primary-container": "#0052cc", "on-surface-variant": "#434654" }, "borderRadius": { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" }, "spacing": { "space-xs": "0.5rem", "gutter": "1.5rem", "space-2xl": "3rem", "space-lg": "1.5rem", "space-sm": "0.75rem", "margin": "2rem", "space-md": "1rem", "space-xl": "2rem", "margin-mobile": "1rem", "gutter-mobile": "1rem", "space-2xs": "0.25rem" }, "fontFamily": { "headline-xl": ["Plus Jakarta Sans"], "body-lg": ["Inter"], "display-hero": ["Plus Jakarta Sans"], "metric-num-lg": ["Plus Jakarta Sans"], "headline-md": ["Plus Jakarta Sans"], "headline-lg": ["Plus Jakarta Sans"], "body-md": ["Inter"], "display-hero-mobile": ["Plus Jakarta Sans"], "body-sm": ["Inter"], "label-md": ["Inter"], "metric-num-sm": ["Plus Jakarta Sans"], "label-sm": ["Inter"], "headline-xl-mobile": ["Plus Jakarta Sans"], "title-md": ["Plus Jakarta Sans"], "headline-sm": ["Plus Jakarta Sans"] } } } };
+  </script>
+</head>
+
+<body class="bg-surface font-body-md text-on-surface antialiased">
+  <!-- 상단 글로벌 네비게이션 헤더 -->
+  <header class="fixed top-0 left-0 w-full z-50 bg-surface/85 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)]">
+    <div class="h-16 max-w-7xl mx-auto px-gutter flex items-center justify-between">
+      <div class="flex items-center gap-space-xl">
+        <a class="flex items-center gap-space-xs text-primary focus:outline-none" data-path="home" href="/">
+          <!-- 브랜드 로고 (.cursorrules 준수) -->
+          <img src="/logo.png" alt="쓸고닦고" class="w-8 h-8 rounded-full object-contain bg-white shadow-xs"
+            onerror="this.style.display='none'" />
+          <div class="flex flex-col leading-none">
+            <span class="font-headline-sm text-headline-sm font-bold text-primary tracking-tight">SseulDakGo</span>
+            <span class="font-label-sm text-label-sm text-on-surface-variant font-medium">쓸고닦고 B2B</span>
+          </div>
+        </a>
+        <nav class="hidden xl:flex items-center gap-space-lg">
+          <a class="font-body-md text-body-md text-on-surface-variant hover:text-on-surface transition-colors py-space-xs"
+            data-path="home" href="/">홈</a>
+          <a aria-current="page" class="transition-colors py-space-xs text-primary font-title-md font-semibold"
+            data-path="partner-management" href="#">시공사 파트너 관리</a>
+          <a class="font-body-md text-body-md text-on-surface-variant hover:text-on-surface transition-colors py-space-xs"
+            data-path="estimate-dispatch" href="#">견적/배차 관리</a>
+          <a class="font-body-md text-body-md text-on-surface-variant hover:text-on-surface transition-colors py-space-xs"
+            data-path="settlement" href="#">정산 관리</a>
+          <a class="font-body-md text-body-md text-on-surface-variant hover:text-on-surface transition-colors py-space-xs"
+            data-path="support-center" href="#">고객센터</a>
+        </nav>
+      </div>
+      <div class="flex items-center gap-space-md">
+        <div
+          class="hidden sm:flex items-center gap-space-2xs bg-secondary-container px-space-sm py-1 rounded-full shadow-[0_1px_3px_rgba(15,23,42,0.04)]">
+          <span class="material-symbols-outlined text-[15px] text-on-secondary-container">verified</span>
+          <span class="font-label-sm text-label-sm text-on-secondary-container font-semibold tracking-tight">인증 시공사
+            (공간다원)</span>
+        </div>
+        <div class="flex items-center gap-space-xs pl-space-xs">
+          <!-- 알림 벨 이모티콘 및 우측 수신 건수 배지 & 목록 드롭다운 -->
+          <div class="relative">
+            <button aria-label="알림" id="notiBellBtn" onclick="toggleNotificationDropdown()"
+              class="flex items-center gap-1.5 px-2.5 py-1.5 h-9 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface border border-slate-200 bg-white transition-colors"
+              type="button" title="알림 센터 열기">
+              <span class="material-symbols-outlined text-[20px]">notifications</span>
+              <!-- 벨 이모티콘 오른쪽에 수신된 메시지 건수 출력 -->
+              <span id="headerNotiCountBadge"
+                class="px-1.5 py-0.5 rounded-full text-[11px] font-extrabold bg-red-600 text-white leading-none min-w-[18px] text-center animate-pulse">3</span>
+            </button>
+
+            <!-- 알림 드롭다운 팝오버 (수신된 목록 출력) -->
+            <div id="headerNotiDropdown"
+              class="hidden absolute right-0 top-full mt-2 w-80 sm:w-96 bg-white rounded-2xl shadow-2xl border border-slate-200 z-50 overflow-hidden text-left">
+              <div class="p-3.5 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                  <span class="material-symbols-outlined text-[19px] text-primary">notifications_active</span>
+                  <span class="text-sm font-bold text-slate-800">알림 센터</span>
+                  <span id="headerNotiUnreadBadge" class="px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-red-100 text-red-600">미확인 3건</span>
+                </div>
+                <div class="flex items-center gap-2">
+                  <button type="button" onclick="readAllHeaderNotifications()"
+                    class="text-[11px] font-bold text-primary hover:underline px-1.5 py-0.5 rounded hover:bg-blue-50 transition-colors">
+                    모두 읽음
+                  </button>
+                  <button type="button" onclick="toggleNotificationDropdown()" class="text-slate-400 hover:text-slate-600 p-0.5 rounded" title="닫기">
+                    <span class="material-symbols-outlined text-[18px]">close</span>
+                  </button>
+                </div>
+              </div>
+              <div id="headerNotiListContainer" class="max-h-80 overflow-y-auto divide-y divide-slate-100">
+                <!-- JS 동적 렌더링 -->
+              </div>
+              <div class="p-2.5 bg-slate-50 border-t border-slate-100 text-center">
+                <span class="text-[10px] text-slate-500 flex items-center justify-center gap-1">
+                  <span class="material-symbols-outlined text-[13px] text-emerald-600">check_circle</span>
+                  실시간 웹 푸시 알림 수신 상태: 정상 연결됨
+                </span>
+              </div>
+            </div>
+          </div>
+          <div class="flex items-center gap-space-xs">
+            <div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white">
+              <span class="material-symbols-outlined text-on-primary text-[18px]">person</span>
+            </div>
+            <div class="hidden md:flex flex-col text-left">
+              <span class="font-label-md text-label-md font-semibold text-on-surface leading-tight">김대표님</span>
+              <span class="font-label-sm text-label-sm text-on-surface-variant leading-none">공간다원 (S20261100001)</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- 메인 레이아웃 -->
+  <main class="w-full pt-16 bg-surface">
+    <div class="max-w-4xl mx-auto px-gutter py-space-xl">
+      <div class="flex flex-col w-full space-y-space-xl">
+        <!-- Top Step Flow Navigation -->
+        <section class="w-full bg-surface-container-lowest rounded-xl p-space-lg shadow-sm border border-slate-100">
+          <div class="flex flex-col md:flex-row md:items-center justify-between gap-space-md">
+            <!-- Step 1: Business Registration (Completed) -->
+            <div onclick="openBizEditModal()"
+              class="flex items-center gap-space-sm flex-1 cursor-pointer hover:opacity-85 transition-opacity"
+              title="사업자등록 정보 수정하기">
+              <div class="w-8 h-8 rounded-full bg-secondary-container flex items-center justify-center shrink-0">
+                <span class="material-symbols-outlined text-[18px] text-on-secondary-container"
+                  style="font-variation-settings: 'FILL' 1;">check_circle</span>
+              </div>
+              <div class="flex flex-col text-left">
+                <div class="flex items-center gap-space-2xs">
+                  <span class="font-label-sm text-label-sm text-secondary font-bold">1단계 완료</span>
+                  <span
+                    class="inline-flex items-center px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-secondary-container text-on-secondary-container">검증완료</span>
+                  <span class="text-[10px] text-primary font-bold underline ml-1">수정</span>
+                </div>
+                <span class="font-title-md text-title-md font-semibold text-on-surface">사업자등록 정보</span>
+              </div>
+            </div>
+            <div class="hidden md:block w-8 h-[2px] bg-secondary shrink-0"></div>
+            <!-- Step 2: Certification & Career (Active) -->
+            <div class="flex items-center gap-space-sm flex-1">
+              <div
+                class="w-8 h-8 rounded-full bg-primary flex items-center justify-center shrink-0 shadow-sm text-white">
+                <span class="font-label-md text-label-md text-on-primary font-bold">2</span>
+              </div>
+              <div class="flex flex-col text-left">
+                <div class="flex items-center gap-space-2xs">
+                  <span class="font-label-sm text-label-sm text-primary font-bold">현재 단계</span>
+                  <span
+                    class="inline-flex items-center px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-primary-fixed text-primary font-semibold">진행중</span>
+                </div>
+                <span class="font-title-md text-title-md font-bold text-primary">자격증 · 수료증 · 경력 (선택)</span>
+              </div>
+            </div>
+            <div class="hidden md:block w-8 h-[2px] bg-surface-container-highest shrink-0"></div>
+            <!-- Step 3: Payout & Finalization (Upcoming) -->
+            <div class="flex items-center gap-space-sm flex-1 opacity-60">
+              <div
+                class="w-8 h-8 rounded-full bg-surface-container-high flex items-center justify-center shrink-0 text-on-surface-variant font-bold text-label-md">
+                3
+              </div>
+              <div class="flex flex-col text-left">
+                <span class="font-label-sm text-label-sm text-on-surface-variant">다음 단계</span>
+                <span class="font-title-md text-title-md text-on-surface-variant font-medium">자격증, 수료증 검토(선택)</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Page Breadcrumbs & Title Block -->
+        <header class="space-y-space-2xs text-left">
+          <nav class="flex items-center gap-space-2xs font-label-sm text-label-sm text-on-surface-variant">
+            <span>홈</span>
+            <span class="material-symbols-outlined text-[14px]">chevron_right</span>
+            <span>마이페이지</span>
+            <span class="material-symbols-outlined text-[14px]">chevron_right</span>
+            <span>시공사 파트너 프로필</span>
+            <span class="material-symbols-outlined text-[14px]">chevron_right</span>
+            <span class="text-primary font-semibold">자격 및 증빙 서류 관리</span>
+          </nav>
+          <div class="flex flex-col md:flex-row md:items-end justify-between gap-space-xs pt-space-xs">
+            <div>
+              <div class="flex items-center gap-space-xs flex-wrap">
+                <h1 class="font-headline-lg text-headline-lg font-bold text-on-surface tracking-tight">자격증 · 수료증 · 경력 검증
+                  관리</h1>
+                <span
+                  class="font-label-sm text-label-sm px-2 py-0.5 rounded bg-surface-container text-on-surface-variant font-mono font-bold">WEB-CLNT-MYP-020100</span>
+              </div>
+              <p class="font-body-md text-body-md text-on-surface-variant mt-1">보유하신 전문 자격증 및 수료증을 등록하시면 인증 심사를 거쳐 파트너
+                프로필에 신뢰 뱃지가 부여됩니다.</p>
+            </div>
+            <div class="text-right">
+              <span class="font-label-sm text-label-sm text-secondary font-medium flex items-center gap-1">
+                <span class="w-2 h-2 rounded-full bg-secondary"></span>
+                동기화 상태: 실시간 DB 연동
+              </span>
+            </div>
+          </div>
+        </header>
+
+        <!-- Section 1: Verified Business Registration Info -->
+        <section class="bg-surface-container-lowest rounded-xl p-space-lg shadow-sm border border-slate-100 text-left">
+          <div
+            class="flex flex-col sm:flex-row sm:items-center justify-between pb-space-md border-b border-surface-container-low gap-space-sm">
+            <div class="flex items-center gap-space-xs flex-wrap">
+              <span class="material-symbols-outlined text-primary text-[22px]">corporate_fare</span>
+              <h2 class="font-title-md text-title-md font-bold text-on-surface">사업자등록 검증 정보</h2>
+              <span
+                class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-label-sm font-semibold bg-secondary-container text-on-secondary-container">
+                <span class="material-symbols-outlined text-[14px]"
+                  style="font-variation-settings: 'FILL' 1;">verified</span>
+                국세청 홈택스 진위확인 완료 (VERIFY_YN = 'Y')
+              </span>
+            </div>
+            <button onclick="openBizEditModal()"
+              class="inline-flex items-center gap-1 font-label-md text-label-md font-semibold text-primary hover:text-on-primary-fixed-variant transition-colors cursor-pointer px-2.5 py-1 rounded-lg hover:bg-primary-fixed/30"
+              type="button">
+              <span>사업자 정보 등록/수정</span>
+              <span class="material-symbols-outlined text-[16px]">edit_document</span>
+            </button>
+          </div>
+          <!-- Data Matrix Grid -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-space-md pt-space-md">
+            <div class="bg-surface-container-low rounded-lg p-space-sm">
+              <span class="font-label-sm text-label-sm text-on-surface-variant block mb-1">상호명 (COMPANY_NM)</span>
+              <span class="font-title-md text-title-md font-bold text-on-surface block">공간다원 (클린앤케어)</span>
+            </div>
+            <div class="bg-surface-container-low rounded-lg p-space-sm">
+              <span class="font-label-sm text-label-sm text-on-surface-variant block mb-1">사업자등록번호 (BIZ_NO)</span>
+              <span
+                class="font-title-md text-title-md font-bold text-on-surface block tracking-tight font-mono">120-88-29401</span>
+            </div>
+            <div class="bg-surface-container-low rounded-lg p-space-sm">
+              <span class="font-label-sm text-label-sm text-on-surface-variant block mb-1">대표자명 (USER_NM)</span>
+              <span class="font-title-md text-title-md font-bold text-on-surface block">김충훈</span>
+            </div>
+            <div class="bg-surface-container-low rounded-lg p-space-sm">
+              <div class="flex items-center justify-between mb-1">
+                <span class="font-label-sm text-label-sm text-on-surface-variant">주력 시공 분야 (LARGE_CD)</span>
+                <button type="button" onclick="openBizEditModal()"
+                  class="text-[11px] text-primary font-bold hover:underline">선택/변경</button>
+              </div>
+              <div class="flex flex-wrap gap-1" id="mainCleanLargeBadges">
+                <span
+                  class="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-semibold bg-primary-fixed text-primary">정기청소</span>
+                <span
+                  class="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-semibold bg-primary-fixed text-primary">입주청소</span>
+              </div>
+            </div>
+          </div>
+          <div
+            class="mt-space-md pt-space-sm border-t border-surface-container-low flex flex-col sm:flex-row sm:items-center justify-between font-body-sm text-body-sm text-on-surface-variant gap-space-xs">
+            <div class="flex items-center gap-space-xs">
+              <span class="material-symbols-outlined text-[16px] text-secondary">task_alt</span>
+              <span>회원식별자: <strong class="text-on-surface font-semibold">S20261100001</strong> | 사업자등록증 원본 서류: 확인완료
+                (2026-11-15)</span>
+            </div>
+            <span class="font-label-sm text-label-sm text-outline">담당 매니저: 본사 클라이언트인프라팀</span>
+          </div>
+        </section>
+
+        <!-- Section 2: Certification & Badges Value Proposition Banner -->
+        <section class="space-y-space-sm text-left">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-space-xs">
+              <h2 class="font-headline-md text-headline-md font-bold text-on-surface">자격증 · 수료증 · 경력 등록</h2>
+              <span
+                class="font-label-sm text-label-sm px-2 py-0.5 rounded-full bg-surface-container-high text-on-surface-variant font-medium">선택
+                (미입력 가능)</span>
+            </div>
+            <span class="font-label-sm text-label-sm text-on-surface-variant">최대 5건 등록 가능</span>
+          </div>
+          <!-- Blue Trust Value Card -->
+          <div class="bg-primary-fixed rounded-xl p-space-lg shadow-sm">
+            <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-space-md">
+              <div class="flex items-start gap-space-md">
+                <div
+                  class="w-12 h-12 rounded-xl bg-primary text-on-primary flex items-center justify-center shrink-0 shadow-md text-white">
+                  <span class="material-symbols-outlined text-[28px]"
+                    style="font-variation-settings: 'FILL' 1;">workspace_premium</span>
+                </div>
+                <div>
+                  <h3 class="font-title-md text-title-md font-bold text-on-primary-fixed tracking-tight leading-snug">
+                    보유하신 자격이나 수료증을 등록하시면 업체 프로필에 [인증 뱃지]가 표시되어 고객 선택률이 최대 2.8배 높아집니다.
+                  </h3>
+                  <p class="font-body-sm text-body-sm text-on-tertiary-fixed-variant mt-1">
+                    본사 위생검증 심사팀(Quality Assurance)의 서류 대조 후 클라이언트 견적서 발행 화면에 자격 배지가 공식 노출됩니다.
+                  </p>
+                </div>
+              </div>
+            </div>
+            <!-- Badge Showcase Preview Grid -->
+            <div
+              class="grid grid-cols-1 md:grid-cols-3 gap-space-sm mt-space-md pt-space-md border-t border-primary-fixed-dim/40">
+              <div class="bg-surface-container-lowest rounded-lg p-space-sm flex items-center gap-space-sm shadow-sm">
+                <div class="w-10 h-10 rounded-lg bg-surface-container flex items-center justify-center shrink-0">
+                  <span class="material-symbols-outlined text-primary text-[22px]"
+                    style="font-variation-settings: 'FILL' 1;">school</span>
+                </div>
+                <div>
+                  <div class="flex items-center gap-1">
+                    <span class="font-label-md text-label-md font-bold text-on-surface">전문교육 수료</span>
+                    <span
+                      class="text-[10px] px-1 py-0.2 rounded bg-surface-container text-on-surface-variant font-mono">BADGE_PRO_EDU</span>
+                  </div>
+                  <p class="font-body-sm text-body-sm text-on-surface-variant">교육·기술 수료증 1건 이상 승인</p>
+                </div>
+              </div>
+              <div class="bg-surface-container-lowest rounded-lg p-space-sm flex items-center gap-space-sm shadow-sm">
+                <div class="w-10 h-10 rounded-lg bg-secondary-container flex items-center justify-center shrink-0">
+                  <span class="material-symbols-outlined text-on-secondary-container text-[22px]"
+                    style="font-variation-settings: 'FILL' 1;">military_tech</span>
+                </div>
+                <div>
+                  <div class="flex items-center gap-1">
+                    <span class="font-label-md text-label-md font-bold text-on-surface">공인 자격증 보유</span>
+                    <span
+                      class="text-[10px] px-1 py-0.2 rounded bg-surface-container text-on-surface-variant font-mono">BADGE_CERTIFIED</span>
+                  </div>
+                  <p class="font-body-sm text-body-sm text-on-surface-variant">국가/공인 민간자격 1건 이상 승인</p>
+                </div>
+              </div>
+              <div class="bg-surface-container-lowest rounded-lg p-space-sm flex items-center gap-space-sm shadow-sm">
+                <div class="w-10 h-10 rounded-lg bg-tertiary-fixed flex items-center justify-center shrink-0">
+                  <span class="material-symbols-outlined text-tertiary text-[22px]"
+                    style="font-variation-settings: 'FILL' 1;">engineering</span>
+                </div>
+                <div>
+                  <div class="flex items-center gap-1">
+                    <span class="font-label-md text-label-md font-bold text-on-surface">제조사 엔지니어 출신</span>
+                    <span
+                      class="text-[10px] px-1 py-0.2 rounded bg-surface-container text-on-surface-variant font-mono">BADGE_MASTER</span>
+                  </div>
+                  <p class="font-body-sm text-body-sm text-on-surface-variant">삼성/LG 등 가전 제조사 경력 검증</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Section 3: Dynamic Tab & Certification Cards Container -->
+        <section class="space-y-space-md text-left">
+          <!-- Tab Navigation Bar -->
+          <div
+            class="bg-surface-container-lowest rounded-xl p-1.5 shadow-sm border border-slate-200 flex flex-wrap gap-1">
+            <button type="button" onclick="switchCertTab('LICENSE')" id="tabBtn_LICENSE"
+              class="flex-1 min-w-[140px] py-2.5 px-3 rounded-lg font-title-md text-sm font-bold flex items-center justify-center gap-1.5 transition-all bg-primary text-white shadow-sm cursor-pointer">
+              <span class="material-symbols-outlined text-[18px]">verified</span>
+              <span>1. 자격증 (국가/민간)</span>
+              <span id="badgeCount_LICENSE"
+                class="px-1.5 py-0.2 rounded-full text-[11px] bg-white/20 font-mono">1</span>
+            </button>
+            <button type="button" onclick="switchCertTab('COMPLETION')" id="tabBtn_COMPLETION"
+              class="flex-1 min-w-[140px] py-2.5 px-3 rounded-lg font-title-md text-sm font-semibold flex items-center justify-center gap-1.5 transition-all text-on-surface-variant hover:bg-surface-container-low cursor-pointer">
+              <span class="material-symbols-outlined text-[18px]">school</span>
+              <span>2. 교육/기술 수료증</span>
+              <span id="badgeCount_COMPLETION"
+                class="px-1.5 py-0.2 rounded-full text-[11px] bg-surface-container-high font-mono">1</span>
+            </button>
+            <button type="button" onclick="switchCertTab('CAREER')" id="tabBtn_CAREER"
+              class="flex-1 min-w-[140px] py-2.5 px-3 rounded-lg font-title-md text-sm font-semibold flex items-center justify-center gap-1.5 transition-all text-on-surface-variant hover:bg-surface-container-low cursor-pointer">
+              <span class="material-symbols-outlined text-[18px]">engineering</span>
+              <span>3. 제조사 경력증명</span>
+              <span id="badgeCount_CAREER"
+                class="px-1.5 py-0.2 rounded-full text-[11px] bg-surface-container-high font-mono">1</span>
+            </button>
+          </div>
+
+          <!-- Dynamic Cards Container -->
+          <div id="certTabListContainer" class="space-y-space-md">
+            <!-- Cards rendered dynamically by renderCertTabCards() -->
+          </div>
+
+          <!-- Add Item Button for Active Tab -->
+          <button type="button" onclick="addNewCertCard()"
+            class="w-full py-space-md px-space-lg rounded-xl bg-surface-container-low hover:bg-surface-container text-primary font-title-md text-title-md font-semibold flex items-center justify-center gap-space-xs transition-colors shadow-sm border border-slate-200 cursor-pointer">
+            <span class="material-symbols-outlined text-[22px]">add_circle</span>
+            <span id="btnAddCertText">+ 항목 추가하기</span>
+          </button>
+        </section>
+
+        <!-- Sticky Bottom Actions Bar -->
+        <aside
+          class="sticky bottom-0 z-40 -mx-gutter px-gutter py-space-md bg-surface-container-lowest/95 backdrop-blur-md shadow-[0_-4px_16px_rgba(0,0,0,0.06)] border-t border-slate-200">
+          <div class="max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-space-sm">
+            <div class="w-full sm:w-auto flex items-center justify-between sm:justify-start gap-space-md">
+              <button onclick="location.href='/'"
+                class="font-label-md text-label-md text-on-surface-variant hover:text-on-surface flex items-center gap-1 transition-colors px-2 py-2 cursor-pointer"
+                type="button">
+                <span>건너뛰기 (나중에 등록)</span>
+                <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+              </button>
+              <span class="hidden md:inline font-body-sm text-body-sm text-outline">
+                ※ 등록된 자격 서류는 영업일 기준 1~2일 내 심사팀이 검증합니다.
+              </span>
+            </div>
+            <div class="flex items-center gap-space-sm w-full sm:w-auto justify-end">
+              <button onclick="alert('현재 입력된 자격증 정보가 임시 저장되었습니다.')"
+                class="flex-1 sm:flex-none px-space-lg h-11 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface font-label-md text-label-md font-semibold transition-colors cursor-pointer"
+                type="button">
+                임시 저장
+              </button>
+              <button
+                class="flex-1 sm:flex-none px-space-lg h-11 rounded-lg bg-primary hover:bg-on-primary-fixed-variant text-white font-label-md text-label-md font-semibold flex items-center justify-center gap-space-xs transition-colors shadow-sm cursor-pointer"
+                id="submitCertBtn" type="button">
+                <span class="material-symbols-outlined text-[20px]"
+                  style="font-variation-settings: 'FILL' 1;">verified</span>
+                <span>저장 및 심사 요청</span>
+              </button>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </main>
+
+  <!-- 푸터 -->
+  <footer class="w-full bg-surface-container-low mt-space-2xl text-left">
+    <div class="max-w-7xl mx-auto px-gutter py-space-2xl">
+      <div class="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-space-xl pb-space-xl">
+        <div class="space-y-space-sm max-w-xl">
+          <div class="flex items-center gap-space-xs">
+            <span class="material-symbols-outlined text-primary text-[24px]">verified_user</span>
+            <span class="font-headline-sm text-headline-sm text-primary font-bold tracking-tight">쓸고닦고 SseulDakGo</span>
+          </div>
+          <p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
+            쓸고닦고(SseulDakGo)는 소형 건물·다세대·오피스텔 이용자와 전문 시공사를 연결하는 위생 관리 매칭 플랫폼입니다. 편리한 매칭 시스템을 제공하며, 실제 시공 수행과 검수 책임은 이용자와
+            시공사 당사자에게 있습니다.
+          </p>
+          <div class="flex flex-wrap items-center gap-space-md pt-space-xs font-label-md text-label-md">
+            <a class="text-on-surface-variant hover:text-on-surface transition-colors font-medium" href="#">이용약관</a>
+            <span class="text-outline-variant">|</span>
+            <a class="text-on-surface font-semibold hover:text-primary transition-colors" href="#">개인정보처리방침</a>
+            <span class="text-outline-variant">|</span>
+            <a class="text-on-surface-variant hover:text-on-surface transition-colors font-medium" href="#">시공사 파트너
+              운영규정</a>
+            <span class="text-outline-variant">|</span>
+            <a class="text-on-surface-variant hover:text-on-surface transition-colors font-medium" href="#">고객지원센터</a>
+          </div>
+        </div>
+        <div class="bg-surface-container rounded-xl p-space-lg max-w-md w-full">
+          <div class="flex items-center gap-space-xs text-primary mb-space-xs">
+            <span class="material-symbols-outlined text-[20px]">support_agent</span>
+            <span class="font-title-md text-title-md font-semibold">파트너 전용 헬프데스크</span>
+          </div>
+          <p class="font-headline-md text-headline-md font-bold text-on-surface tracking-tight">1600-0988</p>
+          <p class="font-body-sm text-body-sm text-on-surface-variant mt-1">평일 08:30 ~ 18:00 (점심시간 12:00 ~ 13:00 /
+            주말·공휴일 휴무)</p>
+          <p class="font-body-sm text-body-sm text-on-surface-variant">야간 긴급 현장 배차 지원: 카카오톡 채널 @쓸고닦고파트너</p>
+        </div>
+      </div>
+      <div class="pt-space-lg space-y-space-xs border-t border-slate-200">
+        <div
+          class="flex flex-wrap gap-x-space-md gap-y-1 font-body-sm text-body-sm text-on-surface-variant leading-relaxed">
+          <span>상호명: (주)스페이스케어코리아</span>
+          <span>대표이사: 이청결</span>
+          <span>사업자등록번호: 214-88-76541</span>
+          <span>통신판매업신고: 제2024-서울강남-03120호</span>
+        </div>
+        <div
+          class="flex flex-wrap gap-x-space-md gap-y-1 font-body-sm text-body-sm text-on-surface-variant leading-relaxed">
+          <span>주소: 서울특별시 강남구 테헤란로 152 강남파이낸스센터 19층</span>
+          <span>호스팅 서비스: (주)스페이스케어코리아 클라우드사업부</span>
+          <span>정산문의: finance@sseuldakgo.co.kr</span>
+        </div>
+        <div class="pt-space-md flex flex-col sm:flex-row sm:items-center justify-between gap-space-sm">
+          <p class="font-body-sm text-body-sm text-outline">© 2024 SseulDakGo (주)스페이스케어코리아. All rights reserved.</p>
+          <div class="flex items-center gap-space-xs text-secondary font-label-sm text-label-sm font-semibold">
+            <span class="material-symbols-outlined text-[16px]">security</span>
+            <span>SSL 256-bit 엔터프라이즈 보안 인증 네트워크</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- 사업자등록 정보 신규/변경 서브 모달 -->
+  <div id="bizEditModal"
+    class="hidden fixed inset-0 z-[400] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
+    <div class="bg-white rounded-2xl max-w-lg w-full shadow-2xl overflow-hidden border border-slate-200 text-left">
+      <div class="p-5 sm:p-6 border-b border-slate-100 flex items-center justify-between bg-slate-50">
+        <div>
+          <div class="flex items-center gap-2">
+            <span
+              class="text-[10px] font-mono font-bold bg-amber-100 text-amber-800 px-2 py-0.5 rounded border border-amber-300">
+              STEP 1
+            </span>
+            <span class="text-[10px] bg-secondary text-white font-bold px-1.5 py-0.5 rounded">
+              시공사 파트너 전용
+            </span>
+          </div>
+          <h3 class="text-lg font-bold text-slate-800 mt-1">사업자등록증 & 세금계산서 관리</h3>
+          <p class="text-xs text-slate-500">사업자등록 정보 신규 등록 및 변경 심사를 요청합니다.</p>
+        </div>
+        <button type="button" onclick="closeBizEditModal()"
+          class="p-1 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-200/60 transition-colors cursor-pointer">
+          <span class="material-symbols-outlined text-[20px]">close</span>
+        </button>
+      </div>
+
+      <form id="bizEditForm" class="p-5 sm:p-6 space-y-3.5 text-xs">
+        <div class="flex rounded-xl bg-slate-100 p-1 border border-slate-200">
+          <button type="button" id="btnBizIndividual" onclick="selectBizType('INDIVIDUAL')"
+            class="flex-1 py-1.5 rounded-lg font-bold transition-all text-slate-500 cursor-pointer">
+            개인사업자
+          </button>
+          <button type="button" id="btnBizCorp" onclick="selectBizType('CORP')"
+            class="flex-1 py-1.5 rounded-lg font-bold transition-all bg-white shadow text-primary cursor-pointer">
+            법인사업자
+          </button>
+        </div>
+
+        <div>
+          <label class="block text-slate-700 font-bold mb-1">사업자등록번호 (10자리)</label>
+          <div class="flex gap-2">
+            <input type="text" id="inputBizNo" value="120-88-29401" placeholder="예: 120-88-29401"
+              class="flex-1 px-3 py-2 border border-slate-300 rounded-lg font-mono focus:ring-2 focus:ring-secondary focus:outline-none" />
+            <button type="button" onclick="verifyHometaxDirect()"
+              class="px-3 py-2 bg-blue-600 text-white rounded-lg font-bold hover:bg-blue-700 transition-colors whitespace-nowrap cursor-pointer">
+              홈택스 진위확인
+            </button>
+          </div>
+          <p id="hometaxSuccessNotice" class="text-emerald-600 font-bold mt-1 flex items-center gap-1">
+            <span class="material-symbols-outlined text-[16px]">check_circle</span>
+            국세청 홈택스 인증 완료 (정상 계속사업자)
+          </p>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-slate-700 font-bold mb-1">상호명 (법인명)</label>
+            <input type="text" id="inputCompanyNm" value="공간다원 (클린앤케어)"
+              class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary focus:outline-none" />
+          </div>
+          <div>
+            <label class="block text-slate-700 font-bold mb-1">대표자 성명</label>
+            <input type="text" id="inputCeoNm" value="김충훈"
+              class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary focus:outline-none" />
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-slate-700 font-bold mb-1">주력 시공 분야 (LARGE_CD)</label>
+          <div class="grid grid-cols-3 gap-2 bg-slate-50 p-2.5 rounded-lg border border-slate-200"
+            id="bizEditCategoryGroup">
+            <label class="flex items-center gap-1.5 text-xs text-slate-800 cursor-pointer">
+              <input type="checkbox" checked class="accent-primary w-3.5 h-3.5" value="정기청소" />
+              <span>정기청소</span>
+            </label>
+            <label class="flex items-center gap-1.5 text-xs text-slate-800 cursor-pointer">
+              <input type="checkbox" checked class="accent-primary w-3.5 h-3.5" value="입주청소" />
+              <span>입주청소</span>
+            </label>
+            <label class="flex items-center gap-1.5 text-xs text-slate-800 cursor-pointer">
+              <input type="checkbox" class="accent-primary w-3.5 h-3.5" value="계절가전청소" />
+              <span>계절가전청소</span>
+            </label>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-slate-700 font-bold mb-1">사업자등록증 사본 첨부</label>
+          <label
+            class="block border-2 border-dashed border-slate-300 rounded-xl p-4 text-center hover:bg-slate-50 transition-colors cursor-pointer">
+            <input type="file" accept="image/jpeg,image/png,application/pdf"
+              onchange="if(this.files[0]) document.getElementById('bizFileNameDisplay').textContent = this.files[0].name;"
+              class="hidden" />
+            <span class="material-symbols-outlined text-[32px] text-slate-400">cloud_upload</span>
+            <p id="bizFileNameDisplay" class="font-bold text-slate-700 mt-1">사업자등록증_공간다원.pdf</p>
+            <p class="text-[10px] text-slate-400 mt-0.5">JPG, PNG, PDF 지원 (최대 10MB)</p>
+          </label>
+        </div>
+
+        <div
+          class="p-4 bg-slate-50 border-t border-slate-100 flex justify-end gap-2 -mx-5 sm:-mx-6 -mb-5 sm:-mb-6 mt-6">
+          <button type="button" onclick="closeBizEditModal()"
+            class="px-4 py-2 border border-slate-300 rounded-lg text-slate-700 hover:bg-slate-100 font-bold cursor-pointer">
+            닫기
+          </button>
+          <button type="submit"
+            class="px-5 py-2 bg-secondary text-white rounded-lg font-bold hover:bg-on-secondary-fixed-variant cursor-pointer shadow-md flex items-center gap-1">
+            <span class="material-symbols-outlined text-[16px]">verified</span>
+            저장 및 인증 요청
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    var currentTab = 'LICENSE';
+    var certList = [
+      {
+        id: 1,
+        certSeq: 1,
+        docType: 'LICENSE',
+        subType: 'PRIVATE',
+        certCode: 'CERT_SYS_AC',
+        certName: '냉난방기/시스템에어컨 종합세척관리사',
+        customCertName: '',
+        issuerName: '한국시스템에어컨유지보수관리협회(KSAMA)',
+        issuedYm: '2024-06',
+        fileName: 'KSAMA_시스템에어컨세척관리사_자격증_김충훈.pdf',
+        fileSize: '2.4MB',
+        privacyMaskYn: 'Y',
+        reviewStatus: 'APPROVED',
+        approvedDt: '2026-11-18'
+      },
+      {
+        id: 2,
+        certSeq: 2,
+        docType: 'COMPLETION',
+        subType: null,
+        certCode: 'ETC_DIRECT_INPUT',
+        certName: '기타 자격/수료증 직접 입력 (ETC_DIRECT_INPUT)',
+        customCertName: '친환경 오존/피톤치드 공간 살균 방역 실무 마스터과정',
+        issuerName: '사단법인 한국실내환경방역안전협회',
+        issuedYm: '2025-02',
+        fileName: '방역살균수료증_공간다원.jpg',
+        fileSize: '4.1MB',
+        privacyMaskYn: 'Y',
+        reviewStatus: 'PENDING',
+        approvedDt: ''
+      },
+      {
+        id: 3,
+        certSeq: 3,
+        docType: 'CAREER',
+        subType: null,
+        certCode: 'CAREER_SAMSUNG_SVC',
+        certName: '삼성전자서비스/로지텍 서비스엔지니어 경력 (CAREER_SAMSUNG)',
+        customCertName: '',
+        issuerName: '삼성전자서비스(주) 중부지사',
+        issuedYm: '2023-08',
+        fileName: '',
+        fileSize: '',
+        privacyMaskYn: 'N',
+        reviewStatus: 'DRAFT',
+        approvedDt: ''
+      }
+    ];
+
+    var NATIONAL_CERTS = [
+      { code: 'QNET_HVAC_ENG', name: '공조냉동기계기사 (Q-Net)', issuer: '한국산업인력공단' },
+      { code: 'QNET_HVAC_CRAFTS', name: '공조냉동기계기능사 (Q-Net)', issuer: '한국산업인력공단' },
+      { code: 'QNET_ELEC_ENG', name: '전기공사기사 / 전기기사 (Q-Net)', issuer: '한국산업인력공단' },
+      { code: 'QNET_ENV_ENG', name: '대기환경기사 / 실내환경관리사', issuer: '한국산업인력공단' },
+      { code: 'QNET_BLDG_FAC', name: '건축설비기사 / 설비보전기능사', issuer: '한국산업인력공단' },
+      { code: 'ETC_DIRECT_INPUT', name: '기타 국가공인 자격증 직접 입력', issuer: '' }
+    ];
+
+    var PRIVATE_CERTS = [
+      { code: 'CERT_SYS_AC', name: '냉난방기/시스템에어컨 종합세척관리사', issuer: '한국시스템에어컨유지보수관리협회(KSAMA)' },
+      { code: 'CERT_CLEAN_SPEC', name: '건축위생관리사 1급/2급', issuer: '한국건물위생관리협회' },
+      { code: 'CERT_FLOOR_COAT', name: '공간바닥코팅마스터 자격인증', issuer: '한국코팅방수기술협회' },
+      { code: 'CERT_MATTRESS', name: '홈케어 매트리스/패브릭 클리닝 전문가', issuer: '한국홈케어마스터협회' },
+      { code: 'CERT_STERILIZE', name: '병원/상업공간 멸균소독전문가', issuer: '한국실내위생검증원' },
+      { code: 'ETC_DIRECT_INPUT', name: '기타 민간자격증 직접 입력', issuer: '' }
+    ];
+
+    var COMPLETION_CERTS = [
+      { code: 'CERT_CLEAN_BUILD', name: '건물위생관리업 법정교육 수료', issuer: '한국건물위생관리협회' },
+      { code: 'CERT_DISINFECT', name: '한국방역협회 소독업무 종사자 교육', issuer: '사단법인 한국방역협회' },
+      { code: 'CERT_AIRCON_DISMANTLE', name: '시스템/스탠드 에어컨 완전분해 실무과정', issuer: '한국냉난방기술학원' },
+      { code: 'CERT_OCCUPATIONAL_SAFE', name: '고소작업 및 산업안전보건 교육 이수', issuer: '안전보건공단' },
+      { code: 'ETC_DIRECT_INPUT', name: '기타 기술/교육과정 직접 입력', issuer: '' }
+    ];
+
+    var CAREER_CERTS = [
+      { code: 'CAREER_SAMSUNG_SVC', name: '삼성전자서비스/로지텍 서비스엔지니어 경력', issuer: '삼성전자서비스(주)' },
+      { code: 'CAREER_LG_SVC', name: 'LG전자 하이엠솔루텍/서비스센터 경력', issuer: 'LG전자 하이엠솔루텍' },
+      { code: 'CAREER_CARRIER_SVC', name: '캐리어/위니아 공조 엔지니어 경력', issuer: '오텍캐리어/위니아에이드' },
+      { code: 'CAREER_CLEAN_CORP', name: '전문 위생관리법인 현장 팀장/소장 3년 이상', issuer: '종합위생관리법인' },
+      { code: 'ETC_DIRECT_INPUT', name: '기타 제조사/공조회사 경력 직접 입력', issuer: '' }
+    ];
+
+    function switchCertTab(tabKey) {
+      currentTab = tabKey;
+      var tabs = ['LICENSE', 'COMPLETION', 'CAREER'];
+      tabs.forEach(function (t) {
+        var btn = document.getElementById('tabBtn_' + t);
+        if (!btn) return;
+        if (t === tabKey) {
+          btn.className = 'flex-1 min-w-[140px] py-2.5 px-3 rounded-lg font-title-md text-sm font-bold flex items-center justify-center gap-1.5 transition-all bg-primary text-white shadow-sm cursor-pointer';
+        } else {
+          btn.className = 'flex-1 min-w-[140px] py-2.5 px-3 rounded-lg font-title-md text-sm font-semibold flex items-center justify-center gap-1.5 transition-all text-on-surface-variant hover:bg-surface-container-low cursor-pointer';
+        }
+      });
+      renderCertTabCards();
+    }
+
+    function updateBadgeCounts() {
+      var lCount = certList.filter(function (c) { return c.docType === 'LICENSE'; }).length;
+      var cCount = certList.filter(function (c) { return c.docType === 'COMPLETION'; }).length;
+      var rCount = certList.filter(function (c) { return c.docType === 'CAREER'; }).length;
+      document.getElementById('badgeCount_LICENSE').textContent = lCount;
+      document.getElementById('badgeCount_COMPLETION').textContent = cCount;
+      document.getElementById('badgeCount_CAREER').textContent = rCount;
+
+      var tabNames = { 'LICENSE': '자격증 (국가/민간)', 'COMPLETION': '교육/기술 수료증', 'CAREER': '제조사 경력증명' };
+      document.getElementById('btnAddCertText').textContent = '+ ' + tabNames[currentTab] + ' 추가하기 (현재 전체 ' + certList.length + '건 / 최대 5건)';
+    }
+
+    function renderCertTabCards() {
+      updateBadgeCounts();
+      var container = document.getElementById('certTabListContainer');
+      var itemsInTab = certList.filter(function (c) { return c.docType === currentTab; });
+
+      if (itemsInTab.length === 0) {
+        var tabTitle = currentTab === 'LICENSE' ? '자격증' : currentTab === 'COMPLETION' ? '수료증' : '경력증명';
+        container.innerHTML = '<div class="p-8 text-center bg-surface-container-lowest rounded-xl border border-dashed border-slate-300 text-on-surface-variant">' +
+          '<span class="material-symbols-outlined text-[36px] text-slate-300">note_add</span>' +
+          '<p class="mt-2 font-bold text-sm text-slate-600">등록된 ' + tabTitle + ' 내역이 없습니다.</p>' +
+          '<p class="text-xs text-slate-400 mt-1">하단 [+ ' + tabTitle + ' 추가하기] 버튼을 눌러 서류를 등록하세요.</p>' +
+          '</div>';
+        updatePayloadPreview();
+        return;
+      }
+
+      var html = '';
+      itemsInTab.forEach(function (item, idx) {
+        var statusBadge = '';
+        var borderClass = 'border-slate-200';
+        if (item.reviewStatus === 'APPROVED') {
+          borderClass = 'border-secondary-container';
+          statusBadge = '<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-label-sm font-semibold bg-secondary-container text-on-secondary-container">' +
+            '<span class="material-symbols-outlined text-[14px]" style="font-variation-settings: \'FILL\' 1;">verified</span>' +
+            '승인 완료 (APPROVED)' +
+            '</span>' +
+            (item.approvedDt ? '<span class="font-label-sm text-label-sm text-on-surface-variant hidden sm:inline font-mono">승인일: ' + item.approvedDt + '</span>' : '');
+        } else if (item.reviewStatus === 'PENDING') {
+          borderClass = 'border-amber-200';
+          statusBadge = '<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-label-sm font-semibold bg-tertiary-fixed text-on-tertiary-fixed">' +
+            '<span class="material-symbols-outlined text-[14px]">hourglass_top</span>' +
+            '심사 대기 (PENDING)' +
+            '</span>';
+        } else {
+          statusBadge = '<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-label-sm font-semibold bg-surface-container text-on-surface-variant">' +
+            '작성중 (DRAFT)' +
+            '</span>';
+        }
+
+        var subTypeSelector = '';
+        if (item.docType === 'LICENSE') {
+          var isNat = item.subType === 'NATIONAL';
+          subTypeSelector = '<div class="md:col-span-12 bg-slate-50 p-2.5 rounded-lg border border-slate-200 flex items-center gap-4 mb-2">' +
+            '<span class="text-xs font-bold text-slate-700">자격증 분류 선택:</span>' +
+            '<label class="flex items-center gap-1.5 text-xs font-bold cursor-pointer ' + (isNat ? 'text-primary' : 'text-slate-600') + '">' +
+            '<input type="radio" name="licenseSubType_' + item.id + '" value="NATIONAL" ' + (isNat ? 'checked' : '') + ' onchange="changeLicenseSubType(' + item.id + ', \'NATIONAL\')" class="accent-primary"/>' +
+            '<span>국가기술/전문자격 (Q-Net 등)</span>' +
+            '</label>' +
+            '<label class="flex items-center gap-1.5 text-xs font-bold cursor-pointer ' + (!isNat ? 'text-primary' : 'text-slate-600') + '">' +
+            '<input type="radio" name="licenseSubType_' + item.id + '" value="PRIVATE" ' + (!isNat ? 'checked' : '') + ' onchange="changeLicenseSubType(' + item.id + ', \'PRIVATE\')" class="accent-primary"/>' +
+            '<span>공인/등록 민간자격 (협회 등)</span>' +
+            '</label>' +
+            '</div>';
+        }
+
+        var optList = [];
+        if (item.docType === 'LICENSE') {
+          optList = item.subType === 'NATIONAL' ? NATIONAL_CERTS : PRIVATE_CERTS;
+        } else if (item.docType === 'COMPLETION') {
+          optList = COMPLETION_CERTS;
+        } else {
+          optList = CAREER_CERTS;
+        }
+
+        var optionsHtml = '';
+        var isCustom = item.certCode === 'ETC_DIRECT_INPUT';
+        optList.forEach(function (o) {
+          var sel = (o.code === item.certCode) ? 'selected' : '';
+          optionsHtml += '<option value="' + o.code + '" ' + sel + '>' + o.name + '</option>';
+        });
+
+        var fileSectionHtml = '';
+        if (item.fileName) {
+          fileSectionHtml = '<div class="bg-surface-container-low rounded-lg p-space-sm flex flex-col sm:flex-row sm:items-center justify-between gap-space-sm">' +
+            '<div class="flex items-center gap-space-sm">' +
+            '<div class="w-10 h-10 rounded bg-surface-container-highest flex items-center justify-center shrink-0 text-primary">' +
+            '<span class="material-symbols-outlined text-[24px]">' + (item.fileName.endsWith('.pdf') ? 'picture_as_pdf' : 'image') + '</span>' +
+            '</div>' +
+            '<div class="flex flex-col">' +
+            '<span class="font-label-md text-label-md font-semibold text-on-surface">' + item.fileName + '</span>' +
+            '<span class="font-body-sm text-body-sm text-on-surface-variant font-mono">저장위치: C:\\SseulDakGo_Storage\\S20261100001\\' + item.docType + '\\ (' + (item.fileSize || '3.2MB') + ')</span>' +
+            '</div>' +
+            '</div>' +
+            '<div class="flex items-center gap-2">' +
+            '<button onclick="alert(\'[증빙 사본 미리보기]\\n서류명: ' + item.fileName + '\\n저장 경로: C:\\\\SseulDakGo_Storage\\\\S20261100001\\\\' + item.docType + '\\\\' + item.fileName + '\')" class="px-3 py-1.5 rounded-lg bg-surface-container hover:bg-surface-container-high font-label-md text-label-md text-on-surface transition-colors flex items-center gap-1 cursor-pointer" type="button">' +
+            '<span class="material-symbols-outlined text-[16px]">visibility</span>' +
+            '미리보기' +
+            '</button>' +
+            '<button onclick="removeAttachedFile(' + item.id + ')" class="px-2.5 py-1.5 rounded-lg text-error hover:bg-error-container/20 font-label-sm text-xs transition-colors cursor-pointer" type="button">변경/삭제</button>' +
+            '</div>' +
+            '</div>';
+        } else {
+          fileSectionHtml = '<label class="w-full p-4 rounded-xl bg-surface-container-low hover:bg-surface-container transition-colors text-center cursor-pointer flex flex-col items-center justify-center border border-dashed border-slate-300 block">' +
+            '<input type="file" accept="image/jpeg,image/png,application/pdf" onchange="handleFileChange(' + item.id + ', this)" class="hidden"/>' +
+            '<div class="w-10 h-10 rounded-full bg-primary-fixed text-primary flex items-center justify-center mb-1">' +
+            '<span class="material-symbols-outlined text-[24px]">cloud_upload</span>' +
+            '</div>' +
+            '<p class="font-title-md text-sm font-semibold text-on-surface">클릭하여 증빙 사본 파일 첨부 (1:1 매칭)</p>' +
+            '<p class="font-body-sm text-xs text-on-surface-variant mt-0.5">JPG, PNG, PDF 지원 (자동 보관: C:\\SseulDakGo_Storage\\S20261100001\\' + item.docType + '\\)</p>' +
+            '</label>';
+        }
+
+        html += '<article class="bg-surface-container-lowest rounded-xl p-space-lg shadow-sm border ' + borderClass + '" id="card_item_' + item.id + '">' +
+          '<div class="flex items-center justify-between pb-space-sm border-b border-surface-container-low mb-space-md">' +
+          '<div class="flex items-center gap-space-sm">' +
+          '<span class="font-title-md text-title-md font-bold text-on-surface">항목 #' + (idx + 1) + '</span>' +
+          statusBadge +
+          '</div>' +
+          '<button onclick="removeCertCard(' + item.id + ')" class="flex items-center gap-1 font-label-md text-label-md text-error hover:text-on-error-container transition-colors px-2 py-1 rounded hover:bg-error-container/20 cursor-pointer" type="button">' +
+          '<span class="material-symbols-outlined text-[18px]">delete</span>' +
+          '삭제' +
+          '</button>' +
+          '</div>' +
+          '<div class="grid grid-cols-1 md:grid-cols-12 gap-space-md">' +
+          subTypeSelector +
+          '<div class="md:col-span-6 space-y-space-xs">' +
+          '<label class="block font-label-md text-label-md font-semibold text-on-surface">2. 자격/수료명 <span class="text-error">*</span></label>' +
+          '<div class="relative">' +
+          '<select onchange="handleCertSelectChange(' + item.id + ', this.value)" class="w-full h-11 px-3 py-2 bg-surface-container-low text-on-surface rounded-lg font-body-md text-body-md focus:outline-none focus:ring-2 focus:ring-primary pr-9 appearance-none">' +
+          optionsHtml +
+          '</select>' +
+          '<span class="material-symbols-outlined text-[20px] text-on-surface-variant absolute right-3 top-3 pointer-events-none">expand_more</span>' +
+          '</div>' +
+          (isCustom ? '<div class="pt-1">' +
+            '<label class="block font-label-sm text-label-sm text-primary font-semibold mb-1">└ 직접 입력 명칭 (CUSTOM_CERT_NM)</label>' +
+            '<input type="text" oninput="updateCertField(' + item.id + ', \'customCertName\', this.value)" value="' + (item.customCertName || '') + '" placeholder="직접 자격증/수료명을 입력하세요" class="w-full h-11 px-3 py-2 bg-surface-container-lowest rounded-lg font-body-md text-body-md text-on-surface focus:outline-none focus:ring-2 focus:ring-primary shadow-sm border border-slate-200"/>' +
+            '</div>' : '') +
+          '</div>' +
+          '<div class="md:col-span-4">' +
+          '<label class="block font-label-md text-label-md font-semibold text-on-surface mb-1">3. 발급기관 또는 회사명 <span class="text-error">*</span></label>' +
+          '<input type="text" oninput="updateCertField(' + item.id + ', \'issuerName\', this.value)" value="' + (item.issuerName || '') + '" class="w-full h-11 px-3 py-2 bg-surface-container-low text-on-surface rounded-lg font-body-md text-body-md focus:outline-none focus:ring-2 focus:ring-primary"/>' +
+          '</div>' +
+          '<div class="md:col-span-2">' +
+          '<label class="block font-label-md text-label-md font-semibold text-on-surface mb-1">4. 취득/수료일 <span class="text-error">*</span></label>' +
+          '<input type="month" onchange="updateCertField(' + item.id + ', \'issuedYm\', this.value)" value="' + (item.issuedYm ? item.issuedYm.replace('년 ', '-').replace('월', '') : '2024-06') + '" class="w-full h-11 px-3 py-2 bg-surface-container-low text-on-surface rounded-lg font-body-md text-body-md focus:outline-none focus:ring-2 focus:ring-primary text-center font-mono"/>' +
+          '</div>' +
+          '<div class="md:col-span-12">' +
+          '<label class="block font-label-md text-label-md font-semibold text-on-surface mb-2">5. 증빙 사본 첨부 (FILE_URL, LOGICAL_FILE_NM) <span class="text-error">*</span></label>' +
+          fileSectionHtml +
+          '<div class="mt-space-xs flex items-center gap-space-xs bg-[#e8f7f5] text-[#006a61] border border-[#a2e2d8]/60 p-space-xs rounded-lg">' +
+          '<input type="checkbox" ' + (item.privacyMaskYn === 'Y' ? 'checked' : '') + ' onchange="updateCertField(' + item.id + ', \'privacyMaskYn\', this.checked ? \'Y\' : \'N\')" class="accent-[#006a61] w-4 h-4 rounded" id="chk_mask_' + item.id + '"/>' +
+          '<label for="chk_mask_' + item.id + '" class="font-label-sm text-label-sm cursor-pointer">[확인완료] 증빙 서류에 표기된 주민등록번호 뒷자리(7자리)를 완전히 마스킹(가림) 처리했음을 확인합니다.</label>' +
+          '</div>' +
+          '</div>' +
+          '</div>' +
+          '</article>';
+      });
+
+      container.innerHTML = html;
+      updatePayloadPreview();
+    }
+
+    function changeLicenseSubType(id, newSubType) {
+      var target = certList.find(function (c) { return c.id === id; });
+      if (!target) return;
+      target.subType = newSubType;
+      var defaultCert = newSubType === 'NATIONAL' ? NATIONAL_CERTS[0] : PRIVATE_CERTS[0];
+      target.certCode = defaultCert.code;
+      target.certName = defaultCert.name;
+      target.customCertName = '';
+      target.issuerName = defaultCert.issuer;
+      renderCertTabCards();
+    }
+
+    function handleCertSelectChange(id, newCode) {
+      var target = certList.find(function (c) { return c.id === id; });
+      if (!target) return;
+      target.certCode = newCode;
+      var pool = [];
+      if (target.docType === 'LICENSE') {
+        pool = target.subType === 'NATIONAL' ? NATIONAL_CERTS : PRIVATE_CERTS;
+      } else if (target.docType === 'COMPLETION') {
+        pool = COMPLETION_CERTS;
+      } else {
+        pool = CAREER_CERTS;
+      }
+      var matched = pool.find(function (p) { return p.code === newCode; });
+      if (matched) {
+        target.certName = matched.name;
+        if (newCode !== 'ETC_DIRECT_INPUT' && matched.issuer) {
+          target.issuerName = matched.issuer;
+        }
+      }
+      renderCertTabCards();
+    }
+
+    function updateCertField(id, field, value) {
+      var target = certList.find(function (c) { return c.id === id; });
+      if (target) {
+        target[field] = value;
+        updatePayloadPreview();
+      }
+    }
+
+    function handleFileChange(id, inputElem) {
+      if (inputElem.files && inputElem.files[0]) {
+        var file = inputElem.files[0];
+        var target = certList.find(function (c) { return c.id === id; });
+        if (target) {
+          target.fileName = file.name;
+          target.fileSize = (file.size / (1024 * 1024)).toFixed(1) + 'MB';
+          target.privacyMaskYn = 'Y';
+          alert('[파일 첨부 완료]\n파일명: ' + file.name + '\n보관 폴더: C:\\SseulDakGo_Storage\\S20261100001\\' + target.docType + '\\\n증빙 서류가 해당 항목과 1:1로 결합되었습니다.');
+          renderCertTabCards();
+        }
+      }
+    }
+
+    function removeAttachedFile(id) {
+      var target = certList.find(function (c) { return c.id === id; });
+      if (target && confirm('첨부된 증빙 서류를 삭제하시겠습니까?')) {
+        target.fileName = '';
+        target.fileSize = '';
+        target.privacyMaskYn = 'N';
+        renderCertTabCards();
+      }
+    }
+
+    function addNewCertCard() {
+      if (certList.length >= 5) {
+        alert('자격증 및 수료증은 전체 최대 5건까지만 등록 가능합니다.');
+        return;
+      }
+      var newId = Date.now();
+      var newSeq = certList.length + 1;
+      var defaultObj = {
+        id: newId,
+        certSeq: newSeq,
+        docType: currentTab,
+        subType: currentTab === 'LICENSE' ? 'PRIVATE' : null,
+        certCode: currentTab === 'LICENSE' ? 'CERT_SYS_AC' : currentTab === 'COMPLETION' ? 'CERT_CLEAN_BUILD' : 'CAREER_SAMSUNG_SVC',
+        certName: currentTab === 'LICENSE' ? '냉난방기/시스템에어컨 종합세척관리사' : currentTab === 'COMPLETION' ? '건물위생관리업 법정교육 수료' : '삼성전자서비스/로지텍 서비스엔지니어 경력',
+        customCertName: '',
+        issuerName: currentTab === 'LICENSE' ? '한국시스템에어컨유지보수관리협회(KSAMA)' : currentTab === 'COMPLETION' ? '한국건물위생관리협회' : '삼성전자서비스(주) 중부지사',
+        issuedYm: '2024-06',
+        fileName: '',
+        fileSize: '',
+        privacyMaskYn: 'N',
+        reviewStatus: 'DRAFT',
+        approvedDt: ''
+      };
+      certList.push(defaultObj);
+      renderCertTabCards();
+    }
+
+    function removeCertCard(id) {
+      if (certList.length <= 1) {
+        alert('최소 1개 이상의 항목 양식이 유지되어야 합니다.');
+        return;
+      }
+      if (confirm('해당 증빙 항목을 삭제하시겠습니까?')) {
+        certList = certList.filter(function (c) { return c.id !== id; });
+        renderCertTabCards();
+      }
+    }
+
+    function updatePayloadPreview() {
+      var codeElem = document.querySelector('#payloadCodeBlock pre code');
+      if (!codeElem) return;
+      var payload = {
+        serviceNo: 'S20261100001',
+        bizRegNo: '120-88-29401',
+        verifyYn: 'Y',
+        certifications: certList.map(function (c, i) {
+          return {
+            certSeq: i + 1,
+            docType: c.docType,
+            subType: c.subType || null,
+            certCode: c.certCode,
+            certName: c.certCode === 'ETC_DIRECT_INPUT' ? (c.customCertName || '직접입력') : c.certName,
+            issuerName: c.issuerName,
+            issuedYm: c.issuedYm,
+            fileName: c.fileName || null,
+            storagePath: c.fileName ? ('C:\\SseulDakGo_Storage\\S20261100001\\' + c.docType + '\\' + c.fileName) : null,
+            privacyMaskYn: c.privacyMaskYn,
+            reviewStatus: c.reviewStatus,
+            approvedDt: c.approvedDt || undefined
+          };
+        })
+      };
+      codeElem.textContent = JSON.stringify(payload, null, 2);
+    }
+
+    function openBizEditModal() {
+      document.getElementById('bizEditModal').classList.remove('hidden');
+    }
+    function closeBizEditModal() {
+      document.getElementById('bizEditModal').classList.add('hidden');
+    }
+    function selectBizType(type) {
+      var indBtn = document.getElementById('btnBizIndividual');
+      var corpBtn = document.getElementById('btnBizCorp');
+      if (type === 'INDIVIDUAL') {
+        indBtn.className = 'flex-1 py-1.5 rounded-lg font-bold transition-all bg-white shadow text-primary cursor-pointer';
+        corpBtn.className = 'flex-1 py-1.5 rounded-lg font-bold transition-all text-slate-500 cursor-pointer';
+      } else {
+        corpBtn.className = 'flex-1 py-1.5 rounded-lg font-bold transition-all bg-white shadow text-primary cursor-pointer';
+        indBtn.className = 'flex-1 py-1.5 rounded-lg font-bold transition-all text-slate-500 cursor-pointer';
+      }
+    }
+    function verifyHometaxDirect() {
+      alert('국세청 홈택스 실시간 진위 확인: 정상 계속사업자 (과세유형: 일반과세자) 확인되었습니다.');
+      document.getElementById('hometaxSuccessNotice').classList.remove('hidden');
+    }
+
+    document.getElementById('bizEditForm').addEventListener('submit', function (e) {
+      e.preventDefault();
+      var bNo = document.getElementById('inputBizNo').value.trim();
+      var cNm = document.getElementById('inputCompanyNm').value.trim();
+      var rNm = document.getElementById('inputCeoNm').value.trim();
+      if (!bNo || bNo.replace(/[^0-9]/g, '').length < 10) {
+        alert('10자리 사업자등록번호를 정확히 입력해주세요.');
+        return;
+      }
+      var checkedBoxes = document.querySelectorAll('#bizEditCategoryGroup input[type="checkbox"]:checked');
+      var selectedCats = [];
+      checkedBoxes.forEach(function (b) { selectedCats.push(b.value); });
+      var badgesContainer = document.getElementById('mainCleanLargeBadges');
+      if (badgesContainer && selectedCats.length > 0) {
+        badgesContainer.innerHTML = selectedCats.map(function (cat) {
+          return '<span class="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-semibold bg-primary-fixed text-primary">' + cat + '</span>';
+        }).join(' ');
+      }
+      alert('사업자등록증 정보 및 주력 시공 분야가 성공적으로 변경/등록되었습니다.\n국세청 홈택스 인증이 정상 완료되었습니다.');
+      closeBizEditModal();
+    });
+
+    (function () {
+      var toggleBtn = document.getElementById('payloadToggleBtn');
+      var codeBlock = document.getElementById('payloadCodeBlock');
+      var chevron = document.getElementById('payloadChevron');
+
+      if (toggleBtn && codeBlock && chevron) {
+        toggleBtn.addEventListener('click', function () {
+          if (codeBlock.classList.contains('hidden')) {
+            codeBlock.classList.remove('hidden');
+            chevron.style.transform = 'rotate(0deg)';
+          } else {
+            codeBlock.classList.add('hidden');
+            chevron.style.transform = 'rotate(180deg)';
+          }
+        });
+      }
+
+      var submitBtn = document.getElementById('submitCertBtn');
+      if (submitBtn) {
+        submitBtn.addEventListener('click', function () {
+          var unmasked = certList.find(function (c) { return c.fileName && c.privacyMaskYn !== 'Y'; });
+          if (unmasked) {
+            alert('개인정보 보호를 위해 [주민등록번호 뒷자리 마스킹 확인]에 체크해 주셔야 제출이 가능합니다.');
+            return;
+          }
+          submitBtn.disabled = true;
+          submitBtn.innerHTML = '<span class="material-symbols-outlined animate-spin text-[20px]">sync</span><span>심사 서류 전송중...</span>';
+          setTimeout(function () {
+            alert('자격 및 경력 서류가 성공적으로 저장되었습니다.\n저장 경로: C:\\SseulDakGo_Storage\\S20261100001\\하위 폴더(LICENSE/COMPLETION/CAREER)\n본사 심사 승인 시 즉시 파트너 프로필에 인증 뱃지가 활성화됩니다.');
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: \'FILL\' 1;">verified</span><span>저장 및 심사 요청</span>';
+          }, 900);
+        });
+      }
+
+      // 초기 렌더링
+      renderCertTabCards();
+      initHeaderNotifications();
+    })();
+
+    // ─────────────────────────────────────────────────────────────
+    // 공통 헤더 알림 센터 스크립트 (수신 건수 배지 & 목록 드롭다운)
+    // ─────────────────────────────────────────────────────────────
+    var headerNotiList = [
+      {
+        notiId: 'NT20261100001',
+        notiType: 'NEW_ORDER',
+        title: '새로운 발주 요청 등록',
+        content: '경기 고양시 일산동구 에어컨 분해세척 (제안가: 180,000원) 청약이 가능합니다.',
+        targetUrl: '/preview_client/WEB-CLNT-ORD-010100.html?orderNo=ORD202611180001',
+        isRead: 'N',
+        regDt: '10분 전'
+      },
+      {
+        notiId: 'NT20261100002',
+        notiType: 'NEW_ORDER',
+        title: '신규 입주 청소 청약 공고',
+        content: '서울 강서구 마곡동 34평 아파트 입주청소 (제안가: 360,000원) 건이 접수되었습니다.',
+        targetUrl: '/preview_client/WEB-CLNT-ORD-010100.html?orderNo=ORD202611180002',
+        isRead: 'N',
+        regDt: '1시간 전'
+      },
+      {
+        notiId: 'NT20261100003',
+        notiType: 'MATCHING_CONFIRMED',
+        title: '시공사 서류 검증 승인 완료',
+        content: '제출하신 사업자등록증 및 자격증 원본 서류 심사가 승인 완료되었습니다.',
+        targetUrl: '/preview/myp_020100.html',
+        isRead: 'N',
+        regDt: '어제'
+      }
+    ];
+
+    function toggleNotificationDropdown() {
+      var dd = document.getElementById('headerNotiDropdown');
+      if (!dd) return;
+      if (dd.classList.contains('hidden')) {
+        renderHeaderNotiList();
+        dd.classList.remove('hidden');
+      } else {
+        dd.classList.add('hidden');
+      }
+    }
+
+    function renderHeaderNotiList() {
+      var container = document.getElementById('headerNotiListContainer');
+      var badge = document.getElementById('headerNotiCountBadge');
+      var unreadBadge = document.getElementById('headerNotiUnreadBadge');
+      if (!container) return;
+
+      var unreadCount = headerNotiList.filter(function (n) { return n.isRead === 'N'; }).length;
+      if (badge) {
+        badge.textContent = unreadCount > 99 ? '99+' : unreadCount;
+        if (unreadCount === 0) {
+          badge.classList.remove('bg-red-600', 'animate-pulse');
+          badge.classList.add('bg-slate-300', 'text-slate-600');
+        } else {
+          badge.classList.remove('bg-slate-300', 'text-slate-600');
+          badge.classList.add('bg-red-600', 'animate-pulse');
+        }
+      }
+      if (unreadBadge) {
+        unreadBadge.textContent = '미확인 ' + unreadCount + '건';
+      }
+
+      if (headerNotiList.length === 0) {
+        container.innerHTML = '<div class="py-8 text-center text-xs text-slate-400">수신된 알림 메시지가 없습니다.</div>';
+        return;
+      }
+
+      var html = '';
+      headerNotiList.forEach(function (noti) {
+        var isUnread = noti.isRead === 'N';
+        html += '<div onclick="readHeaderNotification(\'' + noti.notiId + '\', \'' + (noti.targetUrl || '') + '\')" class="p-3.5 flex items-start gap-3 cursor-pointer transition-colors ' +
+          (isUnread ? 'bg-blue-50/70 hover:bg-blue-100/70' : 'bg-white hover:bg-slate-50') + '">';
+        html += '<div class="pt-1 shrink-0">' +
+          (isUnread ? '<span class="w-2 h-2 rounded-full bg-primary block"></span>' : '<span class="w-2 h-2 rounded-full bg-slate-300 block"></span>') +
+          '</div>';
+        html += '<div class="flex-1 min-w-0">';
+        html += '<div class="flex items-center justify-between gap-2 mb-1">';
+        html += '<span class="text-xs ' + (isUnread ? 'font-bold text-slate-900' : 'font-medium text-slate-600') + '">' + noti.title + '</span>';
+        html += '<span class="text-[10px] px-1.5 py-0.5 rounded font-semibold shrink-0 ' +
+          (isUnread ? 'bg-blue-100 text-primary' : 'bg-slate-100 text-slate-500') + '">' +
+          (isUnread ? '미확인' : '확인완료') + '</span>';
+        html += '</div>';
+        html += '<p class="text-xs text-slate-600 line-clamp-2 leading-relaxed">' + noti.content + '</p>';
+        html += '<span class="text-[10px] text-slate-400 mt-1 block">' + (noti.regDt || '방금 전') + '</span>';
+        html += '</div></div>';
+      });
+      container.innerHTML = html;
+    }
+
+    function readHeaderNotification(notiId, targetUrl) {
+      var item = headerNotiList.find(function (n) { return n.notiId === notiId; });
+      if (item && item.isRead === 'N') {
+        item.isRead = 'Y';
+        fetch('/api/common/notifications/read', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ notiId: notiId, userNo: 'S20261100001' })
+        }).catch(function (e) { console.warn(e); });
+      }
+      renderHeaderNotiList();
+      if (targetUrl) {
+        var dd = document.getElementById('headerNotiDropdown');
+        if (dd) dd.classList.add('hidden');
+        setTimeout(function () {
+          window.location.href = targetUrl;
+        }, 300);
+      }
+    }
+
+    function readAllHeaderNotifications() {
+      headerNotiList.forEach(function (n) { n.isRead = 'Y'; });
+      fetch('/api/common/notifications/read-all', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userNo: 'S20261100001' })
+      }).catch(function (e) { console.warn(e); });
+      renderHeaderNotiList();
+    }
+
+    function initHeaderNotifications() {
+      fetch('/api/common/notifications?userNo=S20261100001')
+        .then(function (res) { return res.json(); })
+        .then(function (data) {
+          if (data && data.success && Array.isArray(data.list) && data.list.length > 0) {
+            headerNotiList = data.list;
+          }
+          renderHeaderNotiList();
+        })
+        .catch(function (e) {
+          renderHeaderNotiList();
+        });
+    }
+  </script>
+</body>
+
+</html>

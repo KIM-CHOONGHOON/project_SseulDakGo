@@ -583,38 +583,50 @@ const AVAILABLE_START_MONTHS = [
 function compressImageToDataUrl(file, maxWidth = 1024, quality = 0.75) {
   return new Promise((resolve) => {
     if (!file) return resolve('');
-    if (typeof file === 'string' && file.startsWith('data:')) return resolve(file);
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const img = new Image();
-      img.onload = () => {
-        let w = img.width;
-        let h = img.height;
-        if (w > maxWidth || h > maxWidth) {
-          if (w > h) {
-            h = Math.round((h * maxWidth) / w);
-            w = maxWidth;
-          } else {
-            w = Math.round((w * maxWidth) / h);
-            h = maxWidth;
-          }
-        }
-        const canvas = document.createElement('canvas');
-        canvas.width = w;
-        canvas.height = h;
-        const ctx = canvas.getContext('2d');
-        if (ctx) {
-          ctx.drawImage(img, 0, 0, w, h);
-          resolve(canvas.toDataURL('image/jpeg', quality));
-        } else {
-          resolve(e.target.result);
+    if (typeof file === 'string') return resolve(file);
+    try {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const img = new Image();
+          img.onload = () => {
+            try {
+              let w = img.width || 1;
+              let h = img.height || 1;
+              if (w > maxWidth || h > maxWidth) {
+                if (w > h) {
+                  h = Math.round((h * maxWidth) / w);
+                  w = maxWidth;
+                } else {
+                  w = Math.round((w * maxWidth) / h);
+                  h = maxWidth;
+                }
+              }
+              const canvas = document.createElement('canvas');
+              canvas.width = Math.max(1, w);
+              canvas.height = Math.max(1, h);
+              const ctx = canvas.getContext('2d');
+              if (ctx) {
+                ctx.drawImage(img, 0, 0, w, h);
+                resolve(canvas.toDataURL('image/jpeg', quality));
+              } else {
+                resolve(e.target.result || '');
+              }
+            } catch (canvasErr) {
+              resolve(e.target.result || '');
+            }
+          };
+          img.onerror = () => resolve(e.target.result || '');
+          img.src = e.target.result;
+        } catch (imgErr) {
+          resolve('');
         }
       };
-      img.onerror = () => resolve(e.target.result);
-      img.src = e.target.result;
-    };
-    reader.onerror = () => resolve('');
-    reader.readAsDataURL(file);
+      reader.onerror = () => resolve('');
+      reader.readAsDataURL(file);
+    } catch (readErr) {
+      resolve('');
+    }
   });
 }
 
@@ -644,6 +656,7 @@ export default function WebClntReq010100Modal({
   ]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isAddrModalOpen, setIsAddrModalOpen] = useState(false);
+  const fileInputRef = useRef(null);
 
   // 기본 주소 초기값 정의 (최초 입력되는 주소는 동일하게 조립하여 제공)
   const DEFAULT_INITIAL_ADDRESS = {
@@ -678,6 +691,19 @@ export default function WebClntReq010100Modal({
     photoCount: 0,
     message: '',
   });
+
+  const [orderCompleteModal, setOrderCompleteModal] = useState({
+    isOpen: false,
+    orderNo: '',
+    orderData: null,
+  });
+
+  const handleConfirmOrderComplete = () => {
+    const data = orderCompleteModal.orderData;
+    setOrderCompleteModal({ isOpen: false, orderNo: '', orderData: null });
+    if (typeof onSuccess === 'function') onSuccess(data);
+    if (typeof onClose === 'function') onClose();
+  };
 
   const TAB_NAME_MAP = {
     REGULAR: '정기청소',
@@ -802,8 +828,14 @@ export default function WebClntReq010100Modal({
     }
   };
 
-  // 폼 필드 변경 핸들러
+  // 폼 필드 변경 핸들러 (금액 입력 시 천단위/세자리 콤마 자동 서식화)
   const handleFieldChange = (field, value) => {
+    if (field === 'proposedPrice') {
+      const rawNumber = String(value || '').replace(/[^0-9]/g, '');
+      const formatted = rawNumber ? Number(rawNumber).toLocaleString('ko-KR') : '';
+      setFormData((prev) => ({ ...prev, [field]: formatted }));
+      return;
+    }
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
@@ -907,8 +939,8 @@ export default function WebClntReq010100Modal({
       const currentDays = Array.isArray(prev.cleanDaysConfig)
         ? [...prev.cleanDaysConfig]
         : typeof prev.cleanDaysConfig === 'string' && prev.cleanDaysConfig.trim()
-        ? prev.cleanDaysConfig.split(',').map((s) => s.trim()).filter(Boolean)
-        : [];
+          ? prev.cleanDaysConfig.split(',').map((s) => s.trim()).filter(Boolean)
+          : [];
       const freq = Number(prev.weekCleanFreq) || 1;
       const exists = currentDays.includes(dayVal);
       if (exists) {
@@ -938,8 +970,8 @@ export default function WebClntReq010100Modal({
       const currentDays = Array.isArray(prev.cleanDaysConfig)
         ? [...prev.cleanDaysConfig]
         : typeof prev.cleanDaysConfig === 'string' && prev.cleanDaysConfig.trim()
-        ? prev.cleanDaysConfig.split(',').map((s) => s.trim()).filter(Boolean)
-        : [];
+          ? prev.cleanDaysConfig.split(',').map((s) => s.trim()).filter(Boolean)
+          : [];
       let nextDays = currentDays;
       if (nextDays.length > freq) {
         nextDays = nextDays.slice(0, freq);
@@ -954,35 +986,54 @@ export default function WebClntReq010100Modal({
     return raw * 3;
   };
 
-  // 사진 추가 핸들러 (최대 10장, Base64 DataURL 압축 및 다중 파일 업로드 지원)
+  // 사진 추가 핸들러 (최대 10장, 초경량 썸네일 즉시 생성 및 예외 원천 격리)
   const handlePhotoAdd = async (e) => {
-    if (e.target.files && e.target.files.length > 0) {
+    try {
+      if (e && typeof e.stopPropagation === 'function') {
+        e.stopPropagation();
+      }
+      const inputEl = e.target;
+      if (!inputEl || !inputEl.files || inputEl.files.length === 0) return;
+
       const remainingSlots = 10 - photoFiles.length;
       if (remainingSlots <= 0) {
         alert('현장 사진은 최대 10장까지 등록할 수 있습니다.');
-        e.target.value = '';
+        try { inputEl.value = ''; } catch { }
         return;
       }
-      const filesToAdd = Array.from(e.target.files).slice(0, remainingSlots);
-      if (e.target.files.length > remainingSlots) {
+      const selectedFiles = Array.from(inputEl.files).slice(0, remainingSlots);
+      if (inputEl.files.length > remainingSlots) {
         alert(`현장 사진은 최대 10장까지 등록 가능하여 선택하신 파일 중 ${remainingSlots}장만 추가되었습니다.`);
       }
 
-      const newItems = await Promise.all(
-        filesToAdd.map(async (file, idx) => {
-          const dataUrl = await compressImageToDataUrl(file);
-          return {
-            seq: Date.now() + idx,
-            title: file.name,
-            url: dataUrl || URL.createObjectURL(file),
-            dataUrl: dataUrl || URL.createObjectURL(file),
-            fileObj: file,
-          };
-        })
-      );
+      // 각 파일별로 안전하게 경량 썸네일 생성
+      const addedItems = [];
+      for (let i = 0; i < selectedFiles.length; i++) {
+        const file = selectedFiles[i];
+        let thumbUrl = '';
+        try {
+          thumbUrl = await compressImageToDataUrl(file);
+        } catch (thumbErr) {
+          console.warn('Thumbnail generation failed for:', file.name, thumbErr);
+        }
+        addedItems.push({
+          seq: Date.now() + Math.random() + i,
+          title: file.name || `사진_${photoFiles.length + i + 1}.jpg`,
+          url: thumbUrl || '',
+          dataUrl: thumbUrl || '',
+          fileObj: file
+        });
+      }
 
-      setPhotoFiles((prev) => [...prev, ...newItems]);
-      e.target.value = '';
+      if (addedItems.length > 0) {
+        setPhotoFiles((prev) => [...prev, ...addedItems]);
+      }
+
+      try {
+        inputEl.value = '';
+      } catch { }
+    } catch (globalErr) {
+      console.error('handlePhotoAdd unexpected error:', globalErr);
     }
   };
 
@@ -1234,8 +1285,8 @@ export default function WebClntReq010100Modal({
         activeTab === 'REGULAR'
           ? formData.cleanMidCdList.join(',')
           : activeTab === 'MOVEIN'
-          ? 'MOVEIN_FULL'
-          : [
+            ? 'MOVEIN_FULL'
+            : [
               (details.WALL_MOUNTED || []).length > 0 ? `AC_WALL:${(details.WALL_MOUNTED || []).length}` : null,
               (details.STAND || []).length > 0 ? `AC_STAND:${(details.STAND || []).length}` : null,
               (details.CEILING_SYS || []).length > 0 ? `AC_CEIL:${(details.CEILING_SYS || []).length}` : null,
@@ -1286,18 +1337,25 @@ export default function WebClntReq010100Modal({
       });
 
       const result = await res.json();
-      if (res.ok && result.success) {
+      if (res.ok && (result.success || result.code === 'OK' || result.code === 'OK_SIMULATION')) {
         // 성공 시 임시 보관 데이터 청소
         try {
           localStorage.removeItem('SSEULDAKGO_GUEST_TEMP_REQ');
         } catch {
           // ignore
         }
-        alert(
-          `[청소 요청 완료]\n발주번호: ${result.data?.orderNo || 'ORD'}\n성공적으로 접수되었습니다! 전담 마스터 배차가 시작됩니다.`
-        );
-        if (onSuccess) onSuccess(result.data);
-        if (onClose) onClose();
+        const finalOrderNo =
+          result.data?.orderNo ||
+          result.orderNo ||
+          result.data?.ORDER_NO ||
+          result.ORDER_NO ||
+          `ORD${new Date().toISOString().slice(0, 10).replace(/-/g, '')}00001`;
+
+        setOrderCompleteModal({
+          isOpen: true,
+          orderNo: finalOrderNo,
+          orderData: result.data || result,
+        });
       } else {
         alert(result.message || '발주 등록 중 오류가 발생했습니다.');
       }
@@ -1359,1008 +1417,1024 @@ export default function WebClntReq010100Modal({
         {/* Scrollable Form Container */}
         <div className="flex-1 overflow-y-auto overscroll-contain scroll-smooth focus:outline-none">
           <form className="divide-y-0" id="order-request-form" onSubmit={handleSubmit}>
-          {/* 2. 3-Tab Segmented Control (CLEAN_LARGE_CD) */}
-          <div className="px-8 pt-6 pb-2">
-            <div className="p-1 bg-surface-container rounded-xl grid grid-cols-3 gap-1">
-              {/* TAB 1: 정기청소 */}
-              <button
-                className={`tab-category-btn flex items-center justify-center gap-1.5 py-2.5 rounded-lg font-label-md text-label-md transition-all cursor-pointer ${
-                  activeTab === 'REGULAR'
-                    ? 'bg-secondary text-white shadow-sm font-bold'
-                    : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high/60'
-                }`}
-                data-large-tab="REGULAR"
-                onClick={() => {
-                  setActiveTab('REGULAR');
-                  setInteractedTabs((prev) => new Set([...prev, 'REGULAR']));
-                }}
-                type="button"
-              >
-                <span className={`material-symbols-outlined text-[18px] ${activeTab === 'REGULAR' ? 'text-white' : 'text-secondary'}`}>
-                  update
-                </span>
-                <span>정기청소</span>
-                <span className={`px-1.5 py-0.2 rounded-full font-label-sm text-label-sm ${
-                  activeTab === 'REGULAR'
-                    ? 'bg-white/20 text-white font-bold'
-                    : 'bg-secondary-fixed text-on-secondary-fixed-variant'
-                }`}>
-                  최소 90일
-                </span>
-              </button>
-
-              {/* TAB 2: 입주청소 */}
-              <button
-                className={`tab-category-btn flex items-center justify-center gap-1.5 py-2.5 rounded-lg font-label-md text-label-md transition-all cursor-pointer ${
-                  activeTab === 'MOVEIN'
-                    ? 'bg-secondary text-white shadow-sm font-bold'
-                    : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high/60'
-                }`}
-                data-large-tab="MOVEIN"
-                onClick={() => {
-                  setActiveTab('MOVEIN');
-                  setInteractedTabs((prev) => new Set([...prev, 'MOVEIN']));
-                }}
-                type="button"
-              >
-                <span className={`material-symbols-outlined text-[18px] ${activeTab === 'MOVEIN' ? 'text-white' : 'text-on-surface-variant'}`}>
-                  home_work
-                </span>
-                <span>입주/이사 청소</span>
-              </button>
-
-              {/* TAB 3: 계절가전청소 */}
-              <button
-                className={`tab-category-btn flex items-center justify-center gap-1.5 py-2.5 rounded-lg font-label-md text-label-md transition-all cursor-pointer ${
-                  activeTab === 'APPLIANCE'
-                    ? 'bg-secondary text-white shadow-sm font-bold'
-                    : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high/60'
-                }`}
-                data-large-tab="APPLIANCE"
-                onClick={() => {
-                  setActiveTab('APPLIANCE');
-                  setInteractedTabs((prev) => new Set([...prev, 'APPLIANCE']));
-                }}
-                type="button"
-              >
-                <span className={`material-symbols-outlined text-[18px] ${activeTab === 'APPLIANCE' ? 'text-white' : 'text-on-surface-variant'}`}>
-                  mode_fan
-                </span>
-                <span>계절 가전 청소</span>
-              </button>
-            </div>
-          </div>
-
-          {/* 3. 공통 의뢰 정보 입력 섹션 (Form Section 1) */}
-          <section className="px-8 py-4 space-y-4">
-            <div className="flex items-center gap-2 pb-1">
-              <span className="w-5 h-5 rounded-full bg-primary text-on-primary font-label-sm text-label-sm flex items-center justify-center font-bold">
-                1
-              </span>
-              <h3 className="font-label-lg text-label-lg text-on-surface font-bold tracking-tight">
-                기본 시공 현장 정보
-              </h3>
-            </div>
-
-            {/* Row 3: 희망 착수일 & 현장 주차 여건 */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="flex flex-col text-left">
-                <label className="font-label-sm text-label-sm text-on-surface mb-1.5 font-semibold">
-                  희망 첫 방문/착수일 <span className="text-error">*</span>
-                </label>
-                <input
-                  className="h-11 rounded-xl bg-surface-container-lowest px-4 font-body-md text-body-md text-on-surface shadow-sm border border-slate-200 focus:outline-none focus:ring-2 focus:ring-secondary/40"
-                  name="HOPE_VISIT_DT"
-                  onChange={(e) => handleFieldChange('hopeVisitDt', e.target.value)}
-                  type="date"
-                  value={formData.hopeVisitDt}
-                />
-              </div>
-
-              <div className="bg-surface-container-low p-2.5 px-3.5 rounded-xl flex flex-col justify-center gap-1.5 text-left border border-slate-200/60">
-                <div className="flex items-center justify-between">
-                  <span className="font-label-sm text-label-sm text-on-surface font-semibold">현장 주차 여건</span>
-                  <span className="font-caption text-[11px] text-secondary">장비차량 탑재</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <label className="flex items-center gap-1.5 cursor-pointer font-label-sm text-label-sm text-on-surface">
-                    <input
-                      checked={formData.parkingAvailCd === 'FREE'}
-                      className="accent-secondary"
-                      name="PARKING_AVAIL_CD"
-                      onChange={() => handleFieldChange('parkingAvailCd', 'FREE')}
-                      type="radio"
-                      value="FREE"
-                    />
-                    <span>무료 주차</span>
-                  </label>
-                  <label className="flex items-center gap-1.5 cursor-pointer font-body-sm text-body-sm text-on-surface-variant">
-                    <input
-                      checked={formData.parkingAvailCd === 'PAID'}
-                      className="accent-secondary"
-                      name="PARKING_AVAIL_CD"
-                      onChange={() => handleFieldChange('parkingAvailCd', 'PAID')}
-                      type="radio"
-                      value="PAID"
-                    />
-                    <span>유료 주차</span>
-                  </label>
-                  <label className="flex items-center gap-1.5 cursor-pointer font-body-sm text-body-sm text-on-surface-variant">
-                    <input
-                      checked={formData.parkingAvailCd === 'UNKNOWN'}
-                      className="accent-secondary"
-                      name="PARKING_AVAIL_CD"
-                      onChange={() => handleFieldChange('parkingAvailCd', 'UNKNOWN')}
-                      type="radio"
-                      value="UNKNOWN"
-                    />
-                    <span>확인 필요</span>
-                  </label>
-                </div>
-              </div>
-            </div>
-
-            {/* Row 4: 현장 주소 with 네이버 주소 검색 연동 (탭별 독립 주소 관리) */}
-            <div className="flex flex-col text-left space-y-2">
-              <div className="flex items-center justify-between">
-                <label className="font-label-sm text-label-sm text-on-surface font-semibold flex items-center gap-1.5">
-                  <span>[{TAB_NAME_MAP[activeTab]}] 시공 현장 주소 <span className="text-error">*</span></span>
-                  <span className="px-1.5 py-0.2 rounded text-[10px] font-bold bg-[#03C75A]/15 text-[#008f3e]">
-                    네이버 주소 연동
-                  </span>
-                </label>
-                <span className="font-caption text-caption text-secondary flex items-center gap-0.5">
-                  <span className="material-symbols-outlined text-[14px]">my_location</span>
-                  {tabAddresses[activeTab]?.sidoNm || '경기도'} {tabAddresses[activeTab]?.sigunguNm || '고양시 일산동구'}
-                </span>
-              </div>
-              <div className="flex gap-2">
+            {/* 2. 3-Tab Segmented Control (CLEAN_LARGE_CD) */}
+            <div className="px-8 pt-6 pb-2">
+              <div className="p-1 bg-surface-container rounded-xl grid grid-cols-3 gap-1">
+                {/* TAB 1: 정기청소 */}
                 <button
-                  className="h-11 px-4 rounded-xl bg-[#03C75A] hover:bg-[#02b350] text-white font-label-md text-label-md shrink-0 transition-colors shadow-sm flex items-center gap-1.5 font-bold cursor-pointer"
-                  onClick={() => setIsAddrModalOpen(true)}
+                  className={`tab-category-btn flex items-center justify-center gap-1.5 py-2.5 rounded-lg font-label-md text-label-md transition-all cursor-pointer ${activeTab === 'REGULAR'
+                    ? 'bg-secondary text-white shadow-sm font-bold'
+                    : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high/60'
+                    }`}
+                  data-large-tab="REGULAR"
+                  onClick={() => {
+                    setActiveTab('REGULAR');
+                    setInteractedTabs((prev) => new Set([...prev, 'REGULAR']));
+                  }}
                   type="button"
                 >
-                  <span className="material-symbols-outlined text-[18px]">search</span>
-                  네이버 주소 검색
+                  <span className={`material-symbols-outlined text-[18px] ${activeTab === 'REGULAR' ? 'text-white' : 'text-secondary'}`}>
+                    update
+                  </span>
+                  <span>정기청소</span>
+                  <span className={`px-1.5 py-0.2 rounded-full font-label-sm text-label-sm ${activeTab === 'REGULAR'
+                    ? 'bg-white/20 text-white font-bold'
+                    : 'bg-secondary-fixed text-on-secondary-fixed-variant'
+                    }`}>
+                    최소 90일
+                  </span>
                 </button>
-                <input
-                  className="h-11 flex-1 rounded-xl bg-surface-container-low px-4 font-body-md text-body-md text-on-surface shadow-sm border border-slate-200"
-                  name="ADDR_TEXT"
-                  readOnly
-                  type="text"
-                  value={tabAddresses[activeTab]?.addrText || ''}
-                />
+
+                {/* TAB 2: 입주청소 */}
+                <button
+                  className={`tab-category-btn flex items-center justify-center gap-1.5 py-2.5 rounded-lg font-label-md text-label-md transition-all cursor-pointer ${activeTab === 'MOVEIN'
+                    ? 'bg-secondary text-white shadow-sm font-bold'
+                    : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high/60'
+                    }`}
+                  data-large-tab="MOVEIN"
+                  onClick={() => {
+                    setActiveTab('MOVEIN');
+                    setInteractedTabs((prev) => new Set([...prev, 'MOVEIN']));
+                  }}
+                  type="button"
+                >
+                  <span className={`material-symbols-outlined text-[18px] ${activeTab === 'MOVEIN' ? 'text-white' : 'text-on-surface-variant'}`}>
+                    home_work
+                  </span>
+                  <span>입주/이사 청소</span>
+                </button>
+
+                {/* TAB 3: 계절가전청소 */}
+                <button
+                  className={`tab-category-btn flex items-center justify-center gap-1.5 py-2.5 rounded-lg font-label-md text-label-md transition-all cursor-pointer ${activeTab === 'APPLIANCE'
+                    ? 'bg-secondary text-white shadow-sm font-bold'
+                    : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high/60'
+                    }`}
+                  data-large-tab="APPLIANCE"
+                  onClick={() => {
+                    setActiveTab('APPLIANCE');
+                    setInteractedTabs((prev) => new Set([...prev, 'APPLIANCE']));
+                  }}
+                  type="button"
+                >
+                  <span className={`material-symbols-outlined text-[18px] ${activeTab === 'APPLIANCE' ? 'text-white' : 'text-on-surface-variant'}`}>
+                    mode_fan
+                  </span>
+                  <span>계절 가전 청소</span>
+                </button>
               </div>
-              <input
-                className="h-11 rounded-xl bg-surface-container-lowest px-4 font-body-md text-body-md text-on-surface shadow-sm border border-slate-200 focus:outline-none focus:ring-2 focus:ring-secondary/40"
-                name="ADDR_DETAIL"
-                onChange={(e) => {
-                  const val = e.target.value;
-                  setTabAddresses((prev) => ({
-                    ...prev,
-                    [activeTab]: {
-                      ...prev[activeTab],
-                      addrDetail: val,
-                    },
-                  }));
-                }}
-                placeholder="상세주소 및 동/호수 입력 (각 탭별 독립 입력 가능)"
-                type="text"
-                value={tabAddresses[activeTab]?.addrDetail || ''}
-              />
             </div>
 
-            {/* Row 5: 정기 청소 전용 - 건물 종류 (위) & 정기 순회 대상 구역 (아래) */}
-            {activeTab === 'REGULAR' && (
-              <div className="space-y-3 pt-1">
-                {/* 정기 청소 건물 종류 (BLDG_TYPE) */}
+            {/* 3. 공통 의뢰 정보 입력 섹션 (Form Section 1) */}
+            <section className="px-8 py-4 space-y-4">
+              <div className="flex items-center gap-2 pb-1">
+                <span className="w-5 h-5 rounded-full bg-primary text-on-primary font-label-sm text-label-sm flex items-center justify-center font-bold">
+                  1
+                </span>
+                <h3 className="font-label-lg text-label-lg text-on-surface font-bold tracking-tight">
+                  기본 시공 현장 정보
+                </h3>
+              </div>
+
+              {/* Row 3: 희망 착수일 & 현장 주차 여건 */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="flex flex-col text-left">
-                  <div className="flex items-center justify-between mb-1.5">
-                    <label className="font-label-sm text-label-sm text-on-surface font-semibold flex items-center gap-1">
-                      <span>정기 청소 건물 종류</span>
-                      <span className="text-error">*</span>
-                    </label>
-                    <span className="text-[10px] text-secondary font-mono bg-secondary/10 px-1.5 py-0.5 rounded">
-                      BLDG_TYPE
-                    </span>
-                  </div>
-                  <div className="relative">
-                    <select
-                      className="h-11 w-full appearance-none rounded-xl bg-surface-container-lowest px-4 pr-10 font-body-md text-body-md text-on-surface shadow-sm border border-slate-200 focus:outline-none focus:ring-2 focus:ring-secondary/40 font-medium"
-                      name="FACILITY_TYPE_CD"
-                      onChange={(e) => handleFieldChange('facilityTypeCd', e.target.value)}
-                      required
-                      value={formData.facilityTypeCd}
-                    >
-                      {COM_CODE_BLDG_TYPE.map((bldg) => (
-                        <option key={bldg.COM_CD} value={bldg.COM_CD}>
-                          {bldg.COM_NM}
-                        </option>
-                      ))}
-                    </select>
-                    <span className="material-symbols-outlined text-[20px] text-outline absolute right-3 top-3 pointer-events-none">
-                      expand_more
-                    </span>
-                  </div>
+                  <label className="font-label-sm text-label-sm text-on-surface mb-1.5 font-semibold">
+                    희망 첫 방문/착수일 <span className="text-error">*</span>
+                  </label>
+                  <input
+                    className="h-11 rounded-xl bg-surface-container-lowest px-4 font-body-md text-body-md text-on-surface shadow-sm border border-slate-200 focus:outline-none focus:ring-2 focus:ring-secondary/40"
+                    name="HOPE_VISIT_DT"
+                    onChange={(e) => handleFieldChange('hopeVisitDt', e.target.value)}
+                    type="date"
+                    value={formData.hopeVisitDt}
+                  />
                 </div>
 
-                {/* 정기 순회 대상 구역 (복수 선택 가능) (공통코드 23개 전체, 1줄 3개, 스크롤 가능) */}
-                <div className="flex flex-col text-left">
-                  <div className="flex items-center justify-between mb-1.5">
-                    <label className="font-label-sm text-label-sm text-on-surface font-semibold flex items-center gap-1">
-                      <span>정기 순회 대상 구역</span>
-                      <span className="text-secondary font-medium">(복수 선택 가능)</span>
-                    </label>
-                    <span className="text-[10px] text-secondary font-mono bg-secondary/10 px-1.5 py-0.5 rounded">
-                      CLEAN_LOC (23종)
-                    </span>
+                <div className="bg-surface-container-low p-2.5 px-3.5 rounded-xl flex flex-col justify-center gap-1.5 text-left border border-slate-200/60">
+                  <div className="flex items-center justify-between">
+                    <span className="font-label-sm text-label-sm text-on-surface font-semibold">현장 주차 여건</span>
+                    <span className="font-caption text-[11px] text-secondary">장비차량 탑재</span>
                   </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 max-h-[190px] overflow-y-auto p-2 bg-surface-container-low/40 rounded-xl border border-slate-200/70 shadow-inner">
-                    {COM_CODE_CLEAN_LOC.map((loc) => {
-                      const isChecked = formData.cleanMidCdList.includes(loc.COM_CD);
-                      return (
-                        <label
-                          key={loc.COM_CD}
-                          className={`flex items-center gap-2 p-2.5 rounded-xl cursor-pointer transition-all text-left ${
-                            isChecked
-                              ? 'bg-secondary-container/40 text-on-secondary-container font-semibold ring-1 ring-secondary/40 shadow-xs'
-                              : 'bg-surface-container-lowest text-on-surface hover:bg-surface-container border border-slate-200/40'
-                          }`}
-                        >
-                          <input
-                            checked={isChecked}
-                            className="w-4 h-4 accent-secondary rounded shrink-0"
-                            onChange={() => handleCleanMidToggle(loc.COM_CD)}
-                            type="checkbox"
-                          />
-                          <span className="text-[12px] truncate leading-tight font-medium">{loc.COM_NM}</span>
-                        </label>
-                      );
-                    })}
-                  </div>
-
-                  {/* SORT_ORD 99 (기타 구역) 선택 시 스크롤 영역 하단에 명칭 직접 입력 항목 노출 */}
-                  {(formData.cleanMidCdList.includes('ETC_LOC') || formData.cleanMidCdList.includes('MID_ETC')) && (
-                    <div className="mt-2 text-left">
+                  <div className="flex items-center gap-3">
+                    <label className="flex items-center gap-1.5 cursor-pointer font-label-sm text-label-sm text-on-surface">
                       <input
-                        className="w-full h-11 px-4 rounded-xl bg-surface-container-lowest font-body-sm text-body-sm text-on-surface border border-secondary/50 focus:outline-none focus:ring-2 focus:ring-secondary/40 placeholder:text-outline/70 shadow-sm"
-                        onChange={(e) => setCustomMidCdText(e.target.value)}
-                        placeholder="기타 순회 대상 구역 명칭을 직접 입력해 주세요 (예: 옥상 테라스, 지하 창고 등)"
-                        type="text"
-                        value={customMidCdText}
+                        checked={formData.parkingAvailCd === 'FREE'}
+                        className="accent-secondary"
+                        name="PARKING_AVAIL_CD"
+                        onChange={() => handleFieldChange('parkingAvailCd', 'FREE')}
+                        type="radio"
+                        value="FREE"
                       />
-                    </div>
-                  )}
+                      <span>무료 주차</span>
+                    </label>
+                    <label className="flex items-center gap-1.5 cursor-pointer font-body-sm text-body-sm text-on-surface-variant">
+                      <input
+                        checked={formData.parkingAvailCd === 'PAID'}
+                        className="accent-secondary"
+                        name="PARKING_AVAIL_CD"
+                        onChange={() => handleFieldChange('parkingAvailCd', 'PAID')}
+                        type="radio"
+                        value="PAID"
+                      />
+                      <span>유료 주차</span>
+                    </label>
+                    <label className="flex items-center gap-1.5 cursor-pointer font-body-sm text-body-sm text-on-surface-variant">
+                      <input
+                        checked={formData.parkingAvailCd === 'UNKNOWN'}
+                        className="accent-secondary"
+                        name="PARKING_AVAIL_CD"
+                        onChange={() => handleFieldChange('parkingAvailCd', 'UNKNOWN')}
+                        type="radio"
+                        value="UNKNOWN"
+                      />
+                      <span>확인 필요</span>
+                    </label>
+                  </div>
                 </div>
               </div>
-            )}
-          </section>
 
-          {/* 4. TAB별 특화 동적 입력 섹션 (Form Section 2) */}
-          <section className="px-8 py-5 bg-surface-container-low/70 my-2 space-y-4" id="dynamic-detail-section">
-            {activeTab === 'REGULAR' && (
-              <>
-                <div className="flex items-center justify-between pb-1">
-                  <div className="flex items-center gap-2">
-                    <span className="w-5 h-5 rounded-full bg-secondary text-on-secondary font-label-sm text-label-sm flex items-center justify-center font-bold">
-                      2
+              {/* Row 4: 현장 주소 with 네이버 주소 검색 연동 (탭별 독립 주소 관리) */}
+              <div className="flex flex-col text-left space-y-2">
+                <div className="flex items-center justify-between">
+                  <label className="font-label-sm text-label-sm text-on-surface font-semibold flex items-center gap-1.5">
+                    <span>[{TAB_NAME_MAP[activeTab]}] 시공 현장 주소 <span className="text-error">*</span></span>
+                    <span className="px-1.5 py-0.2 rounded text-[10px] font-bold bg-[#03C75A]/15 text-[#008f3e]">
+                      네이버 주소 연동
                     </span>
-                    <h3 className="font-label-lg text-label-lg text-on-surface font-bold tracking-tight">
-                      서비스 세부 조건 설정 (정기청소 특화)
-                    </h3>
-                  </div>
-                  <span className="px-2 py-0.5 rounded-full bg-secondary-fixed text-on-secondary-fixed-variant font-caption text-caption font-semibold">
-                    90일 전담 마스터 고정 배정
+                  </label>
+                  <span className="font-caption text-caption text-secondary flex items-center gap-0.5">
+                    <span className="material-symbols-outlined text-[14px]">my_location</span>
+                    {tabAddresses[activeTab]?.sidoNm || '경기도'} {tabAddresses[activeTab]?.sigunguNm || '고양시 일산동구'}
                   </span>
                 </div>
+                <div className="flex gap-2">
+                  <button
+                    className="h-11 px-4 rounded-xl bg-[#03C75A] hover:bg-[#02b350] text-white font-label-md text-label-md shrink-0 transition-colors shadow-sm flex items-center gap-1.5 font-bold cursor-pointer"
+                    onClick={() => setIsAddrModalOpen(true)}
+                    type="button"
+                  >
+                    <span className="material-symbols-outlined text-[18px]">search</span>
+                    네이버 주소 검색
+                  </button>
+                  <input
+                    className="h-11 flex-1 rounded-xl bg-surface-container-low px-4 font-body-md text-body-md text-on-surface shadow-sm border border-slate-200"
+                    name="ADDR_TEXT"
+                    readOnly
+                    type="text"
+                    value={tabAddresses[activeTab]?.addrText || ''}
+                  />
+                </div>
+                <input
+                  className="h-11 rounded-xl bg-surface-container-lowest px-4 font-body-md text-body-md text-on-surface shadow-sm border border-slate-200 focus:outline-none focus:ring-2 focus:ring-secondary/40"
+                  name="ADDR_DETAIL"
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    setTabAddresses((prev) => ({
+                      ...prev,
+                      [activeTab]: {
+                        ...prev[activeTab],
+                        addrDetail: val,
+                      },
+                    }));
+                  }}
+                  placeholder="상세주소 및 동/호수 입력 (각 탭별 독립 입력 가능)"
+                  type="text"
+                  value={tabAddresses[activeTab]?.addrDetail || ''}
+                />
+              </div>
 
-                {/* 기간 설정 및 보장제 공지 (년월/주차 선택 및 3개월 만기 자동 계산) */}
-                <div className="bg-surface-container-lowest p-4 rounded-xl shadow-sm space-y-3">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {/* 1. 용역 개시년월 및 주차 선택 */}
-                    <div className="flex flex-col text-left space-y-1.5">
-                      <label className="font-label-sm text-label-sm text-on-surface font-semibold flex items-center justify-between">
-                        <span>용역 개시년월 / 주차 <span className="text-error">*</span></span>
-                        <span className="font-caption text-caption text-secondary font-medium">개시 기준 시점</span>
+              {/* Row 5: 정기 청소 전용 - 건물 종류 (위) & 정기 순회 대상 구역 (아래) */}
+              {activeTab === 'REGULAR' && (
+                <div className="space-y-3 pt-1">
+                  {/* 정기 청소 건물 종류 (BLDG_TYPE) */}
+                  <div className="flex flex-col text-left">
+                    <div className="flex items-center justify-between mb-1.5">
+                      <label className="font-label-sm text-label-sm text-on-surface font-semibold flex items-center gap-1">
+                        <span>정기 청소 건물 종류</span>
+                        <span className="text-error">*</span>
                       </label>
-                      <div className="grid grid-cols-5 gap-2">
-                        <div className="col-span-3">
-                          <select
-                            className="w-full h-11 px-3 rounded-xl bg-surface-container-low font-body-sm text-body-sm text-on-surface border border-slate-200 focus:outline-none focus:ring-2 focus:ring-secondary/40 cursor-pointer"
-                            onChange={(e) => handleStartYmChange(e.target.value)}
-                            value={startYearMonth}
+                      <span className="text-[10px] text-secondary font-mono bg-secondary/10 px-1.5 py-0.5 rounded">
+                        BLDG_TYPE
+                      </span>
+                    </div>
+                    <div className="relative">
+                      <select
+                        className="h-11 w-full appearance-none rounded-xl bg-surface-container-lowest px-4 pr-10 font-body-md text-body-md text-on-surface shadow-sm border border-slate-200 focus:outline-none focus:ring-2 focus:ring-secondary/40 font-medium"
+                        name="FACILITY_TYPE_CD"
+                        onChange={(e) => handleFieldChange('facilityTypeCd', e.target.value)}
+                        required
+                        value={formData.facilityTypeCd}
+                      >
+                        {COM_CODE_BLDG_TYPE.map((bldg) => (
+                          <option key={bldg.COM_CD} value={bldg.COM_CD}>
+                            {bldg.COM_NM}
+                          </option>
+                        ))}
+                      </select>
+                      <span className="material-symbols-outlined text-[20px] text-outline absolute right-3 top-3 pointer-events-none">
+                        expand_more
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* 정기 순회 대상 구역 (복수 선택 가능) (공통코드 23개 전체, 1줄 3개, 스크롤 가능) */}
+                  <div className="flex flex-col text-left">
+                    <div className="flex items-center justify-between mb-1.5">
+                      <label className="font-label-sm text-label-sm text-on-surface font-semibold flex items-center gap-1">
+                        <span>정기 순회 대상 구역</span>
+                        <span className="text-secondary font-medium">(복수 선택 가능)</span>
+                      </label>
+                      <span className="text-[10px] text-secondary font-mono bg-secondary/10 px-1.5 py-0.5 rounded">
+                        CLEAN_LOC (23종)
+                      </span>
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 max-h-[190px] overflow-y-auto p-2 bg-surface-container-low/40 rounded-xl border border-slate-200/70 shadow-inner">
+                      {COM_CODE_CLEAN_LOC.map((loc) => {
+                        const isChecked = formData.cleanMidCdList.includes(loc.COM_CD);
+                        return (
+                          <label
+                            key={loc.COM_CD}
+                            className={`flex items-center gap-2 p-2.5 rounded-xl cursor-pointer transition-all text-left ${isChecked
+                              ? 'bg-secondary-container/40 text-on-secondary-container font-semibold ring-1 ring-secondary/40 shadow-xs'
+                              : 'bg-surface-container-lowest text-on-surface hover:bg-surface-container border border-slate-200/40'
+                              }`}
                           >
-                            {AVAILABLE_START_MONTHS.map((m) => (
-                              <option key={m.value} value={m.value}>
-                                {m.label}
-                              </option>
-                            ))}
-                          </select>
-                        </div>
-                        <div className="col-span-2">
-                          <select
-                            className="w-full h-11 px-3 rounded-xl bg-surface-container-low font-body-sm text-body-sm text-on-surface border border-slate-200 focus:outline-none focus:ring-2 focus:ring-secondary/40 cursor-pointer"
-                            onChange={(e) => setStartWeek(Number(e.target.value))}
-                            value={startWeek}
-                          >
-                            {(() => {
-                              const [yStr, mStr] = (startYearMonth || '2026-11').split('-');
-                              const weeks = getWeeksInMonth(parseInt(yStr, 10), parseInt(mStr, 10));
-                              return weeks.map((w) => (
-                                <option key={w.week} value={w.week}>
-                                  {w.shortLabel}
+                            <input
+                              checked={isChecked}
+                              className="w-4 h-4 accent-secondary rounded shrink-0"
+                              onChange={() => handleCleanMidToggle(loc.COM_CD)}
+                              type="checkbox"
+                            />
+                            <span className="text-[12px] truncate leading-tight font-medium">{loc.COM_NM}</span>
+                          </label>
+                        );
+                      })}
+                    </div>
+
+                    {/* SORT_ORD 99 (기타 구역) 선택 시 스크롤 영역 하단에 명칭 직접 입력 항목 노출 */}
+                    {(formData.cleanMidCdList.includes('ETC_LOC') || formData.cleanMidCdList.includes('MID_ETC')) && (
+                      <div className="mt-2 text-left">
+                        <input
+                          className="w-full h-11 px-4 rounded-xl bg-surface-container-lowest font-body-sm text-body-sm text-on-surface border border-secondary/50 focus:outline-none focus:ring-2 focus:ring-secondary/40 placeholder:text-outline/70 shadow-sm"
+                          onChange={(e) => setCustomMidCdText(e.target.value)}
+                          placeholder="기타 순회 대상 구역 명칭을 직접 입력해 주세요 (예: 옥상 테라스, 지하 창고 등)"
+                          type="text"
+                          value={customMidCdText}
+                        />
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+            </section>
+
+            {/* 4. TAB별 특화 동적 입력 섹션 (Form Section 2) */}
+            <section className="px-8 py-5 bg-surface-container-low/70 my-2 space-y-4" id="dynamic-detail-section">
+              {activeTab === 'REGULAR' && (
+                <>
+                  <div className="flex items-center justify-between pb-1">
+                    <div className="flex items-center gap-2">
+                      <span className="w-5 h-5 rounded-full bg-secondary text-on-secondary font-label-sm text-label-sm flex items-center justify-center font-bold">
+                        2
+                      </span>
+                      <h3 className="font-label-lg text-label-lg text-on-surface font-bold tracking-tight">
+                        서비스 세부 조건 설정 (정기청소 특화)
+                      </h3>
+                    </div>
+                    <span className="px-2 py-0.5 rounded-full bg-secondary-fixed text-on-secondary-fixed-variant font-caption text-caption font-semibold">
+                      90일 전담 마스터 고정 배정
+                    </span>
+                  </div>
+
+                  {/* 기간 설정 및 보장제 공지 (년월/주차 선택 및 3개월 만기 자동 계산) */}
+                  <div className="bg-surface-container-lowest p-4 rounded-xl shadow-sm space-y-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      {/* 1. 용역 개시년월 및 주차 선택 */}
+                      <div className="flex flex-col text-left space-y-1.5">
+                        <label className="font-label-sm text-label-sm text-on-surface font-semibold flex items-center justify-between">
+                          <span>용역 개시년월 / 주차 <span className="text-error">*</span></span>
+                          <span className="font-caption text-caption text-secondary font-medium">개시 기준 시점</span>
+                        </label>
+                        <div className="grid grid-cols-5 gap-2">
+                          <div className="col-span-3">
+                            <select
+                              className="w-full h-11 px-3 rounded-xl bg-surface-container-low font-body-sm text-body-sm text-on-surface border border-slate-200 focus:outline-none focus:ring-2 focus:ring-secondary/40 cursor-pointer"
+                              onChange={(e) => handleStartYmChange(e.target.value)}
+                              value={startYearMonth}
+                            >
+                              {AVAILABLE_START_MONTHS.map((m) => (
+                                <option key={m.value} value={m.value}>
+                                  {m.label}
                                 </option>
-                              ));
-                            })()}
-                          </select>
+                              ))}
+                            </select>
+                          </div>
+                          <div className="col-span-2">
+                            <select
+                              className="w-full h-11 px-3 rounded-xl bg-surface-container-low font-body-sm text-body-sm text-on-surface border border-slate-200 focus:outline-none focus:ring-2 focus:ring-secondary/40 cursor-pointer"
+                              onChange={(e) => setStartWeek(Number(e.target.value))}
+                              value={startWeek}
+                            >
+                              {(() => {
+                                const [yStr, mStr] = (startYearMonth || '2026-11').split('-');
+                                const weeks = getWeeksInMonth(parseInt(yStr, 10), parseInt(mStr, 10));
+                                return weeks.map((w) => (
+                                  <option key={w.week} value={w.week}>
+                                    {w.shortLabel}
+                                  </option>
+                                ));
+                              })()}
+                            </select>
+                          </div>
+                        </div>
+                        <div className="font-caption text-[11px] text-outline text-left">
+                          {(() => {
+                            const [yStr, mStr] = (startYearMonth || '2026-11').split('-');
+                            const weeks = getWeeksInMonth(parseInt(yStr, 10), parseInt(mStr, 10));
+                            const curWeek = weeks.find((w) => w.week === startWeek) || weeks[0];
+                            return curWeek ? `${mStr}월 ${curWeek.startDay}일 ~ ${mStr}월 ${curWeek.endDay}일 시작` : '';
+                          })()}
                         </div>
                       </div>
-                      <div className="font-caption text-[11px] text-outline text-left">
+
+                      {/* 2. 용역 만료년월 및 주차 (3개월 자동 계산, Read-only) */}
+                      <div className="flex flex-col text-left space-y-1.5">
+                        <div className="flex items-center justify-between">
+                          <label className="font-label-sm text-label-sm text-on-surface font-semibold">
+                            용역 만료일 (90일 만기)
+                          </label>
+                          <span className="px-2 py-0.5 rounded-full bg-primary-fixed text-on-primary-fixed font-caption text-[11px] font-bold">
+                            3개월 자동 계산
+                          </span>
+                        </div>
                         {(() => {
                           const [yStr, mStr] = (startYearMonth || '2026-11').split('-');
-                          const weeks = getWeeksInMonth(parseInt(yStr, 10), parseInt(mStr, 10));
-                          const curWeek = weeks.find((w) => w.week === startWeek) || weeks[0];
-                          return curWeek ? `${mStr}월 ${curWeek.startDay}일 ~ ${mStr}월 ${curWeek.endDay}일 시작` : '';
+                          const { endYear, endMonth, endWeek, endWeekInfo } = calcThreeMonthsLater(
+                            parseInt(yStr, 10),
+                            parseInt(mStr, 10),
+                            startWeek
+                          );
+                          return (
+                            <>
+                              <div className="h-11 rounded-xl bg-surface-container-low/70 px-4 flex items-center justify-between font-body-sm text-body-sm text-primary font-bold border border-slate-200 select-none">
+                                <span>{endYear}년 {String(endMonth).padStart(2, '0')}월 {endWeek}주차</span>
+                                <span className="font-caption text-caption text-outline font-normal">
+                                  (90일 만기 종료)
+                                </span>
+                              </div>
+                              <div className="font-caption text-[11px] text-outline text-left">
+                                {endMonth}월 {endWeekInfo.startDay}일 ~ {endMonth}월 {endWeekInfo.endDay}일 만기
+                              </div>
+                            </>
+                          );
                         })()}
                       </div>
                     </div>
 
-                    {/* 2. 용역 만료년월 및 주차 (3개월 자동 계산, Read-only) */}
-                    <div className="flex flex-col text-left space-y-1.5">
-                      <div className="flex items-center justify-between">
-                        <label className="font-label-sm text-label-sm text-on-surface font-semibold">
-                          용역 만료일 (90일 만기)
-                        </label>
-                        <span className="px-2 py-0.5 rounded-full bg-primary-fixed text-on-primary-fixed font-caption text-[11px] font-bold">
-                          3개월 자동 계산
-                        </span>
-                      </div>
-                      {(() => {
-                        const [yStr, mStr] = (startYearMonth || '2026-11').split('-');
-                        const { endYear, endMonth, endWeek, endWeekInfo } = calcThreeMonthsLater(
-                          parseInt(yStr, 10),
-                          parseInt(mStr, 10),
-                          startWeek
-                        );
-                        return (
-                          <>
-                            <div className="h-11 rounded-xl bg-surface-container-low/70 px-4 flex items-center justify-between font-body-sm text-body-sm text-primary font-bold border border-slate-200 select-none">
-                              <span>{endYear}년 {String(endMonth).padStart(2, '0')}월 {endWeek}주차</span>
-                              <span className="font-caption text-caption text-outline font-normal">
-                                (90일 만기 종료)
-                              </span>
-                            </div>
-                            <div className="font-caption text-[11px] text-outline text-left">
-                              {endMonth}월 {endWeekInfo.startDay}일 ~ {endMonth}월 {endWeekInfo.endDay}일 만기
-                            </div>
-                          </>
-                        );
-                      })()}
+                    <div className="flex items-start gap-2 p-3 bg-secondary-container/20 rounded-lg text-left">
+                      <span className="material-symbols-outlined text-[18px] text-secondary shrink-0 mt-0.5">
+                        verified_user
+                      </span>
+                      <p className="font-caption text-caption text-on-secondary-container">
+                        <strong className="font-semibold">최소 3개월(90일) 락 보장제:</strong> 정기 청소는 시공 파트너의 스케줄 고정과 지속적인 위생 퀄리티를 유지하기 위해 분기(90일) 단위로 의뢰되며, 개시 시점 기준 3개월 후가 자동 산출됩니다.
+                      </p>
                     </div>
                   </div>
 
-                  <div className="flex items-start gap-2 p-3 bg-secondary-container/20 rounded-lg text-left">
-                    <span className="material-symbols-outlined text-[18px] text-secondary shrink-0 mt-0.5">
-                      verified_user
-                    </span>
-                    <p className="font-caption text-caption text-on-secondary-container">
-                      <strong className="font-semibold">최소 3개월(90일) 락 보장제:</strong> 정기 청소는 시공 파트너의 스케줄 고정과 지속적인 위생 퀄리티를 유지하기 위해 분기(90일) 단위로 의뢰되며, 개시 시점 기준 3개월 후가 자동 산출됩니다.
-                    </p>
-                  </div>
-                </div>
-
-                {/* 방문 주기 및 요일 선택 */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="bg-surface-container-lowest p-3.5 rounded-xl shadow-sm text-left flex flex-col justify-between">
-                    <label className="font-label-sm text-label-sm text-on-surface mb-2 font-semibold">
-                      주간 방문 빈도
-                    </label>
-                    <div className="grid grid-cols-4 gap-1">
-                      {[1, 2, 3, 5].map((f) => (
-                        <button
-                          key={f}
-                          className={`py-2 rounded-lg font-label-sm text-label-sm transition-all ${
-                            formData.weekCleanFreq === f
+                  {/* 방문 주기 및 요일 선택 */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="bg-surface-container-lowest p-3.5 rounded-xl shadow-sm text-left flex flex-col justify-between">
+                      <label className="font-label-sm text-label-sm text-on-surface mb-2 font-semibold">
+                        주간 방문 빈도
+                      </label>
+                      <div className="grid grid-cols-4 gap-1">
+                        {[1, 2, 3, 5].map((f) => (
+                          <button
+                            key={f}
+                            className={`py-2 rounded-lg font-label-sm text-label-sm transition-all ${formData.weekCleanFreq === f
                               ? 'bg-primary text-on-primary font-bold shadow-sm'
                               : 'bg-surface-container-low text-on-surface hover:bg-surface-container'
-                          }`}
-                          onClick={() => handleFreqChange(f)}
-                          type="button"
-                        >
-                          주 {f}회
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div className="bg-surface-container-lowest p-3.5 rounded-xl shadow-sm text-left flex flex-col justify-between">
-                    <div className="flex items-center justify-between mb-2">
-                      <label className="font-label-sm text-label-sm text-on-surface font-semibold">
-                        방문 희망 요일
-                      </label>
-                      <span className="font-caption text-caption text-secondary font-medium">
-                        {(Array.isArray(formData.cleanDaysConfig) ? formData.cleanDaysConfig.length : 0)} / {formData.weekCleanFreq}개 선택
-                      </span>
-                    </div>
-                    <div className="grid grid-cols-7 gap-1">
-                      {[
-                        { code: 'MON', label: '월' },
-                        { code: 'TUE', label: '화' },
-                        { code: 'WED', label: '수' },
-                        { code: 'THU', label: '목' },
-                        { code: 'FRI', label: '금' },
-                        { code: 'SAT', label: '토' },
-                        { code: 'SUN', label: '일' },
-                      ].map((day) => {
-                        const safeDays = Array.isArray(formData.cleanDaysConfig)
-                          ? formData.cleanDaysConfig
-                          : [];
-                        const isDayChecked = safeDays.includes(day.code);
-                        return (
-                          <button
-                            key={day.code}
+                              }`}
+                            onClick={() => handleFreqChange(f)}
                             type="button"
-                            onClick={() => handleCleanDayToggle(day.code)}
-                            className={`flex flex-col items-center justify-center py-2 rounded-lg font-label-sm text-label-sm cursor-pointer transition-all ${
-                              isDayChecked
+                          >
+                            주 {f}회
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="bg-surface-container-lowest p-3.5 rounded-xl shadow-sm text-left flex flex-col justify-between">
+                      <div className="flex items-center justify-between mb-2">
+                        <label className="font-label-sm text-label-sm text-on-surface font-semibold">
+                          방문 희망 요일
+                        </label>
+                        <span className="font-caption text-caption text-secondary font-medium">
+                          {(Array.isArray(formData.cleanDaysConfig) ? formData.cleanDaysConfig.length : 0)} / {formData.weekCleanFreq}개 선택
+                        </span>
+                      </div>
+                      <div className="grid grid-cols-7 gap-1">
+                        {[
+                          { code: 'MON', label: '월' },
+                          { code: 'TUE', label: '화' },
+                          { code: 'WED', label: '수' },
+                          { code: 'THU', label: '목' },
+                          { code: 'FRI', label: '금' },
+                          { code: 'SAT', label: '토' },
+                          { code: 'SUN', label: '일' },
+                        ].map((day) => {
+                          const safeDays = Array.isArray(formData.cleanDaysConfig)
+                            ? formData.cleanDaysConfig
+                            : [];
+                          const isDayChecked = safeDays.includes(day.code);
+                          return (
+                            <button
+                              key={day.code}
+                              type="button"
+                              onClick={() => handleCleanDayToggle(day.code)}
+                              className={`flex flex-col items-center justify-center py-2 rounded-lg font-label-sm text-label-sm cursor-pointer transition-all ${isDayChecked
                                 ? 'bg-secondary text-on-secondary font-bold shadow-sm'
                                 : 'bg-surface-container-low text-on-surface-variant hover:bg-surface-container'
-                            }`}
-                          >
-                            <span>{day.label}</span>
-                          </button>
-                        );
-                      })}
+                                }`}
+                            >
+                              <span>{day.label}</span>
+                            </button>
+                          );
+                        })}
+                      </div>
                     </div>
                   </div>
-                </div>
 
-                {/* 공급면적 평수 */}
-                <div className="flex items-center justify-between p-3 bg-surface-container-lowest rounded-xl shadow-sm text-left">
-                  <span className="font-label-sm text-label-sm text-on-surface font-semibold">
-                    건물 실평수 / 관리 면적 (선택)
-                  </span>
-                  <div className="flex items-center gap-2">
-                    <input
-                      className="w-20 h-9 rounded-lg bg-surface-container-low px-2 text-right font-label-md text-label-md font-mono text-on-surface"
-                      onChange={(e) => handleFieldChange('supplyPyeong', e.target.value)}
-                      type="number"
-                      value={formData.supplyPyeong}
-                    />
-                    <span className="font-body-sm text-body-sm text-on-surface-variant">평</span>
-                  </div>
-                </div>
-              </>
-            )}
-
-            {/* [TAB 2] 입주/이사 청소 특화 설정 */}
-            {activeTab === 'MOVEIN' && (
-              <>
-                <div className="flex items-center justify-between pb-1 text-left">
-                  <div className="flex items-center gap-2">
-                    <span className="w-5 h-5 rounded-full bg-secondary text-on-secondary font-label-sm text-label-sm flex items-center justify-center font-bold">
-                      2
+                  {/* 공급면적 평수 */}
+                  <div className="flex items-center justify-between p-3 bg-surface-container-lowest rounded-xl shadow-sm text-left">
+                    <span className="font-label-sm text-label-sm text-on-surface font-semibold">
+                      건물 실평수 / 관리 면적 (선택)
                     </span>
-                    <h3 className="font-label-lg text-label-lg text-on-surface font-bold tracking-tight">
-                      입주/이사 청소 세부 조건 설정
-                    </h3>
-                  </div>
-                  <span className="px-2 py-0.5 rounded-full bg-secondary-fixed text-on-secondary-fixed-variant font-caption text-caption font-semibold">
-                    1회성 집중 풀케어
-                  </span>
-                </div>
-
-                <div className="bg-surface-container-lowest p-5 rounded-2xl shadow-sm space-y-4 text-left border border-slate-100">
-                  {/* 주거 형태 & 공급 평수 */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                      <label className="font-label-sm text-label-sm text-on-surface mb-1.5 font-semibold block">
-                        주거 건물 형태 <span className="text-error">*</span>
-                      </label>
-                      <select
-                        className="h-11 w-full rounded-xl bg-surface-container-low px-4 font-body-md text-body-md border border-slate-200 focus:outline-none focus:ring-2 focus:ring-secondary/40 font-medium"
-                        onChange={(e) => handleFieldChange('moveinBuildingType', e.target.value)}
-                        value={formData.moveinBuildingType || 'APT'}
-                      >
-                        <option value="APT">아파트 (공동주택)</option>
-                        <option value="OFFICETEL">오피스텔 / 도시형 생활주택</option>
-                        <option value="VILLA">빌라 / 다세대·연립</option>
-                        <option value="HOUSE">단독주택 / 전원주택</option>
-                        <option value="STUDIO">원룸 / 투룸</option>
-                      </select>
+                    <div className="flex items-center gap-2">
+                      <input
+                        className="w-20 h-9 rounded-lg bg-surface-container-low px-2 text-right font-label-md text-label-md font-mono text-on-surface"
+                        onChange={(e) => handleFieldChange('supplyPyeong', e.target.value)}
+                        type="number"
+                        value={formData.supplyPyeong}
+                      />
+                      <span className="font-body-sm text-body-sm text-on-surface-variant">평</span>
                     </div>
+                  </div>
+                </>
+              )}
 
-                    <div>
-                      <label className="font-label-sm text-label-sm text-on-surface mb-1.5 font-semibold block">
-                        공급 평수 (분양 평수 기준) <span className="text-error">*</span>
-                      </label>
-                      <div className="flex items-center gap-2">
-                        <input
-                          className="h-11 w-full rounded-xl bg-surface-container-low px-4 font-body-md text-body-md font-mono border border-slate-200 focus:outline-none focus:ring-2 focus:ring-secondary/40 text-right font-bold"
-                          onChange={(e) => handleFieldChange('moveinPyeong', e.target.value)}
-                          placeholder="34"
-                          type="number"
-                          value={formData.moveinPyeong}
-                        />
-                        <span className="font-body-md text-body-md text-on-surface-variant shrink-0">평</span>
+              {/* [TAB 2] 입주/이사 청소 특화 설정 */}
+              {activeTab === 'MOVEIN' && (
+                <>
+                  <div className="flex items-center justify-between pb-1 text-left">
+                    <div className="flex items-center gap-2">
+                      <span className="w-5 h-5 rounded-full bg-secondary text-on-secondary font-label-sm text-label-sm flex items-center justify-center font-bold">
+                        2
+                      </span>
+                      <h3 className="font-label-lg text-label-lg text-on-surface font-bold tracking-tight">
+                        입주/이사 청소 세부 조건 설정
+                      </h3>
+                    </div>
+                    <span className="px-2 py-0.5 rounded-full bg-secondary-fixed text-on-secondary-fixed-variant font-caption text-caption font-semibold">
+                      1회성 집중 풀케어
+                    </span>
+                  </div>
+
+                  <div className="bg-surface-container-lowest p-5 rounded-2xl shadow-sm space-y-4 text-left border border-slate-100">
+                    {/* 주거 형태 & 공급 평수 */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <label className="font-label-sm text-label-sm text-on-surface mb-1.5 font-semibold block">
+                          주거 건물 형태 <span className="text-error">*</span>
+                        </label>
+                        <select
+                          className="h-11 w-full rounded-xl bg-surface-container-low px-4 font-body-md text-body-md border border-slate-200 focus:outline-none focus:ring-2 focus:ring-secondary/40 font-medium"
+                          onChange={(e) => handleFieldChange('moveinBuildingType', e.target.value)}
+                          value={formData.moveinBuildingType || 'APT'}
+                        >
+                          <option value="APT">아파트 (공동주택)</option>
+                          <option value="OFFICETEL">오피스텔 / 도시형 생활주택</option>
+                          <option value="VILLA">빌라 / 다세대·연립</option>
+                          <option value="HOUSE">단독주택 / 전원주택</option>
+                          <option value="STUDIO">원룸 / 투룸</option>
+                        </select>
                       </div>
-                    </div>
-                  </div>
 
-                  {/* 방 개수, 욕실 개수, 베란다 확장 여부 */}
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
-                    <div>
-                      <label className="font-label-sm text-label-sm text-on-surface mb-1 font-semibold block">
-                        방 개수
-                      </label>
-                      <select
-                        className="h-10 w-full rounded-xl bg-surface-container-low px-3 font-body-sm text-body-sm border border-slate-200"
-                        onChange={(e) => handleFieldChange('moveinRoomCount', Number(e.target.value))}
-                        value={formData.moveinRoomCount || 3}
-                      >
-                        <option value={1}>원룸 (1개)</option>
-                        <option value={2}>투룸 (2개)</option>
-                        <option value={3}>쓰리룸 (3개)</option>
-                        <option value={4}>4룸</option>
-                        <option value={5}>5룸 이상</option>
-                      </select>
-                    </div>
-
-                    <div>
-                      <label className="font-label-sm text-label-sm text-on-surface mb-1 font-semibold block">
-                        욕실/화장실 개수
-                      </label>
-                      <select
-                        className="h-10 w-full rounded-xl bg-surface-container-low px-3 font-body-sm text-body-sm border border-slate-200"
-                        onChange={(e) => handleFieldChange('moveinBathCount', Number(e.target.value))}
-                        value={formData.moveinBathCount || 2}
-                      >
-                        <option value={1}>1개</option>
-                        <option value={2}>2개</option>
-                        <option value={3}>3개 이상</option>
-                      </select>
-                    </div>
-
-                    <div>
-                      <label className="font-label-sm text-label-sm text-on-surface mb-1 font-semibold block">
-                        발코니/베란다 확장
-                      </label>
-                      <select
-                        className="h-10 w-full rounded-xl bg-surface-container-low px-3 font-body-sm text-body-sm border border-slate-200"
-                        onChange={(e) => handleFieldChange('moveinBalconyExt', e.target.value)}
-                        value={formData.moveinBalconyExt || 'Y'}
-                      >
-                        <option value="Y">확장형</option>
-                        <option value="N">비확장형 (베란다 다수)</option>
-                      </select>
-                    </div>
-                  </div>
-
-                  {/* 희망 작업 시간대 */}
-                  <div className="pt-1">
-                    <label className="font-label-sm text-label-sm text-on-surface mb-1.5 font-semibold block">
-                      희망 작업 시간대
-                    </label>
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                      {/* 시작시간 입력 */}
-                      <div
-                        className={`p-2.5 rounded-xl flex items-center justify-between gap-1.5 transition-all ${
-                          !formData.workTimeNegotiable
-                            ? 'bg-surface-container-lowest border border-slate-300 shadow-sm'
-                            : 'bg-surface-container-low/60 border border-slate-200 opacity-50'
-                        }`}
-                      >
-                        <span className="text-xs font-bold text-slate-700 shrink-0 pl-1">시작시간</span>
-                        <div className="flex items-center gap-1.5 justify-end">
-                          <select
-                            disabled={formData.workTimeNegotiable}
-                            value={formData.workStartTimeType || '오전'}
-                            onChange={(e) => handleFieldChange('workStartTimeType', e.target.value)}
-                            className="h-8 px-2 rounded-lg bg-surface-container-low text-xs font-semibold text-on-surface border border-slate-200 focus:outline-none focus:ring-1 focus:ring-primary cursor-pointer disabled:cursor-not-allowed"
-                          >
-                            <option value="오전">오전</option>
-                            <option value="오후">오후</option>
-                          </select>
+                      <div>
+                        <label className="font-label-sm text-label-sm text-on-surface mb-1.5 font-semibold block">
+                          공급 평수 (분양 평수 기준) <span className="text-error">*</span>
+                        </label>
+                        <div className="flex items-center gap-2">
                           <input
-                            type="text"
-                            disabled={formData.workTimeNegotiable}
-                            placeholder="08:00"
-                            value={formData.workStartTime || '08:00'}
-                            onChange={(e) => handleFieldChange('workStartTime', e.target.value)}
-                            className="h-8 w-16 px-1 text-center rounded-lg bg-surface-container-low text-xs font-bold text-primary font-mono border border-slate-200 focus:outline-none focus:ring-1 focus:ring-primary disabled:cursor-not-allowed"
+                            className="h-11 w-full rounded-xl bg-surface-container-low px-4 font-body-md text-body-md font-mono border border-slate-200 focus:outline-none focus:ring-2 focus:ring-secondary/40 text-right font-bold"
+                            onChange={(e) => handleFieldChange('moveinPyeong', e.target.value)}
+                            placeholder="34"
+                            type="number"
+                            value={formData.moveinPyeong}
                           />
+                          <span className="font-body-md text-body-md text-on-surface-variant shrink-0">평</span>
                         </div>
                       </div>
+                    </div>
 
-                      {/* 종료시간 입력 */}
-                      <div
-                        className={`p-2.5 rounded-xl flex items-center justify-between gap-1.5 transition-all ${
-                          !formData.workTimeNegotiable
-                            ? 'bg-surface-container-lowest border border-slate-300 shadow-sm'
-                            : 'bg-surface-container-low/60 border border-slate-200 opacity-50'
-                        }`}
-                      >
-                        <span className="text-xs font-bold text-slate-700 shrink-0 pl-1">종료시간</span>
-                        <div className="flex items-center gap-1.5 justify-end">
-                          <select
-                            disabled={formData.workTimeNegotiable}
-                            value={formData.workEndTimeType || '오후'}
-                            onChange={(e) => handleFieldChange('workEndTimeType', e.target.value)}
-                            className="h-8 px-2 rounded-lg bg-surface-container-low text-xs font-semibold text-on-surface border border-slate-200 focus:outline-none focus:ring-1 focus:ring-primary cursor-pointer disabled:cursor-not-allowed"
-                          >
-                            <option value="오전">오전</option>
-                            <option value="오후">오후</option>
-                          </select>
-                          <input
-                            type="text"
-                            disabled={formData.workTimeNegotiable}
-                            placeholder="05:00"
-                            value={formData.workEndTime || '05:00'}
-                            onChange={(e) => handleFieldChange('workEndTime', e.target.value)}
-                            className="h-8 w-16 px-1 text-center rounded-lg bg-surface-container-low text-xs font-bold text-primary font-mono border border-slate-200 focus:outline-none focus:ring-1 focus:ring-primary disabled:cursor-not-allowed"
-                          />
-                        </div>
+                    {/* 방 개수, 욕실 개수, 베란다 확장 여부 */}
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
+                      <div>
+                        <label className="font-label-sm text-label-sm text-on-surface mb-1 font-semibold block">
+                          방 개수
+                        </label>
+                        <select
+                          className="h-10 w-full rounded-xl bg-surface-container-low px-3 font-body-sm text-body-sm border border-slate-200"
+                          onChange={(e) => handleFieldChange('moveinRoomCount', Number(e.target.value))}
+                          value={formData.moveinRoomCount || 3}
+                        >
+                          <option value={1}>원룸 (1개)</option>
+                          <option value={2}>투룸 (2개)</option>
+                          <option value={3}>쓰리룸 (3개)</option>
+                          <option value={4}>4룸</option>
+                          <option value={5}>5룸 이상</option>
+                        </select>
                       </div>
 
-                      {/* 시공사와 협의 가능 버튼 */}
-                      <button
-                        type="button"
-                        onClick={() => {
-                          const nextNeg = !formData.workTimeNegotiable;
-                          setFormData((prev) => ({
-                            ...prev,
-                            workTimeNegotiable: nextNeg,
-                            moveinTimeSlot: nextNeg
-                              ? 'FLEXIBLE'
-                              : `${prev.workStartTimeType || '오전'} ${prev.workStartTime || '08:00'} ~ ${prev.workEndTimeType || '오후'} ${prev.workEndTime || '05:00'}`,
-                          }));
-                        }}
-                        className={`h-11 sm:h-auto rounded-xl font-label-sm text-label-sm font-semibold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
-                          formData.workTimeNegotiable
+                      <div>
+                        <label className="font-label-sm text-label-sm text-on-surface mb-1 font-semibold block">
+                          욕실/화장실 개수
+                        </label>
+                        <select
+                          className="h-10 w-full rounded-xl bg-surface-container-low px-3 font-body-sm text-body-sm border border-slate-200"
+                          onChange={(e) => handleFieldChange('moveinBathCount', Number(e.target.value))}
+                          value={formData.moveinBathCount || 2}
+                        >
+                          <option value={1}>1개</option>
+                          <option value={2}>2개</option>
+                          <option value={3}>3개 이상</option>
+                        </select>
+                      </div>
+
+                      <div>
+                        <label className="font-label-sm text-label-sm text-on-surface mb-1 font-semibold block">
+                          발코니/베란다 확장
+                        </label>
+                        <select
+                          className="h-10 w-full rounded-xl bg-surface-container-low px-3 font-body-sm text-body-sm border border-slate-200"
+                          onChange={(e) => handleFieldChange('moveinBalconyExt', e.target.value)}
+                          value={formData.moveinBalconyExt || 'Y'}
+                        >
+                          <option value="Y">확장형</option>
+                          <option value="N">비확장형 (베란다 다수)</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    {/* 희망 작업 시간대 */}
+                    <div className="pt-1">
+                      <label className="font-label-sm text-label-sm text-on-surface mb-1.5 font-semibold block">
+                        희망 작업 시간대
+                      </label>
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                        {/* 시작시간 입력 */}
+                        <div
+                          className={`p-2.5 rounded-xl flex items-center justify-between gap-1.5 transition-all ${!formData.workTimeNegotiable
+                            ? 'bg-surface-container-lowest border border-slate-300 shadow-sm'
+                            : 'bg-surface-container-low/60 border border-slate-200 opacity-50'
+                            }`}
+                        >
+                          <span className="text-xs font-bold text-slate-700 shrink-0 pl-1">시작시간</span>
+                          <div className="flex items-center gap-1.5 justify-end">
+                            <select
+                              disabled={formData.workTimeNegotiable}
+                              value={formData.workStartTimeType || '오전'}
+                              onChange={(e) => handleFieldChange('workStartTimeType', e.target.value)}
+                              className="h-8 px-2 rounded-lg bg-surface-container-low text-xs font-semibold text-on-surface border border-slate-200 focus:outline-none focus:ring-1 focus:ring-primary cursor-pointer disabled:cursor-not-allowed"
+                            >
+                              <option value="오전">오전</option>
+                              <option value="오후">오후</option>
+                            </select>
+                            <input
+                              type="text"
+                              disabled={formData.workTimeNegotiable}
+                              placeholder="08:00"
+                              value={formData.workStartTime || '08:00'}
+                              onChange={(e) => handleFieldChange('workStartTime', e.target.value)}
+                              className="h-8 w-16 px-1 text-center rounded-lg bg-surface-container-low text-xs font-bold text-primary font-mono border border-slate-200 focus:outline-none focus:ring-1 focus:ring-primary disabled:cursor-not-allowed"
+                            />
+                          </div>
+                        </div>
+
+                        {/* 종료시간 입력 */}
+                        <div
+                          className={`p-2.5 rounded-xl flex items-center justify-between gap-1.5 transition-all ${!formData.workTimeNegotiable
+                            ? 'bg-surface-container-lowest border border-slate-300 shadow-sm'
+                            : 'bg-surface-container-low/60 border border-slate-200 opacity-50'
+                            }`}
+                        >
+                          <span className="text-xs font-bold text-slate-700 shrink-0 pl-1">종료시간</span>
+                          <div className="flex items-center gap-1.5 justify-end">
+                            <select
+                              disabled={formData.workTimeNegotiable}
+                              value={formData.workEndTimeType || '오후'}
+                              onChange={(e) => handleFieldChange('workEndTimeType', e.target.value)}
+                              className="h-8 px-2 rounded-lg bg-surface-container-low text-xs font-semibold text-on-surface border border-slate-200 focus:outline-none focus:ring-1 focus:ring-primary cursor-pointer disabled:cursor-not-allowed"
+                            >
+                              <option value="오전">오전</option>
+                              <option value="오후">오후</option>
+                            </select>
+                            <input
+                              type="text"
+                              disabled={formData.workTimeNegotiable}
+                              placeholder="05:00"
+                              value={formData.workEndTime || '05:00'}
+                              onChange={(e) => handleFieldChange('workEndTime', e.target.value)}
+                              className="h-8 w-16 px-1 text-center rounded-lg bg-surface-container-low text-xs font-bold text-primary font-mono border border-slate-200 focus:outline-none focus:ring-1 focus:ring-primary disabled:cursor-not-allowed"
+                            />
+                          </div>
+                        </div>
+
+                        {/* 시공사와 협의 가능 버튼 */}
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const nextNeg = !formData.workTimeNegotiable;
+                            setFormData((prev) => ({
+                              ...prev,
+                              workTimeNegotiable: nextNeg,
+                              moveinTimeSlot: nextNeg
+                                ? 'FLEXIBLE'
+                                : `${prev.workStartTimeType || '오전'} ${prev.workStartTime || '08:00'} ~ ${prev.workEndTimeType || '오후'} ${prev.workEndTime || '05:00'}`,
+                            }));
+                          }}
+                          className={`h-11 sm:h-auto rounded-xl font-label-sm text-label-sm font-semibold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${formData.workTimeNegotiable
                             ? 'bg-primary text-on-primary font-bold shadow-sm'
                             : 'bg-surface-container-low text-on-surface-variant hover:bg-surface-container border border-slate-200'
-                        }`}
+                            }`}
+                        >
+                          <span className="material-symbols-outlined text-[18px]">
+                            {formData.workTimeNegotiable ? 'check_circle' : 'handshake'}
+                          </span>
+                          <span>시공사와 협의 가능</span>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </>
+              )}
+
+              {/* [TAB 3] 계절가전청소 특화 설정 (세로 9개 품목 4개 Row 높이 스크롤 박스 및 +클릭시 기기별 스펙 Row 추가) */}
+              {activeTab === 'APPLIANCE' && (
+                <>
+                  <div className="flex items-center justify-between pb-1 text-left">
+                    <div className="flex items-center gap-2">
+                      <span className="w-5 h-5 rounded-full bg-secondary text-on-secondary font-label-sm text-label-sm flex items-center justify-center font-bold">
+                        2
+                      </span>
+                      <h3 className="font-label-lg text-label-lg text-on-surface font-bold tracking-tight">
+                        계절가전청소 세부 조건 설정
+                      </h3>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <span className="px-2 py-0.5 rounded-full bg-secondary text-white font-caption text-caption font-bold">
+                        총 {APPLIANCE_CATALOG.reduce((acc, cur) => acc + ((formData.applianceDetails?.[cur.id] || []).length), 0)}대 선택됨
+                      </span>
+                      <span className="px-2 py-0.5 rounded-full bg-secondary-fixed text-on-secondary-fixed-variant font-caption text-caption font-semibold">
+                        완전분해 · 고압살균
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* 4개 Row 기본 노출 + 위/아래 스크롤 관리 박스 (총 9개 품목) */}
+                  <div className="max-h-[390px] sm:max-h-[430px] overflow-y-auto overscroll-contain pr-1.5 space-y-2.5 p-2 bg-slate-50/80 rounded-2xl border border-slate-200/90 shadow-inner">
+                    {APPLIANCE_CATALOG.map((item) => {
+                      const instList = formData.applianceDetails?.[item.id] || [];
+                      const count = instList.length;
+
+                      return (
+                        <div
+                          key={item.id}
+                          className={`bg-surface-container-lowest p-3.5 rounded-xl border transition-all text-left ${count > 0 ? 'border-secondary/40 shadow-sm ring-1 ring-secondary/20' : 'border-slate-200/80 shadow-xs'
+                            }`}
+                        >
+                          {/* 품목 헤더 행: 카테고리 + 제품명 + +,- 카운터 버튼 */}
+                          <div className="flex items-center justify-between gap-2">
+                            <div className="flex items-center gap-2.5 min-w-0">
+                              <span className="w-8 h-8 rounded-lg bg-surface-container-low flex items-center justify-center text-secondary shrink-0">
+                                <span className="material-symbols-outlined text-[20px]">{item.icon}</span>
+                              </span>
+                              <div className="flex flex-col min-w-0">
+                                <div className="flex items-center gap-1.5">
+                                  <span className={`text-[10px] px-1.5 py-0.2 rounded border font-bold ${item.catColor}`}>
+                                    {item.category}
+                                  </span>
+                                  <span className="font-label-md text-label-md font-bold text-slate-900 truncate">
+                                    {item.name}
+                                  </span>
+                                </div>
+                                <span className="text-[11px] text-slate-400 truncate mt-0.5">
+                                  {item.subDesc}
+                                </span>
+                              </div>
+                            </div>
+
+                            {/* +,- 대수 컨트롤 버튼 */}
+                            <div className="flex items-center gap-2 shrink-0">
+                              <button
+                                type="button"
+                                onClick={() => handleApplianceRemove(item.id)}
+                                disabled={count === 0}
+                                className="w-8 h-8 rounded-lg bg-surface-container-low border border-slate-200 font-bold text-slate-700 hover:bg-slate-200 disabled:opacity-35 disabled:cursor-not-allowed flex items-center justify-center cursor-pointer transition-colors"
+                              >
+                                -
+                              </button>
+                              <span className={`w-8 text-center font-mono font-bold text-[14px] ${count > 0 ? 'text-secondary' : 'text-slate-400'}`}>
+                                {count}
+                              </span>
+                              <button
+                                type="button"
+                                onClick={() => handleApplianceAdd(item.id)}
+                                className="w-8 h-8 rounded-lg bg-secondary text-white font-bold hover:bg-secondary/90 flex items-center justify-center shadow-xs cursor-pointer transition-transform active:scale-95"
+                              >
+                                +
+                              </button>
+                            </div>
+                          </div>
+
+                          {/* + 클릭 시 동적으로 생성/추가되는 개별 기기별 세부 스펙 입력 행들 */}
+                          {count > 0 && (
+                            <div className="mt-3 pt-2.5 border-t border-slate-100 space-y-2">
+                              <div className="flex items-center justify-between text-[11px] font-semibold text-slate-500 px-1">
+                                <span>개별 기기 순번</span>
+                                <span>세부 규격 ({item.unit}) 입력</span>
+                              </div>
+
+                              {instList.map((inst, idx) => (
+                                <div
+                                  key={inst.seq || idx}
+                                  className="flex items-center justify-between bg-surface-container-low/70 px-3 py-1.5 rounded-lg border border-slate-200/60"
+                                >
+                                  <div className="flex items-center gap-1.5">
+                                    <span className="w-5 h-5 rounded-full bg-secondary/15 text-secondary text-[11px] font-bold font-mono flex items-center justify-center">
+                                      {idx + 1}
+                                    </span>
+                                    <span className="text-xs font-bold text-slate-700">
+                                      {idx + 1}호기
+                                    </span>
+                                  </div>
+
+                                  {/* 스펙 입력 컨트롤 (평형, Kg, 리터, 개(구) 또는 매트리스 크기 목록 선택) */}
+                                  {item.inputType === 'select' ? (
+                                    <div className="flex items-center gap-1.5">
+                                      <select
+                                        value={inst.spec || 'QUEEN'}
+                                        onChange={(e) => handleApplianceSpecChange(item.id, idx, e.target.value)}
+                                        className="h-8 px-2 text-xs font-semibold text-slate-800 bg-surface-container-lowest border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-secondary cursor-pointer"
+                                      >
+                                        {item.options.map((opt) => (
+                                          <option key={opt.val} value={opt.val}>
+                                            {opt.label}
+                                          </option>
+                                        ))}
+                                      </select>
+                                      {inst.spec === 'CUSTOM' && (
+                                        <input
+                                          type="text"
+                                          value={inst.customSize || ''}
+                                          onChange={(e) => handleApplianceSpecChange(item.id, idx, inst.spec, e.target.value)}
+                                          placeholder="규격 직접입력"
+                                          className="w-28 h-8 px-2 text-xs font-medium text-slate-800 bg-surface-container-lowest border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-secondary"
+                                        />
+                                      )}
+                                    </div>
+                                  ) : (
+                                    <div className="flex items-center gap-1.5">
+                                      <input
+                                        type="number"
+                                        min={1}
+                                        value={inst.spec || ''}
+                                        onChange={(e) => handleApplianceSpecChange(item.id, idx, e.target.value)}
+                                        placeholder={item.placeholder}
+                                        className="w-24 h-8 px-2 text-center text-xs font-bold font-mono text-primary bg-surface-container-lowest border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-secondary"
+                                      />
+                                      <span className="text-xs font-bold text-slate-600 min-w-[28px]">
+                                        {item.unit}
+                                      </span>
+                                    </div>
+                                  )}
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </>
+              )}
+            </section>
+
+            {/* 5. 금액 및 상세 정보 섹션 (Form Section 3) */}
+            <section className="px-8 py-4 space-y-4">
+              <div className="flex items-center gap-2 pb-1">
+                <span className="w-5 h-5 rounded-full bg-primary text-on-primary font-label-sm text-label-sm flex items-center justify-center font-bold">
+                  3
+                </span>
+                <h3 className="font-label-lg text-label-lg text-on-surface font-bold tracking-tight">
+                  발주 금액 및 현장 특이사항
+                </h3>
+              </div>
+
+              {/* 고객 확정 지정 총 용역 대금 */}
+              <div className="bg-surface-container-lowest p-5 rounded-2xl shadow-sm space-y-3 text-left border border-slate-100">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <label className="font-headline-sm text-headline-sm text-on-surface font-bold">
+                      고객 확정 지정 {activeTab === 'REGULAR' ? '월 ' : ''}용역 대금 <span className="text-error">*</span>
+                    </label>
+                    <p className="font-caption text-caption text-on-surface-variant mt-0.5">
+                      매월 시공사에 지급하는 금액(VAT 포함)을 작성합니다.
+                    </p>
+                  </div>
+                  <span className="px-2.5 py-1 rounded-full bg-error-container text-on-error-container font-label-sm text-label-sm font-semibold">
+                    현장 직불 계약 원칙
+                  </span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="relative flex-1">
+                    <input
+                      className="h-14 w-full rounded-xl bg-surface-container-low px-5 font-headline-md text-headline-md font-bold text-primary font-mono tracking-tight shadow-inner focus:outline-none focus:ring-2 focus:ring-secondary/40"
+                      onChange={(e) => handleFieldChange('proposedPrice', e.target.value)}
+                      type="text"
+                      value={formData.proposedPrice}
+                    />
+                    <span className="font-headline-sm text-headline-sm text-primary font-bold absolute right-4 top-3.5">
+                      원 {activeTab === 'REGULAR' ? '/ 월' : ''}
+                    </span>
+                  </div>
+                  {activeTab === 'REGULAR' && (
+                    <div className="flex flex-col justify-center items-end px-4 py-2 bg-surface-container rounded-xl min-w-[210px]">
+                      <span className="font-caption text-caption text-outline">90일(3개월) 총 계약액</span>
+                      <span className="font-headline-sm text-headline-sm text-secondary font-bold font-mono">
+                        ₩{new Intl.NumberFormat('ko-KR').format(getQuarterlyPrice())}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* 추가 요청 사항 및 특이사항 */}
+              <div className="flex flex-col text-left space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <label className="font-label-sm text-label-sm text-on-surface font-semibold">
+                    추가 요청 사항 및 특이사항
+                  </label>
+                  <span className="font-caption text-caption text-outline">현장 전담 마스터 전달용</span>
+                </div>
+                <textarea
+                  className="w-full rounded-xl bg-surface-container-lowest p-4 font-body-md text-body-md text-on-surface shadow-sm border border-slate-200 focus:outline-none focus:ring-2 focus:ring-secondary/40 resize-none placeholder:text-outline/60"
+                  onChange={(e) => handleFieldChange('detailReqNote', e.target.value)}
+                  placeholder="현장 특이사항, 방문 희망 시간대, 중점 관리 요청 구역을 적어주세요."
+                  rows={3}
+                  value={formData.detailReqNote}
+                />
+              </div>
+
+              {/* 현장 사진 첨부 (최대 10장) */}
+              <div className="flex flex-col text-left space-y-2">
+                <div className="flex items-center justify-between">
+                  <label className="font-label-sm text-label-sm text-on-surface font-semibold flex items-center gap-1.5">
+                    <span>현장 사진 첨부</span>
+                    <span className="font-caption text-caption text-outline font-normal">(최대 10장)</span>
+                  </label>
+                  <span className="font-caption text-caption text-secondary font-bold">
+                    {photoFiles.length} / 10장 등록됨
+                  </span>
+                </div>
+                <div className="grid grid-cols-3 sm:grid-cols-5 gap-3">
+                  {photoFiles.map((photo) => (
+                    <div
+                      key={photo.seq}
+                      className="relative group aspect-square rounded-xl overflow-hidden bg-surface-container shadow-sm flex flex-col justify-end p-2 border border-slate-200"
+                    >
+                      <img
+                        src={photo.url || photo.dataUrl}
+                        alt={photo.title || '현장 사진'}
+                        className="w-full h-full object-cover absolute inset-0 pointer-events-none"
+                        onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-inverse-surface/80 via-transparent to-transparent pointer-events-none" />
+                      <span className="relative font-caption text-caption text-on-primary truncate text-[11px] pointer-events-none">
+                        {photo.title}
+                      </span>
+                      <button
+                        aria-label="삭제"
+                        className="absolute top-1.5 right-1.5 w-6 h-6 rounded-full bg-inverse-surface/70 hover:bg-error text-on-error flex items-center justify-center transition-colors cursor-pointer z-10"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handlePhotoDelete(photo.seq);
+                        }}
+                        type="button"
                       >
-                        <span className="material-symbols-outlined text-[18px]">
-                          {formData.workTimeNegotiable ? 'check_circle' : 'handshake'}
-                        </span>
-                        <span>시공사와 협의 가능</span>
+                        <span className="material-symbols-outlined text-[14px]">close</span>
                       </button>
+                    </div>
+                  ))}
+
+                  {/* 실제 숨겨진 독립 File Input (useRef로 안전하게 트리거) */}
+                  <input
+                    ref={fileInputRef}
+                    id="photo-file-upload-input"
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    className="hidden"
+                    onChange={handlePhotoAdd}
+                    onClick={(e) => e.stopPropagation()}
+                  />
+
+                  {/* 추가 등록 버튼 */}
+                  {photoFiles.length < 10 && (
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        if (fileInputRef.current) {
+                          fileInputRef.current.click();
+                        }
+                      }}
+                      className="aspect-square rounded-xl bg-surface-container-low hover:bg-surface-container text-on-surface-variant hover:text-secondary flex flex-col items-center justify-center gap-1 cursor-pointer transition-colors shadow-sm border border-dashed border-slate-300"
+                    >
+                      <span className="material-symbols-outlined text-[24px]">add_a_photo</span>
+                      <span className="font-label-sm text-label-sm font-semibold">+ 추가 등록</span>
+                      <span className="font-caption text-caption text-outline">{photoFiles.length} / 10</span>
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              {/* 플랫폼 정보 이용료 안내 카드 */}
+              <div className="p-4 rounded-xl bg-secondary-container/25 text-on-surface shadow-sm space-y-2 text-left border border-secondary/20">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="w-7 h-7 rounded-lg bg-secondary text-on-secondary flex items-center justify-center">
+                      <span className="material-symbols-outlined text-[18px]">verified</span>
+                    </span>
+                    <div>
+                      <h4 className="font-label-md text-label-md text-primary font-bold">쓸고닦고 안심 매칭 보증료</h4>
+                      <p className="font-caption text-caption text-on-surface-variant">
+                        배차 성공 및 1:1 전담 마스터 확정 배정 시에만 부과
+                      </p>
                     </div>
                   </div>
                 </div>
-              </>
-            )}
 
-            {/* [TAB 3] 계절가전청소 특화 설정 (세로 9개 품목 4개 Row 높이 스크롤 박스 및 +클릭시 기기별 스펙 Row 추가) */}
-            {activeTab === 'APPLIANCE' && (
-              <>
-                <div className="flex items-center justify-between pb-1 text-left">
-                  <div className="flex items-center gap-2">
-                    <span className="w-5 h-5 rounded-full bg-secondary text-on-secondary font-label-sm text-label-sm flex items-center justify-center font-bold">
-                      2
-                    </span>
-                    <h3 className="font-label-lg text-label-lg text-on-surface font-bold tracking-tight">
-                      계절가전청소 세부 조건 설정
-                    </h3>
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <span className="px-2 py-0.5 rounded-full bg-secondary text-white font-caption text-caption font-bold">
-                      총 {APPLIANCE_CATALOG.reduce((acc, cur) => acc + ((formData.applianceDetails?.[cur.id] || []).length), 0)}대 선택됨
-                    </span>
-                    <span className="px-2 py-0.5 rounded-full bg-secondary-fixed text-on-secondary-fixed-variant font-caption text-caption font-semibold">
-                      완전분해 · 고압살균
-                    </span>
-                  </div>
+                <div className="p-3 bg-error-container/30 rounded-lg text-on-error-container font-caption text-caption flex items-start gap-2">
+                  <span className="material-symbols-outlined text-[16px] text-error shrink-0 mt-0.5">
+                    notification_important
+                  </span>
+                  <span>
+                    <strong>[현장 직불 공지]</strong> 인건비 및 용역비({formData.proposedPrice}원)는 시공 완료 후 사진 또는 검수후 시공자에게 직접 결제합니다. 플랫폼은 인건비 에스크로를 보유하지 않으므로 현장 검수 후 직접 정산하여 주시기 바랍니다.
+                  </span>
                 </div>
+              </div>
+              {/* 하단 여백 버퍼 (고정 하단바와 겹치지 않고 끝까지 스크롤되도록 충분한 여백 제공) */}
+              <div className="h-16" />
+            </section>
+          </form>
+        </div>
 
-                {/* 4개 Row 기본 노출 + 위/아래 스크롤 관리 박스 (총 9개 품목) */}
-                <div className="max-h-[390px] sm:max-h-[430px] overflow-y-auto overscroll-contain pr-1.5 space-y-2.5 p-2 bg-slate-50/80 rounded-2xl border border-slate-200/90 shadow-inner">
-                  {APPLIANCE_CATALOG.map((item) => {
-                    const instList = formData.applianceDetails?.[item.id] || [];
-                    const count = instList.length;
-
-                    return (
-                      <div
-                        key={item.id}
-                        className={`bg-surface-container-lowest p-3.5 rounded-xl border transition-all text-left ${
-                          count > 0 ? 'border-secondary/40 shadow-sm ring-1 ring-secondary/20' : 'border-slate-200/80 shadow-xs'
-                        }`}
-                      >
-                        {/* 품목 헤더 행: 카테고리 + 제품명 + +,- 카운터 버튼 */}
-                        <div className="flex items-center justify-between gap-2">
-                          <div className="flex items-center gap-2.5 min-w-0">
-                            <span className="w-8 h-8 rounded-lg bg-surface-container-low flex items-center justify-center text-secondary shrink-0">
-                              <span className="material-symbols-outlined text-[20px]">{item.icon}</span>
-                            </span>
-                            <div className="flex flex-col min-w-0">
-                              <div className="flex items-center gap-1.5">
-                                <span className={`text-[10px] px-1.5 py-0.2 rounded border font-bold ${item.catColor}`}>
-                                  {item.category}
-                                </span>
-                                <span className="font-label-md text-label-md font-bold text-slate-900 truncate">
-                                  {item.name}
-                                </span>
-                              </div>
-                              <span className="text-[11px] text-slate-400 truncate mt-0.5">
-                                {item.subDesc}
-                              </span>
-                            </div>
-                          </div>
-
-                          {/* +,- 대수 컨트롤 버튼 */}
-                          <div className="flex items-center gap-2 shrink-0">
-                            <button
-                              type="button"
-                              onClick={() => handleApplianceRemove(item.id)}
-                              disabled={count === 0}
-                              className="w-8 h-8 rounded-lg bg-surface-container-low border border-slate-200 font-bold text-slate-700 hover:bg-slate-200 disabled:opacity-35 disabled:cursor-not-allowed flex items-center justify-center cursor-pointer transition-colors"
-                            >
-                              -
-                            </button>
-                            <span className={`w-8 text-center font-mono font-bold text-[14px] ${count > 0 ? 'text-secondary' : 'text-slate-400'}`}>
-                              {count}
-                            </span>
-                            <button
-                              type="button"
-                              onClick={() => handleApplianceAdd(item.id)}
-                              className="w-8 h-8 rounded-lg bg-secondary text-white font-bold hover:bg-secondary/90 flex items-center justify-center shadow-xs cursor-pointer transition-transform active:scale-95"
-                            >
-                              +
-                            </button>
-                          </div>
-                        </div>
-
-                        {/* + 클릭 시 동적으로 생성/추가되는 개별 기기별 세부 스펙 입력 행들 */}
-                        {count > 0 && (
-                          <div className="mt-3 pt-2.5 border-t border-slate-100 space-y-2">
-                            <div className="flex items-center justify-between text-[11px] font-semibold text-slate-500 px-1">
-                              <span>개별 기기 순번</span>
-                              <span>세부 규격 ({item.unit}) 입력</span>
-                            </div>
-
-                            {instList.map((inst, idx) => (
-                              <div
-                                key={inst.seq || idx}
-                                className="flex items-center justify-between bg-surface-container-low/70 px-3 py-1.5 rounded-lg border border-slate-200/60"
-                              >
-                                <div className="flex items-center gap-1.5">
-                                  <span className="w-5 h-5 rounded-full bg-secondary/15 text-secondary text-[11px] font-bold font-mono flex items-center justify-center">
-                                    {idx + 1}
-                                  </span>
-                                  <span className="text-xs font-bold text-slate-700">
-                                    {idx + 1}호기
-                                  </span>
-                                </div>
-
-                                {/* 스펙 입력 컨트롤 (평형, Kg, 리터, 개(구) 또는 매트리스 크기 목록 선택) */}
-                                {item.inputType === 'select' ? (
-                                  <div className="flex items-center gap-1.5">
-                                    <select
-                                      value={inst.spec || 'QUEEN'}
-                                      onChange={(e) => handleApplianceSpecChange(item.id, idx, e.target.value)}
-                                      className="h-8 px-2 text-xs font-semibold text-slate-800 bg-surface-container-lowest border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-secondary cursor-pointer"
-                                    >
-                                      {item.options.map((opt) => (
-                                        <option key={opt.val} value={opt.val}>
-                                          {opt.label}
-                                        </option>
-                                      ))}
-                                    </select>
-                                    {inst.spec === 'CUSTOM' && (
-                                      <input
-                                        type="text"
-                                        value={inst.customSize || ''}
-                                        onChange={(e) => handleApplianceSpecChange(item.id, idx, inst.spec, e.target.value)}
-                                        placeholder="규격 직접입력"
-                                        className="w-28 h-8 px-2 text-xs font-medium text-slate-800 bg-surface-container-lowest border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-secondary"
-                                      />
-                                    )}
-                                  </div>
-                                ) : (
-                                  <div className="flex items-center gap-1.5">
-                                    <input
-                                      type="number"
-                                      min={1}
-                                      value={inst.spec || ''}
-                                      onChange={(e) => handleApplianceSpecChange(item.id, idx, e.target.value)}
-                                      placeholder={item.placeholder}
-                                      className="w-24 h-8 px-2 text-center text-xs font-bold font-mono text-primary bg-surface-container-lowest border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-secondary"
-                                    />
-                                    <span className="text-xs font-bold text-slate-600 min-w-[28px]">
-                                      {item.unit}
-                                    </span>
-                                  </div>
-                                )}
-                              </div>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-              </>
-            )}
-          </section>
-
-          {/* 5. 금액 및 상세 정보 섹션 (Form Section 3) */}
-          <section className="px-8 py-4 space-y-4">
-            <div className="flex items-center gap-2 pb-1">
-              <span className="w-5 h-5 rounded-full bg-primary text-on-primary font-label-sm text-label-sm flex items-center justify-center font-bold">
-                3
+        {/* 6. Modal Fixed Footer Action (스크롤 영역 밖 고정 하단바) */}
+        <footer className="shrink-0 bg-surface-container-lowest px-8 py-4 shadow-[0_-4px_16px_rgba(0,0,0,0.06)] flex items-center justify-between border-t border-slate-100 z-10">
+          <div className="flex items-center gap-2 text-left">
+            <span className="material-symbols-outlined text-[18px] text-secondary">cloud_done</span>
+            <div className="flex flex-col">
+              <span className="font-label-sm text-label-sm text-on-surface font-semibold">입력 내용 자동 임시저장</span>
+              <span className="font-caption text-caption text-outline">
+                비회원 작성 시 브라우저 LocalStorage에 안전하게 보관됩니다.
               </span>
-              <h3 className="font-label-lg text-label-lg text-on-surface font-bold tracking-tight">
-                발주 금액 및 현장 특이사항
-              </h3>
             </div>
-
-            {/* 고객 확정 지정 총 용역 대금 */}
-            <div className="bg-surface-container-lowest p-5 rounded-2xl shadow-sm space-y-3 text-left border border-slate-100">
-              <div className="flex items-center justify-between">
-                <div>
-                  <label className="font-headline-sm text-headline-sm text-on-surface font-bold">
-                    고객 확정 지정 {activeTab === 'REGULAR' ? '월 ' : ''}용역 대금 <span className="text-error">*</span>
-                  </label>
-                  <p className="font-caption text-caption text-on-surface-variant mt-0.5">
-                    매월 시공사에 지급하는 금액(VAT 포함)을 작성합니다.
-                  </p>
-                </div>
-                <span className="px-2.5 py-1 rounded-full bg-error-container text-on-error-container font-label-sm text-label-sm font-semibold">
-                  현장 직불 계약 원칙
-                </span>
-              </div>
-              <div className="flex items-center gap-3">
-                <div className="relative flex-1">
-                  <input
-                    className="h-14 w-full rounded-xl bg-surface-container-low px-5 font-headline-md text-headline-md font-bold text-primary font-mono tracking-tight shadow-inner focus:outline-none focus:ring-2 focus:ring-secondary/40"
-                    onChange={(e) => handleFieldChange('proposedPrice', e.target.value)}
-                    type="text"
-                    value={formData.proposedPrice}
-                  />
-                  <span className="font-headline-sm text-headline-sm text-primary font-bold absolute right-4 top-3.5">
-                    원 {activeTab === 'REGULAR' ? '/ 월' : ''}
-                  </span>
-                </div>
-                {activeTab === 'REGULAR' && (
-                  <div className="flex flex-col justify-center items-end px-4 py-2 bg-surface-container rounded-xl min-w-[210px]">
-                    <span className="font-caption text-caption text-outline">90일(3개월) 총 계약액</span>
-                    <span className="font-headline-sm text-headline-sm text-secondary font-bold font-mono">
-                      ₩{new Intl.NumberFormat('ko-KR').format(getQuarterlyPrice())}
-                    </span>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* 추가 요청 사항 및 특이사항 */}
-            <div className="flex flex-col text-left space-y-1.5">
-              <div className="flex items-center justify-between">
-                <label className="font-label-sm text-label-sm text-on-surface font-semibold">
-                  추가 요청 사항 및 특이사항
-                </label>
-                <span className="font-caption text-caption text-outline">현장 전담 마스터 전달용</span>
-              </div>
-              <textarea
-                className="w-full rounded-xl bg-surface-container-lowest p-4 font-body-md text-body-md text-on-surface shadow-sm border border-slate-200 focus:outline-none focus:ring-2 focus:ring-secondary/40 resize-none placeholder:text-outline/60"
-                onChange={(e) => handleFieldChange('detailReqNote', e.target.value)}
-                placeholder="현장 특이사항, 방문 희망 시간대, 중점 관리 요청 구역을 적어주세요."
-                rows={3}
-                value={formData.detailReqNote}
-              />
-            </div>
-
-            {/* 현장 사진 첨부 (최대 10장) */}
-            <div className="flex flex-col text-left space-y-2">
-              <div className="flex items-center justify-between">
-                <label className="font-label-sm text-label-sm text-on-surface font-semibold flex items-center gap-1.5">
-                  <span>현장 사진 첨부</span>
-                  <span className="font-caption text-caption text-outline font-normal">(최대 10장)</span>
-                </label>
-                <span className="font-caption text-caption text-secondary font-bold">
-                  {photoFiles.length} / 10장 등록됨
-                </span>
-              </div>
-              <div className="grid grid-cols-3 sm:grid-cols-5 gap-3">
-                {photoFiles.map((photo) => (
-                  <div
-                    key={photo.seq}
-                    className="relative group aspect-square rounded-xl overflow-hidden bg-surface-container shadow-sm flex flex-col justify-end p-2 border border-slate-200"
-                  >
-                    <div
-                      className="bg-cover bg-center absolute inset-0"
-                      style={{ backgroundImage: `url('${photo.url}')` }}
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-inverse-surface/80 via-transparent to-transparent" />
-                    <span className="relative font-caption text-caption text-on-primary truncate text-[11px]">
-                      {photo.title}
-                    </span>
-                    <button
-                      aria-label="삭제"
-                      className="absolute top-1.5 right-1.5 w-6 h-6 rounded-full bg-inverse-surface/70 hover:bg-error text-on-error flex items-center justify-center transition-colors cursor-pointer"
-                      onClick={() => handlePhotoDelete(photo.seq)}
-                      type="button"
-                    >
-                      <span className="material-symbols-outlined text-[14px]">close</span>
-                    </button>
-                  </div>
-                ))}
-
-                {photoFiles.length < 10 && (
-                  <label className="aspect-square rounded-xl bg-surface-container-low hover:bg-surface-container text-on-surface-variant hover:text-secondary flex flex-col items-center justify-center gap-1 cursor-pointer transition-colors shadow-sm border border-dashed border-slate-300">
-                    <input accept="image/*" className="sr-only" multiple onChange={handlePhotoAdd} type="file" />
-                    <span className="material-symbols-outlined text-[24px]">add_a_photo</span>
-                    <span className="font-label-sm text-label-sm font-semibold">+ 추가 등록</span>
-                    <span className="font-caption text-caption text-outline">{photoFiles.length} / 10</span>
-                  </label>
-                )}
-              </div>
-            </div>
-
-            {/* 플랫폼 정보 이용료 안내 카드 */}
-            <div className="p-4 rounded-xl bg-secondary-container/25 text-on-surface shadow-sm space-y-2 text-left border border-secondary/20">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <span className="w-7 h-7 rounded-lg bg-secondary text-on-secondary flex items-center justify-center">
-                    <span className="material-symbols-outlined text-[18px]">verified</span>
-                  </span>
-                  <div>
-                    <h4 className="font-label-md text-label-md text-primary font-bold">쓸고닦고 안심 매칭 보증료</h4>
-                    <p className="font-caption text-caption text-on-surface-variant">
-                      배차 성공 및 1:1 전담 마스터 확정 배정 시에만 부과
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="p-3 bg-error-container/30 rounded-lg text-on-error-container font-caption text-caption flex items-start gap-2">
-                <span className="material-symbols-outlined text-[16px] text-error shrink-0 mt-0.5">
-                  notification_important
-                </span>
-                <span>
-                  <strong>[현장 직불 공지]</strong> 인건비 및 용역비({formData.proposedPrice}원)는 시공 완료 후 사진 또는 검수후 시공자에게 직접 결제합니다. 플랫폼은 인건비 에스크로를 보유하지 않으므로 현장 검수 후 직접 정산하여 주시기 바랍니다.
-                </span>
-              </div>
-            </div>
-            {/* 하단 여백 버퍼 (고정 하단바와 겹치지 않고 끝까지 스크롤되도록 충분한 여백 제공) */}
-            <div className="h-16" />
-          </section>
-        </form>
+          </div>
+          <div className="flex items-center gap-3">
+            <button
+              className="h-12 px-6 rounded-xl text-on-surface-variant hover:text-on-surface hover:bg-surface-container font-label-md text-label-md transition-colors cursor-pointer"
+              onClick={onClose}
+              type="button"
+            >
+              취소
+            </button>
+            <button
+              form="order-request-form"
+              className="h-12 px-7 rounded-xl bg-secondary hover:bg-on-secondary-container text-on-secondary font-label-lg text-label-lg font-bold shadow-md shadow-secondary/20 flex items-center gap-2 transition-all active:scale-[0.98] disabled:opacity-60 cursor-pointer"
+              disabled={isSubmitting}
+              type="submit"
+            >
+              <span className="material-symbols-outlined text-[20px]">assignment_turned_in</span>
+              <span>{isSubmitting ? '발주 등록 중...' : '+ 청소 서비스 신청 완료 (확정 발주)'}</span>
+            </button>
+          </div>
+        </footer>
       </div>
 
-      {/* 6. Modal Fixed Footer Action (스크롤 영역 밖 고정 하단바) */}
-      <footer className="shrink-0 bg-surface-container-lowest px-8 py-4 shadow-[0_-4px_16px_rgba(0,0,0,0.06)] flex items-center justify-between border-t border-slate-100 z-10">
-        <div className="flex items-center gap-2 text-left">
-          <span className="material-symbols-outlined text-[18px] text-secondary">cloud_done</span>
-          <div className="flex flex-col">
-            <span className="font-label-sm text-label-sm text-on-surface font-semibold">입력 내용 자동 임시저장</span>
-            <span className="font-caption text-caption text-outline">
-              비회원 작성 시 브라우저 LocalStorage에 안전하게 보관됩니다.
-            </span>
-          </div>
-        </div>
-        <div className="flex items-center gap-3">
-          <button
-            className="h-12 px-6 rounded-xl text-on-surface-variant hover:text-on-surface hover:bg-surface-container font-label-md text-label-md transition-colors cursor-pointer"
-            onClick={onClose}
-            type="button"
-          >
-            취소
-          </button>
-          <button
-            form="order-request-form"
-            className="h-12 px-7 rounded-xl bg-secondary hover:bg-on-secondary-container text-on-secondary font-label-lg text-label-lg font-bold shadow-md shadow-secondary/20 flex items-center gap-2 transition-all active:scale-[0.98] disabled:opacity-60 cursor-pointer"
-            disabled={isSubmitting}
-            type="submit"
-          >
-            <span className="material-symbols-outlined text-[20px]">assignment_turned_in</span>
-            <span>{isSubmitting ? '발주 등록 중...' : '+ 청소 서비스 신청 완료 (확정 발주)'}</span>
-          </button>
-        </div>
-      </footer>
-    </div>
-
-    {/* 네이버 주소 검색 팝업 연동 (현재 활성 탭 주소 업데이트) */}
+      {/* 네이버 주소 검색 팝업 연동 (현재 활성 탭 주소 업데이트) */}
       <NaverAddressSearchModal
         isOpen={isAddrModalOpen}
         onClose={() => setIsAddrModalOpen(false)}
@@ -2421,6 +2495,35 @@ export default function WebClntReq010100Modal({
             >
               <span>확인 (로그인 화면으로 이동)</span>
               <span className="material-symbols-outlined text-sm">arrow_forward</span>
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* 8. 청소 요청 완료 커스텀 안심 모달 (브라우저 기본 alert 대체 -> localhost:3000 문구 완전 제거) */}
+      {orderCompleteModal.isOpen && (
+        <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-150">
+          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200 flex flex-col items-center text-center">
+            <div className="w-14 h-14 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center mb-4 border border-emerald-200">
+              <span className="material-symbols-outlined text-3xl">task_alt</span>
+            </div>
+            <h3 className="text-xl font-bold text-slate-900 mb-1">
+              청소 요청 완료
+            </h3>
+            <div className="my-3 px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl flex items-center gap-2">
+              <span className="text-xs text-slate-500 font-semibold">발주번호</span>
+              <span className="text-sm font-bold font-mono text-primary">{orderCompleteModal.orderNo}</span>
+            </div>
+            <p className="text-sm text-slate-700 leading-relaxed mb-6 font-medium">
+              성공적으로 접수되었습니다!<br />
+              <span className="text-primary font-bold">시공사에 메시지 전달되었습니다.</span>
+            </p>
+            <button
+              type="button"
+              onClick={handleConfirmOrderComplete}
+              className="w-full py-3.5 px-6 rounded-xl bg-primary hover:bg-primary/90 text-white font-bold text-base shadow-md hover:shadow-lg transition-all active:scale-[0.98] cursor-pointer"
+            >
+              확인
             </button>
           </div>
         </div>

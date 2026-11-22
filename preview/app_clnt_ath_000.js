@@ -207,60 +207,93 @@ function AppClntAth010100({ isOpen = false, visible, onClose, onSuccessLogin, on
             setIsLoading(false);
         }
     };
-    // 소셜 간편 로그인 시뮬레이션
+    // 소셜 간편 로그인 (웹과 100% 동일한 OAuth 2.0 공식 팝업 & 백엔드 연동)
     const handleSocialLogin = async (provider) => {
         triggerHaptic('LIGHT');
         setIsLoading(true);
         setErrorMsg('');
-        try {
-            const res = await fetch('/api/app/client/ath_010100', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    userRoleCd: role,
-                    socialProvider: provider,
-                    socialUid: `demo_${provider.toLowerCase()}_${Date.now()}`,
-                }),
-            });
-            const data = await res.json();
-            if (data && data.success) {
-                triggerHaptic('SUCCESS');
-                if (typeof window !== 'undefined') {
-                    const authObj = { ...data.data, hasTempReq };
-                    localStorage.setItem('SSEULDAKGO_AUTH_USER', JSON.stringify(authObj));
-                    localStorage.setItem('SSEULDAKGO_KEEP_LOGIN', 'Y');
-                }
-                if (onSuccessLogin) {
-                    onSuccessLogin({
-                        ...data.data,
-                        hasTempReq,
+
+        if (typeof window !== 'undefined') {
+            const providerLower = provider.toLowerCase();
+            let popupUrl = `./${providerLower}_oauth_popup.html?action=login&userRoleCd=${role}`;
+            if (window.location.protocol.startsWith('http')) {
+                popupUrl = `/preview/${providerLower}_oauth_popup.html?action=login&userRoleCd=${role}`;
+            }
+
+            const width = 480;
+            const height = 640;
+            const left = window.screenX + (window.outerWidth - width) / 2;
+            const top = window.screenY + (window.outerHeight - height) / 2;
+
+            let bridgeCompleted = false;
+
+            const doProcessLogin = async (profile) => {
+                if (bridgeCompleted) return;
+                bridgeCompleted = true;
+                setIsLoading(true);
+                try {
+                    // 모바일 백엔드 실제 TB_USER DB 조회 및 간편 가입 완료
+                    const checkRes = await fetch('/api/app/client/ath_010100', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            userRoleCd: role,
+                            socialProvider: provider,
+                            socialUid: profile.id,
+                            userEmail: profile.email,
+                            userNm: profile.name,
+                            userTel: profile.mobile
+                        })
                     });
+                    const checkData = await checkRes.json();
+                    setIsLoading(false);
+
+                    if (checkData.success) {
+                        triggerHaptic('SUCCESS');
+                        const loginUser = {
+                            ...checkData.data,
+                            hasTempReq
+                        };
+                        localStorage.setItem('SSEULDAKGO_AUTH_USER', JSON.stringify(loginUser));
+                        localStorage.setItem('SSEULDAKGO_KEEP_LOGIN', 'Y');
+                        if (onSuccessLogin) {
+                            onSuccessLogin(loginUser);
+                        }
+                        if (onClose) onClose();
+                    } else {
+                        setErrorMsg(checkData.message || '소셜 로그인 처리에 실패했습니다.');
+                    }
+                } catch (err) {
+                    console.error('Mobile social login error:', err);
+                    setIsLoading(false);
                 }
-                if (onClose)
-                    onClose();
-            }
-        }
-        catch (err) {
-            triggerHaptic('SUCCESS');
-            const mockData = {
-                userNo: role === 'C' ? 'C20261000001' : 'S20261000001',
-                userNm: `${provider} 사용자`,
-                userEmail: `${provider.toLowerCase()}@example.com`,
-                userRoleCd: role,
-                accessToken: `mock_social_token_${Date.now()}`,
-                hasTempReq,
             };
-            if (typeof window !== 'undefined') {
-                localStorage.setItem('SSEULDAKGO_AUTH_USER', JSON.stringify(mockData));
-                localStorage.setItem('SSEULDAKGO_KEEP_LOGIN', 'Y');
-            }
-            if (onSuccessLogin)
-                onSuccessLogin(mockData);
-            if (onClose)
-                onClose();
-        }
-        finally {
-            setIsLoading(false);
+
+            const onMsg = (e) => {
+                if (e.data && e.data.type === `${provider}_AUTH_SUCCESS` && e.data.profile) {
+                    window.removeEventListener('message', onMsg);
+                    doProcessLogin(e.data.profile);
+                }
+            };
+            window.addEventListener('message', onMsg);
+
+            // localStorage bridge 폴링 (팝업-부모창 간 postMessage 유실 대비)
+            const checkStorage = setInterval(() => {
+                try {
+                    const raw = localStorage.getItem('SSEULDAKGO_SOCIAL_LOGIN_BRIDGE');
+                    if (raw) {
+                        const parsed = JSON.parse(raw);
+                        if (parsed.provider === provider && Date.now() - parsed.timestamp < 10000) {
+                            localStorage.removeItem('SSEULDAKGO_SOCIAL_LOGIN_BRIDGE');
+                            clearInterval(checkStorage);
+                            doProcessLogin(parsed.profile);
+                        }
+                    }
+                } catch (e) {}
+            }, 300);
+            setTimeout(() => clearInterval(checkStorage), 60000);
+
+            window.open(popupUrl, `${providerLower}_oauth_popup`, `width=${width},height=${height},left=${left},top=${top},scrollbars=yes`);
         }
     };
     return (React.createElement("div", { className: "fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm animate-in fade-in duration-200", onClick: (e) => {

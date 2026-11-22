@@ -190,7 +190,7 @@ export async function processWebClntOrd010000(payload = {}) {
            D.CLEAN_LARGE_CD,
            D.CLEAN_MID_CD,
            D.SERVICE_STATUS,
-           DATE_FORMAT(D.SERVICE_START_DT, '%Y-%m-%d') AS SERVICE_START_DT,
+           DATE_FORMAT(D.HOPE_CLEAN_DATE, '%Y-%m-%d') AS SERVICE_START_DT,
            D.DETAIL_REQ_NOTE,
            (SELECT COUNT(*) FROM TB_QUOTE_APPLY Q WHERE Q.ORDER_NO = M.ORDER_NO AND Q.APPLY_STAT_CD = 'APPLIED') AS APPLY_COUNT
          FROM TB_ORDER_MSTR M

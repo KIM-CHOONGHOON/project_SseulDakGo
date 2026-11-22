@@ -594,3 +594,6 @@ export async function POST(request) {
     );
   }
 }
+
+export { processWebClntAth010200200 as processWebClntAth010200 };
+

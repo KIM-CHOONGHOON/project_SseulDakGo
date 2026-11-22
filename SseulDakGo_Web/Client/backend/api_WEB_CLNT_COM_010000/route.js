@@ -294,11 +294,42 @@ async function executeDatabaseQueries({ userNo, sidoCd, sigunguCd }) {
       sigunguCd,
     ]);
 
+    // 4. 회원 알림 목록 및 안 읽은 알림 수 조회 (TB_USER_NOTIFICATION)
+    let notificationRows = [];
+    let unreadCount = 0;
+    if (userNo && userNo !== 'GUEST') {
+      try {
+        notificationRows = await executeQuery(
+          `SELECT 
+             NOTI_ID, USER_NO, NOTI_TYPE, TITLE, CONTENT, TARGET_URL, IS_READ, 
+             DATE_FORMAT(REG_DT, '%Y-%m-%d %H:%i') AS REG_DT
+           FROM TB_USER_NOTIFICATION
+           WHERE USER_NO = ?
+           ORDER BY REG_DT DESC
+           LIMIT 20`,
+          [userNo]
+        );
+        const unreadRows = await executeQuery(
+          `SELECT COUNT(*) AS UNREAD_CNT 
+           FROM TB_USER_NOTIFICATION 
+           WHERE USER_NO = ? AND IS_READ = 'N'`,
+          [userNo]
+        );
+        if (Array.isArray(unreadRows) && unreadRows.length > 0) {
+          unreadCount = Number(unreadRows[0].UNREAD_CNT || 0);
+        }
+      } catch (notiErr) {
+        console.warn('[api_WEB_CLNT_COM_010000] 알림 조회 실패:', notiErr.message);
+      }
+    }
+
     return {
       userRow,
       categoryRows: Array.isArray(categoryRows) ? categoryRows : [],
       regularDetailRows: Array.isArray(regularDetailRows) ? regularDetailRows : [],
       feedRows: Array.isArray(feedRows) ? feedRows : [],
+      notificationRows: Array.isArray(notificationRows) ? notificationRows : [],
+      unreadCount,
     };
   } catch (dbErr) {
     console.warn('[api_WEB_CLNT_COM_010000] lib/db.ts 쿼리 실행 실패(시드 데이터 사용):', dbErr.message);
@@ -313,6 +344,42 @@ export async function processWebClntCom010000(body = {}) {
   // 네이버 주소 검색 액션 분기
   if (body.action === 'SEARCH_NAVER_ADDRESS' || body.searchAddress) {
     return await searchNaverAddress({ query: body.query || body.keyword });
+  }
+
+  // 알림 개별 읽음 처리 액션 분기
+  if (body.action === 'READ_NOTIFICATION') {
+    try {
+      const dbModule = await import('../../../../lib/db.js');
+      if (dbModule?.executeQuery && body.notiId && body.userNo) {
+        await dbModule.executeQuery(
+          `UPDATE TB_USER_NOTIFICATION 
+           SET IS_READ = 'Y', READ_DT = NOW() 
+           WHERE NOTI_ID = ? AND USER_NO = ?`,
+          [body.notiId, body.userNo]
+        );
+      }
+      return { success: true, code: 'OK', message: '알림이 읽음 처리되었습니다.' };
+    } catch (e) {
+      return { success: false, code: 'ERR_FAIL', message: e.message };
+    }
+  }
+
+  // 알림 전체 읽음 처리 액션 분기
+  if (body.action === 'READ_ALL_NOTIFICATIONS') {
+    try {
+      const dbModule = await import('../../../../lib/db.js');
+      if (dbModule?.executeQuery && body.userNo) {
+        await dbModule.executeQuery(
+          `UPDATE TB_USER_NOTIFICATION 
+           SET IS_READ = 'Y', READ_DT = NOW() 
+           WHERE USER_NO = ? AND IS_READ = 'N'`,
+          [body.userNo]
+        );
+      }
+      return { success: true, code: 'OK', message: '모든 알림이 읽음 처리되었습니다.' };
+    } catch (e) {
+      return { success: false, code: 'ERR_FAIL', message: e.message };
+    }
   }
 
   const rawUserNo = body.userNo || body.USER_NO || 'GUEST';
@@ -418,11 +485,34 @@ export async function processWebClntCom010000(body = {}) {
     }
   }
 
-  // 4) 최종 JSON 응답 반환
+  // 4) 역할별 메뉴 목록 및 기본 랜딩 뷰 구성
+  const isPartner = userInfo.USER_ROLE_CD === 'S';
+  const screenNm = isPartner ? '시공사 메인 홈' : '고객 메인 홈';
+  const defaultLandingView = !userInfo.isGuest && userInfo.USER_NO !== 'GUEST' ? 'WEB-CLNT-MYP-010100' : 'home';
+  const menuList = isPartner
+    ? [
+        { id: 'home', label: '홈', path: 'home' },
+        { id: 'contract', label: '청소·시공 청약', path: 'contract' },
+        { id: 'review_reply', label: '이용후기 답글 쓰기', path: 'review_reply' },
+        { id: 'mypage', label: '내 정보', path: 'WEB-CLNT-MYP-010100' },
+        { id: 'cs', label: '고객센터', path: 'cs' },
+      ]
+    : [
+        { id: 'home', label: '홈', path: 'home' },
+        { id: 'matching', label: '청소·시공 매칭', path: 'matching' },
+        { id: 'estimate', label: '견적 요청', path: 'estimate' },
+        { id: 'review', label: '이용후기', path: 'review' },
+        { id: 'mypage', label: '내 정보', path: 'WEB-CLNT-MYP-010100' },
+        { id: 'cs', label: '고객센터', path: 'cs' },
+      ];
+
+  // 5) 최종 JSON 응답 반환
   return {
     success: true,
     screenId: 'WEB-CLNT-COM-010000',
-    screenNm: '고객 메인 홈',
+    screenNm,
+    defaultLandingView,
+    menuList,
     isGuest: userInfo.isGuest,
     userInfo: {
       USER_NO: userInfo.USER_NO,
@@ -444,6 +534,8 @@ export async function processWebClntCom010000(body = {}) {
       serviceSubItemCodes,
     },
     feedList,
+    notifications: dbResult?.notificationRows || [],
+    unreadCount: dbResult?.unreadCount || 0,
     sqlMeta: {
       userQuery: 'TB_USER (USER_NO, USER_NM, USER_ROLE_CD)',
       codeQuery: "TB_COM_CODE (GRP_CD IN ('CLEAN_LARGE', 'BLDG_TYPE', 'CLEAN_LOC', 'SERVICE_SUB_ITEM'))",

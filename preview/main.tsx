@@ -1466,7 +1466,7 @@ function AppPreview() {
           initialReqNo="REQ202610210001"
           initialUserNo={currentUserNo || 'U20261000001'}
           onNavigate={handleNavigate}
-          logoSrc="/logo.png"
+          logoSrc="/storage/project/brand/Logo_쓸고딱고.jpg"
           apiEndpoint="/api/user/user_qot_00"
         />
       ) : currentScreen === 'USER-REQ-04' ? (
@@ -2346,7 +2346,7 @@ function AppPreview() {
           key="screen_user_req_00"
           initialUserNo={currentUserNo || 'U20261000001'}
           onNavigate={handleNavigate}
-          logoSrc="/logo.png"
+          logoSrc="/storage/project/brand/Logo_쓸고딱고.jpg"
           apiEndpoint="/api/user/user_req_00"
         />
       ) : currentScreen === 'USER-ATH-03' ? (
@@ -2354,14 +2354,14 @@ function AppPreview() {
           key={`screen_user_ath_03_${currentUserNo || 'default'}`}
           initialUserNo={currentUserNo || 'U20261000001'}
           onNavigate={handleNavigate}
-          logoSrc="/logo.png"
+          logoSrc="/storage/project/brand/Logo_쓸고딱고.jpg"
           apiEndpoint="/api/user/user_ath_03"
         />
       ) : currentScreen === 'USER-ATH-02' ? (
         <UserAth02Screen
           key="screen_user_ath_02"
           onNavigate={handleNavigate}
-          logoSrc="/logo.png"
+          logoSrc="/storage/project/brand/Logo_쓸고딱고.jpg"
           apiEndpoint="/api/user/user_ath_02"
         />
       ) : currentScreen === 'USER-ATH-01' ? (
@@ -2371,7 +2371,7 @@ function AppPreview() {
             initialUserNo={currentUserNo}
             onNavigate={handleNavigate}
             onLogout={handleLogout}
-            logoUrl="/logo.png"
+            logoUrl="/storage/project/brand/Logo_쓸고딱고.jpg"
           />
           <UserAth01Screen
             key="screen_user_ath_01"
@@ -2379,7 +2379,7 @@ function AppPreview() {
             onClose={() => handleNavigate('USER-COM-00')}
             onNavigate={handleNavigate}
             onRegisterSuccess={handleRegisterSuccess}
-            logoSrc="/logo.png"
+            logoSrc="/storage/project/brand/Logo_쓸고딱고.jpg"
             apiEndpoint="/api/user/user_ath_01"
           />
         </>
@@ -2388,7 +2388,7 @@ function AppPreview() {
           key="screen_user_ath_00"
           onNavigate={handleNavigate}
           onLoginSuccess={handleLoginSuccess}
-          logoSrc="/logo.png"
+          logoSrc="/storage/project/brand/Logo_쓸고딱고.jpg"
           apiEndpoint="/api/user/user_ath_00"
         />
       ) : (

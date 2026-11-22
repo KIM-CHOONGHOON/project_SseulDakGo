@@ -356,7 +356,7 @@ function WebClntAth010100({
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          userRoleCd: role,
+          userRoleCd: (profile.userRoleCd || role),
           userEmail: email.trim(),
           userPwd: pwd,
           keepLogin
@@ -402,7 +402,7 @@ function WebClntAth010100({
         userNo: role === 'C' ? 'C20261000001' : 'S20261000001',
         userNm: role === 'C' ? '홍길동' : '김반장 (마스터)',
         userEmail: email.trim(),
-        userRoleCd: role,
+        userRoleCd: (profile.userRoleCd || role),
         accessToken: `mock_jwt_token_${Date.now()}`,
         hasTempReq,
         keepLogin,
@@ -476,7 +476,7 @@ function WebClntAth010100({
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          userRoleCd: role,
+          userRoleCd: (profile.userRoleCd || role),
           socialProvider: provider,
           socialUid: `demo_${provider.toLowerCase()}_${Date.now()}`
         })
@@ -497,7 +497,7 @@ function WebClntAth010100({
         userNo: role === 'C' ? 'C20261000001' : 'S20261000001',
         userNm: `${provider} 사용자`,
         userEmail: `${provider.toLowerCase()}@example.com`,
-        userRoleCd: role,
+        userRoleCd: (profile.userRoleCd || role),
         accessToken: `mock_social_token_${Date.now()}`,
         hasTempReq
       };
@@ -539,7 +539,7 @@ function WebClntAth010100({
         <div className="flex flex-col items-center text-center mt-1 mb-4">
           <div className="w-14 h-14 rounded-full overflow-hidden shadow-md ring-4 ring-secondary-container/40 mb-3 flex items-center justify-center bg-white">
             <img
-              src="/logo.png"
+              src="/storage/project/brand/Logo_쓸고딱고.jpg"
               alt="쓸고닦고 로고"
               className="w-full h-full object-cover rounded-full"
             />
@@ -555,50 +555,7 @@ function WebClntAth010100({
           </p>
         </div>
 
-        {/* 2. 회원 구분 라디오 (USER_ROLE_CD) */}
-        <div
-          aria-label="회원 유형 선택"
-          className="w-full bg-surface-container-low p-1 rounded-xl grid grid-cols-2 gap-1 mb-3"
-          data-field="USER_ROLE_CD"
-          role="radiogroup"
-        >
-          <button
-            aria-checked={role === 'C'}
-            className={`flex items-center justify-center gap-1.5 h-10 rounded-lg font-label-md text-label-md transition-all ${
-              role === 'C'
-                ? 'bg-surface-container-lowest text-primary shadow-sm font-bold'
-                : 'text-on-surface-variant hover:text-on-surface'
-            }`}
-            data-role="C"
-            id="role-client"
-            onClick={() => setRole('C')}
-            role="radio"
-            type="button"
-          >
-            <span className={`material-symbols-outlined text-[16px] ${role === 'C' ? 'text-secondary' : 'text-outline'}`}>
-              {role === 'C' ? 'radio_button_checked' : 'radio_button_unchecked'}
-            </span>
-            <span>고객 회원</span>
-          </button>
-          <button
-            aria-checked={role === 'S'}
-            className={`flex items-center justify-center gap-1.5 h-10 rounded-lg font-label-md text-label-md transition-all ${
-              role === 'S'
-                ? 'bg-surface-container-lowest text-primary shadow-sm font-bold'
-                : 'text-on-surface-variant hover:text-on-surface'
-            }`}
-            data-role="S"
-            id="role-partner"
-            onClick={() => setRole('S')}
-            role="radio"
-            type="button"
-          >
-            <span className={`material-symbols-outlined text-[16px] ${role === 'S' ? 'text-secondary' : 'text-outline'}`}>
-              {role === 'S' ? 'radio_button_checked' : 'radio_button_unchecked'}
-            </span>
-            <span>시공사 회원</span>
-          </button>
-        </div>
+        {/* 2. 회원 구분 라디오는 삭제됨: 로그인 시 TB_USER의 USER_ROLE_CD에 따라 고객/시공사로 자동 분기 */}
 
         {/* 3. 비회원 임시 요청서 감지 배너 (조건부 노출) */}
         {hasTempReq && (

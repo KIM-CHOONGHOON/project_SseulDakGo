@@ -263,50 +263,84 @@ export default function AppClntAth010100({
     setIsLoading(true);
     setErrorMsg('');
 
-    // 카카오 / 네이버 / Google 공식 OAuth 2.0 연동
-    if ((provider === 'NAVER' || provider === 'KAKAO' || provider === 'GOOGLE') && typeof window !== 'undefined') {
+    if (typeof window !== 'undefined') {
       const providerLower = provider.toLowerCase();
-      try {
-        const authRes = await fetch(`/api/auth/${providerLower}/authorize?userRoleCd=${role}`);
-        const authJson = await authRes.json();
-        if (authJson.success && authJson.authUrl) {
-          const onSocialMessage = (e: MessageEvent) => {
-            if (e.data?.type === `${provider}_AUTH_SUCCESS`) {
-              window.removeEventListener('message', onSocialMessage);
-              setIsLoading(false);
-              const authData = e.data.data;
-              triggerHaptic('SUCCESS');
-              const authObj = { ...authData.user, hasTempReq };
-              localStorage.setItem('SSEULDAKGO_AUTH_USER', JSON.stringify(authObj));
-              localStorage.setItem('SSEULDAKGO_KEEP_LOGIN', 'Y');
-              if (onSuccessLogin) onSuccessLogin(authObj);
-              if (onClose) onClose();
-            } else if (e.data?.type === `${provider}_AUTH_NEW_USER`) {
-              window.removeEventListener('message', onSocialMessage);
-              setIsLoading(false);
-              const authData = e.data.data;
-              sessionStorage.setItem(`SSEULDAKGO_${provider}_PREFILL`, JSON.stringify(authData.profile));
-              if (onOpenRegister) {
-                onOpenRegister({ socialProfile: authData.profile, provider });
-              }
-            }
-          };
-          window.addEventListener('message', onSocialMessage);
-
-          const width = 480;
-          const height = 640;
-          const left = window.screenX + (window.outerWidth - width) / 2;
-          const top = window.screenY + (window.outerHeight - height) / 2;
-          const popup = window.open(authJson.authUrl, `${providerLower}_oauth_popup`, `width=${width},height=${height},left=${left},top=${top},scrollbars=yes`);
-
-          if (!popup || popup.closed || typeof popup.closed === 'undefined') {
-            window.location.href = authJson.authUrl;
-          }
-          return;
-        }
-      } catch (oauthErr) {
-        console.warn(`[${provider}_APP_OAUTH_FALLBACK]`, oauthErr);
+      let popupUrl = `./${providerLower}_oauth_popup.html?action=login&userRoleCd=${role}`;
+      if (window.location.protocol.startsWith('http')) {
+        popupUrl = `/preview/${providerLower}_oauth_popup.html?action=login&userRoleCd=${role}`;
       }
+
+      const width = 480;
+      const height = 640;
+      const left = window.screenX + (window.outerWidth - width) / 2;
+      const top = window.screenY + (window.outerHeight - height) / 2;
+
+      let bridgeCompleted = false;
+
+      const doProcessLogin = async (profile: any) => {
+        if (bridgeCompleted) return;
+        bridgeCompleted = true;
+        setIsLoading(true);
+        try {
+          const checkRes = await fetch('/api/app/client/ath_010100', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              userRoleCd: role,
+              socialProvider: provider,
+              socialUid: profile.id,
+              userEmail: profile.email,
+              userNm: profile.name,
+              userTel: profile.mobile,
+            }),
+          });
+          const checkData = await checkRes.json();
+          setIsLoading(false);
+
+          if (checkData.success) {
+            triggerHaptic('SUCCESS');
+            const loginUser = {
+              ...checkData.data,
+              hasTempReq,
+            };
+            localStorage.setItem('SSEULDAKGO_AUTH_USER', JSON.stringify(loginUser));
+            localStorage.setItem('SSEULDAKGO_KEEP_LOGIN', 'Y');
+            if (onSuccessLogin) onSuccessLogin(loginUser);
+            if (onClose) onClose();
+          } else {
+            setErrorMsg(checkData.message || '소셜 로그인 처리에 실패했습니다.');
+          }
+        } catch (err) {
+          console.error('Mobile social login error:', err);
+          setIsLoading(false);
+        }
+      };
+
+      const onMsg = (e: MessageEvent) => {
+        if (e.data && e.data.type === `${provider}_AUTH_SUCCESS` && e.data.profile) {
+          window.removeEventListener('message', onMsg);
+          doProcessLogin(e.data.profile);
+        }
+      };
+      window.addEventListener('message', onMsg);
+
+      const checkStorage = setInterval(() => {
+        try {
+          const raw = localStorage.getItem('SSEULDAKGO_SOCIAL_LOGIN_BRIDGE');
+          if (raw) {
+            const parsed = JSON.parse(raw);
+            if (parsed.provider === provider && Date.now() - parsed.timestamp < 10000) {
+              localStorage.removeItem('SSEULDAKGO_SOCIAL_LOGIN_BRIDGE');
+              clearInterval(checkStorage);
+              doProcessLogin(parsed.profile);
+            }
+          }
+        } catch (e) {}
+      }, 300);
+      setTimeout(() => clearInterval(checkStorage), 60000);
+
+      window.open(popupUrl, `${providerLower}_oauth_popup`, `width=${width},height=${height},left=${left},top=${top},scrollbars=yes`);
+      return;
     }
 
     try {
@@ -390,7 +424,7 @@ export default function AppClntAth010100({
         <div className="flex flex-col items-center text-center mt-1 mb-4">
           <div className="w-14 h-14 rounded-full overflow-hidden shadow-md ring-4 ring-secondary-container/40 mb-3 flex items-center justify-center bg-white">
             <img
-              src="/logo.png"
+              src="/storage/project/brand/Logo_쓸고딱고.jpg"
               alt="쓸고닦고 로고"
               className="w-full h-full object-cover rounded-full"
               onError={(e) => {

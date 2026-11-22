@@ -793,7 +793,7 @@ export default function WebClntAth010200({
                 <img
                   alt="쓸고닦고 공식 심볼 로고"
                   className="w-full h-full object-cover rounded-lg"
-                  src="/logo.png"
+                  src="/storage/project/brand/Logo_쓸고딱고.jpg"
                 />
               </div>
               <div>
@@ -1653,7 +1653,7 @@ export default function WebClntAth010200({
               <div className="bg-white rounded-2xl p-4 border border-slate-200 shadow-xs text-center space-y-2">
                 <div className="flex items-center justify-center gap-3">
                   <div className="w-11 h-11 rounded-2xl bg-slate-50 border border-slate-200 p-1 flex items-center justify-center">
-                    <img src="logo.png" alt="쓸고닦고" className="w-full h-full object-contain" onError={(e) => { e.target.src = '../public/logo.png'; }} />
+                    <img src="/storage/project/brand/Logo_쓸고딱고.jpg" alt="쓸고닦고" className="w-full h-full object-contain" onError={(e) => { e.target.src = '../public/logo.png'; }} />
                   </div>
                   <span className="text-slate-300 font-bold text-lg">+</span>
                   <div className="w-11 h-11 rounded-2xl bg-[#03C75A] flex items-center justify-center text-white font-extrabold text-2xl shadow-xs">
@@ -1812,7 +1812,7 @@ export default function WebClntAth010200({
               <div className="bg-white rounded-2xl p-4 border border-slate-200 shadow-xs text-center space-y-2">
                 <div className="flex items-center justify-center gap-3">
                   <div className="w-11 h-11 rounded-2xl bg-slate-50 border border-slate-200 p-1 flex items-center justify-center">
-                    <img src="logo.png" alt="쓸고닦고" className="w-full h-full object-contain" onError={(e) => { e.target.src = '../public/logo.png'; }} />
+                    <img src="/storage/project/brand/Logo_쓸고딱고.jpg" alt="쓸고닦고" className="w-full h-full object-contain" onError={(e) => { e.target.src = '../public/logo.png'; }} />
                   </div>
                   <span className="text-slate-300 font-bold text-lg">+</span>
                   <div className="w-11 h-11 rounded-2xl bg-[#FEE500] flex items-center justify-center shadow-xs">
@@ -1968,7 +1968,7 @@ export default function WebClntAth010200({
             <div className="p-5 space-y-4 max-h-[70vh] overflow-y-auto">
               <div className="text-center space-y-1.5 pb-3 border-b border-slate-100">
                 <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-slate-50 border border-slate-200 mb-1 shadow-xs">
-                  <img src="/logo.png" alt="쓸고닦고" className="w-8 h-8 rounded-full object-cover" onerror="this.src='logo.png'" />
+                  <img src="/storage/project/brand/Logo_쓸고딱고.jpg" alt="쓸고닦고" className="w-8 h-8 rounded-full object-cover" onerror="this.src='/storage/project/brand/Logo_쓸고딱고.jpg'" />
                 </div>
                 <h4 className="font-bold text-slate-900 text-sm">
                   <span className="text-[#003262]">쓸고닦고</span> 서비스 제공을 위한<br />

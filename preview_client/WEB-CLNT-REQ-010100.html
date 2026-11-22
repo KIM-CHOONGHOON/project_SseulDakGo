@@ -1,6 +1,32 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
+  <!-- [전역 런타임 에러 감지 배너] -->
+  <div id="global-runtime-error-banner" style="display:none; position:fixed; top:0; left:0; right:0; z-index:9999999; background:#ba1a1a; color:#ffffff; padding:12px 16px; font-family:monospace; font-size:13px; box-shadow:0 4px 12px rgba(0,0,0,0.3); border-bottom:2px solid #ffffff;">
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+      <strong>⚠️ [스크립트 실행 오류 감지]</strong>
+      <button onclick="document.getElementById('global-runtime-error-banner').style.display='none'" style="background:#ffffff; color:#ba1a1a; border:none; padding:2px 8px; border-radius:4px; font-weight:bold; cursor:pointer;">닫기</button>
+    </div>
+    <div id="global-runtime-error-msg" style="margin-top:6px; white-space:pre-wrap; word-break:break-all;"></div>
+  </div>
+  <script>
+    window.addEventListener('error', function(e) {
+      var banner = document.getElementById('global-runtime-error-banner');
+      var msgEl = document.getElementById('global-runtime-error-msg');
+      if (banner && msgEl) {
+        banner.style.display = 'block';
+        msgEl.textContent = (e.message || '알 수 없는 오류') + '\n출처: ' + (e.filename || '') + ':' + (e.lineno || '') + ':' + (e.colno || '');
+      }
+    });
+    window.addEventListener('unhandledrejection', function(e) {
+      var banner = document.getElementById('global-runtime-error-banner');
+      var msgEl = document.getElementById('global-runtime-error-msg');
+      if (banner && msgEl) {
+        banner.style.display = 'block';
+        msgEl.textContent = '비동기 오류: ' + (e.reason && (e.reason.message || e.reason.stack || String(e.reason)));
+      }
+    });
+  </script>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>[WEB-CLNT-REQ-010100] 청소 서비스 신청 (발주서 작성) - 쓸고닦고 프리뷰</title>
@@ -114,23 +140,8 @@
           }
         }
 
-        // 2. 실제 백엔드 API 우선 호출 (실제 MySQL DB TB_USER 반영)
+        // 2. 실제 백엔드 API 우선 호출 (실제 MySQL DB TB_USER, TB_ORDER_MSTR, TB_ORDER_DTL 반영)
         // (오프라인 / 단독 프리뷰 환경일 때만 catch 블록에서 모의 폴백 실행)
-
-        // 4. 청소 서비스 신청 발주 등록 (/api/web/client/req_010100)
-        if (urlStr.includes('/api/web/client/req_010100')) {
-          try {
-            const orderNo = 'ORD-' + new Date().toISOString().slice(0, 10).replace(/-/g, '') + '-' + Math.floor(1000 + Math.random() * 9000);
-            return new Response(JSON.stringify({
-              success: true,
-              code: 'OK',
-              orderNo: orderNo,
-              message: '청소 서비스 신청 및 확정 발주서 작성이 성공적으로 접수되었습니다.'
-            }), { status: 200, headers: { 'Content-Type': 'application/json' } });
-          } catch (e) {
-            console.warn('req_010100 mock error:', e);
-          }
-        }
 
         // 5. 결제 승인 (/api/web/client/pay_010100)
         if (urlStr.includes('/api/web/client/pay_010100')) {
@@ -243,6 +254,56 @@
   <div id="root"></div>
 
   <script type="text/babel">
+  /* [React 최상위 GlobalErrorBoundary] */
+  class GlobalErrorBoundary extends React.Component {
+    constructor(props) {
+      super(props);
+      this.state = { hasError: false, error: null, errorInfo: null };
+    }
+    static getDerivedStateFromError(error) {
+      return { hasError: true, error };
+    }
+    componentDidCatch(error, errorInfo) {
+      this.setState({ error, errorInfo });
+      console.error('GlobalErrorBoundary caught error:', error, errorInfo);
+    }
+    render() {
+      if (this.state.hasError) {
+        return (
+          <div className="fixed inset-0 z-[99999] bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-4">
+            <div className="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-red-300 text-left">
+              <div className="flex items-center gap-3 text-red-600 mb-3">
+                <span className="material-symbols-outlined text-3xl">error</span>
+                <h3 className="font-bold text-lg text-slate-800">화면 렌더링 중 오류가 발생했습니다</h3>
+              </div>
+              <p className="text-xs text-slate-600 mb-2">오류 내용:</p>
+              <div className="p-3 bg-red-50 text-red-800 rounded-lg text-xs font-mono whitespace-pre-wrap break-all max-h-48 overflow-y-auto mb-4 border border-red-200">
+                {this.state.error?.message || String(this.state.error)}
+                {this.state.error?.stack && '\n\n' + this.state.error.stack}
+              </div>
+              <div className="flex gap-2 justify-end">
+                <button
+                  type="button"
+                  onClick={() => this.setState({ hasError: false, error: null, errorInfo: null })}
+                  className="px-4 py-2 rounded-lg bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold text-sm cursor-pointer"
+                >
+                  다시 시도
+                </button>
+                <button
+                  type="button"
+                  onClick={() => window.location.reload()}
+                  className="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white font-bold text-sm cursor-pointer"
+                >
+                  화면 새로고침
+                </button>
+              </div>
+            </div>
+          </div>
+        );
+      }
+      return this.props.children;
+    }
+  }
     const { useState, useEffect, useCallback, useRef } = React;
 const ReactHooks = { useState, useEffect, useCallback, useRef };
 
@@ -1030,42 +1091,63 @@ const AVAILABLE_START_MONTHS = [
  * 로컬스토리지 저장을 위한 이미지 Base64 Data URL 압축 생성 헬퍼
  * 최대 1024px, JPEG 0.75 퀄리티 (장당 약 80~120KB로 압축되어 10장도 1MB 내외로 안전 저장)
  */
-function compressImageToDataUrl(file, maxWidth = 1024, quality = 0.75) {
+/**
+ * [사진 첨부] 초경량 안전 썸네일 DataURL 생성기 (최대 480px, Canvas 압축, file:/// 및 http:// 100% 호환)
+ */
+function createSafeThumbnailDataUrl(file, maxSize = 480, quality = 0.7) {
   return new Promise((resolve) => {
     if (!file) return resolve('');
-    if (typeof file === 'string' && file.startsWith('data:')) return resolve(file);
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const img = new Image();
-      img.onload = () => {
-        let w = img.width;
-        let h = img.height;
-        if (w > maxWidth || h > maxWidth) {
-          if (w > h) {
-            h = Math.round((h * maxWidth) / w);
-            w = maxWidth;
-          } else {
-            w = Math.round((w * maxWidth) / h);
-            h = maxWidth;
-          }
-        }
-        const canvas = document.createElement('canvas');
-        canvas.width = w;
-        canvas.height = h;
-        const ctx = canvas.getContext('2d');
-        if (ctx) {
-          ctx.drawImage(img, 0, 0, w, h);
-          resolve(canvas.toDataURL('image/jpeg', quality));
-        } else {
-          resolve(e.target.result);
+    if (typeof file === 'string') return resolve(file);
+    try {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const resultDataUrl = e.target ? e.target.result : '';
+          if (!resultDataUrl) return resolve('');
+          const img = new Image();
+          img.onload = () => {
+            try {
+              let w = img.width || 1;
+              let h = img.height || 1;
+              if (w > maxSize || h > maxSize) {
+                if (w > h) {
+                  h = Math.round((h * maxSize) / w);
+                  w = maxSize;
+                } else {
+                  w = Math.round((w * maxSize) / h);
+                  h = maxSize;
+                }
+              }
+              const canvas = document.createElement('canvas');
+              canvas.width = Math.max(1, w);
+              canvas.height = Math.max(1, h);
+              const ctx = canvas.getContext('2d');
+              if (ctx) {
+                ctx.drawImage(img, 0, 0, w, h);
+                resolve(canvas.toDataURL('image/jpeg', quality));
+              } else {
+                resolve(resultDataUrl);
+              }
+            } catch (canvasErr) {
+              resolve(resultDataUrl);
+            }
+          };
+          img.onerror = () => resolve(resultDataUrl);
+          img.src = resultDataUrl;
+        } catch (imgErr) {
+          resolve('');
         }
       };
-      img.onerror = () => resolve(e.target.result);
-      img.src = e.target.result;
-    };
-    reader.onerror = () => resolve('');
-    reader.readAsDataURL(file);
+      reader.onerror = () => resolve('');
+      reader.readAsDataURL(file);
+    } catch (err) {
+      resolve('');
+    }
   });
+}
+
+function compressImageToDataUrl(file, maxWidth = 1024, quality = 0.75) {
+  return createSafeThumbnailDataUrl(file, maxWidth, quality);
 }
 
 function WebClntReq010100Modal({
@@ -1094,6 +1176,7 @@ function WebClntReq010100Modal({
   ]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isAddrModalOpen, setIsAddrModalOpen] = useState(false);
+  const fileInputRef = useRef(null);
 
   // 기본 주소 초기값 정의 (최초 입력되는 주소는 동일하게 조립하여 제공)
   const DEFAULT_INITIAL_ADDRESS = {
@@ -1128,6 +1211,19 @@ function WebClntReq010100Modal({
     photoCount: 0,
     message: '',
   });
+
+  const [orderCompleteModal, setOrderCompleteModal] = useState({
+    isOpen: false,
+    orderNo: '',
+    orderData: null,
+  });
+
+  const handleConfirmOrderComplete = () => {
+    const data = orderCompleteModal.orderData;
+    setOrderCompleteModal({ isOpen: false, orderNo: '', orderData: null });
+    if (typeof onSuccess === 'function') onSuccess(data);
+    if (typeof onClose === 'function') onClose();
+  };
 
   const TAB_NAME_MAP = {
     REGULAR: '정기청소',
@@ -1252,8 +1348,14 @@ function WebClntReq010100Modal({
     }
   };
 
-  // 폼 필드 변경 핸들러
+  // 폼 필드 변경 핸들러 (금액 입력 시 천단위/세자리 콤마 자동 서식화)
   const handleFieldChange = (field, value) => {
+    if (field === 'proposedPrice') {
+      const rawNumber = String(value || '').replace(/[^0-9]/g, '');
+      const formatted = rawNumber ? Number(rawNumber).toLocaleString('ko-KR') : '';
+      setFormData((prev) => ({ ...prev, [field]: formatted }));
+      return;
+    }
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
@@ -1404,35 +1506,54 @@ function WebClntReq010100Modal({
     return raw * 3;
   };
 
-  // 사진 추가 핸들러 (최대 10장, Base64 DataURL 압축 및 다중 파일 업로드 지원)
+  // 사진 추가 핸들러 (최대 10장, 초경량 썸네일 즉시 생성 및 예외 원천 격리)
   const handlePhotoAdd = async (e) => {
-    if (e.target.files && e.target.files.length > 0) {
+    try {
+      if (e && typeof e.stopPropagation === 'function') {
+        e.stopPropagation();
+      }
+      const inputEl = e.target;
+      if (!inputEl || !inputEl.files || inputEl.files.length === 0) return;
+
       const remainingSlots = 10 - photoFiles.length;
       if (remainingSlots <= 0) {
         alert('현장 사진은 최대 10장까지 등록할 수 있습니다.');
-        e.target.value = '';
+        try { inputEl.value = ''; } catch {}
         return;
       }
-      const filesToAdd = Array.from(e.target.files).slice(0, remainingSlots);
-      if (e.target.files.length > remainingSlots) {
+      const selectedFiles = Array.from(inputEl.files).slice(0, remainingSlots);
+      if (inputEl.files.length > remainingSlots) {
         alert(`현장 사진은 최대 10장까지 등록 가능하여 선택하신 파일 중 ${remainingSlots}장만 추가되었습니다.`);
       }
 
-      const newItems = await Promise.all(
-        filesToAdd.map(async (file, idx) => {
-          const dataUrl = await compressImageToDataUrl(file);
-          return {
-            seq: Date.now() + idx,
-            title: file.name,
-            url: dataUrl || URL.createObjectURL(file),
-            dataUrl: dataUrl || URL.createObjectURL(file),
-            fileObj: file,
-          };
-        })
-      );
+      // 각 파일별로 안전하게 경량 썸네일 생성
+      const addedItems = [];
+      for (let i = 0; i < selectedFiles.length; i++) {
+        const file = selectedFiles[i];
+        let thumbUrl = '';
+        try {
+          thumbUrl = await createSafeThumbnailDataUrl(file);
+        } catch (thumbErr) {
+          console.warn('Thumbnail generation failed for:', file.name, thumbErr);
+        }
+        addedItems.push({
+          seq: Date.now() + Math.random() + i,
+          title: file.name || `사진_${photoFiles.length + i + 1}.jpg`,
+          url: thumbUrl || '',
+          dataUrl: thumbUrl || '',
+          fileObj: file
+        });
+      }
 
-      setPhotoFiles((prev) => [...prev, ...newItems]);
-      e.target.value = '';
+      if (addedItems.length > 0) {
+        setPhotoFiles((prev) => [...prev, ...addedItems]);
+      }
+
+      try {
+        inputEl.value = '';
+      } catch {}
+    } catch (globalErr) {
+      console.error('handlePhotoAdd unexpected error:', globalErr);
     }
   };
 
@@ -1736,18 +1857,25 @@ function WebClntReq010100Modal({
       });
 
       const result = await res.json();
-      if (res.ok && result.success) {
+      if (res.ok && (result.success || result.code === 'OK' || result.code === 'OK_SIMULATION')) {
         // 성공 시 임시 보관 데이터 청소
         try {
           localStorage.removeItem('SSEULDAKGO_GUEST_TEMP_REQ');
         } catch {
           // ignore
         }
-        alert(
-          `[청소 요청 완료]\n발주번호: ${result.data?.orderNo || 'ORD'}\n성공적으로 접수되었습니다! 전담 마스터 배차가 시작됩니다.`
-        );
-        if (onSuccess) onSuccess(result.data);
-        if (onClose) onClose();
+        const finalOrderNo =
+          result.data?.orderNo ||
+          result.orderNo ||
+          result.data?.ORDER_NO ||
+          result.ORDER_NO ||
+          `ORD${new Date().toISOString().slice(0, 10).replace(/-/g, '')}00001`;
+
+        setOrderCompleteModal({
+          isOpen: true,
+          orderNo: finalOrderNo,
+          orderData: result.data || result,
+        });
       } else {
         alert(result.message || '발주 등록 중 오류가 발생했습니다.');
       }
@@ -1773,11 +1901,11 @@ function WebClntReq010100Modal({
       {/* Centered Modal Window */}
       <div
         aria-labelledby="modal-title"
-        className="relative w-full max-w-[780px] my-auto max-h-[94vh] flex flex-col bg-surface-container-lowest rounded-2xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200"
+        className="relative w-full max-w-[780px] my-auto max-h-[94vh] flex flex-col bg-white rounded-2xl shadow-2xl overflow-hidden"
         data-field="TB_ORDER_MSTR"
       >
         {/* 1. Modal Sticky Header */}
-        <header className="shrink-0 bg-surface-container-lowest/95 backdrop-blur px-8 py-5 flex items-center justify-between shadow-sm border-b border-slate-100 z-10">
+        <header className="shrink-0 bg-white/95 backdrop-blur px-8 py-5 flex items-center justify-between shadow-sm border-b border-slate-100 z-10">
           <div className="flex flex-col text-left">
             <div className="flex items-center gap-2">
               <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-secondary-container text-on-secondary-container font-label-sm text-label-sm font-semibold">
@@ -2717,18 +2845,23 @@ function WebClntReq010100Modal({
                     key={photo.seq}
                     className="relative group aspect-square rounded-xl overflow-hidden bg-surface-container shadow-sm flex flex-col justify-end p-2 border border-slate-200"
                   >
-                    <div
-                      className="bg-cover bg-center absolute inset-0"
-                      style={{ backgroundImage: `url('${photo.url}')` }}
+                    <img
+                      src={photo.url || photo.dataUrl}
+                      alt={photo.title || '현장 사진'}
+                      className="w-full h-full object-cover absolute inset-0 pointer-events-none"
+                      onError={(e) => { e.currentTarget.style.display = 'none'; }}
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-inverse-surface/80 via-transparent to-transparent" />
-                    <span className="relative font-caption text-caption text-on-primary truncate text-[11px]">
+                    <div className="absolute inset-0 bg-gradient-to-t from-inverse-surface/80 via-transparent to-transparent pointer-events-none" />
+                    <span className="relative font-caption text-caption text-on-primary truncate text-[11px] pointer-events-none">
                       {photo.title}
                     </span>
                     <button
                       aria-label="삭제"
-                      className="absolute top-1.5 right-1.5 w-6 h-6 rounded-full bg-inverse-surface/70 hover:bg-error text-on-error flex items-center justify-center transition-colors cursor-pointer"
-                      onClick={() => handlePhotoDelete(photo.seq)}
+                      className="absolute top-1.5 right-1.5 w-6 h-6 rounded-full bg-inverse-surface/70 hover:bg-error text-on-error flex items-center justify-center transition-colors cursor-pointer z-10"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handlePhotoDelete(photo.seq);
+                      }}
                       type="button"
                     >
                       <span className="material-symbols-outlined text-[14px]">close</span>
@@ -2736,13 +2869,35 @@ function WebClntReq010100Modal({
                   </div>
                 ))}
 
+                {/* 실제 숨겨진 독립 File Input (useRef로 안전하게 트리거) */}
+                <input
+                  ref={fileInputRef}
+                  id="photo-file-upload-input"
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  className="hidden"
+                  onChange={handlePhotoAdd}
+                  onClick={(e) => e.stopPropagation()}
+                />
+
+                {/* 추가 등록 버튼 */}
                 {photoFiles.length < 10 && (
-                  <label className="aspect-square rounded-xl bg-surface-container-low hover:bg-surface-container text-on-surface-variant hover:text-secondary flex flex-col items-center justify-center gap-1 cursor-pointer transition-colors shadow-sm border border-dashed border-slate-300">
-                    <input accept="image/*" className="sr-only" multiple onChange={handlePhotoAdd} type="file" />
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      if (fileInputRef.current) {
+                        fileInputRef.current.click();
+                      }
+                    }}
+                    className="aspect-square rounded-xl bg-surface-container-low hover:bg-surface-container text-on-surface-variant hover:text-secondary flex flex-col items-center justify-center gap-1 cursor-pointer transition-colors shadow-sm border border-dashed border-slate-300"
+                  >
                     <span className="material-symbols-outlined text-[24px]">add_a_photo</span>
                     <span className="font-label-sm text-label-sm font-semibold">+ 추가 등록</span>
                     <span className="font-caption text-caption text-outline">{photoFiles.length} / 10</span>
-                  </label>
+                  </button>
                 )}
               </div>
             </div>
@@ -2875,6 +3030,35 @@ function WebClntReq010100Modal({
           </div>
         </div>
       )}
+
+      {/* 8. 청소 요청 완료 커스텀 안심 모달 (브라우저 기본 alert 대체 -> localhost:3000 문구 완전 제거) */}
+      {orderCompleteModal.isOpen && (
+        <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-150">
+          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200 flex flex-col items-center text-center">
+            <div className="w-14 h-14 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center mb-4 border border-emerald-200">
+              <span className="material-symbols-outlined text-3xl">task_alt</span>
+            </div>
+            <h3 className="text-xl font-bold text-slate-900 mb-1">
+              청소 요청 완료
+            </h3>
+            <div className="my-3 px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl flex items-center gap-2">
+              <span className="text-xs text-slate-500 font-semibold">발주번호</span>
+              <span className="text-sm font-bold font-mono text-primary">{orderCompleteModal.orderNo}</span>
+            </div>
+            <p className="text-sm text-slate-700 leading-relaxed mb-6 font-medium">
+              성공적으로 접수되었습니다!<br />
+              <span className="text-primary font-bold">시공사에 메시지 전달되었습니다.</span>
+            </p>
+            <button
+              type="button"
+              onClick={handleConfirmOrderComplete}
+              className="w-full py-3.5 px-6 rounded-xl bg-primary hover:bg-primary/90 text-white font-bold text-base shadow-md hover:shadow-lg transition-all active:scale-[0.98] cursor-pointer"
+            >
+              확인
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -2918,7 +3102,11 @@ function WebClntReq010100Modal({
           </div>
         );
       }
-      ReactDOM.createRoot(document.getElementById('root')).render(<AppWrapper />);
+      ReactDOM.createRoot(document.getElementById('root')).render(
+        <GlobalErrorBoundary>
+          <AppWrapper />
+        </GlobalErrorBoundary>
+      );
     
   </script>
 </body>

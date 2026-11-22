@@ -312,22 +312,23 @@ export async function processAppClntReq010100(body = {}) {
           CLEAN_LARGE_CD,
           CLEAN_MID_CD,
           SERVICE_STATUS,
+          HOPE_CLEAN_DATE,
+          HOPE_CLEAN_TIME,
           CONTRACT_TYPE_CD,
           SELECTED_SRV_ITEMS,
           CONTRACT_TERM_DAYS,
           WEEK_CLEAN_FREQ,
           CLEAN_DAYS_CONFIG,
-          SERVICE_START_DT,
-          SERVICE_END_DT,
           SUPPLY_PYEONG,
           APPLIANCE_TOTAL_CNT,
           AIRCON_TOTAL_CNT,
           WASHER_TOTAL_CNT,
           KITCHEN_TOTAL_CNT,
           WORK_TIME_SLOT,
-          REG_DT
+          REG_DT,
+          REG_ID
         ) VALUES (
-          ?, ?, ?, ?, 'WAIT_BID', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW()
+          ?, ?, ?, ?, 'WAIT_BID', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), ?
         )
       `;
 
@@ -346,15 +347,15 @@ export async function processAppClntReq010100(body = {}) {
         else effectiveMidCd = 'MID_STANDARD';
       }
 
-      // 시작/종료일 fallback 계산
-      let validStartDt = serviceStartDt;
-      let validEndDt = serviceEndDt;
-      if (cleanLargeCd === 'REGULAR' && !validEndDt && validStartDt) {
-        const d = new Date(validStartDt);
-        d.setDate(d.getDate() + 90);
-        validEndDt = d.toISOString().split('T')[0];
-      } else if (cleanLargeCd !== 'REGULAR' && !validStartDt) {
-        validStartDt = new Date().toISOString().split('T')[0];
+      // 시작/희망일 및 희망시간 fallback 계산
+      let validHopeDate = serviceStartDt;
+      if (!validHopeDate) {
+        validHopeDate = new Date().toISOString().split('T')[0];
+      }
+      let validHopeTime = '09:00';
+      if (workTimeSlot && typeof workTimeSlot === 'string') {
+        const timeMatch = workTimeSlot.match(/\d{1,2}:\d{2}/);
+        if (timeMatch) validHopeTime = timeMatch[0].padStart(5, '0');
       }
 
       const srvItemsStr = Array.isArray(selectedSrvItems)
@@ -377,19 +378,20 @@ export async function processAppClntReq010100(body = {}) {
         orderNo,
         cleanLargeCd,
         effectiveMidCd,
+        validHopeDate,
+        validHopeTime,
         effectiveContractTypeCd,
         srvItemsStr,
         cleanLargeCd === 'REGULAR' ? Number(contractTermDays) || 90 : null,
         Number(weekCleanFreq) || 1,
         cleanDaysStr,
-        validStartDt,
-        validEndDt || null,
         effectivePyeong ? Number(effectivePyeong) : null,
         calcTotalApplianceCnt,
         calcAirconCnt,
         calcWasherCnt,
         calcKitchenCnt,
         workTimeSlot || (moveinTimeSlot ? String(moveinTimeSlot) : null),
+        effectiveClientUserNo,
       ]);
 
       // 2-4-B. TB_ORDER_APPLIANCE_ITEM INSERT (가전 개별 기기 품목 목록 원장 등록)
@@ -473,6 +475,68 @@ export async function processAppClntReq010100(body = {}) {
             effectiveClientUserNo,
           ]);
         }
+      }
+
+      // 2-6. 회원가입된 시공사 중 해당 청소 용역 분야(LARGE_CD)로 등록된 시공사만 타겟팅하여 발주 푸시 알림(TB_USER_NOTIFICATION) 발송 및 기록
+      try {
+        const [partners] = await connection.execute(
+          `SELECT USER_NO, USER_NM, USER_TEL, USER_EMAIL, MAIN_CLEAN_LARGE_CD 
+           FROM TB_USER 
+           WHERE (USER_ROLE_CD IN ('S', 'PARTNER', 'CORP') OR USER_NO LIKE 'S%') 
+             AND ACTIVE_STATUS_YN = 'Y'
+             -- ★ 시공사 사업자등록 검증 시 등록된 '주력 시공 분야 (LARGE_CD)' 매칭 조건
+             AND (
+               MAIN_CLEAN_LARGE_CD IS NULL 
+               OR FIND_IN_SET(?, MAIN_CLEAN_LARGE_CD) > 0 
+               OR MAIN_CLEAN_LARGE_CD LIKE CONCAT('%', ?, '%')
+               OR (
+                 (? = 'REGULAR' AND (MAIN_CLEAN_LARGE_CD LIKE '%정기%' OR MAIN_CLEAN_LARGE_CD LIKE '%REGULAR%')) OR
+                 (? = 'MOVEIN' AND (MAIN_CLEAN_LARGE_CD LIKE '%입주%' OR MAIN_CLEAN_LARGE_CD LIKE '%이사%' OR MAIN_CLEAN_LARGE_CD LIKE '%MOVE%')) OR
+                 (? = 'APPLIANCE' AND (MAIN_CLEAN_LARGE_CD LIKE '%가전%' OR MAIN_CLEAN_LARGE_CD LIKE '%에어컨%' OR MAIN_CLEAN_LARGE_CD LIKE '%APPLIANCE%'))
+               )
+             )`,
+          [cleanLargeCd, cleanLargeCd, cleanLargeCd, cleanLargeCd, cleanLargeCd]
+        );
+
+        if (Array.isArray(partners) && partners.length > 0) {
+          const nowStr = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+          const notiDatePrefix = `NT${nowStr}`;
+
+          let baseSeq = 1;
+          try {
+            const [maxNotiRows] = await connection.execute(
+              `SELECT NOTI_ID FROM TB_USER_NOTIFICATION WHERE NOTI_ID LIKE CONCAT(?, '%') ORDER BY NOTI_ID DESC LIMIT 1 FOR UPDATE`,
+              [notiDatePrefix]
+            );
+            if (Array.isArray(maxNotiRows) && maxNotiRows.length > 0 && maxNotiRows[0]?.NOTI_ID) {
+              const lastSeq = parseInt(String(maxNotiRows[0].NOTI_ID).slice(-5), 10);
+              if (!isNaN(lastSeq)) baseSeq = lastSeq + 1;
+            }
+          } catch (seqErr) {
+            console.warn('[NOTI_SEQ_WARN_APP]', seqErr.message);
+          }
+
+          for (let idx = 0; idx < partners.length; idx++) {
+            const partner = partners[idx];
+            const notiSeqStr = String(baseSeq + idx).padStart(5, '0');
+            const notiId = `${notiDatePrefix}${notiSeqStr}`;
+            const cleanLargeNm = cleanLargeCd === 'REGULAR' ? '정기청소' : cleanLargeCd === 'MOVEIN' ? '입주/이사 청소' : '계절 가전 청소';
+            const notiTitle = `[신규 청소 발주] 새로운 ${cleanLargeNm} 요청이 접수되었습니다.`;
+            const notiContent = `[쓸고닦고] 발주번호: ${orderNo}\n현장 주소: ${addrText || ''} ${addrDetail || ''}\n고객 지정가: ${Number(numPrice).toLocaleString()}원\n시공사에 메시지가 정상 전달되었습니다.`;
+
+            await connection.execute(
+              `INSERT INTO TB_USER_NOTIFICATION (
+                NOTI_ID, USER_NO, NOTI_TYPE, TITLE, CONTENT, TARGET_URL, IS_READ, REG_DT
+              ) VALUES (?, ?, 'NEW_ORDER', ?, ?, ?, 'N', NOW())
+              ON DUPLICATE KEY UPDATE CONTENT = VALUES(CONTENT), REG_DT = NOW()`,
+              [notiId, partner.USER_NO, notiTitle, notiContent, `/preview_client/WEB-CLNT-ORD-010100.html?orderNo=${orderNo}`]
+            );
+
+            console.log(`📢 [시공사 푸시 알림 등록 완료] 수신 시공사: ${partner.USER_NM}(${partner.USER_NO}), 발주번호: ${orderNo}`);
+          }
+        }
+      } catch (notiErr) {
+        console.warn('⚠️ [api_APP_CLNT_REQ_010100] 시공사 알림 발송 기록 중 경고:', notiErr);
       }
 
       return {

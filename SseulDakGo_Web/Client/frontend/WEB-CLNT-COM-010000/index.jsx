@@ -775,38 +775,50 @@ const AVAILABLE_START_MONTHS = [
 function compressImageToDataUrl(file, maxWidth = 1024, quality = 0.75) {
   return new Promise((resolve) => {
     if (!file) return resolve('');
-    if (typeof file === 'string' && file.startsWith('data:')) return resolve(file);
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const img = new Image();
-      img.onload = () => {
-        let w = img.width;
-        let h = img.height;
-        if (w > maxWidth || h > maxWidth) {
-          if (w > h) {
-            h = Math.round((h * maxWidth) / w);
-            w = maxWidth;
-          } else {
-            w = Math.round((w * maxWidth) / h);
-            h = maxWidth;
-          }
-        }
-        const canvas = document.createElement('canvas');
-        canvas.width = w;
-        canvas.height = h;
-        const ctx = canvas.getContext('2d');
-        if (ctx) {
-          ctx.drawImage(img, 0, 0, w, h);
-          resolve(canvas.toDataURL('image/jpeg', quality));
-        } else {
-          resolve(e.target.result);
+    if (typeof file === 'string') return resolve(file);
+    try {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const img = new Image();
+          img.onload = () => {
+            try {
+              let w = img.width || 1;
+              let h = img.height || 1;
+              if (w > maxWidth || h > maxWidth) {
+                if (w > h) {
+                  h = Math.round((h * maxWidth) / w);
+                  w = maxWidth;
+                } else {
+                  w = Math.round((w * maxWidth) / h);
+                  h = maxWidth;
+                }
+              }
+              const canvas = document.createElement('canvas');
+              canvas.width = Math.max(1, w);
+              canvas.height = Math.max(1, h);
+              const ctx = canvas.getContext('2d');
+              if (ctx) {
+                ctx.drawImage(img, 0, 0, w, h);
+                resolve(canvas.toDataURL('image/jpeg', quality));
+              } else {
+                resolve(e.target.result || '');
+              }
+            } catch (canvasErr) {
+              resolve(e.target.result || '');
+            }
+          };
+          img.onerror = () => resolve(e.target.result || '');
+          img.src = e.target.result;
+        } catch (imgErr) {
+          resolve('');
         }
       };
-      img.onerror = () => resolve(e.target.result);
-      img.src = e.target.result;
-    };
-    reader.onerror = () => resolve('');
-    reader.readAsDataURL(file);
+      reader.onerror = () => resolve('');
+      reader.readAsDataURL(file);
+    } catch (readErr) {
+      resolve('');
+    }
   });
 }
 
@@ -836,6 +848,7 @@ export default function WebClntReq010100Modal({
   ]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isAddrModalOpen, setIsAddrModalOpen] = useState(false);
+  const fileInputRef = useRef(null);
 
   // 기본 주소 초기값 정의 (최초 입력되는 주소는 동일하게 조립하여 제공)
   const DEFAULT_INITIAL_ADDRESS = {
@@ -865,6 +878,18 @@ export default function WebClntReq010100Modal({
   });
 
   const [guestNoticeModal, setGuestNoticeModal] = useState({ isOpen: false, message: '' });
+  const [orderCompleteModal, setOrderCompleteModal] = useState({
+    isOpen: false,
+    orderNo: '',
+    orderData: null,
+  });
+
+  const handleConfirmOrderComplete = () => {
+    const data = orderCompleteModal.orderData;
+    setOrderCompleteModal({ isOpen: false, orderNo: '', orderData: null });
+    if (typeof onSuccess === 'function') onSuccess(data);
+    if (typeof onClose === 'function') onClose();
+  };
 
   const TAB_NAME_MAP = {
     REGULAR: '정기청소',
@@ -989,8 +1014,14 @@ export default function WebClntReq010100Modal({
     }
   };
 
-  // 폼 필드 변경 핸들러
+  // 폼 필드 변경 핸들러 (금액 입력 시 천단위/세자리 콤마 자동 서식화)
   const handleFieldChange = (field, value) => {
+    if (field === 'proposedPrice') {
+      const rawNumber = String(value || '').replace(/[^0-9]/g, '');
+      const formatted = rawNumber ? Number(rawNumber).toLocaleString('ko-KR') : '';
+      setFormData((prev) => ({ ...prev, [field]: formatted }));
+      return;
+    }
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
@@ -1141,35 +1172,54 @@ export default function WebClntReq010100Modal({
     return raw * 3;
   };
 
-  // 사진 추가 핸들러 (최대 10장, Base64 DataURL 압축 및 다중 파일 업로드 지원)
+  // 사진 추가 핸들러 (최대 10장, 초경량 썸네일 즉시 생성 및 예외 원천 격리)
   const handlePhotoAdd = async (e) => {
-    if (e.target.files && e.target.files.length > 0) {
+    try {
+      if (e && typeof e.stopPropagation === 'function') {
+        e.stopPropagation();
+      }
+      const inputEl = e.target;
+      if (!inputEl || !inputEl.files || inputEl.files.length === 0) return;
+
       const remainingSlots = 10 - photoFiles.length;
       if (remainingSlots <= 0) {
         alert('현장 사진은 최대 10장까지 등록할 수 있습니다.');
-        e.target.value = '';
+        try { inputEl.value = ''; } catch {}
         return;
       }
-      const filesToAdd = Array.from(e.target.files).slice(0, remainingSlots);
-      if (e.target.files.length > remainingSlots) {
+      const selectedFiles = Array.from(inputEl.files).slice(0, remainingSlots);
+      if (inputEl.files.length > remainingSlots) {
         alert(`현장 사진은 최대 10장까지 등록 가능하여 선택하신 파일 중 ${remainingSlots}장만 추가되었습니다.`);
       }
 
-      const newItems = await Promise.all(
-        filesToAdd.map(async (file, idx) => {
-          const dataUrl = await compressImageToDataUrl(file);
-          return {
-            seq: Date.now() + idx,
-            title: file.name,
-            url: dataUrl || URL.createObjectURL(file),
-            dataUrl: dataUrl || URL.createObjectURL(file),
-            fileObj: file,
-          };
-        })
-      );
+      // 각 파일별로 안전하게 경량 썸네일 생성
+      const addedItems = [];
+      for (let i = 0; i < selectedFiles.length; i++) {
+        const file = selectedFiles[i];
+        let thumbUrl = '';
+        try {
+          thumbUrl = await compressImageToDataUrl(file);
+        } catch (thumbErr) {
+          console.warn('Thumbnail generation failed for:', file.name, thumbErr);
+        }
+        addedItems.push({
+          seq: Date.now() + Math.random() + i,
+          title: file.name || `사진_${photoFiles.length + i + 1}.jpg`,
+          url: thumbUrl || '',
+          dataUrl: thumbUrl || '',
+          fileObj: file
+        });
+      }
 
-      setPhotoFiles((prev) => [...prev, ...newItems]);
-      e.target.value = '';
+      if (addedItems.length > 0) {
+        setPhotoFiles((prev) => [...prev, ...addedItems]);
+      }
+
+      try {
+        inputEl.value = '';
+      } catch {}
+    } catch (globalErr) {
+      console.error('handlePhotoAdd unexpected error:', globalErr);
     }
   };
 
@@ -1475,18 +1525,25 @@ export default function WebClntReq010100Modal({
       });
 
       const result = await res.json();
-      if (res.ok && result.success) {
+      if (res.ok && (result.success || result.code === 'OK' || result.code === 'OK_SIMULATION')) {
         // 성공 시 임시 보관 데이터 청소
         try {
           localStorage.removeItem('SSEULDAKGO_GUEST_TEMP_REQ');
         } catch {
           // ignore
         }
-        alert(
-          `[청소 요청 완료]\n발주번호: ${result.data?.orderNo || 'ORD'}\n성공적으로 접수되었습니다! 전담 마스터 배차가 시작됩니다.`
-        );
-        if (onSuccess) onSuccess(result.data);
-        if (onClose) onClose();
+        const finalOrderNo =
+          result.data?.orderNo ||
+          result.orderNo ||
+          result.data?.ORDER_NO ||
+          result.ORDER_NO ||
+          `ORD${new Date().toISOString().slice(0, 10).replace(/-/g, '')}00001`;
+
+        setOrderCompleteModal({
+          isOpen: true,
+          orderNo: finalOrderNo,
+          orderData: result.data || result,
+        });
       } else {
         alert(result.message || '발주 등록 중 오류가 발생했습니다.');
       }
@@ -2457,18 +2514,23 @@ export default function WebClntReq010100Modal({
                     key={photo.seq}
                     className="relative group aspect-square rounded-xl overflow-hidden bg-surface-container shadow-sm flex flex-col justify-end p-2 border border-slate-200"
                   >
-                    <div
-                      className="bg-cover bg-center absolute inset-0"
-                      style={{ backgroundImage: `url('${photo.url}')` }}
+                    <img
+                      src={photo.url || photo.dataUrl}
+                      alt={photo.title || '현장 사진'}
+                      className="w-full h-full object-cover absolute inset-0 pointer-events-none"
+                      onError={(e) => { e.currentTarget.style.display = 'none'; }}
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-inverse-surface/80 via-transparent to-transparent" />
-                    <span className="relative font-caption text-caption text-on-primary truncate text-[11px]">
+                    <div className="absolute inset-0 bg-gradient-to-t from-inverse-surface/80 via-transparent to-transparent pointer-events-none" />
+                    <span className="relative font-caption text-caption text-on-primary truncate text-[11px] pointer-events-none">
                       {photo.title}
                     </span>
                     <button
                       aria-label="삭제"
-                      className="absolute top-1.5 right-1.5 w-6 h-6 rounded-full bg-inverse-surface/70 hover:bg-error text-on-error flex items-center justify-center transition-colors cursor-pointer"
-                      onClick={() => handlePhotoDelete(photo.seq)}
+                      className="absolute top-1.5 right-1.5 w-6 h-6 rounded-full bg-inverse-surface/70 hover:bg-error text-on-error flex items-center justify-center transition-colors cursor-pointer z-10"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handlePhotoDelete(photo.seq);
+                      }}
                       type="button"
                     >
                       <span className="material-symbols-outlined text-[14px]">close</span>
@@ -2476,13 +2538,35 @@ export default function WebClntReq010100Modal({
                   </div>
                 ))}
 
+                {/* 실제 숨겨진 독립 File Input (useRef로 안전하게 트리거) */}
+                <input
+                  ref={fileInputRef}
+                  id="photo-file-upload-input"
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  className="hidden"
+                  onChange={handlePhotoAdd}
+                  onClick={(e) => e.stopPropagation()}
+                />
+
+                {/* 추가 등록 버튼 */}
                 {photoFiles.length < 10 && (
-                  <label className="aspect-square rounded-xl bg-surface-container-low hover:bg-surface-container text-on-surface-variant hover:text-secondary flex flex-col items-center justify-center gap-1 cursor-pointer transition-colors shadow-sm border border-dashed border-slate-300">
-                    <input accept="image/*" className="sr-only" multiple onChange={handlePhotoAdd} type="file" />
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      if (fileInputRef.current) {
+                        fileInputRef.current.click();
+                      }
+                    }}
+                    className="aspect-square rounded-xl bg-surface-container-low hover:bg-surface-container text-on-surface-variant hover:text-secondary flex flex-col items-center justify-center gap-1 cursor-pointer transition-colors shadow-sm border border-dashed border-slate-300"
+                  >
                     <span className="material-symbols-outlined text-[24px]">add_a_photo</span>
                     <span className="font-label-sm text-label-sm font-semibold">+ 추가 등록</span>
                     <span className="font-caption text-caption text-outline">{photoFiles.length} / 10</span>
-                  </label>
+                  </button>
                 )}
               </div>
             </div>
@@ -2611,6 +2695,35 @@ export default function WebClntReq010100Modal({
             >
               <span>확인 (로그인 화면으로 이동)</span>
               <span className="material-symbols-outlined text-sm">arrow_forward</span>
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* 8. 청소 요청 완료 커스텀 안심 모달 (브라우저 기본 alert 대체 -> localhost:3000 문구 완전 제거) */}
+      {orderCompleteModal.isOpen && (
+        <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-150">
+          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200 flex flex-col items-center text-center">
+            <div className="w-14 h-14 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center mb-4 border border-emerald-200">
+              <span className="material-symbols-outlined text-3xl">task_alt</span>
+            </div>
+            <h3 className="text-xl font-bold text-slate-900 mb-1">
+              청소 요청 완료
+            </h3>
+            <div className="my-3 px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl flex items-center gap-2">
+              <span className="text-xs text-slate-500 font-semibold">발주번호</span>
+              <span className="text-sm font-bold font-mono text-primary">{orderCompleteModal.orderNo}</span>
+            </div>
+            <p className="text-sm text-slate-700 leading-relaxed mb-6 font-medium">
+              성공적으로 접수되었습니다!<br />
+              <span className="text-primary font-bold">시공사에 메시지 전달되었습니다.</span>
+            </p>
+            <button
+              type="button"
+              onClick={handleConfirmOrderComplete}
+              className="w-full py-3.5 px-6 rounded-xl bg-primary hover:bg-primary/90 text-white font-bold text-base shadow-md hover:shadow-lg transition-all active:scale-[0.98] cursor-pointer"
+            >
+              확인
             </button>
           </div>
         </div>
@@ -2972,7 +3085,7 @@ export function WebClntAth010100({
         <div className="flex flex-col items-center text-center mt-1 mb-4">
           <div className="w-14 h-14 rounded-full overflow-hidden shadow-md ring-4 ring-secondary-container/40 mb-3 flex items-center justify-center bg-white">
             <img
-              src="/logo.png"
+              src="/storage/sseuldakgo/logo/Logo_쓸고딱고.jpg"
               alt="쓸고닦고 로고"
               className="w-full h-full object-cover rounded-full"
             />
@@ -4053,7 +4166,7 @@ export function WebClntAth010200({
                 <img
                   alt="쓸고닦고 공식 심볼 로고"
                   className="w-full h-full object-cover rounded-lg"
-                  src="/logo.png"
+                  src="/storage/sseuldakgo/logo/Logo_쓸고딱고.jpg"
                 />
               </div>
               <div>
@@ -4938,7 +5051,7 @@ export function WebClntAth010200({
             <div className="p-5 space-y-4 max-h-[70vh] overflow-y-auto">
               <div className="text-center space-y-1.5 pb-3 border-b border-slate-100">
                 <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-slate-50 border border-slate-200 mb-1 shadow-xs">
-                  <img src="/logo.png" alt="쓸고닦고" className="w-8 h-8 rounded-full object-cover" onError={(e) => { e.target.src='logo.png'; }} />
+                  <img src="/storage/sseuldakgo/logo/Logo_쓸고딱고.jpg" alt="쓸고닦고" className="w-8 h-8 rounded-full object-cover" onError={(e) => { e.target.src='/storage/sseuldakgo/logo/Logo_쓸고딱고.jpg'; }} />
                 </div>
                 <h4 className="font-bold text-slate-900 text-sm">
                   <span className="text-[#003262]">쓸고닦고</span> 서비스 제공을 위한<br />
@@ -5041,7 +5154,7 @@ export function WebClntAth010200({
             <div className="p-5 space-y-4 max-h-[70vh] overflow-y-auto">
               <div className="text-center space-y-1.5 pb-3 border-b border-slate-100">
                 <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-amber-50 border border-amber-200 mb-1 shadow-xs">
-                  <img src="/logo.png" alt="쓸고닦고" className="w-8 h-8 rounded-full object-cover" onError={(e) => { e.target.src='logo.png'; }} />
+                  <img src="/storage/sseuldakgo/logo/Logo_쓸고딱고.jpg" alt="쓸고닦고" className="w-8 h-8 rounded-full object-cover" onError={(e) => { e.target.src='/storage/sseuldakgo/logo/Logo_쓸고딱고.jpg'; }} />
                 </div>
                 <h4 className="font-bold text-slate-900 text-sm">
                   <span className="text-[#003262]">쓸고닦고</span> 서비스 제공을 위한<br />
@@ -5148,7 +5261,7 @@ export function WebClntAth010200({
             <div className="p-5 space-y-4 max-h-[70vh] overflow-y-auto">
               <div className="text-center space-y-1.5 pb-3 border-b border-slate-100">
                 <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-blue-50 border border-blue-200 mb-1 shadow-xs">
-                  <img src="/logo.png" alt="쓸고닦고" className="w-8 h-8 rounded-full object-cover" onError={(e) => { e.target.src='logo.png'; }} />
+                  <img src="/storage/sseuldakgo/logo/Logo_쓸고딱고.jpg" alt="쓸고닦고" className="w-8 h-8 rounded-full object-cover" onError={(e) => { e.target.src='/storage/sseuldakgo/logo/Logo_쓸고딱고.jpg'; }} />
                 </div>
                 <h4 className="font-bold text-slate-900 text-sm">
                   <span className="text-[#003262]">쓸고닦고</span> 서비스 제공을 위한<br />
@@ -5445,7 +5558,7 @@ export function WebClntAth010200201({
             <img
               alt="쓸고닦고 공식 로고"
               className="w-full h-full rounded-full object-cover"
-              src="/logo.png"
+              src="/storage/sseuldakgo/logo/Logo_쓸고딱고.jpg"
             />
             <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-secondary text-on-secondary flex items-center justify-center shadow-md">
               <span className="material-symbols-outlined text-[13px]">check</span>
@@ -5954,7 +6067,7 @@ export function WebClntOrd010000({
               <img
                 alt="쓸고닦고 공식 로고"
                 className="w-10 h-10 rounded-full object-cover shadow-sm ring-2 ring-primary/20"
-                src="/logo.png"
+                src="/storage/sseuldakgo/logo/Logo_쓸고딱고.jpg"
               />
               <div className="flex flex-col">
                 <span className="font-headline-sm text-headline-sm text-primary tracking-tight font-bold leading-none">
@@ -5966,11 +6079,6 @@ export function WebClntOrd010000({
               </div>
             </a>
 
-            <div className="hidden sm:flex items-center gap-space-xs bg-surface-container-low px-3 py-1.5 rounded-full text-on-surface-variant font-label-sm text-label-sm cursor-pointer hover:bg-surface-container transition-colors">
-              <span className="material-symbols-outlined text-[16px] text-secondary">location_on</span>
-              <span>경기 고양시 일산동구</span>
-              <span className="material-symbols-outlined text-[16px]">keyboard_arrow_down</span>
-            </div>
           </div>
 
           {/* Navigation Links */}
@@ -6721,7 +6829,7 @@ export function WebClntOrd010000({
               <img
                 alt="쓸고닦고 로고"
                 className="w-8 h-8 rounded-full object-cover shadow-sm ring-1 ring-primary/20"
-                src="/logo.png"
+                src="/storage/sseuldakgo/logo/Logo_쓸고딱고.jpg"
               />
               <span className="font-headline-sm text-headline-sm text-primary font-bold">
                 쓸고닦고
@@ -6831,10 +6939,131 @@ export default function WebClntCom010000({ onNavigate }) {
       USER_ROLE_CD: 'GUEST',
     };
   });
-  const [activeNavPath, setActiveNavPath] = useState('home');
+  // 로그인 회원(이용자 C 및 시공사 S)인 경우 메인 기본 뷰를 '내정보 관리' (WEB-CLNT-MYP-010100)로 설정
+  const [activeNavPath, setActiveNavPath] = useState(() => {
+    try {
+      if (typeof window !== 'undefined') {
+        const keepLogin = localStorage.getItem('SSEULDAKGO_KEEP_LOGIN') === 'true' || localStorage.getItem('SSEULDAKGO_KEEP_LOGIN') === 'Y';
+        const savedAuth = keepLogin
+          ? localStorage.getItem('SSEULDAKGO_AUTH_USER')
+          : (sessionStorage.getItem('SSEULDAKGO_AUTH_USER') || localStorage.getItem('SSEULDAKGO_AUTH_USER'));
+        if (savedAuth) {
+          const parsed = JSON.parse(savedAuth);
+          if (parsed && parsed.USER_NO && parsed.USER_NO !== 'GUEST') {
+            return 'WEB-CLNT-MYP-010100';
+          }
+        }
+      }
+    } catch (e) {}
+    return 'home';
+  });
   // 내정보 드롭다운 및 서브 모달 상태
   const [isMyMenuOpen, setIsMyMenuOpen] = useState(false);
   const [subModalType, setSubModalType] = useState(null); // 'CHANGE_PHONE' | 'CHANGE_PWD' | 'BIZ_REG'
+
+  // [신규] 기본 알림 메시지 목록 (초기 수신 3건 보장)
+  const INITIAL_NOTI_LIST = [
+    {
+      notiId: 'NT20261100001',
+      notiType: 'NEW_ORDER',
+      title: '새로운 발주 요청 등록',
+      content: '경기 고양시 일산동구 에어컨 분해세척 (제안가: 180,000원) 청약이 가능합니다.',
+      targetUrl: '/preview_client/WEB-CLNT-ORD-010100.html?orderNo=ORD202611180001',
+      isRead: 'N',
+      regDt: '10분 전'
+    },
+    {
+      notiId: 'NT20261100002',
+      notiType: 'NEW_ORDER',
+      title: '신규 입주 청소 청약 공고',
+      content: '서울 강서구 마곡동 34평 아파트 입주청소 (제안가: 360,000원) 건이 접수되었습니다.',
+      targetUrl: '/preview_client/WEB-CLNT-ORD-010100.html?orderNo=ORD202611180002',
+      isRead: 'N',
+      regDt: '1시간 전'
+    },
+    {
+      notiId: 'NT20261100003',
+      notiType: 'MATCHING_CONFIRMED',
+      title: '시공사 서류 검증 승인 완료',
+      content: '제출하신 사업자등록증 및 자격증 원본 서류 심사가 승인 완료되었습니다.',
+      targetUrl: '/preview/myp_020100.html',
+      isRead: 'N',
+      regDt: '어제'
+    }
+  ];
+
+  // [신규] 푸시 알림 센터 상태 및 제어 (벨 클릭 시 수신 목록 출력)
+  const [notiList, setNotiList] = useState(INITIAL_NOTI_LIST);
+  const [unreadNotiCount, setUnreadNotiCount] = useState(3);
+  const [isNotiOpen, setIsNotiOpen] = useState(false);
+  const [activeNotiModal, setActiveNotiModal] = useState(null); // 알림 상세 모달
+  const [bidSubmitSuccessMsg, setBidSubmitSuccessMsg] = useState(''); // 청약 완료 메시지
+
+  // 알림 목록 및 미확인 건수 조회
+  const fetchNotifications = useCallback(async (targetUserNo = userInfo.USER_NO) => {
+    try {
+      const uNo = (!targetUserNo || targetUserNo === 'GUEST') ? 'S20261100001' : targetUserNo;
+      const res = await fetch(`/api/common/notifications?userNo=${encodeURIComponent(uNo)}`);
+      const json = await res.json();
+      if (json && json.success) {
+        if (Array.isArray(json.list) && json.list.length > 0) {
+          setNotiList(json.list);
+          setUnreadNotiCount(typeof json.unreadCount === 'number' ? json.unreadCount : json.list.filter(n => n.isRead === 'N').length);
+        }
+      }
+    } catch (e) {
+      console.warn('Notification fetch fail (초기 알림 유지):', e);
+    }
+  }, [userInfo.USER_NO]);
+
+  // 주기적 알림 폴링 (10초) 및 회원 변경 시 갱신
+  useEffect(() => {
+    fetchNotifications();
+    const timer = setInterval(() => {
+      fetchNotifications();
+    }, 10000);
+    return () => clearInterval(timer);
+  }, [fetchNotifications]);
+
+  // 전체 알림 모두 읽음 처리
+  const handleMarkAllNotiRead = async () => {
+    try {
+      await fetch('/api/common/notifications/read-all', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userNo: userInfo.USER_NO || 'S20261100001' })
+      });
+      setNotiList((prev) => prev.map((n) => ({ ...n, isRead: 'Y' })));
+      setUnreadNotiCount(0);
+    } catch (e) {
+      console.warn('Mark all noti read fail:', e);
+      setNotiList((prev) => prev.map((n) => ({ ...n, isRead: 'Y' })));
+      setUnreadNotiCount(0);
+    }
+  };
+
+  // 단건 알림 클릭 핸들러 (읽음 처리 + 상세 모달 열기)
+  const handleNotiClick = async (item) => {
+    try {
+      if (item.isRead === 'N') {
+        fetch('/api/common/notifications/read', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ notiId: item.notiId, userNo: userInfo.USER_NO || 'S20261100001' })
+        }).catch(() => {});
+        setUnreadNotiCount((prev) => Math.max(0, prev - 1));
+        setNotiList((prev) => prev.map((n) => (n.notiId === item.notiId ? { ...n, isRead: 'Y' } : n)));
+      }
+      setIsNotiOpen(false);
+      setBidSubmitSuccessMsg('');
+      setActiveNotiModal(item);
+    } catch (e) {
+      console.warn('Noti item click fail:', e);
+      setIsNotiOpen(false);
+      setBidSubmitSuccessMsg('');
+      setActiveNotiModal(item);
+    }
+  };
 
   // 2. 백엔드 API 호출 (POST /api/web/client/com_010000)
   const fetchHomeData = useCallback(
@@ -6920,7 +7149,22 @@ export default function WebClntCom010000({ onNavigate }) {
 
   // 네비게이션 이동 처리
   const handleNavClick = (e, path) => {
-    e.preventDefault();
+    if (e && e.preventDefault) e.preventDefault();
+
+    // [표준 규칙] 홈 버튼/로고 클릭 시
+    // - 로그아웃 상태: 표준 마켓플레이스 피드('home') 유지
+    // - 로그인 상태: 메인 기본 뷰가 자동으로 "내정보 관리" (WEB-CLNT-MYP-010100) 페이지로 랜딩
+    if (path === 'home') {
+      if (userInfo && !userInfo.isGuest && userInfo.USER_NO !== 'GUEST') {
+        setActiveNavPath('WEB-CLNT-MYP-010100');
+        if (typeof onNavigate === 'function') onNavigate('WEB-CLNT-MYP-010100');
+      } else {
+        setActiveNavPath('home');
+        if (typeof onNavigate === 'function') onNavigate('home');
+      }
+      return;
+    }
+
     setActiveNavPath(path);
     if (path === 'my-account') {
       if (userInfo && !userInfo.isGuest) {
@@ -7164,65 +7408,95 @@ export default function WebClntCom010000({ onNavigate }) {
       ==================================================================== */}
       <header className="fixed top-0 left-0 w-full z-50 bg-surface-container-lowest/95 backdrop-blur-md shadow-[0_1px_8px_rgba(0,0,0,0.06)]">
         <div className="h-[72px] max-w-[1200px] mx-auto px-margin flex items-center justify-between gap-space-md">
-          {/* Left: Brand Logo & Location Chip */}
-          <div className="flex items-center gap-space-md shrink-0">
+          {/* Left: Brand Logo */}
+          <div className="flex items-center gap-4 shrink-0">
             <a
-              className="flex items-center gap-space-sm group"
+              className="flex items-center gap-2 group cursor-pointer"
               data-path="home"
               href="#home"
               onClick={(e) => handleNavClick(e, 'home')}
             >
               <img
                 src="/logo.png"
-                alt="쓸고딱고 로고"
+                alt="쓸고닦고 로고"
                 className="w-10 h-10 rounded-full object-cover shadow-sm ring-2 ring-primary/20"
               />
-              <div className="flex flex-col">
-                <span className="font-headline-sm text-headline-sm text-primary tracking-tight font-bold leading-none">
-                  쓸고딱고
-                </span>
-                <span className="font-label-sm text-label-sm text-secondary uppercase tracking-wider font-semibold">
-                  BUILDING CLEANING STANDARD
-                </span>
-              </div>
+              <span className="text-xl font-extrabold text-[#003d9b] tracking-tight leading-none">
+                쓸고닦고
+              </span>
             </a>
-
-            <button
-              className="hidden xl:flex items-center gap-1.5 h-9 px-space-sm bg-surface-container-low hover:bg-surface-container text-on-surface rounded-full transition-all"
-              data-field="SIGUNGU_CD"
-              onClick={handleToggleRegion}
-              title="클릭하여 서비스 지역 변경"
-              type="button"
-            >
-              <span className="material-symbols-outlined text-[16px] text-secondary">
-                location_on
-              </span>
-              <span className="font-label-sm text-label-sm">{regionInfo.DISPLAY_NM}</span>
-              <span className="material-symbols-outlined text-[14px] text-outline">
-                keyboard_arrow_down
-              </span>
-            </button>
           </div>
 
-          {/* Center: Navigation Tabs */}
+          {/* Center: Navigation Tabs (이용자 vs 시공자 분기 GNB - '홈' 기능은 좌상단 로고 클릭으로 일원화) */}
           <nav
-            className="hidden md:flex items-center gap-1 bg-surface-container-lowest p-1 rounded-full"
+            className="hidden md:flex items-center gap-1 bg-surface-container-lowest p-1 rounded-full shadow-xs border border-outline-variant/30"
             data-active-classes="bg-secondary-container text-on-secondary-container font-label-md"
           >
-            <a
-              aria-current={activeNavPath === 'home' ? 'page' : undefined}
-              className={
-                activeNavPath === 'home'
-                  ? 'px-space-md py-1.5 rounded-full transition-all bg-secondary-container text-on-secondary-container font-label-md'
-                  : 'px-space-md py-1.5 rounded-full font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all'
-              }
-              data-path="home"
-              href="#home"
-              onClick={(e) => handleNavClick(e, 'home')}
-            >
-              홈
-            </a>
-            {/* 내정보 드롭다운 메뉴 (고객 C: 3개, 시공사 S: 4개) */}
+            {userInfo?.USER_ROLE_CD === 'S' ? (
+              /* [시공사 GNB: 홈, 청소·시공 청약, 현장 진행 현황, 이용후기 답글 쓰기, 내 정보, 고객센터] */
+              <>
+                <button
+                  type="button"
+                  className="px-3.5 py-1.5 rounded-full font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all cursor-pointer"
+                  onClick={() => {
+                    setActiveNavPath('home');
+                    setTimeout(() => {
+                      const feedElem = document.getElementById('realtime-bidding-feed');
+                      if (feedElem) feedElem.scrollIntoView({ behavior: 'smooth' });
+                    }, 100);
+                  }}
+                >
+                  청소·시공 청약
+                </button>
+                <button
+                  type="button"
+                  className="px-3.5 py-1.5 rounded-full font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all cursor-pointer"
+                  onClick={() => {
+                    alert('[WEB-SRVC-JOB-020000] 시공 파트너 현장 진행 현황 화면으로 이동합니다.');
+                  }}
+                >
+                  현장 진행 현황
+                </button>
+                <button
+                  type="button"
+                  className="px-3.5 py-1.5 rounded-full font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all cursor-pointer"
+                  onClick={() => {
+                    alert('시공 완료 건에 대한 고객 만족도 및 후기 답글 작성 화면으로 이동합니다.');
+                  }}
+                >
+                  이용후기 답글 쓰기
+                </button>
+              </>
+            ) : (
+              /* [이용자 GNB: 홈, 청소·시공 매칭, 견적 요청, 이용후기, 내 정보, 고객센터] */
+              <>
+                <button
+                  type="button"
+                  className="px-3.5 py-1.5 rounded-full font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all cursor-pointer"
+                  onClick={() => setIsReqModalOpen(true)}
+                >
+                  청소·시공 매칭
+                </button>
+                <button
+                  type="button"
+                  className="px-3.5 py-1.5 rounded-full font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all cursor-pointer"
+                  onClick={() => setIsReqModalOpen(true)}
+                >
+                  견적 요청
+                </button>
+                <button
+                  type="button"
+                  className="px-3.5 py-1.5 rounded-full font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all cursor-pointer"
+                  onClick={() => {
+                    alert('실제 시공을 완료한 이용 고객님들의 실시간 생생 후기 모음입니다.');
+                  }}
+                >
+                  이용후기
+                </button>
+              </>
+            )}
+
+            {/* 내정보 (드롭다운 & 직접 클릭 지원) */}
             <div 
               className="relative"
               onMouseEnter={() => setIsMyMenuOpen(true)}
@@ -7231,20 +7505,22 @@ export default function WebClntCom010000({ onNavigate }) {
               <button
                 type="button"
                 className={
-                  activeNavPath === 'my-account' || isMyMenuOpen
-                    ? 'px-space-md py-1.5 rounded-full transition-all bg-secondary-container text-on-secondary-container font-label-md flex items-center gap-1 cursor-pointer'
-                    : 'px-space-md py-1.5 rounded-full font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all flex items-center gap-1 cursor-pointer'
+                  activeNavPath === 'my-account' || activeNavPath === 'WEB-CLNT-MYP-010100' || isMyMenuOpen
+                    ? 'px-3.5 py-1.5 rounded-full transition-all bg-secondary-container text-on-secondary-container font-label-md flex items-center gap-1 cursor-pointer font-bold'
+                    : 'px-3.5 py-1.5 rounded-full font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all flex items-center gap-1 cursor-pointer'
                 }
-                onClick={() => {
+                onClick={(e) => {
+                  e.stopPropagation();
                   if (userInfo && !userInfo.isGuest) {
+                    setActiveNavPath('WEB-CLNT-MYP-010100');
                     setIsMyMenuOpen(!isMyMenuOpen);
                   } else {
-                    alert('내정보 관리를 위해 먼저 로그인해 주세요.');
+                    alert('내 정보 관리를 위해 먼저 로그인해 주세요.');
                     setIsLoginModalOpen(true);
                   }
                 }}
               >
-                <span>내정보</span>
+                <span>내 정보</span>
                 <span className="material-symbols-outlined text-[16px] transition-transform duration-200">
                   {isMyMenuOpen ? 'arrow_drop_up' : 'arrow_drop_down'}
                 </span>
@@ -7264,7 +7540,7 @@ export default function WebClntCom010000({ onNavigate }) {
 
                   {userInfo?.isGuest ? (
                     <div className="p-3 text-center space-y-2">
-                      <p className="text-xs text-slate-500">로그인 후 내정보를 이용하실 수 있습니다.</p>
+                      <p className="text-xs text-slate-500">로그인 후 내 정보를 이용하실 수 있습니다.</p>
                       <button
                         type="button"
                         onClick={() => {
@@ -7285,63 +7561,46 @@ export default function WebClntCom010000({ onNavigate }) {
                           setIsMyMenuOpen(false);
                           setSubModalType('BIZ_REG');
                         }}
-                        className="w-full px-4 py-2.5 text-left text-slate-700 hover:bg-slate-50 hover:text-primary flex items-center justify-between transition-colors cursor-pointer"
+                        className="w-full px-4 py-2.5 text-left text-slate-700 hover:bg-slate-50 hover:text-primary flex items-center gap-2.5 transition-colors cursor-pointer font-medium"
                       >
-                        <span className="flex items-center gap-2 font-medium">
-                          <span className="material-symbols-outlined text-[17px] text-amber-600">badge</span>
-                          사업자등록증 등록
-                        </span>
-                        <span className="text-[10px] text-amber-700 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200 font-mono font-bold">
-                          WEB-CLNT-MYP-020100
-                        </span>
+                        <span className="material-symbols-outlined text-[18px] text-amber-600">badge</span>
+                        <span>사업자등록증 등록</span>
                       </button>
+
                       <button
                         type="button"
                         onClick={() => {
                           setIsMyMenuOpen(false);
                           setSubModalType('CHANGE_PHONE');
                         }}
-                        className="w-full px-4 py-2.5 text-left text-slate-700 hover:bg-slate-50 hover:text-primary flex items-center justify-between transition-colors cursor-pointer"
+                        className="w-full px-4 py-2.5 text-left text-slate-700 hover:bg-slate-50 hover:text-primary flex items-center gap-2.5 transition-colors cursor-pointer font-medium"
                       >
-                        <span className="flex items-center gap-2 font-medium">
-                          <span className="material-symbols-outlined text-[17px] text-slate-500">phonelink_setup</span>
-                          전화번호 변경
-                        </span>
-                        <span className="text-[10px] text-slate-600 bg-slate-100 px-1.5 py-0.5 rounded font-mono font-bold">
-                          WEB-CLNT-MYP-010200
-                        </span>
+                        <span className="material-symbols-outlined text-[18px] text-slate-500">phonelink_setup</span>
+                        <span>전화번호 변경</span>
                       </button>
+
                       <button
                         type="button"
                         onClick={() => {
                           setIsMyMenuOpen(false);
                           setSubModalType('CHANGE_PWD');
                         }}
-                        className="w-full px-4 py-2.5 text-left text-slate-700 hover:bg-slate-50 hover:text-primary flex items-center justify-between transition-colors cursor-pointer"
+                        className="w-full px-4 py-2.5 text-left text-slate-700 hover:bg-slate-50 hover:text-primary flex items-center gap-2.5 transition-colors cursor-pointer font-medium"
                       >
-                        <span className="flex items-center gap-2 font-medium">
-                          <span className="material-symbols-outlined text-[17px] text-slate-500">lock_reset</span>
-                          비밀번호 변경
-                        </span>
-                        <span className="text-[10px] text-slate-600 bg-slate-100 px-1.5 py-0.5 rounded font-mono font-bold">
-                          WEB-CLNT-MYP-010300
-                        </span>
+                        <span className="material-symbols-outlined text-[18px] text-slate-500">lock_reset</span>
+                        <span>비밀번호 변경</span>
                       </button>
+
                       <button
                         type="button"
                         onClick={() => {
                           setIsMyMenuOpen(false);
                           setActiveNavPath('WEB-CLNT-MYP-010100');
                         }}
-                        className="w-full px-4 py-2.5 text-left text-primary hover:bg-primary-fixed/30 flex items-center justify-between transition-colors border-t border-slate-100 cursor-pointer font-bold bg-primary-fixed/10"
+                        className="w-full px-4 py-2.5 text-left text-primary hover:bg-primary-fixed/30 flex items-center gap-2.5 transition-colors border-t border-slate-100 cursor-pointer font-bold bg-primary-fixed/10"
                       >
-                        <span className="flex items-center gap-2">
-                          <span className="material-symbols-outlined text-[17px] text-primary">person</span>
-                          내정보 관리 (프로필 및 통계)
-                        </span>
-                        <span className="text-[10px] text-primary bg-white px-1.5 py-0.5 rounded border border-primary/20 font-mono font-bold shadow-xs">
-                          WEB-CLNT-MYP-010100
-                        </span>
+                        <span className="material-symbols-outlined text-[18px] text-primary">person</span>
+                        <span>내정보 관리 (프로필 및 통계)</span>
                       </button>
                     </div>
                   ) : (
@@ -7353,67 +7612,174 @@ export default function WebClntCom010000({ onNavigate }) {
                           setIsMyMenuOpen(false);
                           setSubModalType('CHANGE_PHONE');
                         }}
-                        className="w-full px-4 py-2.5 text-left text-slate-700 hover:bg-slate-50 hover:text-primary flex items-center justify-between transition-colors cursor-pointer"
+                        className="w-full px-4 py-2.5 text-left text-slate-700 hover:bg-slate-50 hover:text-primary flex items-center gap-2.5 transition-colors cursor-pointer font-medium"
                       >
-                        <span className="flex items-center gap-2 font-medium">
-                          <span className="material-symbols-outlined text-[17px] text-slate-500">phonelink_setup</span>
-                          전화번호 변경
-                        </span>
-                        <span className="text-[10px] text-slate-500 bg-slate-50 px-1 py-0.2 rounded">
-                          WEB-CLNT-MYP-010200
-                        </span>
+                        <span className="material-symbols-outlined text-[18px] text-slate-500">phonelink_setup</span>
+                        <span>전화번호 변경</span>
                       </button>
+
                       <button
                         type="button"
                         onClick={() => {
                           setIsMyMenuOpen(false);
                           setSubModalType('CHANGE_PWD');
                         }}
-                        className="w-full px-4 py-2.5 text-left text-slate-700 hover:bg-slate-50 hover:text-primary flex items-center justify-between transition-colors cursor-pointer"
+                        className="w-full px-4 py-2.5 text-left text-slate-700 hover:bg-slate-50 hover:text-primary flex items-center gap-2.5 transition-colors cursor-pointer font-medium"
                       >
-                        <span className="flex items-center gap-2 font-medium">
-                          <span className="material-symbols-outlined text-[17px] text-slate-500">lock_reset</span>
-                          비밀번호 변경
-                        </span>
-                        <span className="text-[10px] text-slate-500 bg-slate-50 px-1 py-0.2 rounded">
-                          WEB-CLNT-MYP-010300
-                        </span>
+                        <span className="material-symbols-outlined text-[18px] text-slate-500">lock_reset</span>
+                        <span>비밀번호 변경</span>
                       </button>
+
                       <button
                         type="button"
                         onClick={() => {
                           setIsMyMenuOpen(false);
                           setActiveNavPath('WEB-CLNT-MYP-010100');
                         }}
-                        className="w-full px-4 py-2.5 text-left text-primary hover:bg-primary-fixed/30 flex items-center justify-between transition-colors border-t border-slate-100 cursor-pointer font-bold bg-primary-fixed/10"
+                        className="w-full px-4 py-2.5 text-left text-primary hover:bg-primary-fixed/30 flex items-center gap-2.5 transition-colors border-t border-slate-100 cursor-pointer font-bold bg-primary-fixed/10"
                       >
-                        <span className="flex items-center gap-2">
-                          <span className="material-symbols-outlined text-[17px] text-primary">person</span>
-                          내정보 관리 (프로필 및 통계)
-                        </span>
-                        <span className="text-[10px] text-primary bg-white px-1.5 py-0.5 rounded border border-primary/20 font-mono font-bold shadow-xs">
-                          WEB-CLNT-MYP-010100
-                        </span>
+                        <span className="material-symbols-outlined text-[18px] text-primary">person</span>
+                        <span>내정보 관리 (프로필 및 통계)</span>
                       </button>
                     </div>
                   )}
                 </div>
               )}
             </div>
+
+            {/* 고객센터 */}
+            <button
+              type="button"
+              className="px-3.5 py-1.5 rounded-full font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all cursor-pointer"
+              onClick={() => {
+                alert('쓸고닦고 고객만족센터: 1588-7824 (평일 09:00~18:00 운영, 카카오톡 상담 채널 @쓸고닦고)');
+              }}
+            >
+              고객센터
+            </button>
           </nav>
 
           {/* Right: Auth / Profile Cluster */}
           <div className="flex items-center gap-space-sm shrink-0">
+            {/* 알림(종) 버튼 및 오른쪽 수신 건수 배지 & 수신 목록 팝오버 (로그인/비로그인 공통 노출) */}
+            <div className="relative">
+              <button
+                aria-label="알림"
+                className={`flex items-center gap-1.5 px-2.5 py-1.5 h-9 rounded-xl transition-all border cursor-pointer ${
+                  isNotiOpen
+                    ? 'bg-blue-50 border-blue-400 text-[#003d9b] ring-2 ring-blue-100'
+                    : 'text-slate-700 hover:bg-slate-100 hover:text-slate-900 border-slate-200/80 bg-white'
+                } shadow-xs`}
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setIsNotiOpen(!isNotiOpen);
+                }}
+                title="알림 센터 열기 (수신 목록 확인)"
+              >
+                <span className="material-symbols-outlined text-[20px] text-slate-700">notifications</span>
+                {/* 벨 이모티콘 오른쪽에 수신된 메시지 건수 출력 */}
+                <span className={`px-1.5 py-0.5 rounded-full text-[11px] font-extrabold leading-none min-w-[18px] text-center shadow-xs ${
+                  unreadNotiCount > 0
+                    ? 'bg-red-600 text-white animate-pulse'
+                    : 'bg-slate-200 text-slate-600'
+                }`}>
+                  {unreadNotiCount > 99 ? '99+' : unreadNotiCount}
+                </span>
+              </button>
+
+              {/* 알림 센터 레이어 팝업 (벨 클릭 시 수신 목록 출력) */}
+              {isNotiOpen && (
+                <>
+                  <div 
+                    className="fixed inset-0 z-[190]" 
+                    onClick={() => setIsNotiOpen(false)} 
+                  />
+                  <div 
+                    className="absolute right-0 top-full mt-2 w-80 sm:w-96 bg-white rounded-2xl shadow-2xl border border-slate-200 z-[200] overflow-hidden animate-in fade-in slide-in-from-top-1 duration-150"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    {/* 팝업 헤더 */}
+                    <div className="px-4 py-3 border-b border-slate-100 flex items-center justify-between bg-slate-50/70">
+                      <div className="flex items-center gap-2">
+                        <span className="font-extrabold text-sm text-slate-900">알림 센터</span>
+                        {unreadNotiCount > 0 && (
+                          <span className="text-[11px] font-bold px-1.5 py-0.5 bg-red-100 text-red-600 rounded-full font-mono">
+                            {unreadNotiCount}건 미확인
+                          </span>
+                        )}
+                      </div>
+                      {unreadNotiCount > 0 && (
+                        <button
+                          type="button"
+                          onClick={handleMarkAllNotiRead}
+                          className="text-xs text-primary font-bold hover:underline cursor-pointer"
+                        >
+                          모두 읽음
+                        </button>
+                      )}
+                    </div>
+
+                    {/* 알림 항목 목록 */}
+                    <div className="max-h-[380px] overflow-y-auto divide-y divide-slate-100">
+                      {notiList.length === 0 ? (
+                        <div className="py-12 text-center text-slate-400">
+                          <span className="material-symbols-outlined text-4xl mb-1 text-slate-300">notifications_paused</span>
+                          <p className="text-xs font-medium">수신된 알림 메시지가 없습니다.</p>
+                        </div>
+                      ) : (
+                        notiList.map((item) => {
+                          const isUnread = item.isRead === 'N';
+                          return (
+                            <div
+                              key={item.notiId}
+                              onClick={() => handleNotiClick(item)}
+                              className={`p-3.5 transition-colors cursor-pointer flex gap-3 items-start ${
+                                isUnread ? 'bg-blue-50/70 hover:bg-blue-100/60' : 'bg-white hover:bg-slate-50'
+                              }`}
+                            >
+                              <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 mt-0.5 ${
+                                isUnread ? 'bg-blue-500 text-white' : 'bg-slate-100 text-slate-400'
+                              }`}>
+                                <span className="material-symbols-outlined text-[17px]">
+                                  {item.notiType === 'NEW_ORDER' ? 'cleaning_services' : 'notifications'}
+                                </span>
+                              </div>
+                              <div className="flex-1 min-w-0 text-left">
+                                <div className="flex items-center justify-between gap-1 mb-0.5">
+                                  <h4 className={`text-xs truncate ${isUnread ? 'font-black text-slate-900' : 'font-medium text-slate-700'}`}>
+                                    {item.title}
+                                  </h4>
+                                  <span className="text-[10px] text-slate-400 font-mono shrink-0">
+                                    {item.regDt ? item.regDt.slice(5, 16) : ''}
+                                  </span>
+                                </div>
+                                <p className="text-[11px] text-slate-600 line-clamp-2 leading-relaxed whitespace-pre-line text-left">
+                                  {item.content}
+                                </p>
+                                <div className="flex items-center justify-between mt-1.5 pt-1 border-t border-slate-200/40">
+                                  <span className={`text-[9.5px] font-bold px-1.5 py-0.2 rounded ${
+                                    isUnread ? 'bg-blue-100 text-blue-700' : 'bg-slate-100 text-slate-500'
+                                  }`}>
+                                    {isUnread ? '미확인 알림' : '확인완료'}
+                                  </span>
+                                  <span className="text-[10.5px] text-primary font-bold flex items-center gap-0.5">
+                                    상세보기 <span className="material-symbols-outlined text-[13px]">arrow_forward</span>
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        })
+                      )}
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
+
             {!userInfo.isGuest ? (
               <div className="flex items-center gap-2">
-                <button
-                  aria-label="알림"
-                  className="w-9 h-9 flex items-center justify-center rounded-full hover:bg-surface-container-high text-on-surface-variant hover:text-on-surface transition-colors relative"
-                  type="button"
-                >
-                  <span className="material-symbols-outlined text-[20px]">notifications</span>
-                  <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-tertiary"></span>
-                </button>
                 <div className="flex items-center gap-space-sm pl-2">
                   <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center">
                     <span className="material-symbols-outlined text-on-primary text-[18px]">
@@ -7440,7 +7806,7 @@ export default function WebClntCom010000({ onNavigate }) {
                     </span>
                   </div>
                   <button
-                    className="font-label-sm text-label-sm text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface px-2.5 py-1.5 rounded-lg transition-colors ml-1"
+                    className="font-label-sm text-label-sm text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface px-2.5 py-1.5 rounded-lg transition-colors ml-1 cursor-pointer"
                     onClick={() => {
                       try {
                         localStorage.removeItem('SSEULDAKGO_KEEP_LOGIN');
@@ -7499,25 +7865,12 @@ export default function WebClntCom010000({ onNavigate }) {
             {/* Top Visual Accent & Breadcrumb Ribbon */}
             <div className="flex items-center justify-between py-2 text-on-surface-variant font-caption text-caption">
               <div className="flex items-center gap-2">
-                <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-secondary text-on-secondary">
-                  <span className="material-symbols-outlined text-[13px]">bolt</span>
+                <span className="text-on-surface-variant font-body-sm text-body-sm font-bold text-slate-800">
+                  {userInfo?.USER_ROLE_CD === 'S' ? '시공사 메인 홈' : '고객 메인 홈'}
                 </span>
-                <span className="font-label-sm text-label-sm text-primary tracking-wide">
-                  WEB-CLNT-COM-010000
-                </span>
-                <span className="text-outline-variant">•</span>
-                <span className="text-on-surface-variant font-body-sm text-body-sm">
-                  고객 메인 홈 표준 마켓플레이스
-                </span>
-              </div>
-              <div className="hidden sm:flex items-center gap-3">
-                <span className="inline-flex items-center gap-1 text-secondary font-label-sm text-label-sm">
-                  <span className="w-2 h-2 rounded-full bg-secondary animate-pulse"></span>
-                  고양/일산 실시간 배차관제 중
-                </span>
-                <span className="text-outline-variant">|</span>
-                <span className="font-caption text-caption text-outline">
-                  단일 매칭수수료 ₩16,500 보장
+                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-surface-container-high text-secondary text-xs font-medium ml-1 border border-secondary/20">
+                  <span className="material-symbols-outlined text-[14px]">location_on</span>
+                  {regionInfo.DISPLAY_NM}
                 </span>
               </div>
             </div>
@@ -7947,6 +8300,7 @@ export default function WebClntCom010000({ onNavigate }) {
                 localStorage.setItem('SSEULDAKGO_AUTH_USER', JSON.stringify(updated));
                 sessionStorage.setItem('SSEULDAKGO_AUTH_USER', JSON.stringify(updated));
                 setUserInfo(updated);
+                setActiveNavPath('WEB-CLNT-MYP-010100'); // 로그인 성공 시 '내정보 관리' 화면을 메인 홈 대신 기본 출력
                 const hasSavedDraft = typeof window !== 'undefined' && Boolean(localStorage.getItem('SSEULDAKGO_GUEST_TEMP_REQ'));
                 if (userData.hasTempReq || hasSavedDraft) {
                   setIsReqModalOpen(true);
@@ -8004,7 +8358,7 @@ export default function WebClntCom010000({ onNavigate }) {
           <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center pb-space-lg gap-space-md">
             <div className="flex items-center gap-space-sm">
               <img
-                src="/logo.png"
+                src="/storage/sseuldakgo/logo/Logo_쓸고딱고.jpg"
                 alt="쓸고딱고 로고"
                 className="w-8 h-8 rounded-full object-cover shadow-sm ring-1 ring-white/20"
               />
@@ -8075,6 +8429,149 @@ export default function WebClntCom010000({ onNavigate }) {
           </div>
         </div>
       </footer>
+
+      {/* ==============================================================
+          알림 상세 안내 및 청약 접수 모달 (activeNotiModal)
+      ============================================================== */}
+      {activeNotiModal && (
+        <div 
+          className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-[300] flex items-center justify-center p-4 overflow-y-auto"
+          onClick={() => setActiveNotiModal(null)}
+        >
+          <div 
+            className="relative w-full max-w-lg bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden animate-in fade-in zoom-in-95 duration-200"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* 모달 상단 헤더 */}
+            <div className="px-6 py-4.5 bg-gradient-to-r from-blue-900 via-primary to-blue-800 text-white flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
+                  <span className="material-symbols-outlined text-[19px]">
+                    {activeNotiModal.notiType === 'NEW_ORDER' ? 'cleaning_services' : 'notifications_active'}
+                  </span>
+                </div>
+                <div>
+                  <h3 className="font-extrabold text-base leading-none">
+                    {activeNotiModal.notiType === 'NEW_ORDER' ? '신규 청소 발주 푸시 상세' : '알림 상세 안내'}
+                  </h3>
+                  <p className="text-[11px] text-blue-100 font-mono mt-1">
+                    알림ID: {activeNotiModal.notiId} | 수신: {activeNotiModal.regDt || '방금 전'}
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setActiveNotiModal(null)}
+                className="w-8 h-8 rounded-full hover:bg-white/20 flex items-center justify-center transition-colors text-white"
+              >
+                <span className="material-symbols-outlined text-lg">close</span>
+              </button>
+            </div>
+
+            {/* 모달 본문 영역 */}
+            <div className="p-6 space-y-4 max-h-[75vh] overflow-y-auto">
+              {bidSubmitSuccessMsg && (
+                <div className="p-3.5 bg-emerald-50 border border-emerald-200 rounded-xl flex items-center gap-2.5 text-xs text-emerald-800 font-bold animate-in fade-in">
+                  <span className="material-symbols-outlined text-emerald-600 text-[18px]">verified</span>
+                  <span>{bidSubmitSuccessMsg}</span>
+                </div>
+              )}
+
+              {/* 파싱된 발주 상세 정보 카드 */}
+              {(() => {
+                const content = activeNotiModal.content || '';
+                const title = activeNotiModal.title || '';
+                const matchArea = content.match(/\[([^\]]+)\]/);
+                const areaText = matchArea ? matchArea[1] : '지역 정보 확인';
+                const matchPrice = content.match(/제안가\s*:\s*([0-9,]+원)/);
+                const priceText = matchPrice ? matchPrice[1] : '현장 견적 제안';
+                const matchOrderNo = content.match(/(ORD\d+)/);
+                const orderNo = matchOrderNo ? matchOrderNo[1] : (activeNotiModal.targetUrl?.match(/orderNo=([^&]+)/)?.[1] || 'ORD202611180001');
+
+                return (
+                  <div className="space-y-4">
+                    <div className="p-4 bg-slate-50 border border-slate-200 rounded-2xl space-y-3">
+                      <div className="flex items-center justify-between border-b border-slate-200/80 pb-2.5">
+                        <span className="text-xs font-mono text-slate-500">발주번호: {orderNo}</span>
+                        <span className="text-[11px] px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 font-bold">
+                          {activeNotiModal.notiType === 'NEW_ORDER' ? '배차/청약 가능' : '일반 공지'}
+                        </span>
+                      </div>
+                      <div>
+                        <h4 className="font-extrabold text-slate-900 text-sm mb-1">
+                          {activeNotiModal.title}
+                        </h4>
+                        <p className="text-xs text-slate-600 leading-relaxed whitespace-pre-line">
+                          {content}
+                        </p>
+                      </div>
+                      <div className="grid grid-cols-2 gap-2 pt-1 text-xs">
+                        <div className="bg-white p-2.5 rounded-xl border border-slate-100">
+                          <span className="text-[11px] text-slate-400 block mb-0.5">시공 대상 지역</span>
+                          <span className="font-bold text-slate-800 truncate block">{areaText}</span>
+                        </div>
+                        <div className="bg-white p-2.5 rounded-xl border border-slate-100">
+                          <span className="text-[11px] text-slate-400 block mb-0.5">희망 시공 제안가</span>
+                          <span className="font-black text-primary truncate block">{priceText}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* 시공사 청약(응찰) 액션 가이드 */}
+                    {activeNotiModal.notiType === 'NEW_ORDER' && (
+                      <div className="p-4 bg-amber-50/70 border border-amber-200/80 rounded-2xl text-xs text-amber-900 space-y-1.5">
+                        <div className="flex items-center gap-1.5 font-bold text-amber-800">
+                          <span className="material-symbols-outlined text-[16px]">info</span>
+                          <span>청약(배차) 신청 안내</span>
+                        </div>
+                        <p className="leading-relaxed text-[11.5px] text-amber-800/90">
+                          위 발주 건은 귀사의 주력 시공 분야(정기청소/입주청소/계절가전)와 매칭되어 실시간 전달되었습니다.
+                          [청약 참여하기]를 누르시면 시공 일정과 제안가를 즉시 확정 접수할 수 있습니다.
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                );
+              })()}
+            </div>
+
+            {/* 모달 푸터 버튼 영역 */}
+            <div className="p-4 bg-slate-50 border-t border-slate-100 flex items-center justify-end gap-2.5">
+              <button
+                type="button"
+                onClick={() => setActiveNotiModal(null)}
+                className="px-4 py-2.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer"
+              >
+                닫기
+              </button>
+
+              {activeNotiModal.targetUrl ? (
+                <button
+                  type="button"
+                  onClick={() => {
+                    const url = activeNotiModal.targetUrl;
+                    setActiveNotiModal(null);
+                    window.location.href = url;
+                  }}
+                  className="px-5 py-2.5 rounded-xl bg-primary text-white text-xs font-black shadow-sm hover:bg-blue-700 transition-colors flex items-center gap-1.5 cursor-pointer"
+                >
+                  <span>발주 상세 및 청약 화면 이동</span>
+                  <span className="material-symbols-outlined text-[16px]">arrow_forward</span>
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => setActiveNotiModal(null)}
+                  className="px-5 py-2.5 rounded-xl bg-slate-800 text-white text-xs font-bold transition-colors cursor-pointer"
+                >
+                  <span className="material-symbols-outlined text-[16px]">done</span>
+                  확인 완료
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -8947,7 +9444,7 @@ export function WebClntOrd010100({
               <img
                 alt="쓸고닦고 공식 로고"
                 className="w-10 h-10 rounded-full object-cover shadow-sm ring-2 ring-primary/20"
-                src="/logo.png"
+                src="/storage/sseuldakgo/logo/Logo_쓸고딱고.jpg"
               />
               <div className="flex flex-col">
                 <span className="font-headline-sm text-headline-sm text-primary font-bold tracking-tight leading-none">
@@ -8958,11 +9455,6 @@ export function WebClntOrd010100({
                 </span>
               </div>
             </a>
-            <div className="hidden sm:flex items-center gap-space-xs bg-surface-container-low px-3 py-1.5 rounded-full text-on-surface-variant font-label-sm text-label-sm cursor-pointer hover:bg-surface-container transition-colors">
-              <span className="material-symbols-outlined text-[16px] text-secondary">location_on</span>
-              <span>경기 고양시 일산동구</span>
-              <span className="material-symbols-outlined text-[16px]">keyboard_arrow_down</span>
-            </div>
           </div>
 
           {/* Navigation Links */}
@@ -9536,7 +10028,7 @@ export function WebClntOrd010100({
               <img
                 alt="쓸고닦고 공식 로고"
                 className="w-8 h-8 rounded-full object-cover shadow-sm ring-1 ring-primary/20"
-                src="/logo.png"
+                src="/storage/sseuldakgo/logo/Logo_쓸고딱고.jpg"
               />
               <span className="font-headline-sm text-headline-sm text-primary font-bold">
                 쓸고닦고
@@ -9789,7 +10281,7 @@ export function WebClntJob010100({
               className="flex items-center gap-2 cursor-pointer"
             >
               <img
-                src="/logo.png"
+                src="/storage/sseuldakgo/logo/Logo_쓸고딱고.jpg"
                 alt="쓸고닦고 공식 로고"
                 className="w-10 h-10 object-contain rounded-full shadow-xs"
               />
@@ -9797,11 +10289,6 @@ export function WebClntJob010100({
                 쓸고닦고
               </span>
             </button>
-            <div className="hidden sm:flex items-center gap-space-xs bg-surface-container-low px-3 py-1.5 rounded-full text-on-surface-variant font-label-sm text-label-sm cursor-pointer hover:bg-surface-container transition-colors">
-              <span className="material-symbols-outlined text-[16px] text-secondary">location_on</span>
-              <span>고양시 일산동구</span>
-              <span className="material-symbols-outlined text-[16px]">keyboard_arrow_down</span>
-            </div>
           </div>
 
           {/* GNB Navigation */}
@@ -10471,7 +10958,7 @@ export function WebClntJob010100({
           <div className="flex flex-wrap items-center justify-between gap-space-md pb-space-md border-b border-slate-200/60">
             <div className="flex items-center gap-space-sm">
               <img
-                src="/logo.png"
+                src="/storage/sseuldakgo/logo/Logo_쓸고딱고.jpg"
                 alt="쓸고닦고 공식 로고"
                 className="w-7 h-7 object-contain rounded-full shadow-xs"
               />

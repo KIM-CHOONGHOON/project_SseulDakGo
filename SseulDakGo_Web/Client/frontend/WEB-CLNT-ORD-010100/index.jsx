@@ -204,7 +204,7 @@ export default function WebClntOrd010100({
               <img
                 alt="쓸고닦고 공식 로고"
                 className="w-10 h-10 rounded-full object-cover shadow-sm ring-2 ring-primary/20"
-                src="/logo.png"
+                src="/storage/project/brand/Logo_쓸고딱고.jpg"
               />
               <div className="flex flex-col">
                 <span className="font-headline-sm text-headline-sm text-primary font-bold tracking-tight leading-none">
@@ -793,7 +793,7 @@ export default function WebClntOrd010100({
               <img
                 alt="쓸고닦고 공식 로고"
                 className="w-8 h-8 rounded-full object-cover shadow-sm ring-1 ring-primary/20"
-                src="/logo.png"
+                src="/storage/project/brand/Logo_쓸고딱고.jpg"
               />
               <span className="font-headline-sm text-headline-sm text-primary font-bold">
                 쓸고닦고
