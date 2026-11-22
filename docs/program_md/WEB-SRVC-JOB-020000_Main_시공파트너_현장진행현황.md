@@ -7,6 +7,11 @@
 - **프론트엔드 경로**: `SseulDakGo_Web/Service/frontend/WEB-SRVC-JOB-020000/index.jsx`
 - **백엔드 모듈 경로**: `SseulDakGo_Web/Service/backend/api_WEB_SRVC_JOB_020000/route.js`
 - **API 엔드포인트**: `GET /api/web/service/job_020000`
+- **호출 트리거**:
+  1. 시공사 GNB 상단 네비게이션 `[현장 진행 현황]` 메뉴 클릭
+  2. 내정보 관리(`WEB-CLNT-MYP-010100`) 화면 내 Section 5 `[현장 진행 현황 바로가기 >]` 버튼 클릭
+  3. 내정보 관리 통계 카드 1(수주 및 시공 진행 중) `[현장 진행 현황 바로가기]` 링크 클릭
+  4. 직접 URL 라우팅 (`/preview/job_020000`, `activeNavPath === 'WEB-SRVC-JOB-020000'`)
 - **목적**:
   - 시공사(용역) 회원이 수주/배차 확정된 진행 현장의 실시간 작업 상황을 모니터링하고 관제합니다.
   - 현장별 시공 5단계 진행 상태 시각화 및 현장 책임자 정보를 제공합니다.

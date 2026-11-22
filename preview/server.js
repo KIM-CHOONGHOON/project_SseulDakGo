@@ -12,6 +12,9 @@ import { processWebClntOrd010100 } from '../SseulDakGo_Web/Client/backend/api_WE
 import { processWebClntPay010100 } from '../SseulDakGo_Web/Client/backend/api_WEB_CLNT_PAY_010100/route.js';
 import { processWebClntJob010100 } from '../SseulDakGo_Web/Client/backend/api_WEB_CLNT_JOB_010100/route.js';
 import { processWebClntMyp010100 } from '../SseulDakGo_Web/Client/backend/api_WEB_CLNT_MYP_010100/route.js';
+import { processWebSrvcJob020000 } from '../SseulDakGo_Web/Service/backend/api_WEB_SRVC_JOB_020000/route.js';
+import { processWebSrvcJob020100 } from '../SseulDakGo_Web/Service/backend/api_WEB_SRVC_JOB_020100/route.js';
+import { processWebSrvcJob020200 } from '../SseulDakGo_Web/Service/backend/api_WEB_SRVC_JOB_020200/route.js';
 import {
   processWebClntMyp020100,
   getCertificationCommonCodes,
@@ -1089,6 +1092,15 @@ app.post('/api/web/client/job_010100', async (req, res) => {
 });
 
 // ============================================================================
+// [API 라우트] GET /api/web/service/job_020000 (시공 파트너 현장 진행 현황 대시보드)
+// [API 라우트] POST /api/web/service/job_020100 (현장 시공 사진 첨부 모달)
+// [API 라우트] POST /api/web/service/job_020200 (현장 시공 완료 등록 모달)
+// ============================================================================
+app.get('/api/web/service/job_020000', processWebSrvcJob020000);
+app.post('/api/web/service/job_020100', processWebSrvcJob020100);
+app.post('/api/web/service/job_020200', processWebSrvcJob020200);
+
+// ============================================================================
 // [API 라우트] ALL /api/web/client/myp_010100 (WEB-CLNT-MYP-010100 내정보 프로필 및 통계)
 // ============================================================================
 app.all('/api/web/client/myp_010100', async (req, res) => {
@@ -1360,6 +1372,11 @@ if (fs.existsSync(externalStoragePath)) {
 // WEB-CLNT-MYP-020100 파트너 자격증 및 경력 검증 관리 프리뷰 라우트
 app.get(['/myp_020100', '/myp_020100.html', '/preview/myp_020100', '/preview/myp_020100.html'], (req, res) => {
   res.sendFile(path.join(__dirname, 'myp_020100.html'));
+});
+
+// WEB-SRVC-JOB-020000 시공 파트너 현장 진행 현황 프리뷰 라우트
+app.get(['/job_020000', '/job_020000.html', '/preview/job_020000', '/preview/job_020000.html'], (req, res) => {
+  res.sendFile(path.join(__dirname, 'job_020000.html'));
 });
 
 // APP-CLNT-MYP-020100 모바일 파트너 자격증 및 경력 등록 프리뷰 라우트

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import WebClntReq010101Modal from '../WEB-CLNT-REQ-010101/index.jsx';
+import WebSrvcJob020000 from '../../../Service/frontend/WEB-SRVC-JOB-020000/index.jsx';
 
 /**
  * ============================================================================
@@ -7256,6 +7257,25 @@ export default function WebClntCom010000({ onNavigate }) {
     );
   };
 
+  // 시공 파트너 현장 진행 현황 (WEB-SRVC-JOB-020000) 화면 전환
+  if (activeNavPath && (activeNavPath === "WEB-SRVC-JOB-020000" || activeNavPath === "job-progress")) {
+    return (
+      <WebSrvcJob020000
+        currentUser={userInfo}
+        onLogout={() => {
+          setUserInfo({
+            isGuest: true,
+            USER_NO: "GUEST",
+            USER_NM: "비회원",
+            USER_ROLE_CD: "GUEST",
+          });
+          setActiveNavPath("home");
+        }}
+        onNavigate={(path) => setActiveNavPath(path)}
+      />
+    );
+  }
+
   // 청소 시공 검수 및 현장 직불 완료 승인 (WEB-CLNT-JOB-010100) 화면 전환
   if (activeNavPath && (activeNavPath === "WEB-CLNT-JOB-010100" || activeNavPath.startsWith("WEB-CLNT-JOB-010100?") || activeNavPath === "inspection")) {
     const urlParams = new URLSearchParams(activeNavPath.includes('?') ? activeNavPath.split('?')[1] : '');
@@ -7452,7 +7472,7 @@ export default function WebClntCom010000({ onNavigate }) {
                   type="button"
                   className="px-3.5 py-1.5 rounded-full font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all cursor-pointer"
                   onClick={() => {
-                    alert('[WEB-SRVC-JOB-020000] 시공 파트너 현장 진행 현황 화면으로 이동합니다.');
+                    setActiveNavPath('WEB-SRVC-JOB-020000');
                   }}
                 >
                   현장 진행 현황

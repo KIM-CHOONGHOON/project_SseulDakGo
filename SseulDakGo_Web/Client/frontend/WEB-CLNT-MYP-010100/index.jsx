@@ -411,7 +411,7 @@ export default function WebClntMyp010100({
               </div>
               <a
                 className="mt-5 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-[#003d9b] group-hover:underline cursor-pointer"
-                onClick={() => onNavigate?.('quotes')}
+                onClick={() => onNavigate?.(isContractor ? 'WEB-SRVC-JOB-020000' : 'quotes')}
               >
                 <span>{isContractor ? '수주 일감 관리 바로가기' : '의뢰 내역 바로가기'}</span>
                 <span className="material-symbols-outlined text-[16px] transition-transform group-hover:translate-x-1">arrow_forward</span>
@@ -567,6 +567,16 @@ export default function WebClntMyp010100({
                 <h2 className="text-lg font-extrabold text-slate-900">
                   {isContractor ? '시공 파트너 현장 진행 현황' : '진행 중인 공간 케어 현황'}
                 </h2>
+                {isContractor && (
+                  <button
+                    type="button"
+                    onClick={() => onNavigate?.('WEB-SRVC-JOB-020000')}
+                    className="ml-2 px-3 py-1 rounded-full bg-[#003d9b] hover:bg-[#002b6e] text-white text-xs font-bold transition-all shadow-xs flex items-center gap-1 cursor-pointer"
+                  >
+                    <span>현장 진행 현황 바로가기</span>
+                    <span className="material-symbols-outlined text-[14px]">arrow_forward</span>
+                  </button>
+                )}
                 <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-100 text-[#006a61]">
                   D-Day 14:00 예약
                 </span>
@@ -659,7 +669,7 @@ export default function WebClntMyp010100({
                 </div>
                 <div className="flex flex-col gap-2 mt-1">
                   <button
-                    onClick={() => showToast('실시간 시공 갤러리(사진 8장)를 불러옵니다.')}
+                    onClick={() => isContractor ? onNavigate?.('WEB-SRVC-JOB-020000') : showToast('실시간 시공 갤러리(사진 8장)를 불러옵니다.')}
                     className="w-full py-2.5 px-4 rounded-xl bg-[#003d9b] hover:bg-[#002b6e] text-white text-xs font-bold transition-colors flex items-center justify-center gap-2 shadow-xs cursor-pointer"
                     type="button"
                   >
