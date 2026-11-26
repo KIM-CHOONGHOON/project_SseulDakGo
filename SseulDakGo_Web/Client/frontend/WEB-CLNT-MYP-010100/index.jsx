@@ -221,6 +221,12 @@ export default function WebClntMyp010100({
     window.alert('회원 탈퇴 시 진행 중인 공간 케어 보증 서비스 및 잔여 포인트(15,000P)가 즉시 소멸됩니다. 고객센터(1588-7824)를 통해 정산 후 진행 가능합니다.');
   };
 
+  // 회원탈회 모달 열기 (placeholder implementation)
+  const handleOpenLeaveModal = () => {
+    // TODO: replace with actual modal implementation
+    window.alert('회원 탈회 모달을 열 예정입니다.');
+  };
+
   // 백엔드 API 연동
   useEffect(() => {
     const fetchProfile = async () => {
@@ -742,6 +748,30 @@ export default function WebClntMyp010100({
                     >
                       재설정
                     </button>
+                    <div className="flex items-center space-x-2 mt-2">
+                      <button
+                        className="px-4 py-2 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-bold flex items-center gap-1.5 cursor-pointer"
+                        onClick={handleConfirmLogout}
+                        type="button"
+                      >
+                        <span className="material-symbols-outlined text-[18px]">logout</span>
+                        로그아웃
+                      </button>
+                      <button
+                        className="px-4 py-2 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-bold flex items-center gap-1.5 cursor-pointer"
+                        onClick={handleOpenLeaveModal}
+                        type="button"
+                      >
+                        회원탈회
+                      </button>
+                      <button
+                        className="text-slate-400 hover:text-red-500 text-xs font-medium underline decoration-slate-300 underline-offset-4 cursor-pointer"
+                        onClick={handleOpenDeleteModal}
+                        type="button"
+                      >
+                        회원탈퇴 안내
+                      </button>
+                    </div>
                   </div>
 
 

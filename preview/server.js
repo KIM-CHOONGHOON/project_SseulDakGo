@@ -15,6 +15,11 @@ import { processWebClntMyp010100 } from '../SseulDakGo_Web/Client/backend/api_WE
 import { processWebSrvcJob020000 } from '../SseulDakGo_Web/Service/backend/api_WEB_SRVC_JOB_020000/route.js';
 import { processWebSrvcJob020100 } from '../SseulDakGo_Web/Service/backend/api_WEB_SRVC_JOB_020100/route.js';
 import { processWebSrvcJob020200 } from '../SseulDakGo_Web/Service/backend/api_WEB_SRVC_JOB_020200/route.js';
+import { processWebSrvcMyp010100 } from '../SseulDakGo_Web/Service/backend/api_WEB_SRVC_MYP_010100/route.js';
+import { processWebSrvcMyp010200 } from '../SseulDakGo_Web/Service/backend/api_WEB_SRVC_MYP_010200/route.js';
+import { processWebSrvcMyp010201 } from '../SseulDakGo_Web/Service/backend/api_WEB_SRVC_MYP_010201/route.js';
+import { processWebSrvcQot010100 } from '../SseulDakGo_Web/Service/backend/api_WEB_SRVC_QOT_010100/route.js';
+import { processWebSrvcQot020200 } from '../SseulDakGo_Web/Service/backend/api_WEB_SRVC_QOT_020200/route.js';
 import {
   processWebClntMyp020100,
   getCertificationCommonCodes,
@@ -683,128 +688,62 @@ app.get(['/api/common/notifications', '/api/web/client/notifications', '/api/app
       return res.status(200).json({ success: true, unreadCount: 0, list: [] });
     }
 
-    // 1. 시공사(S)인 경우, 만약 TB_USER_NOTIFICATION에 알림이 없다면 실시간 발주 푸시 알림 자동 동기화
+    // 1. 시공사(S)인 경우, 실제 TB_ORDER_MSTR + TB_ORDER_DTL 실 데이터만 조회하여 반환 (목업 데이터 배제)
     if (userNo.startsWith('S')) {
-      try {
-        const notiCheck = await executeQuery(
-          'SELECT COUNT(*) as cnt FROM TB_USER_NOTIFICATION WHERE USER_NO = ?',
-          [userNo]
-        );
-        if (notiCheck[0]?.cnt === 0) {
-          const todayStr = new Date().toISOString().slice(0, 10).replace(/-/g, '');
-          const userSuffix = userNo.replace(/[^0-9]/g, '').slice(-4) || '0001';
+      const orders = await executeQuery(
+        `SELECT M.ORDER_NO,
+                M.PROPOSED_PRICE,
+                M.ADDR_TEXT,
+                M.ORDER_STATUS,
+                DATE_FORMAT(M.REG_DT, '%Y-%m-%d %H:%i:%s') AS regDt,
+                D.CLEAN_LARGE_CD,
+                D.SELECTED_SRV_ITEMS,
+                D.SUPPLY_PYEONG,
+                Q.APPLY_NO
+           FROM TB_ORDER_MSTR M
+           JOIN TB_ORDER_DTL D ON M.ORDER_NO = D.ORDER_NO
+           LEFT JOIN TB_QUOTE_APPLY Q
+             ON M.ORDER_NO = Q.ORDER_NO AND Q.SERVICE_USER_NO = ?
+          WHERE M.ORDER_STATUS = 'BID_OPEN' OR Q.APPLY_NO IS NOT NULL
+          ORDER BY M.REG_DT DESC
+          LIMIT 30`,
+        [userNo]
+      );
 
-          let orders = [];
-          try {
-            // 시공사의 주력 시공 분야(LARGE_CD) 조회
-            const uRows = await executeQuery('SELECT MAIN_CLEAN_LARGE_CD FROM TB_USER WHERE USER_NO = ? LIMIT 1', [userNo]);
-            const mainCd = uRows[0]?.MAIN_CLEAN_LARGE_CD || '';
+      const catMap = { REGULAR: '정기청소', MOVEIN: '입주청소', APPLIANCE: '계절가전청소' };
+      const realList = (orders || []).map((o, idx) => {
+        const cleanTypeNm = catMap[o.CLEAN_LARGE_CD] || '정기청소';
+        const shortAddr = String(o.ADDR_TEXT || '').split(/\s+/).slice(0, 3).join(' ');
+        const cleanScope = o.SELECTED_SRV_ITEMS || (o.SUPPLY_PYEONG ? `공급 ${o.SUPPLY_PYEONG}평형` : cleanTypeNm);
+        const isQuoted = Boolean(o.APPLY_NO);
+        return {
+          notiId: `ORD_${o.ORDER_NO}_${idx}`,
+          orderNo: o.ORDER_NO,
+          CLEAN_TYPE_NM: cleanTypeNm,
+          SITE_ADDR: shortAddr,
+          CLEAN_SCOPE: cleanScope,
+          FIXED_PRICE: o.PROPOSED_PRICE,
+          title: `[신규 청소 발주] ${cleanTypeNm}`,
+          content: `발주번호: ${o.ORDER_NO} 현장: ${shortAddr} • ${cleanScope}`,
+          isRead: isQuoted ? 'Y' : 'N',
+          regDt: o.regDt,
+          isQuoted,
+          IS_QUOTED: isQuoted,
+        };
+      });
 
-            orders = await executeQuery(
-              `SELECT m.ORDER_NO, m.PROPOSED_PRICE, m.ADDR_TEXT, m.ADDR_DETAIL, m.REG_DT, d.CLEAN_LARGE_CD
-               FROM TB_ORDER_MSTR m
-               LEFT JOIN TB_ORDER_DTL d ON m.ORDER_NO = d.ORDER_NO
-               WHERE (? = '' OR d.CLEAN_LARGE_CD IS NULL OR FIND_IN_SET(d.CLEAN_LARGE_CD, ?) > 0 OR ? LIKE CONCAT('%', d.CLEAN_LARGE_CD, '%'))
-               ORDER BY m.REG_DT DESC LIMIT 5`,
-              [mainCd, mainCd, mainCd]
-            );
-          } catch (e) {
-            orders = [];
-          }
-
-          if (orders && orders.length > 0) {
-            for (let i = 0; i < orders.length; i++) {
-              const o = orders[i];
-              const notiId = `NT${todayStr}${userSuffix}${String(i + 1).padStart(3, '0')}`;
-              const notiTitle = `[신규 청소 발주] 경기 고양시 청소 요청이 접수되었습니다.`;
-              const notiContent = `[쓸고닦고] 발주번호: ${o.ORDER_NO}\n현장: ${o.ADDR_TEXT || ''} ${o.ADDR_DETAIL || ''}\n고객 지정가: ${Number(o.PROPOSED_PRICE || 0).toLocaleString()}원`;
-              await executeQuery(
-                `INSERT INTO TB_USER_NOTIFICATION (
-                  NOTI_ID, USER_NO, NOTI_TYPE, TITLE, CONTENT, TARGET_URL, IS_READ, REG_DT
-                ) VALUES (?, ?, 'NEW_ORDER', ?, ?, ?, 'N', ?)
-                ON DUPLICATE KEY UPDATE CONTENT = VALUES(CONTENT)`,
-                [notiId, userNo, notiTitle, notiContent, `/preview_client/WEB-CLNT-ORD-010100.html?orderNo=${o.ORDER_NO}`, o.REG_DT || new Date()]
-              );
-            }
-          } else {
-            // DB에 등록된 주문이 아직 없는 경우에도 시공사가 실시간 발주 푸시를 수신할 수 있도록 기본 청소 발주 푸시 생성
-            const defaultNotis = [
-              {
-                orderNo: 'ORD-20261116-0001',
-                title: '[신규 청소 발주] 경기 고양시 일산동구 정기청소 요청이 접수되었습니다.',
-                content: '[쓸고닦고] 발주번호: ORD-20261116-0001\n고객 지정가: 450,000원\n현장: 경기 고양시 일산동구 백석동 120-1 (백석 상가빌딩 1~2층)\n• 정기 순회 대상 구역: 상가 1~2층 공용 복도, 계단실, 남녀 화장실 2개소, 1층 로비 출입문 유리창 (주 2회 월 8회 정기 순회 관리, 쓰레기 분리수거 포함)',
-                url: '/preview_client/WEB-CLNT-ORD-010100.html?orderNo=ORD-20261116-0001'
-              },
-              {
-                orderNo: 'ORD-20261116-0002',
-                title: '[신규 청소 발주] 가전 분해세척(시스템에어컨 4대) 요청이 접수되었습니다.',
-                content: '[쓸고닦고] 발주번호: ORD-20261116-0002\n고객 지정가: 380,000원\n현장: 경기 고양시 일산서구 주엽동 강선마을 14단지 (1402동 502호)\n• 계절가전청소 세부 조건: 천장형 4way 시스템에어컨 4대 완전분해 친환경 고압세척 (드레인판, 송풍팬, 필터 고압 세척 및 피톤치드 살균 탈취 코팅 포함)',
-                url: '/preview_client/WEB-CLNT-ORD-010100.html?orderNo=ORD-20261116-0002'
-              },
-              {
-                orderNo: 'ORD-20261116-0003',
-                title: '[신규 청소 발주] 식사동 위시티 34평형 아파트 입주청소 요청',
-                content: '[쓸고닦고] 발주번호: ORD-20261116-0003\n고객 지정가: 420,000원\n현장: 경기 고양시 일산동구 식사동 위시티일산자이 2단지 (204동 1203호)\n• 입주/이사 청소 세부 조건: 공급 34평형 전체 내부 창틀, 유리창, 베란다 배수구, 주방 싱크대/후드 기름때 완벽 제거, 욕실 2개소 물때/곰팡이 방지 시공, 바닥 고온스팀 살균',
-                url: '/preview_client/WEB-CLNT-ORD-010100.html?orderNo=ORD-20261116-0003'
-              }
-            ];
-
-            for (let i = 0; i < defaultNotis.length; i++) {
-              const dn = defaultNotis[i];
-              const notiId = `NT${todayStr}${userSuffix}${String(i + 1).padStart(3, '0')}`;
-              await executeQuery(
-                `INSERT INTO TB_USER_NOTIFICATION (
-                  NOTI_ID, USER_NO, NOTI_TYPE, TITLE, CONTENT, TARGET_URL, IS_READ, REG_DT
-                ) VALUES (?, ?, 'NEW_ORDER', ?, ?, ?, 'N', NOW())
-                ON DUPLICATE KEY UPDATE TITLE = VALUES(TITLE), CONTENT = VALUES(CONTENT), IS_READ = 'N'`,
-                [notiId, userNo, dn.title, dn.content, dn.url]
-              );
-            }
-          }
-        }
-      } catch (syncErr) {
-        console.warn('⚠️ [NOTI_SYNC_WARN]', syncErr.message);
-      }
+      const unreadCount = realList.filter((item) => !item.isQuoted).length;
+      return res.status(200).json({
+        success: true,
+        unreadCount,
+        list: realList,
+      });
     }
-
-    // 2. 미확인 건수 조회
-    const countRows = await executeQuery(
-      `SELECT COUNT(*) as unreadCount 
-       FROM TB_USER_NOTIFICATION 
-       WHERE USER_NO = ? AND IS_READ = 'N'`,
-      [userNo]
-    );
-    const unreadCount = countRows[0]?.unreadCount || 0;
-
-    // 3. 알림 목록 조회 (최신순 30건)
-    const listRows = await executeQuery(
-      `SELECT 
-        NOTI_ID as notiId,
-        USER_NO as userNo,
-        NOTI_TYPE as notiType,
-        TITLE as title,
-        CONTENT as content,
-        TARGET_URL as targetUrl,
-        IS_READ as isRead,
-        DATE_FORMAT(REG_DT, '%Y-%m-%d %H:%i:%s') as regDt
-       FROM TB_USER_NOTIFICATION 
-       WHERE USER_NO = ? 
-       ORDER BY REG_DT DESC 
-       LIMIT 30`,
-      [userNo]
-    );
-
-    return res.status(200).json({
-      success: true,
-      unreadCount,
-      list: listRows || []
-    });
   } catch (error) {
-    console.error('❌ [NOTI_GET_ERR]', error);
+    console.error(error);
     return res.status(500).json({ success: false, message: error.message, unreadCount: 0, list: [] });
   }
 });
-
 // 단건 읽음 처리
 app.post(['/api/common/notifications/read', '/api/web/client/notifications/read', '/api/app/client/notifications/read'], async (req, res) => {
   try {
@@ -1099,6 +1038,54 @@ app.post('/api/web/client/job_010100', async (req, res) => {
 app.get('/api/web/service/job_020000', processWebSrvcJob020000);
 app.post('/api/web/service/job_020100', processWebSrvcJob020100);
 app.post('/api/web/service/job_020200', processWebSrvcJob020200);
+
+// ============================================================================
+// [API 라우트] WEB-SRVC-MYP-010100 / 010200 / 010201 (시공사 내정보·지역관리·회원탈회)
+// ============================================================================
+app.all('/api/srvc/myp/010100', async (req, res) => {
+  try {
+    const result = await processWebSrvcMyp010100(req.body || {}, req.query || {}, req.method);
+    return res.status(result.status || 200).json(result);
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error?.message || '시공사 내정보 처리 오류' });
+  }
+});
+
+app.get('/api/srvc/myp/010200', async (req, res) => {
+  try {
+    const result = await processWebSrvcMyp010200(req.query || {});
+    return res.status(result.status || 200).json(result);
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error?.message || '시공사 탈회 조건 검증 오류' });
+  }
+});
+
+app.patch('/api/srvc/myp/010201', async (req, res) => {
+  try {
+    const result = await processWebSrvcMyp010201(req.body || {});
+    return res.status(result.status || 200).json(result);
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error?.message || '시공사 회원 탈회 처리 오류' });
+  }
+});
+
+app.post('/api/srvc/qot/010100', async (req, res) => {
+  try {
+    const result = await processWebSrvcQot010100(req.body || {});
+    return res.status(result.status || 200).json(result);
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error?.message || '확정가 청약 신청 오류' });
+  }
+});
+
+app.get('/api/srvc/qot/020200', async (req, res) => {
+  try {
+    const result = await processWebSrvcQot020200(req.query || {});
+    return res.status(result.status || 200).json(result);
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error?.message || '청약진행상태 상세 조회 오류' });
+  }
+});
 
 // ============================================================================
 // [API 라우트] ALL /api/web/client/myp_010100 (WEB-CLNT-MYP-010100 내정보 프로필 및 통계)

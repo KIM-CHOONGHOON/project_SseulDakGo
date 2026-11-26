@@ -18,13 +18,33 @@ try {
   console.error('❌ TypeScript build error for WEB-CLNT-COM-010000:', e.message);
 }
 
-let code = fs.readFileSync(path.join(tempBuildDir, 'index.js'), 'utf8');
+const mainJsPath = fs.existsSync(path.join(tempBuildDir, 'index.js'))
+  ? path.join(tempBuildDir, 'index.js')
+  : path.join(tempBuildDir, 'Client', 'frontend', 'WEB-CLNT-COM-010000', 'index.js');
 
-// Replace any import React from 'react' with window.React
-code = code.replace(/import\s+React\s*,?\s*\{([^}]+)\}\s+from\s+['"]react['"];?/g, (match, hooks) => {
-  return `const { ${hooks.trim()} } = window.React;\nconst React = window.React;`;
-});
-code = code.replace(/import\s+React\s+from\s+['"]react['"];?/g, 'const React = window.React;');
+let code = '';
+const reqModalPath = path.join(tempBuildDir, 'Client', 'frontend', 'WEB-CLNT-REQ-010101', 'index.js');
+if (fs.existsSync(reqModalPath)) {
+  code += fs.readFileSync(reqModalPath, 'utf8') + '\n';
+}
+const srvcQot020200Path = path.join(tempBuildDir, 'Service', 'frontend', 'WEB-SRVC-QOT-020200', 'index.js');
+if (fs.existsSync(srvcQot020200Path)) {
+  code += fs.readFileSync(srvcQot020200Path, 'utf8') + '\n';
+}
+const srvcMypPath = path.join(tempBuildDir, 'Service', 'frontend', 'WEB-SRVC-MYP-010100', 'index.js');
+if (fs.existsSync(srvcMypPath)) {
+  code += fs.readFileSync(srvcMypPath, 'utf8') + '\n';
+}
+code += fs.readFileSync(mainJsPath, 'utf8');
+
+code = code.replace(/import\s+WebClntReq010101Modal\s+from\s+['"][^'"]+['"];?/g, '');
+code = code.replace(/import\s+WebSrvcMyp010100\s+from\s+['"][^'"]+['"];?/g, '');
+code = code.replace(/import\s+WebSrvcQot020200Modal\s+from\s+['"][^'"]+['"];?/g, '');
+
+// Replace any import React from 'react' with a single top-level declaration
+code = code.replace(/import\s+React\s*,?\s*\{[^}]+\}\s+from\s+['"]react['"];?/g, '');
+code = code.replace(/import\s+React\s+from\s+['"]react['"];?/g, '');
+code = `const React = window.React;\nconst { useState, useEffect, useCallback, useRef, useMemo } = window.React;\n` + code;
 
 // Strip ES module exports so it can run as a standalone browser script
 code = code.replace(/export\s+function\s+/g, 'function ');

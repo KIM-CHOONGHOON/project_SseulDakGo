@@ -2428,7 +2428,7 @@ export default function WebClntReq010100Modal({
               type="submit"
             >
               <span className="material-symbols-outlined text-[20px]">assignment_turned_in</span>
-              <span>{isSubmitting ? '발주 등록 중...' : '+ 청소 서비스 신청 완료 (확정 발주)'}</span>
+              <span>{isSubmitting ? '발주 등록 중...' : '+ 청소 서비스 신청 등록'}</span>
             </button>
           </div>
         </footer>

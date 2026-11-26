@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import WebClntReq010101Modal from '../WEB-CLNT-REQ-010101/index.jsx';
-import WebSrvcJob020000 from '../../../Service/frontend/WEB-SRVC-JOB-020000/index.jsx';
+import WebSrvcMyp010100 from '../../../Service/frontend/WEB-SRVC-MYP-010100/index.jsx';
 
 /**
  * ============================================================================
@@ -2629,7 +2629,7 @@ export default function WebClntReq010100Modal({
             type="submit"
           >
             <span className="material-symbols-outlined text-[20px]">assignment_turned_in</span>
-            <span>{isSubmitting ? '발주 등록 중...' : '+ 청소 서비스 신청 완료 (확정 발주)'}</span>
+            <span>{isSubmitting ? '발주 등록 중...' : '+ 청소 서비스 신청 등록'}</span>
           </button>
         </div>
       </footer>
@@ -2750,6 +2750,17 @@ export const WebClntReq010100 = WebClntReq010100Modal;
  * - onOpenRegister: 회원가입 모달 전환 핸들러 () => void
  * - onOpenFindPwd: 비밀번호 찾기 모달 전환 핸들러 () => void
  */
+/**
+ * @file SseulDakGo_Web/Client/frontend/WEB-CLNT-ATH-010100/index.jsx
+ * @description 고객 및 시공사 회원 로그인 모달 컴포넌트 (WEB-CLNT-ATH-010100)
+ * 
+ * Props:
+ * - isOpen: 모달 노출 여부 (boolean)
+ * - onClose: 모달 닫기 핸들러 () => void
+ * - onSuccessLogin: 로그인 성공 콜백 (userData: { userNo, userNm, userEmail, userRoleCd, hasTempReq }) => void
+ * - onOpenRegister: 회원가입 모달 전환 핸들러 () => void
+ * - onOpenFindPwd: 비밀번호 찾기 모달 전환 핸들러 () => void
+ */
 export function WebClntAth010100({
   isOpen = false,
   onClose,
@@ -2849,7 +2860,7 @@ export function WebClntAth010100({
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          userRoleCd: role,
+          userRoleCd: (profile.userRoleCd || role),
           userEmail: email.trim(),
           userPwd: pwd,
           keepLogin
@@ -2895,7 +2906,7 @@ export function WebClntAth010100({
         userNo: role === 'C' ? 'C20261000001' : 'S20261000001',
         userNm: role === 'C' ? '홍길동' : '김반장 (마스터)',
         userEmail: email.trim(),
-        userRoleCd: role,
+        userRoleCd: (profile.userRoleCd || role),
         accessToken: `mock_jwt_token_${Date.now()}`,
         hasTempReq,
         keepLogin,
@@ -2908,14 +2919,13 @@ export function WebClntAth010100({
     }
   };
 
-  // 소셜 간편 로그인 (네이버 / 카카오 / Google OAuth 2.0 공식 팝업 연동)
+  // 소셜 간편 로그인 (네이버 / 카카오 / Google OAuth 2.0 공식 연동)
   const handleSocialLogin = async (provider) => {
     setIsLoading(true);
     setErrorMsg('');
 
     if (typeof window !== 'undefined') {
       const providerLower = provider.toLowerCase();
-      // file:/// 로컬 파일 실행 환경과 http:// 로컬 서버 환경 모두 완벽 호환되도록 경로 동적 계산
       let popupUrl = `./${providerLower}_oauth_popup.html?action=login&userRoleCd=${role}`;
       if (window.location.protocol.startsWith('http')) {
         popupUrl = `/preview/${providerLower}_oauth_popup.html?action=login&userRoleCd=${role}`;
@@ -2926,96 +2936,71 @@ export function WebClntAth010100({
       const left = window.screenX + (window.outerWidth - width) / 2;
       const top = window.screenY + (window.outerHeight - height) / 2;
 
-      const onSocialMessage = async (e) => {
-        if (e.data?.provider === provider || e.data?.type?.startsWith(provider)) {
-          window.removeEventListener('message', onSocialMessage);
-          setIsLoading(true);
-          const profile = e.data.profile || e.data?.data?.profile || {};
-          try {
-            // 백엔드 실제 TB_USER DB 조회 (기존 가입 여부 검증)
-            const checkRes = await fetch('/api/web/client/ath_010100', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                userRoleCd: role,
-                socialProvider: provider,
-                socialUid: profile.id,
-                userEmail: profile.email
-              })
-            });
-            const checkData = await checkRes.json();
-            setIsLoading(false);
+      let bridgeCompleted = false;
 
-            if (checkData.success && !checkData.isNewUser && checkData.data) {
-              // 1. 기존 가입 회원: 실제 DB 정보로 로그인 성공 처리
-              const loggedUser = {
-                ...checkData.data,
-                hasTempReq
-              };
-              localStorage.setItem('SSEULDAKGO_AUTH_USER', JSON.stringify(loggedUser));
-              if (onSuccessLogin) onSuccessLogin(loggedUser);
-              if (onClose) onClose();
-            } else {
-              // 2. 미가입 신규 회원: 로그인 모달 닫고 회원가입 모달 열기 + 소셜 인증 정보 주입
-              if (onClose) onClose();
-              if (onOpenRegister) {
-                onOpenRegister({
-                  socialProvider: provider,
-                  socialUid: profile.id,
-                  email: profile.email,
-                  name: profile.name,
-                  mobile: profile.mobile
-                });
-              } else {
-                alert(`${provider} 계정 인증이 완료되었습니다. 필수 약관 동의 및 회원가입을 완료해 주세요.`);
-              }
-            }
-          } catch (err) {
-            console.error('Social login DB check error:', err);
-            setIsLoading(false);
+      const doProcessLogin = async (profile) => {
+        if (bridgeCompleted) return;
+        bridgeCompleted = true;
+        setIsLoading(true);
+        try {
+          const checkRes = await fetch('/api/web/client/ath_010100', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              userRoleCd: (profile.userRoleCd || role),
+              socialProvider: provider,
+              socialUid: profile.id,
+              userEmail: profile.email,
+              userNm: profile.name,
+              userTel: profile.mobile,
+            }),
+          });
+          const checkData = await checkRes.json();
+          setIsLoading(false);
+
+          if (checkData.success) {
+            const loginUser = {
+              ...checkData.data,
+              hasTempReq,
+            };
+            localStorage.setItem('SSEULDAKGO_AUTH_USER', JSON.stringify(loginUser));
+            localStorage.setItem('SSEULDAKGO_KEEP_LOGIN', 'Y');
+            if (onSuccessLogin) onSuccessLogin(loginUser);
+            if (onClose) onClose();
+          } else {
+            setErrorMsg(checkData.message || '소셜 로그인 처리에 실패했습니다.');
           }
+        } catch (err) {
+          console.error('Web social login error:', err);
+          setIsLoading(false);
         }
       };
-      window.addEventListener('message', onSocialMessage);
 
-      // 팝업 열기
-      const popup = window.open(popupUrl, `${providerLower}_login_popup`, `width=${width},height=${height},left=${left},top=${top},scrollbars=yes`);
+      const onMsg = (e) => {
+        if (e.data && e.data.type === `${provider}_AUTH_SUCCESS` && e.data.profile) {
+          window.removeEventListener('message', onMsg);
+          doProcessLogin(e.data.profile);
+        }
+      };
+      window.addEventListener('message', onMsg);
 
-      // 팝업 감지 타이머 (postMessage 차단 환경 및 팝업 닫힘 시 100% 자동 연동 보장)
-      const bridgeTimer = setInterval(async () => {
+      const checkStorage = setInterval(() => {
         try {
           const raw = localStorage.getItem('SSEULDAKGO_SOCIAL_LOGIN_BRIDGE');
           if (raw) {
-            const bridge = JSON.parse(raw);
-            if (bridge && (Date.now() - bridge.timestamp < 15000) && bridge.provider === provider) {
-              clearInterval(bridgeTimer);
+            const parsed = JSON.parse(raw);
+            if (parsed.provider === provider && Date.now() - parsed.timestamp < 10000) {
               localStorage.removeItem('SSEULDAKGO_SOCIAL_LOGIN_BRIDGE');
-              onSocialMessage({ data: { provider, profile: bridge.profile } });
-              return;
+              clearInterval(checkStorage);
+              doProcessLogin(parsed.profile);
             }
           }
-          if (popup && popup.closed) {
-            clearInterval(bridgeTimer);
-            const finalRaw = localStorage.getItem('SSEULDAKGO_SOCIAL_LOGIN_BRIDGE');
-            if (finalRaw) {
-              const finalBridge = JSON.parse(finalRaw);
-              if (finalBridge && finalBridge.provider === provider) {
-                localStorage.removeItem('SSEULDAKGO_SOCIAL_LOGIN_BRIDGE');
-                onSocialMessage({ data: { provider, profile: finalBridge.profile } });
-                return;
-              }
-            }
-            setIsLoading(false);
-          }
-        } catch (e) {
-          clearInterval(bridgeTimer);
-          setIsLoading(false);
-        }
-      }, 400);
+        } catch (e) {}
+      }, 300);
+      setTimeout(() => clearInterval(checkStorage), 60000);
 
-      if (popup && !popup.closed) {
-        return;
-      }
+      window.open(popupUrl, `${providerLower}_oauth_popup`, `width=${width},height=${height},left=${left},top=${top},scrollbars=yes`);
+      return;
     }
 
     try {
@@ -3023,7 +3008,7 @@ export function WebClntAth010100({
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          userRoleCd: role,
+          userRoleCd: (profile.userRoleCd || role),
           socialProvider: provider,
           socialUid: `demo_${provider.toLowerCase()}_${Date.now()}`
         })
@@ -3044,7 +3029,7 @@ export function WebClntAth010100({
         userNo: role === 'C' ? 'C20261000001' : 'S20261000001',
         userNm: `${provider} 사용자`,
         userEmail: `${provider.toLowerCase()}@example.com`,
-        userRoleCd: role,
+        userRoleCd: (profile.userRoleCd || role),
         accessToken: `mock_social_token_${Date.now()}`,
         hasTempReq
       };
@@ -3086,7 +3071,7 @@ export function WebClntAth010100({
         <div className="flex flex-col items-center text-center mt-1 mb-4">
           <div className="w-14 h-14 rounded-full overflow-hidden shadow-md ring-4 ring-secondary-container/40 mb-3 flex items-center justify-center bg-white">
             <img
-              src="/storage/sseuldakgo/logo/Logo_쓸고딱고.jpg"
+              src="/storage/project/brand/Logo_쓸고딱고.jpg"
               alt="쓸고닦고 로고"
               className="w-full h-full object-cover rounded-full"
             />
@@ -3102,50 +3087,7 @@ export function WebClntAth010100({
           </p>
         </div>
 
-        {/* 2. 회원 구분 라디오 (USER_ROLE_CD) */}
-        <div
-          aria-label="회원 유형 선택"
-          className="w-full bg-surface-container-low p-1 rounded-xl grid grid-cols-2 gap-1 mb-3"
-          data-field="USER_ROLE_CD"
-          role="radiogroup"
-        >
-          <button
-            aria-checked={role === 'C'}
-            className={`flex items-center justify-center gap-1.5 h-10 rounded-lg font-label-md text-label-md transition-all ${
-              role === 'C'
-                ? 'bg-surface-container-lowest text-primary shadow-sm font-bold'
-                : 'text-on-surface-variant hover:text-on-surface'
-            }`}
-            data-role="C"
-            id="role-client"
-            onClick={() => setRole('C')}
-            role="radio"
-            type="button"
-          >
-            <span className={`material-symbols-outlined text-[16px] ${role === 'C' ? 'text-secondary' : 'text-outline'}`}>
-              {role === 'C' ? 'radio_button_checked' : 'radio_button_unchecked'}
-            </span>
-            <span>고객 회원</span>
-          </button>
-          <button
-            aria-checked={role === 'S'}
-            className={`flex items-center justify-center gap-1.5 h-10 rounded-lg font-label-md text-label-md transition-all ${
-              role === 'S'
-                ? 'bg-surface-container-lowest text-primary shadow-sm font-bold'
-                : 'text-on-surface-variant hover:text-on-surface'
-            }`}
-            data-role="S"
-            id="role-partner"
-            onClick={() => setRole('S')}
-            role="radio"
-            type="button"
-          >
-            <span className={`material-symbols-outlined text-[16px] ${role === 'S' ? 'text-secondary' : 'text-outline'}`}>
-              {role === 'S' ? 'radio_button_checked' : 'radio_button_unchecked'}
-            </span>
-            <span>시공사 회원</span>
-          </button>
-        </div>
+        {/* 2. 회원 구분 라디오는 삭제됨: 로그인 시 TB_USER의 USER_ROLE_CD에 따라 고객/시공사로 자동 분기 */}
 
         {/* 3. 비회원 임시 요청서 감지 배너 (조건부 노출) */}
         {hasTempReq && (
@@ -3362,26 +3304,10 @@ export function WebClntAth010100({
   );
 }
 
-// ============================================================================
-// [모달 컴포넌트] WEB-CLNT-ATH-010200 (통합 회원가입 및 4대 약관 정독 모달)
-// ============================================================================
 /**
  * @file SseulDakGo_Web/Client/frontend/WEB-CLNT-ATH-010200/index.jsx
  * @description 통합 회원가입 및 4대 약관 정독 모달 컴포넌트 (WEB-CLNT-ATH-010200)
- *              - SNS(카카오, 네이버, Google, Apple) 연동 간편 가입 및 일반 이메일 가입
- *              - 자필 전자서명 캔버스 패드 & 서명 지우기 & PNG 파일 저장 연동
- * 
- * Props:
- * - isOpen: 모달 표시 여부 (boolean)
- * - onClose: 모달 닫기 핸들러 () => void
- * - onSuccessRegister: 가입 완료 성공 콜백 (userData) => void
- * - onOpenLogin: 로그인 모달(WEB-CLNT-ATH-010100) 전환 핸들러 () => void
- */
-
-/**
- * @file SseulDakGo_Web/Client/frontend/WEB-CLNT-ATH-010200/index.jsx
- * @description 통합 회원가입 및 4대 약관 정독 모달 컴포넌트 (WEB-CLNT-ATH-010200)
- *              - SNS(카카오, 네이버, Google, Apple) 연동 간편 가입 및 일반 이메일 가입
+ *              - SNS(카카오, 네이버, Google) 연동 간편 가입 및 일반 이메일 가입
  *              - 자필 전자서명 캔버스 패드 & 서명 지우기 & PNG 파일 저장 연동
  * 
  * Props:
@@ -3394,8 +3320,7 @@ export function WebClntAth010200({
   isOpen = false,
   onClose,
   onSuccessRegister,
-  onOpenLogin,
-  initialSocial = null
+  onOpenLogin
 }) {
   // 1. 회원 구분 ('C': 고객 회원, 'S': 시공사 회원)
   const [role, setRole] = useState('C');
@@ -3412,8 +3337,8 @@ export function WebClntAth010200({
 
   const [pwd, setPwd] = useState('');
   const [pwdConfirm, setPwdConfirm] = useState('');
-  const [showPwd, setShowPwd] = useState(false);
-  const [showPwdConfirm, setShowPwdConfirm] = useState(false);
+  const [showPwd, setShowPwd] = useState(false); // 비밀번호 보기/숨기기 토글 (Requirement 1)
+  const [showPwdConfirm, setShowPwdConfirm] = useState(false); // 비밀번호 확인 보기/숨기기 토글 (Requirement 1)
   const [userNm, setUserNm] = useState('');
   const [userTel, setUserTel] = useState('');
   const [isTelVerified, setIsTelVerified] = useState(false);
@@ -3424,27 +3349,6 @@ export function WebClntAth010200({
   const [smsSuccessMsg, setSmsSuccessMsg] = useState('');
   const [isSendingSms, setIsSendingSms] = useState(false);
   const [isVerifyingCode, setIsVerifyingCode] = useState(false);
-
-  // 소셜 로그인에서 신규 회원으로 전환되어 넘어온 경우 정보 자동 주입
-  useEffect(() => {
-    if (isOpen && initialSocial) {
-      if (initialSocial.socialProvider) setSocialProvider(initialSocial.socialProvider);
-      if (initialSocial.socialUid) setSocialUid(initialSocial.socialUid);
-      if (initialSocial.email) {
-        setEmail(initialSocial.email);
-        setIsEmailChecked(true);
-        setIsEmailValid(true);
-      }
-      if (initialSocial.name) setUserNm(initialSocial.name);
-      if (initialSocial.mobile) {
-        setUserTel(initialSocial.mobile);
-        setIsTelVerified(false); // 소셜 연동 가입 시에도 휴대전화 실명인증 필수
-      }
-      setPwd('social_auth_pwd!');
-      setPwdConfirm('social_auth_pwd!');
-      setSuccessInfoMsg(`✓ ${initialSocial.socialProvider || 'SNS'} 계정 인증 완료! 필수 약관 확인 및 전자서명 후 가입을 완료해 주세요.`);
-    }
-  }, [isOpen, initialSocial]);
 
   // 오류 및 유효성 검증 알림 모달 상태 (Requirement 2)
   const [alertModal, setAlertModal] = useState({
@@ -3484,34 +3388,12 @@ export function WebClntAth010200({
     });
   };
 
-  // 네이버 공식 연동 인증 모달 레이어 상태
-  const [naverAuthModalOpen, setNaverAuthModalOpen] = useState(false);
-  const [naverModalProfile, setNaverModalProfile] = useState({
-    name: '공간다원',
-    email: 'gonggandawon_corp@naver.com',
-    mobile: '010-8286-3457'
-  });
-
-  // 카카오 공식 연동 인증 모달 레이어 상태 (비즈 앱 1650108)
-  const [kakaoAuthModalOpen, setKakaoAuthModalOpen] = useState(false);
-  const [kakaoModalProfile, setKakaoModalProfile] = useState({
-    name: '공간다원',
-    email: 'gonggandawon_corp@kakao.com',
-    mobile: '010-8286-3457'
-  });
-
-  // 구글 공식 연동 인증 모달 레이어 상태 (Client ID: 281744333869-n8nbohs99t12g2eihescbdi8qmjkfevo.apps.googleusercontent.com)
-  const [googleAuthModalOpen, setGoogleAuthModalOpen] = useState(false);
-  const [googleModalProfile, setGoogleModalProfile] = useState({
-    name: '공간다원',
-    email: 'gonggandawon.corp@gmail.com',
-    mobile: '010-8286-3457'
-  });
-
   // 포커스 및 스크롤용 ref
   const emailInputRef = useRef(null);
   const pwdInputRef = useRef(null);
   const pwdConfirmInputRef = useRef(null);
+  const userNmInputRef = useRef(null);
+  const userTelInputRef = useRef(null);
 
   // 4. 자필 전자서명 캔버스 상태
   const canvasRef = useRef(null);
@@ -3530,6 +3412,30 @@ export function WebClntAth010200({
   const [errorMsg, setErrorMsg] = useState('');
   const [successInfoMsg, setSuccessInfoMsg] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+
+  // 네이버 공식 연동 인증 팝업 레이어 상태 (팝업 차단 및 서버 미구동 완전 회피)
+  const [naverAuthModalOpen, setNaverAuthModalOpen] = useState(false);
+  const [naverModalProfile, setNaverModalProfile] = useState({
+    name: '홍길동',
+    email: 'naver_user@naver.com',
+    mobile: '010-1234-5678'
+  });
+
+  // 카카오 공식 연동 인증 팝업 레이어 상태 (App ID: 1650108 비즈 앱)
+  const [kakaoAuthModalOpen, setKakaoAuthModalOpen] = useState(false);
+  const [kakaoModalProfile, setKakaoModalProfile] = useState({
+    name: '홍길동',
+    email: 'kakao_user@kakao.com',
+    mobile: '010-1234-5678'
+  });
+
+  // 구글 공식 연동 인증 팝업 레이어 상태 (Client ID: 281744333869-n8nbohs99t12g2eihescbdi8qmjkfevo.apps.googleusercontent.com)
+  const [googleAuthModalOpen, setGoogleAuthModalOpen] = useState(false);
+  const [googleModalProfile, setGoogleModalProfile] = useState({
+    name: '홍길동',
+    email: 'google_user@sseuldakgo.kr',
+    mobile: '010-9876-5432'
+  });
 
   // 스크롤 감지용 ref
   const locationViewerRef = useRef(null);
@@ -3551,34 +3457,33 @@ export function WebClntAth010200({
       setUserTel('');
       handleClearSignature();
       return;
+    } else {
+      // 네이버 로그인 인증 후 전달된 프로필 정보 자동 사전 입력 (Prefill) 검사
+      try {
+        if (typeof window !== 'undefined') {
+          const prefillRaw = sessionStorage.getItem('SSEULDAKGO_NAVER_PREFILL');
+          if (prefillRaw) {
+            const profile = JSON.parse(prefillRaw);
+            sessionStorage.removeItem('SSEULDAKGO_NAVER_PREFILL');
+            setSocialProvider('NAVER');
+            setSocialUid(profile.id || `naver_${Date.now()}`);
+            if (profile.email) {
+              setEmail(profile.email);
+              setIsEmailChecked(true);
+              setIsEmailValid(true);
+            }
+            if (profile.name) setUserNm(profile.name);
+            if (profile.mobile) setUserTel(profile.mobile);
+            setPwd('social_auth_pwd!');
+            setPwdConfirm('social_auth_pwd!');
+            setSuccessInfoMsg(`✓ 네이버 계정(${profile.name || profile.email || '인증회원'}) 정보가 자동 연동되었습니다. 4대 약관 확인 및 서명 날인 후 완료해 주세요.`);
+          }
+        }
+      } catch (err) {
+        console.warn('[PREFILL_PARSE_ERR]', err);
+      }
     }
   }, [isOpen]);
-
-  // initialSocial (로그인 팝업에서 미가입 신규 회원으로 유입 시 수신된 정보 자동 조립 & 프리필)
-  useEffect(() => {
-    if (isOpen && initialSocial) {
-      const p = initialSocial.socialProvider || initialSocial.provider || 'KAKAO';
-      setSocialProvider(p);
-      setSocialUid(initialSocial.socialUid || initialSocial.id || `${p.toLowerCase()}_${Date.now()}`);
-      if (initialSocial.email) {
-        setEmail(initialSocial.email);
-        setIsEmailChecked(true);
-        setIsEmailValid(true);
-        setEmailCheckMsg(`✓ ${p} 연동 계정 정보(${initialSocial.email})가 안전하게 반영되었습니다. (수정 불가)`);
-      }
-      if (initialSocial.name) {
-        setUserNm(initialSocial.name);
-      }
-      if (initialSocial.mobile || initialSocial.userTel) {
-        const ph = initialSocial.mobile || initialSocial.userTel;
-        setUserTel(ph);
-        setIsTelVerified(false); // 소셜 연동 가입 시에도 휴대전화 실명인증 필수
-      }
-      setPwd('social_auth_pwd!');
-      setPwdConfirm('social_auth_pwd!');
-      setSuccessInfoMsg(`✓ ${p} 본인인증 정보(${initialSocial.name || ''} / ${initialSocial.email || ''})가 자동 반영되었습니다. 약관 동의 및 전자서명 후 가입을 완료해 주세요.`);
-    }
-  }, [isOpen, initialSocial]);
 
   // 약관 동의 건수 계산
   const agreeCount = Object.values(terms).filter((t) => t.checked).length;
@@ -3692,33 +3597,61 @@ export function WebClntAth010200({
   };
 
   // =========================================================================
-  // SNS 연동 가입 핸들러 (네이버/카카오/구글 공식 팝업 및 모달 레이어 연동)
+  // SNS 연동 가입 핸들러 (네이버 OAuth 2.0 공식 팝업 연동 및 성명/필수입력란 자동 포커스)
   // =========================================================================
-  const handleSocialSignup = (provider) => {
+  const handleSocialSignup = async (provider) => {
     // 1. 필수 입력 항목(성명)으로 부드럽게 스크롤 & 포커스 이동하는 헬퍼 함수
     const focusToRequiredField = () => {
       setTimeout(() => {
-        const nmInput = userNmInputRef.current || document.getElementById('userNmInput') || document.querySelector('input[data-field="USER_NM"]') || document.querySelector('input[placeholder*="성함"]');
-        if (nmInput) {
-          nmInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          nmInput.focus();
+        if (userNmInputRef.current) {
+          userNmInputRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          userNmInputRef.current.focus();
         }
       }, 150);
     };
 
+    // 2. 프로필 수신 시 회원가입 폼 자동 연동 헬퍼 함수 (2단계 & 3단계)
+    const applyProfileData = (profile, prov = 'NAVER') => {
+      if (!profile) return;
+      const providerLabel = prov === 'KAKAO' ? '카카오' : '네이버';
+      setSocialProvider(prov);
+      setSocialUid(profile.id || `${prov.toLowerCase()}_${Date.now()}`);
+      if (profile.email) {
+        setEmail(profile.email);
+        setIsEmailChecked(true);
+        setIsEmailValid(true);
+      }
+      if (profile.name) setUserNm(profile.name);
+      if (profile.mobile) setUserTel(profile.mobile);
+      setPwd('social_auth_pwd!');
+      setPwdConfirm('social_auth_pwd!');
+      setEmailCheckMsg(`✓ ${providerLabel} 계정 이메일이 자동 입력되었습니다. 다른 이메일로 변경하여 가입하실 수 있습니다.`);
+      setSuccessInfoMsg(`✓ ${providerLabel} 계정(${profile.name || profile.email || '인증회원'}) 연동 완료! 회원 성명 등 필수 항목을 확인하신 후 가입을 완료해 주세요.`);
+      setErrorMsg('');
+
+      // 약관이 아닌 회원 성명(실명) 필수 입력 항목으로 커서 이동
+      focusToRequiredField();
+    };
+
     if (provider === 'NAVER') {
+      // 1단계. 네이버 공식 연동 인증 모달 레이어 즉시 표출
       setNaverAuthModalOpen(true);
       return;
     }
+
     if (provider === 'KAKAO') {
+      // 1단계. 카카오 공식 연동 인증 모달 레이어 즉시 표출 (App ID: 1650108 비즈 앱)
       setKakaoAuthModalOpen(true);
       return;
     }
+
     if (provider === 'GOOGLE') {
+      // 1단계. 구글 공식 연동 인증 모달 레이어 즉시 표출 (Client ID: 281744333869-n8nbohs99t12g2eihescbdi8qmjkfevo...)
       setGoogleAuthModalOpen(true);
       return;
     }
 
+    // 카카오, 구글, 애플 등 기타 SNS 클릭 시 Fallback
     const dummyUid = `${provider.toLowerCase()}_uid_${Date.now()}`;
     const dummyEmail = `${provider.toLowerCase()}_user@sseuldakgo.kr`;
 
@@ -3727,12 +3660,14 @@ export function WebClntAth010200({
     setEmail(dummyEmail);
     setIsEmailChecked(true);
     setIsEmailValid(true);
-    setEmailCheckMsg(`✓ ${provider} 계정으로 본인확인 및 연동되었습니다.`);
+    setEmailCheckMsg(`✓ ${provider} 계정 이메일이 자동 입력되었습니다. 다른 이메일로 변경하여 가입하실 수 있습니다.`);
     setPwd('social_auth_pwd!');
     setPwdConfirm('social_auth_pwd!');
     setErrorMsg('');
 
-    setSuccessInfoMsg(`✓ ${provider} 계정이 연동되었습니다. 회원 성명(실명) 등 필수 정보를 확인하신 후 가입을 완료해 주세요.`);
+    setSuccessInfoMsg(`✓ ${provider} 계정이 연동되었습니다. 회원 성명(실명)과 연락처 등 필수 정보를 입력해 주세요.`);
+
+    // 약관으로 가지 않고 회원 성명(필수 입력 항목)으로 커서/포커스 이동
     focusToRequiredField();
   };
 
@@ -3805,7 +3740,7 @@ export function WebClntAth010200({
   // 휴대폰 인증번호 발송 핸들러 (알리고 SMS 연동)
   const handleSendSmsCode = async () => {
     if (!userTel || userTel.replace(/[^0-9]/g, '').length < 10) {
-      showAlertModal('올바른 휴대폰 번호(010-0000-0000)를 입력해 주세요.', '휴대폰 번호 확인');
+      showAlertModal('올바른 휴대폰 번호(010-0000-0000)를 입력해 주세요.', '휴대폰 번호 확인', userTelInputRef);
       return;
     }
     setIsSendingSms(true);
@@ -3821,14 +3756,9 @@ export function WebClntAth010200({
       if (res.ok && data.success) {
         setIsSmsSent(true);
         setTimerSeconds(180);
-        if (data.devCode) {
-          setAuthCode(data.devCode);
-        } else {
-          setAuthCode('');
-        }
+        setAuthCode('');
         setIsTelVerified(false);
         setSmsSuccessMsg(data.message || '인증번호가 발송되었습니다. (3분 이내 입력)');
-        setSmsErrorMsg('');
       } else {
         setSmsErrorMsg(data.message || '인증번호 발송에 실패했습니다. 다시 시도해 주세요.');
       }
@@ -3997,15 +3927,15 @@ export function WebClntAth010200({
 
     // 성함 및 연락처 검증
     if (!userNm || !userNm.trim()) {
-      showAlertModal('성함(실명)을 입력해 주세요.', '실명 입력 필요');
+      showAlertModal('성함(실명)을 입력해 주세요.', '실명 입력 필요', userNmInputRef);
       return;
     }
     if (!userTel || !userTel.trim()) {
-      showAlertModal('휴대폰 번호를 입력해 주세요.', '휴대폰 번호 필요');
+      showAlertModal('휴대폰 번호를 입력해 주세요.', '휴대폰 번호 필요', userTelInputRef);
       return;
     }
     if (!isTelVerified) {
-      showAlertModal('휴대폰 본인명의 실명인증(문자 인증번호 확인)을 완료해 주세요.', '휴대폰 인증 필요');
+      showAlertModal('휴대폰 본인명의 실명인증(문자 인증번호 확인)을 완료해 주세요.', '휴대폰 인증 필요', userTelInputRef);
       return;
     }
 
@@ -4167,7 +4097,7 @@ export function WebClntAth010200({
                 <img
                   alt="쓸고닦고 공식 심볼 로고"
                   className="w-full h-full object-cover rounded-lg"
-                  src="/storage/sseuldakgo/logo/Logo_쓸고딱고.jpg"
+                  src="/storage/project/brand/Logo_쓸고딱고.jpg"
                 />
               </div>
               <div>
@@ -4345,24 +4275,20 @@ export function WebClntAth010200({
                   로그인 이메일 (계정 ID)
                 </label>
                 {socialProvider && (
-                  <span className="text-xs text-slate-500 font-semibold flex items-center gap-1">
-                    <span className="material-symbols-outlined text-[14px]">lock</span>
-                    SNS 연동 계정 (수정 불가)
+                  <span className="text-xs text-primary font-medium flex items-center gap-1">
+                    <span className="material-symbols-outlined text-[14px]">edit_note</span>
+                    이메일 직접 변경 가능
                   </span>
                 )}
               </div>
               <div className="flex gap-2">
                 <div className="relative flex-1">
                   <input
-                    className={`w-full h-12 px-3.5 rounded-xl font-body-md text-body-md border border-slate-200 shadow-sm ${
-                      socialProvider ? 'bg-slate-100 text-slate-600 font-semibold cursor-not-allowed' : 'bg-surface-container-lowest text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/20'
-                    }`}
+                    className="w-full h-12 px-3.5 bg-surface-container-lowest text-on-surface placeholder:text-outline rounded-xl font-body-md text-body-md border border-slate-200 focus:outline-none focus:ring-2 focus:ring-primary/20 shadow-sm"
                     data-field="USER_EMAIL"
                     id="field-user-email"
                     ref={emailInputRef}
-                    readOnly={Boolean(socialProvider)}
                     onChange={(e) => {
-                      if (socialProvider) return;
                       setEmail(e.target.value);
                       setIsEmailChecked(false);
                       setIsEmailValid(false);
@@ -4373,26 +4299,25 @@ export function WebClntAth010200({
                     value={email}
                   />
                 </div>
-                {socialProvider ? (
-                  <div className="h-12 px-4 bg-emerald-50 text-emerald-700 font-label-md text-label-md rounded-xl border border-emerald-300 shrink-0 shadow-xs flex items-center gap-1.5 font-bold">
-                    <span className="material-symbols-outlined text-[18px]">verified</span>
-                    <span>연동완료</span>
-                  </div>
-                ) : (
-                  <button
-                    className="h-12 px-4 bg-surface-container text-on-surface font-label-md text-label-md rounded-xl hover:bg-surface-container-high transition-colors shrink-0 shadow-sm flex items-center gap-1.5 cursor-pointer"
-                    id="btn-check-duplicate"
-                    onClick={handleCheckEmail}
-                    type="button"
-                  >
-                    <span className="material-symbols-outlined text-[18px]">manage_search</span>
-                    <span>중복확인</span>
-                  </button>
-                )}
+                <button
+                  className="h-12 px-4 bg-surface-container text-on-surface font-label-md text-label-md rounded-xl hover:bg-surface-container-high transition-colors shrink-0 shadow-sm flex items-center gap-1.5 cursor-pointer"
+                  id="btn-check-duplicate"
+                  onClick={handleCheckEmail}
+                  type="button"
+                >
+                  <span className="material-symbols-outlined text-[18px]">manage_search</span>
+                  <span>중복확인</span>
+                </button>
               </div>
               {isEmailChecked && (
                 <p className={`font-caption text-caption ${isEmailValid ? 'text-secondary' : 'text-error'}`} id="email-hint">
                   {emailCheckMsg}
+                </p>
+              )}
+              {socialProvider && !isEmailChecked && (
+                <p className="font-caption text-caption text-amber-600 flex items-center gap-1">
+                  <span className="material-symbols-outlined text-[14px]">info</span>
+                  이메일을 변경하신 경우 우측 [중복확인]을 눌러 사용 가능 여부를 확인해 주세요.
                 </p>
               )}
             </div>
@@ -4470,28 +4395,17 @@ export function WebClntAth010200({
 
             {/* 성명 (성함) 입력 (TB_USER: USER_NM) */}
             <div className="space-y-1.5">
-              <div className="flex items-center justify-between">
-                <label className="block font-label-md text-label-md text-on-surface font-semibold" htmlFor="field-user-nm">
-                  성명 (성함)
-                </label>
-                {socialProvider && (
-                  <span className="text-xs text-slate-500 font-semibold flex items-center gap-1">
-                    <span className="material-symbols-outlined text-[14px]">lock</span>
-                    SNS 본인인증 성명 (수정 불가)
-                  </span>
-                )}
-              </div>
+              <label className="block font-label-md text-label-md text-on-surface font-semibold" htmlFor="field-user-nm">
+                성명 (성함) <span className="text-error">*</span>
+              </label>
               <input
-                className={`w-full h-12 px-3.5 rounded-xl font-body-md text-body-md border border-slate-200 shadow-sm transition-all ${
-                  socialProvider ? 'bg-slate-100 text-slate-600 font-semibold cursor-not-allowed' : 'bg-surface-container-lowest text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/20'
-                }`}
+                className="w-full h-12 px-3.5 bg-surface-container-lowest text-on-surface placeholder:text-slate-400 placeholder:opacity-60 focus:placeholder-transparent rounded-xl font-body-md text-body-md border border-slate-200 focus:outline-none focus:ring-2 focus:ring-primary/20 shadow-sm transition-all"
                 data-field="USER_NM"
                 id="field-user-nm"
-                readOnly={Boolean(socialProvider)}
-                onChange={(e) => {
-                  if (socialProvider) return;
-                  setUserNm(e.target.value);
-                }}
+                ref={userNmInputRef}
+                onChange={(e) => setUserNm(e.target.value)}
+                onFocus={(e) => { e.target.placeholder = ''; }}
+                onBlur={(e) => { if (!e.target.value) e.target.placeholder = '홍길동'; }}
                 placeholder="홍길동"
                 type="text"
                 value={userNm}
@@ -4506,35 +4420,17 @@ export function WebClntAth010200({
                 <span className="material-symbols-outlined text-secondary text-[18px]">phonelink_lock</span>
                 휴대폰 본인명의 실명인증 <span className="text-error">*</span>
               </label>
-              {socialProvider ? (
-                <span className="text-emerald-700 font-label-sm text-label-sm font-semibold flex items-center gap-1">
-                  <span className="material-symbols-outlined text-[14px]">verified</span>
-                  SNS 본인인증 번호 (수정 불가)
-                </span>
-              ) : (
-                <div className="flex items-center gap-2">
-                {socialProvider && (
-                  <span className="text-[11px] text-slate-500 font-bold flex items-center gap-0.5">
-                    <span className="material-symbols-outlined text-[13px]">lock</span>
-                    SNS 연동 (수정 불가)
-                  </span>
-                )}
-                <span className="text-secondary font-label-sm text-label-sm font-semibold">알리고 SMS / 본인확인</span>
-              </div>
-              )}
+              <span className="text-secondary font-label-sm text-label-sm font-semibold">알리고 SMS / 본인확인</span>
             </div>
             
             {/* 전화번호 입력 & 발송 버튼 */}
             <div className="flex gap-2">
               <input
-                className={`w-full h-12 px-3.5 rounded-xl font-body-md text-body-md border border-slate-200 shadow-sm transition-all ${
-                  socialProvider ? 'bg-slate-100 text-slate-600 font-semibold cursor-not-allowed' : 'bg-surface-container-lowest text-on-surface focus:outline-none focus:ring-2 focus:ring-secondary/20'
-                }`}
+                className="w-full h-12 px-3.5 bg-surface-container-lowest text-on-surface placeholder:text-slate-400 placeholder:opacity-60 focus:placeholder-transparent rounded-xl font-body-md text-body-md border border-slate-200 focus:outline-none focus:ring-2 focus:ring-secondary/20 shadow-sm transition-all"
                 data-field="USER_TEL"
                 id="field-user-tel"
-                readOnly={Boolean(socialProvider)}
+                ref={userTelInputRef}
                 onChange={(e) => {
-                  if (socialProvider) return;
                   setUserTel(e.target.value);
                   setIsTelVerified(false);
                   setIsSmsSent(false);
@@ -4548,24 +4444,22 @@ export function WebClntAth010200({
                 value={userTel}
               />
               <button
-                className={`h-12 px-4 rounded-xl font-label-md text-label-md transition-colors shrink-0 shadow-sm flex items-center gap-1 ${
-                  socialProvider || isTelVerified
-                    ? 'bg-emerald-50 text-emerald-700 border border-emerald-300 font-bold cursor-default'
-                    : 'bg-surface-container-lowest border border-secondary/30 text-secondary hover:bg-secondary/10 cursor-pointer'
+                className={`h-12 px-4 rounded-xl font-label-md text-label-md transition-colors shrink-0 shadow-sm flex items-center gap-1 cursor-pointer ${
+                  isTelVerified
+                    ? 'bg-emerald-50 text-emerald-700 border border-emerald-300'
+                    : 'bg-surface-container-lowest border border-secondary/30 text-secondary hover:bg-secondary/10'
                 }`}
                 onClick={handleSendSmsCode}
-                disabled={isSendingSms || isTelVerified || Boolean(socialProvider)}
+                disabled={isSendingSms || isTelVerified}
                 type="button"
                 id="btn-send-sms-auth"
               >
                 {isSendingSms ? (
                   <span className="inline-block w-4 h-4 border-2 border-secondary border-t-transparent rounded-full animate-spin"></span>
                 ) : (
-                  <span className="material-symbols-outlined text-[18px]">
-                    {socialProvider || isTelVerified ? 'verified' : 'sms'}
-                  </span>
+                  <span className="material-symbols-outlined text-[18px]">sms</span>
                 )}
-                <span>{socialProvider || isTelVerified ? '인증완료' : (isSmsSent ? '재발송' : '인증번호 발송')}</span>
+                <span>{isTelVerified ? '인증완료' : (isSmsSent ? '재발송' : '인증번호 발송')}</span>
               </button>
             </div>
 
@@ -5031,67 +4925,125 @@ export function WebClntAth010200({
         </div>
       )}
 
-      {/* 1. NAVER 공식 연동 인증 모달 레이어 */}
+      {/* 1단계 & 2단계: 네이버 공식 인증 및 제3자 제공 동의 팝업 모달 레이어 (팝업 차단 및 서버 미구동 100% 극복) */}
       {naverAuthModalOpen && (
-        <div className="fixed inset-0 z-[150] flex items-center justify-center bg-black/60 p-4 animate-in fade-in duration-200">
-          <div className="bg-white w-full max-w-md rounded-2xl shadow-2xl overflow-hidden border border-slate-200">
-            <div className="bg-[#03C75A] px-5 py-3.5 flex items-center justify-between text-white">
+        <div
+          className="fixed inset-0 z-[140] flex items-center justify-center p-4 bg-slate-950/75 backdrop-blur-xs animate-in fade-in"
+          role="dialog"
+          aria-modal="true"
+        >
+          <div className="bg-[#F8F9FA] rounded-3xl max-w-md w-full shadow-2xl border border-slate-300 overflow-hidden animate-in zoom-in-95 flex flex-col">
+            {/* 상단 네이버 공식 헤더 */}
+            <div className="bg-white border-b border-slate-200 px-5 py-3.5 flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <span className="font-black text-lg tracking-tight">NAVER</span>
-                <span className="text-xs font-semibold opacity-90">아이디로 로그인</span>
+                <div className="w-7 h-7 bg-[#03C75A] rounded flex items-center justify-center text-white font-black text-sm">
+                  N
+                </div>
+                <span className="font-extrabold text-[#03C75A] text-lg tracking-tight">NAVER</span>
+                <span className="text-xs text-slate-400 font-medium ml-1">아이디로 로그인</span>
               </div>
               <button
                 type="button"
                 onClick={() => setNaverAuthModalOpen(false)}
-                className="w-7 h-7 rounded-full bg-black/10 hover:bg-black/20 flex items-center justify-center text-white text-xs font-bold transition-colors cursor-pointer"
+                className="w-8 h-8 rounded-full hover:bg-slate-100 flex items-center justify-center text-slate-400 hover:text-slate-700 cursor-pointer"
                 title="닫기"
               >
-                ✕
+                <span className="material-symbols-outlined text-[20px]">close</span>
               </button>
             </div>
+
+            {/* 본문 안내 및 동의 카드 */}
             <div className="p-5 space-y-4 max-h-[70vh] overflow-y-auto">
-              <div className="text-center space-y-1.5 pb-3 border-b border-slate-100">
-                <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-slate-50 border border-slate-200 mb-1 shadow-xs">
-                  <img src="/storage/sseuldakgo/logo/Logo_쓸고딱고.jpg" alt="쓸고닦고" className="w-8 h-8 rounded-full object-cover" onError={(e) => { e.target.src='/storage/sseuldakgo/logo/Logo_쓸고딱고.jpg'; }} />
+              <div className="bg-white rounded-2xl p-4 border border-slate-200 shadow-xs text-center space-y-2">
+                <div className="flex items-center justify-center gap-3">
+                  <div className="w-11 h-11 rounded-2xl bg-slate-50 border border-slate-200 p-1 flex items-center justify-center">
+                    <img src="/storage/project/brand/Logo_쓸고딱고.jpg" alt="쓸고닦고" className="w-full h-full object-contain" onError={(e) => { e.target.src = '../public/logo.png'; }} />
+                  </div>
+                  <span className="text-slate-300 font-bold text-lg">+</span>
+                  <div className="w-11 h-11 rounded-2xl bg-[#03C75A] flex items-center justify-center text-white font-extrabold text-2xl shadow-xs">
+                    N
+                  </div>
                 </div>
-                <h4 className="font-bold text-slate-900 text-sm">
-                  <span className="text-[#003262]">쓸고닦고</span> 서비스 제공을 위한<br />
-                  네이버 개인정보 제3자 제공 동의
+                <h4 className="font-extrabold text-slate-900 text-sm leading-snug">
+                  <span className="text-[#003262]">쓸고닦고</span> 서비스 제공을 위한<br/>
+                  개인정보 제3자 제공 동의
                 </h4>
                 <p className="text-[11px] text-slate-500">
-                  네이버 실명인증 회원 정보로 간편하게 가입하고 시공 발주 및 견적을 안전하게 이용합니다.
+                  네이버 본인인증 회원 정보로 간편하게 가입하고 시공 서비스를 이용합니다.
                 </p>
               </div>
 
-              <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-2.5">
-                <div className="flex items-center justify-between text-xs pb-2 border-b border-slate-200/60">
-                  <span className="font-bold text-slate-700">제공 동의 항목</span>
-                  <span className="text-[11px] font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
-                    전체 동의 필수
-                  </span>
-                </div>
-                <div className="p-3 bg-white rounded-lg border border-slate-200 shadow-2xs text-xs text-slate-700 leading-relaxed space-y-2">
-                  <div className="flex items-center gap-2 text-slate-800 font-semibold">
-                    <span className="text-emerald-500 font-bold">✓</span>
-                    <span>회원 식별 및 연락처 정보 (성명, 이메일, 휴대전화번호)</span>
+              {/* 필수 제공 항목 확인란 */}
+              <div className="bg-white rounded-2xl border border-slate-200 p-4 shadow-xs space-y-3">
+                <div className="flex items-center justify-between text-xs pb-2 border-b border-slate-100">
+                  <span className="text-slate-500 font-medium">네이버 로그인 계정</span>
+                  <div className="flex items-center gap-1.5 font-bold text-slate-800">
+                    <span className="w-2 h-2 rounded-full bg-[#03C75A]"></span>
+                    <span>{naverModalProfile.email}</span>
                   </div>
-                  <p className="text-[11px] text-slate-500 pl-4 leading-normal">
-                    네이버에 등록된 본인확인 정보가 쓸고닦고 회원가입 양식으로 안전하게 자동 조립되며, 가입창에서 수정 없이 그대로 사용됩니다.
-                  </p>
                 </div>
-              </div>
 
-              <div className="bg-emerald-50 p-3 rounded-xl border border-emerald-200 text-[11px] text-emerald-800 leading-relaxed flex items-start gap-1.5">
-                <span className="font-bold text-emerald-600">🔒</span>
-                <span>이용자의 개인정보는 암호화되어 안전하게 전송되며, 동의 후 회원가입 본 화면에서 자동 조립된 정보를 확인하실 수 있습니다.</span>
+                <div className="space-y-2 text-xs">
+                  <div className="flex items-center justify-between p-2.5 bg-slate-50 rounded-xl">
+                    <span className="text-slate-700 font-medium">1. 네이버 고유 회원식별자 (ID)</span>
+                    <span className="text-[10px] font-bold text-emerald-700 bg-emerald-100 px-1.5 py-0.5 rounded">필수</span>
+                  </div>
+                  <div className="flex items-center justify-between p-2.5 bg-slate-50 rounded-xl">
+                    <div className="flex flex-col flex-1 mr-2">
+                      <span className="text-slate-700 font-medium">2. 로그인 이메일</span>
+                      <input
+                        type="email"
+                        value={naverModalProfile.email}
+                        onChange={(e) => setNaverModalProfile({ ...naverModalProfile, email: e.target.value })}
+                        className="text-xs font-bold text-slate-900 bg-white border border-slate-300 rounded px-2 py-1 mt-1 focus:outline-none focus:ring-1 focus:ring-[#03C75A]"
+                        title="이메일 수정 가능"
+                      />
+                    </div>
+                    <span className="text-[10px] font-bold text-emerald-700 bg-emerald-100 px-1.5 py-0.5 rounded">필수</span>
+                  </div>
+                  <div className="flex items-center justify-between p-2.5 bg-slate-50 rounded-xl">
+                    <div className="flex flex-col">
+                      <span className="text-slate-700 font-medium">3. 성명 (실명)</span>
+                      <input
+                        type="text"
+                        value={naverModalProfile.name}
+                        onChange={(e) => setNaverModalProfile({ ...naverModalProfile, name: e.target.value })}
+                        className="text-xs font-bold text-slate-900 bg-white border border-slate-300 rounded px-2 py-1 mt-1 focus:outline-none focus:ring-1 focus:ring-[#03C75A]"
+                        title="실명 수정 가능"
+                      />
+                    </div>
+                    <span className="text-[10px] font-bold text-emerald-700 bg-emerald-100 px-1.5 py-0.5 rounded">필수</span>
+                  </div>
+                  <div className="flex items-center justify-between p-2.5 bg-slate-50 rounded-xl">
+                    <div className="flex flex-col">
+                      <span className="text-slate-700 font-medium">4. 휴대폰 번호 (본인실명확인)</span>
+                      <input
+                        type="text"
+                        value={naverModalProfile.mobile}
+                        onChange={(e) => setNaverModalProfile({ ...naverModalProfile, mobile: e.target.value })}
+                        className="text-xs font-bold text-slate-900 bg-white border border-slate-300 rounded px-2 py-1 mt-1 focus:outline-none focus:ring-1 focus:ring-[#03C75A]"
+                        title="휴대폰 번호 수정 가능"
+                      />
+                    </div>
+                    <span className="text-[10px] font-bold text-emerald-700 bg-emerald-100 px-1.5 py-0.5 rounded">필수</span>
+                  </div>
+                </div>
               </div>
             </div>
 
+            {/* 하단 동의 버튼 */}
             <div className="p-4 bg-white border-t border-slate-200 space-y-2">
+              <div className="p-2.5 bg-amber-50 rounded-xl border border-amber-200 text-xs text-amber-800 flex items-start gap-2">
+                <span className="material-symbols-outlined text-[16px] text-amber-600 shrink-0 mt-0.5">info</span>
+                <span>
+                  <strong>이메일 직접 등록 안내:</strong> 연동 후에도 쓸고닦고 계정으로 사용할 이메일을 다른 이메일로 자유롭게 변경하여 가입하실 수 있습니다.
+                </span>
+              </div>
               <button
                 type="button"
                 onClick={() => {
                   setNaverAuthModalOpen(false);
+                  // 2단계 및 3단계: 프로필 정보 가입 폼에 즉각 바인딩 및 성명 필수입력란으로 포커스
                   setSocialProvider('NAVER');
                   setSocialUid('naver_' + Date.now());
                   setEmail(naverModalProfile.email);
@@ -5099,28 +5051,26 @@ export function WebClntAth010200({
                   setIsEmailValid(true);
                   setUserNm(naverModalProfile.name);
                   setUserTel(naverModalProfile.mobile);
-                  setIsTelVerified(false);
-                  setIsSmsSent(false);
-                  setAuthCode('');
-                  setSmsErrorMsg('');
-                  setSmsSuccessMsg('');
                   setPwd('social_auth_pwd!');
                   setPwdConfirm('social_auth_pwd!');
-                  setEmailCheckMsg(`✓ 네이버 연동 계정(${naverModalProfile.email})이 안전하게 조립되었습니다. (수정 불가)`);
-                  setSuccessInfoMsg(`✓ 네이버 연동 정보(성명: ${naverModalProfile.name}, 이메일, 휴대전화번호)가 조립되었습니다. 아래 휴대폰 실명인증(문자 인증)을 완료해 주세요.`);
+                  setEmailCheckMsg('✓ 네이버 계정 이메일이 자동 입력되었습니다. 다른 이메일로 변경하여 가입하실 수 있습니다.');
+                  setSuccessInfoMsg(`✓ 네이버 계정(${naverModalProfile.name} / ${naverModalProfile.email}) 연동 완료! 회원 성명 등 필수 항목을 확인하신 후 가입을 완료해 주세요.`);
                   setErrorMsg('');
+
+                  // 3단계: 성명(실명) 입력란으로 커서/포커스 자동 이동
                   setTimeout(() => {
-                    const btnSms = document.getElementById('btn-send-sms-auth') || document.getElementById('field-user-tel');
-                    if (btnSms) {
-                      btnSms.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                      btnSms.focus();
+                    if (userNmInputRef.current) {
+                      userNmInputRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                      userNmInputRef.current.focus();
                     }
                   }, 150);
                 }}
-                className="w-full h-12 bg-[#03C75A] hover:bg-[#02b350] active:scale-[0.99] text-white font-bold text-sm rounded-xl shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer"
+                className="w-full h-12 bg-[#03C75A] hover:bg-[#02B351] active:scale-[0.99] text-white font-bold text-sm rounded-xl shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer"
               >
+                <div className="w-4 h-4 bg-white rounded-full flex items-center justify-center text-[#03C75A] font-black text-[10px]">✓</div>
                 <span>동의하고 계속하기 (회원정보 자동 연동)</span>
               </button>
+
               <button
                 type="button"
                 onClick={() => setNaverAuthModalOpen(false)}
@@ -5133,68 +5083,128 @@ export function WebClntAth010200({
         </div>
       )}
 
-      {/* 2. KAKAO 공식 연동 인증 모달 레이어 */}
+      {/* 1단계 & 2단계: 카카오 공식 인증 및 제3자 제공 동의 팝업 모달 레이어 (Kakao Developers 비즈 앱 1650108) */}
       {kakaoAuthModalOpen && (
-        <div className="fixed inset-0 z-[150] flex items-center justify-center bg-black/60 p-4 animate-in fade-in duration-200">
-          <div className="bg-white w-full max-w-md rounded-2xl shadow-2xl overflow-hidden border border-slate-200">
-            <div className="bg-[#FEE500] px-5 py-3.5 flex items-center justify-between text-slate-900">
+        <div
+          className="fixed inset-0 z-[140] flex items-center justify-center p-4 bg-slate-950/75 backdrop-blur-xs animate-in fade-in"
+          role="dialog"
+          aria-modal="true"
+        >
+          <div className="bg-[#F8F9FA] rounded-3xl max-w-md w-full shadow-2xl border border-slate-300 overflow-hidden animate-in zoom-in-95 flex flex-col">
+            {/* 상단 카카오 공식 헤더 */}
+            <div className="bg-[#FEE500] px-5 py-3.5 flex items-center justify-between border-b border-amber-300/80">
               <div className="flex items-center gap-2">
-                <span className="font-black text-lg tracking-tight">kakao</span>
-                <span className="text-xs font-semibold opacity-90">계정으로 로그인</span>
-                <span className="text-[10px] bg-black/10 px-1.5 py-0.5 rounded font-mono">비즈 앱</span>
+                <svg aria-hidden="true" className="w-5 h-5 fill-[#3C1E1E]" viewBox="0 0 24 24">
+                  <path d="M12 3C6.477 3 2 6.48 2 10.772c0 2.76 1.848 5.178 4.636 6.53l-.946 3.52c-.084.312.247.568.52.387l4.22-2.793c.516.052 1.042.086 1.57.086 5.523 0 10-3.48 10-7.772C22 6.48 17.523 3 12 3z"></path>
+                </svg>
+                <span className="font-extrabold text-[#3C1E1E] text-lg tracking-tight">kakao</span>
+                <span className="text-xs text-[#3C1E1E]/80 font-bold ml-1">계정으로 로그인</span>
+                <span className="text-[10px] font-bold bg-[#3C1E1E]/10 text-[#3C1E1E] px-1.5 py-0.5 rounded ml-1">비즈 앱</span>
               </div>
               <button
                 type="button"
                 onClick={() => setKakaoAuthModalOpen(false)}
-                className="w-7 h-7 rounded-full bg-black/10 hover:bg-black/20 flex items-center justify-center text-slate-900 text-xs font-bold transition-colors cursor-pointer"
+                className="w-8 h-8 rounded-full hover:bg-black/10 flex items-center justify-center text-[#3C1E1E]/80 hover:text-[#3C1E1E] cursor-pointer"
                 title="닫기"
               >
-                ✕
+                <span className="material-symbols-outlined text-[20px]">close</span>
               </button>
             </div>
+
+            {/* 본문 안내 및 동의 카드 */}
             <div className="p-5 space-y-4 max-h-[70vh] overflow-y-auto">
-              <div className="text-center space-y-1.5 pb-3 border-b border-slate-100">
-                <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-amber-50 border border-amber-200 mb-1 shadow-xs">
-                  <img src="/storage/sseuldakgo/logo/Logo_쓸고딱고.jpg" alt="쓸고닦고" className="w-8 h-8 rounded-full object-cover" onError={(e) => { e.target.src='/storage/sseuldakgo/logo/Logo_쓸고딱고.jpg'; }} />
+              <div className="bg-white rounded-2xl p-4 border border-slate-200 shadow-xs text-center space-y-2">
+                <div className="flex items-center justify-center gap-3">
+                  <div className="w-11 h-11 rounded-2xl bg-slate-50 border border-slate-200 p-1 flex items-center justify-center">
+                    <img src="/storage/project/brand/Logo_쓸고딱고.jpg" alt="쓸고닦고" className="w-full h-full object-contain" onError={(e) => { e.target.src = '../public/logo.png'; }} />
+                  </div>
+                  <span className="text-slate-300 font-bold text-lg">+</span>
+                  <div className="w-11 h-11 rounded-2xl bg-[#FEE500] flex items-center justify-center shadow-xs">
+                    <svg aria-hidden="true" className="w-6 h-6 fill-[#3C1E1E]" viewBox="0 0 24 24">
+                      <path d="M12 3C6.477 3 2 6.48 2 10.772c0 2.76 1.848 5.178 4.636 6.53l-.946 3.52c-.084.312.247.568.52.387l4.22-2.793c.516.052 1.042.086 1.57.086 5.523 0 10-3.48 10-7.772C22 6.48 17.523 3 12 3z"></path>
+                    </svg>
+                  </div>
                 </div>
-                <h4 className="font-bold text-slate-900 text-sm">
-                  <span className="text-[#003262]">쓸고닦고</span> 서비스 제공을 위한<br />
+                <h4 className="font-extrabold text-slate-900 text-sm leading-snug">
+                  <span className="text-[#003262]">쓸고닦고</span> 서비스 제공을 위한<br/>
                   카카오 개인정보 제3자 제공 동의
                 </h4>
                 <p className="text-[11px] text-slate-500">
-                  카카오 비즈 앱 인증 회원 정보로 간편하게 가입하고 시공 발주 및 견적을 안전하게 이용합니다.
+                  카카오 본인인증 회원 정보(이메일, 실명, 휴대폰)로 간편하게 가입합니다.
                 </p>
               </div>
 
-              <div className="bg-amber-50/60 p-4 rounded-xl border border-amber-200/80 space-y-2.5">
-                <div className="flex items-center justify-between text-xs pb-2 border-b border-amber-200/60">
-                  <span className="font-bold text-amber-900">제공 동의 항목</span>
-                  <span className="text-[11px] font-semibold text-amber-800 bg-amber-100 px-2 py-0.5 rounded border border-amber-300">
-                    전체 동의 필수
-                  </span>
-                </div>
-                <div className="p-3 bg-white rounded-lg border border-amber-200 shadow-2xs text-xs text-slate-700 leading-relaxed space-y-2">
-                  <div className="flex items-center gap-2 text-slate-800 font-semibold">
-                    <span className="text-amber-500 font-bold">✓</span>
-                    <span>회원 식별 및 연락처 정보 (성명, 이메일, 휴대전화번호)</span>
+              {/* 필수 제공 항목 확인란 */}
+              <div className="bg-white rounded-2xl border border-slate-200 p-4 shadow-xs space-y-3">
+                <div className="flex items-center justify-between text-xs pb-2 border-b border-slate-100">
+                  <span className="text-slate-500 font-medium">카카오 로그인 계정</span>
+                  <div className="flex items-center gap-1.5 font-bold text-slate-800">
+                    <span className="w-2 h-2 rounded-full bg-[#FEE500] border border-[#3C1E1E]"></span>
+                    <span>{kakaoModalProfile.email}</span>
                   </div>
-                  <p className="text-[11px] text-slate-500 pl-4 leading-normal">
-                    카카오 계정에 등록된 본인확인 정보가 쓸고닦고 회원가입 양식으로 안전하게 자동 조립되며, 가입창에서 수정 없이 그대로 사용됩니다.
-                  </p>
                 </div>
-              </div>
 
-              <div className="bg-amber-50 p-3 rounded-xl border border-amber-200 text-[11px] text-amber-900 leading-relaxed flex items-start gap-1.5">
-                <span className="font-bold text-amber-600">🔒</span>
-                <span>카카오 비즈 인증으로 수신된 회원정보는 안전하게 자동 조립되며, 가입창에서 조립된 정보를 확인하실 수 있습니다.</span>
+                <div className="space-y-2 text-xs">
+                  <div className="flex items-center justify-between p-2.5 bg-slate-50 rounded-xl">
+                    <span className="text-slate-700 font-medium">1. 카카오 회원번호 (ID)</span>
+                    <span className="text-[10px] font-bold text-amber-900 bg-amber-100 px-1.5 py-0.5 rounded">필수</span>
+                  </div>
+                  <div className="flex items-center justify-between p-2.5 bg-slate-50 rounded-xl">
+                    <div className="flex flex-col flex-1 mr-2">
+                      <span className="text-slate-700 font-medium">2. 카카오계정 이메일</span>
+                      <input
+                        type="email"
+                        value={kakaoModalProfile.email}
+                        onChange={(e) => setKakaoModalProfile({ ...kakaoModalProfile, email: e.target.value })}
+                        className="text-xs font-bold text-slate-900 bg-white border border-slate-300 rounded px-2 py-1 mt-1 focus:outline-none focus:ring-1 focus:ring-amber-500"
+                        title="이메일 수정 가능"
+                      />
+                    </div>
+                    <span className="text-[10px] font-bold text-amber-900 bg-amber-100 px-1.5 py-0.5 rounded">필수</span>
+                  </div>
+                  <div className="flex items-center justify-between p-2.5 bg-slate-50 rounded-xl">
+                    <div className="flex flex-col">
+                      <span className="text-slate-700 font-medium">3. 성명 (실명)</span>
+                      <input
+                        type="text"
+                        value={kakaoModalProfile.name}
+                        onChange={(e) => setKakaoModalProfile({ ...kakaoModalProfile, name: e.target.value })}
+                        className="text-xs font-bold text-slate-900 bg-white border border-slate-300 rounded px-2 py-1 mt-1 focus:outline-none focus:ring-1 focus:ring-amber-500"
+                        title="실명 수정 가능"
+                      />
+                    </div>
+                    <span className="text-[10px] font-bold text-amber-900 bg-amber-100 px-1.5 py-0.5 rounded">필수</span>
+                  </div>
+                  <div className="flex items-center justify-between p-2.5 bg-slate-50 rounded-xl">
+                    <div className="flex flex-col">
+                      <span className="text-slate-700 font-medium">4. 휴대전화번호 (본인실명확인)</span>
+                      <input
+                        type="text"
+                        value={kakaoModalProfile.mobile}
+                        onChange={(e) => setKakaoModalProfile({ ...kakaoModalProfile, mobile: e.target.value })}
+                        className="text-xs font-bold text-slate-900 bg-white border border-slate-300 rounded px-2 py-1 mt-1 focus:outline-none focus:ring-1 focus:ring-amber-500"
+                        title="휴대폰 번호 수정 가능"
+                      />
+                    </div>
+                    <span className="text-[10px] font-bold text-amber-900 bg-amber-100 px-1.5 py-0.5 rounded">필수</span>
+                  </div>
+                </div>
               </div>
             </div>
 
+            {/* 하단 동의 버튼 */}
             <div className="p-4 bg-white border-t border-slate-200 space-y-2">
+              <div className="p-2.5 bg-amber-50 rounded-xl border border-amber-200 text-xs text-amber-800 flex items-start gap-2">
+                <span className="material-symbols-outlined text-[16px] text-amber-600 shrink-0 mt-0.5">info</span>
+                <span>
+                  <strong>이메일 직접 등록 안내:</strong> 연동 후에도 쓸고닦고 계정으로 사용할 이메일을 다른 이메일로 자유롭게 변경하여 가입하실 수 있습니다.
+                </span>
+              </div>
               <button
                 type="button"
                 onClick={() => {
                   setKakaoAuthModalOpen(false);
+                  // 2단계 및 3단계: 프로필 정보 가입 폼에 즉각 바인딩 및 성명 필수입력란으로 포커스
                   setSocialProvider('KAKAO');
                   setSocialUid('kakao_' + Date.now());
                   setEmail(kakaoModalProfile.email);
@@ -5202,28 +5212,26 @@ export function WebClntAth010200({
                   setIsEmailValid(true);
                   setUserNm(kakaoModalProfile.name);
                   setUserTel(kakaoModalProfile.mobile);
-                  setIsTelVerified(false);
-                  setIsSmsSent(false);
-                  setAuthCode('');
-                  setSmsErrorMsg('');
-                  setSmsSuccessMsg('');
                   setPwd('social_auth_pwd!');
                   setPwdConfirm('social_auth_pwd!');
-                  setEmailCheckMsg(`✓ 카카오 연동 계정(${kakaoModalProfile.email})이 안전하게 조립되었습니다. (수정 불가)`);
-                  setSuccessInfoMsg(`✓ 카카오 연동 정보(성명: ${kakaoModalProfile.name}, 이메일, 휴대전화번호)가 조립되었습니다. 아래 휴대폰 실명인증(문자 인증)을 완료해 주세요.`);
+                  setEmailCheckMsg('✓ 카카오 계정 이메일이 자동 입력되었습니다. 다른 이메일로 변경하여 가입하실 수 있습니다.');
+                  setSuccessInfoMsg(`✓ 카카오 계정(${kakaoModalProfile.name} / ${kakaoModalProfile.email}) 연동 완료! 회원 성명 등 필수 항목을 확인하신 후 가입을 완료해 주세요.`);
                   setErrorMsg('');
+
+                  // 3단계: 성명(실명) 입력란으로 커서/포커스 자동 이동
                   setTimeout(() => {
-                    const btnSms = document.getElementById('btn-send-sms-auth') || document.getElementById('field-user-tel');
-                    if (btnSms) {
-                      btnSms.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                      btnSms.focus();
+                    if (userNmInputRef.current) {
+                      userNmInputRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                      userNmInputRef.current.focus();
                     }
                   }, 150);
                 }}
-                className="w-full h-12 bg-[#FEE500] hover:bg-[#ebd200] active:scale-[0.99] text-slate-900 font-bold text-sm rounded-xl shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer"
+                className="w-full h-12 bg-[#FEE500] hover:bg-[#FDD835] active:scale-[0.99] text-[#3C1E1E] font-bold text-sm rounded-xl shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer"
               >
+                <div className="w-4 h-4 bg-[#3C1E1E] rounded-full flex items-center justify-center text-[#FEE500] font-black text-[10px]">✓</div>
                 <span>동의하고 계속하기 (회원정보 자동 연동)</span>
               </button>
+
               <button
                 type="button"
                 onClick={() => setKakaoAuthModalOpen(false)}
@@ -5235,34 +5243,37 @@ export function WebClntAth010200({
           </div>
         </div>
       )}
-
-      {/* 3. Google 공식 연동 인증 모달 레이어 */}
+      {/* 4. Google 공식 연동 인증 모달 레이어 (Client ID: 281744333869-n8nbohs99t12g2eihescbdi8qmjkfevo.apps.googleusercontent.com) */}
       {googleAuthModalOpen && (
-        <div className="fixed inset-0 z-[150] flex items-center justify-center bg-black/60 p-4 animate-in fade-in duration-200">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 animate-in fade-in duration-200">
           <div className="bg-white w-full max-w-md rounded-2xl shadow-2xl overflow-hidden border border-slate-200">
-            <div className="bg-slate-50 px-5 py-3.5 flex items-center justify-between border-b border-slate-200">
+            {/* 상단 Google 공식 헤더 */}
+            <div className="bg-white px-5 py-3.5 border-b border-slate-200 flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <svg className="w-5 h-5" viewBox="0 0 24 24">
-                  <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
-                  <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
-                  <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" />
-                  <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" />
+                <svg aria-hidden="true" className="w-5 h-5" viewBox="0 0 24 24">
+                  <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"></path>
+                  <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"></path>
+                  <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" fill="#FBBC05"></path>
+                  <path d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.24 6.58l4.04 3.15c.95-2.83 3.6-4.98 6.72-4.98z" fill="#EA4335"></path>
                 </svg>
-                <span className="font-bold text-slate-800 text-sm">Google 계정으로 로그인</span>
+                <span className="font-extrabold text-slate-800 text-base tracking-tight">Google</span>
+                <span className="text-xs text-slate-500 font-bold ml-1">계정으로 로그인</span>
               </div>
               <button
                 type="button"
                 onClick={() => setGoogleAuthModalOpen(false)}
-                className="w-7 h-7 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-600 text-xs font-bold transition-colors cursor-pointer"
+                className="w-7 h-7 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-500 text-xs font-bold transition-colors cursor-pointer"
                 title="닫기"
               >
                 ✕
               </button>
             </div>
+
+            {/* 연동 안내 및 제3자 제공 동의 */}
             <div className="p-5 space-y-4 max-h-[70vh] overflow-y-auto">
               <div className="text-center space-y-1.5 pb-3 border-b border-slate-100">
-                <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-blue-50 border border-blue-200 mb-1 shadow-xs">
-                  <img src="/storage/sseuldakgo/logo/Logo_쓸고딱고.jpg" alt="쓸고닦고" className="w-8 h-8 rounded-full object-cover" onError={(e) => { e.target.src='/storage/sseuldakgo/logo/Logo_쓸고딱고.jpg'; }} />
+                <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-slate-50 border border-slate-200 mb-1 shadow-xs">
+                  <img src="/storage/project/brand/Logo_쓸고딱고.jpg" alt="쓸고닦고" className="w-8 h-8 rounded-full object-cover" onerror="this.src='/storage/project/brand/Logo_쓸고딱고.jpg'" />
                 </div>
                 <h4 className="font-bold text-slate-900 text-sm">
                   <span className="text-[#003262]">쓸고닦고</span> 서비스 제공을 위한<br />
@@ -5271,37 +5282,63 @@ export function WebClntAth010200({
                 <p className="text-[11px] text-slate-500">
                   Google 인증 회원 정보로 간편하게 가입하고 시공 발주 및 견적을 안전하게 이용합니다.
                 </p>
+                <div className="inline-block mt-1 px-2.5 py-0.5 bg-slate-100 rounded text-[10px] text-slate-500 font-mono">
+                  OAuth 2.0 (Project: sseuldakgo)
+                </div>
               </div>
 
-              <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-2.5">
-                <div className="flex items-center justify-between text-xs pb-2 border-b border-slate-200/60">
-                  <span className="font-bold text-slate-700">제공 동의 항목</span>
-                  <span className="text-[11px] font-semibold text-blue-600 bg-blue-50 px-2 py-0.5 rounded border border-blue-200">
-                    전체 동의 필수
-                  </span>
+              {/* 계정 정보 표출 */}
+              <div className="bg-slate-50 p-3.5 rounded-xl border border-slate-200 space-y-2 text-xs">
+                <div className="flex justify-between items-center text-slate-500 font-semibold">
+                  <span>Google 로그인 이메일</span>
+                  <span className="text-[11px] text-blue-600 font-bold">수정 가능</span>
                 </div>
-                <div className="p-3 bg-white rounded-lg border border-slate-200 shadow-2xs text-xs text-slate-700 leading-relaxed space-y-2">
-                  <div className="flex items-center gap-2 text-slate-800 font-semibold">
-                    <span className="text-blue-500 font-bold">✓</span>
-                    <span>회원 식별 및 연락처 정보 (성명, 이메일, 휴대전화번호)</span>
+                <input
+                  type="email"
+                  value={googleModalProfile.email}
+                  onChange={(e) => setGoogleModalProfile(prev => ({ ...prev, email: e.target.value }))}
+                  placeholder="예: your_id@gmail.com"
+                  className="w-full px-2.5 py-1.5 bg-white border border-slate-300 rounded text-slate-900 text-xs font-bold focus:outline-none focus:ring-1 focus:ring-blue-500"
+                />
+              </div>
+
+              {/* 필수 제공 항목 리스트 */}
+              <div className="space-y-2">
+                <span className="text-xs font-bold text-slate-700 block">제공 항목 (필수 동의)</span>
+                <div className="space-y-1.5 text-xs text-slate-600 bg-slate-50 p-3 rounded-xl border border-slate-100">
+                  <div className="flex items-center justify-between">
+                    <span>✓ Google 프로필 기본 정보 (성명, 프로필 사진)</span>
+                    <span className="text-[11px] font-bold text-blue-600">필수</span>
                   </div>
-                  <p className="text-[11px] text-slate-500 pl-4 leading-normal">
-                    Google 계정에 등록된 본인확인 정보가 쓸고닦고 회원가입 양식으로 안전하게 자동 조립되며, 가입창에서 수정 없이 그대로 사용됩니다.
-                  </p>
+                  <div className="flex items-center justify-between">
+                    <span>✓ Google 계정 이메일 주소</span>
+                    <span className="text-[11px] font-bold text-blue-600">필수</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span>✓ OpenID 고유 식별자</span>
+                    <span className="text-[11px] font-bold text-blue-600">필수</span>
+                  </div>
                 </div>
               </div>
 
-              <div className="bg-blue-50 p-3 rounded-xl border border-blue-200 text-[11px] text-blue-800 leading-relaxed flex items-start gap-1.5">
-                <span className="font-bold text-blue-600">🔒</span>
-                <span>Google 인증으로 수신된 회원정보는 안전하게 자동 조립되며, 가입창에서 조립된 정보를 확인하실 수 있습니다.</span>
+              <div className="bg-amber-50 p-3 rounded-xl border border-amber-200 text-[11px] text-amber-800 leading-relaxed">
+                ℹ️ Google 연동 완료 후 <strong>[성명 (성함)]</strong> 필수 입력란으로 자동 포커스 이동되며, 4대 필수 약관 전자서명 완료 후 최종 가입됩니다.
               </div>
             </div>
 
+            {/* 하단 동의 버튼 */}
             <div className="p-4 bg-white border-t border-slate-200 space-y-2">
+              <div className="p-2.5 bg-amber-50 rounded-xl border border-amber-200 text-xs text-amber-800 flex items-start gap-2">
+                <span className="material-symbols-outlined text-[16px] text-amber-600 shrink-0 mt-0.5">info</span>
+                <span>
+                  <strong>이메일 직접 등록 안내:</strong> 연동 후에도 쓸고닦고 계정으로 사용할 이메일을 다른 이메일로 자유롭게 변경하여 가입하실 수 있습니다.
+                </span>
+              </div>
               <button
                 type="button"
                 onClick={() => {
                   setGoogleAuthModalOpen(false);
+                  // 2단계 및 3단계: 프로필 정보 가입 폼에 즉각 바인딩 및 성명 필수입력란으로 포커스
                   setSocialProvider('GOOGLE');
                   setSocialUid('google_' + Date.now());
                   setEmail(googleModalProfile.email);
@@ -5309,28 +5346,26 @@ export function WebClntAth010200({
                   setIsEmailValid(true);
                   setUserNm(googleModalProfile.name);
                   setUserTel(googleModalProfile.mobile);
-                  setIsTelVerified(false);
-                  setIsSmsSent(false);
-                  setAuthCode('');
-                  setSmsErrorMsg('');
-                  setSmsSuccessMsg('');
                   setPwd('social_auth_pwd!');
                   setPwdConfirm('social_auth_pwd!');
-                  setEmailCheckMsg(`✓ Google 연동 계정(${googleModalProfile.email})이 안전하게 조립되었습니다. (수정 불가)`);
-                  setSuccessInfoMsg(`✓ Google 연동 정보(성명: ${googleModalProfile.name}, 이메일, 휴대전화번호)가 조립되었습니다. 아래 휴대폰 실명인증(문자 인증)을 완료해 주세요.`);
+                  setEmailCheckMsg('✓ Google 계정 이메일이 자동 입력되었습니다. 다른 이메일로 변경하여 가입하실 수 있습니다.');
+                  setSuccessInfoMsg(`✓ Google 계정(${googleModalProfile.name} / ${googleModalProfile.email}) 연동 완료! 회원 성명 등 필수 항목을 확인하신 후 가입을 완료해 주세요.`);
                   setErrorMsg('');
+
+                  // 3단계: 성명(실명) 입력란으로 커서/포커스 자동 이동
                   setTimeout(() => {
-                    const btnSms = document.getElementById('btn-send-sms-auth') || document.getElementById('field-user-tel');
-                    if (btnSms) {
-                      btnSms.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                      btnSms.focus();
+                    if (userNmInputRef.current) {
+                      userNmInputRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                      userNmInputRef.current.focus();
                     }
                   }, 150);
                 }}
-                className="w-full h-12 bg-white border border-slate-300 hover:bg-slate-50 active:scale-[0.99] text-slate-800 font-bold text-sm rounded-xl shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer"
+                className="w-full h-12 bg-[#4285F4] hover:bg-[#3367D6] active:scale-[0.99] text-white font-bold text-sm rounded-xl shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer"
               >
+                <div className="w-4 h-4 bg-white rounded-full flex items-center justify-center text-[#4285F4] font-black text-[10px]">✓</div>
                 <span>동의하고 계속하기 (회원정보 자동 연동)</span>
               </button>
+
               <button
                 type="button"
                 onClick={() => setGoogleAuthModalOpen(false)}
@@ -6908,6 +6943,10 @@ export default function WebClntCom010000({ onNavigate }) {
   const [isWelcomeModalOpen, setIsWelcomeModalOpen] = useState(false);
   const [welcomeUserInfo, setWelcomeUserInfo] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState('REGULAR');
+  const handleOpenReqModal = (category) => {
+    if (category) setSelectedCategory(category);
+    setIsReqModalOpen(true);
+  };
 
   // 추가 보조 상태 (카테고리 공통코드 메타, 회원/비회원 정보, 네비게이션 탭)
   const [categoryList, setCategoryList] = useState(INITIAL_CATEGORY_LIST);
@@ -6951,13 +6990,31 @@ export default function WebClntCom010000({ onNavigate }) {
         if (savedAuth) {
           const parsed = JSON.parse(savedAuth);
           if (parsed && parsed.USER_NO && parsed.USER_NO !== 'GUEST') {
-            return 'WEB-CLNT-MYP-010100';
+            return parsed.USER_ROLE_CD === 'S' || String(parsed.USER_NO).startsWith('S')
+              ? 'WEB-SRVC-MYP-010100'
+              : 'WEB-CLNT-MYP-010100';
           }
         }
       }
     } catch (e) {}
     return 'home';
   });
+  // 테마 상태 (light / dark)
+  const [isDark, setIsDark] = useState(() => {
+    try {
+      return typeof window !== 'undefined' && localStorage.getItem('SSEULDAKGO_THEME') === 'dark';
+    } catch {
+      return false;
+    }
+  });
+  useEffect(() => {
+    if (typeof document === 'undefined') return;
+    document.documentElement.classList.toggle('dark', isDark);
+    try {
+      localStorage.setItem('SSEULDAKGO_THEME', isDark ? 'dark' : 'light');
+    } catch {}
+  }, [isDark]);
+
   // 내정보 드롭다운 및 서브 모달 상태
   const [isMyMenuOpen, setIsMyMenuOpen] = useState(false);
   const [subModalType, setSubModalType] = useState(null); // 'CHANGE_PHONE' | 'CHANGE_PWD' | 'BIZ_REG'
@@ -7257,19 +7314,21 @@ export default function WebClntCom010000({ onNavigate }) {
     );
   };
 
-  // 시공 파트너 현장 진행 현황 (WEB-SRVC-JOB-020000) 화면 전환
-  if (activeNavPath && (activeNavPath === "WEB-SRVC-JOB-020000" || activeNavPath === "job-progress")) {
+  // 시공사 내정보 및 서비스 지역 관리 (WEB-SRVC-MYP-010100) 화면 전환
+  if (activeNavPath === 'WEB-SRVC-MYP-010100') {
     return (
-      <WebSrvcJob020000
+      <WebSrvcMyp010100
         currentUser={userInfo}
         onLogout={() => {
+          localStorage.removeItem('SSEULDAKGO_AUTH_USER');
+          sessionStorage.removeItem('SSEULDAKGO_AUTH_USER');
           setUserInfo({
             isGuest: true,
-            USER_NO: "GUEST",
-            USER_NM: "비회원",
-            USER_ROLE_CD: "GUEST",
+            USER_NO: 'GUEST',
+            USER_NM: '비회원',
+            USER_ROLE_CD: 'GUEST',
           });
-          setActiveNavPath("home");
+          setActiveNavPath('home');
         }}
         onNavigate={(path) => setActiveNavPath(path)}
       />
@@ -7439,11 +7498,8 @@ export default function WebClntCom010000({ onNavigate }) {
               <img
                 src="/logo.png"
                 alt="쓸고닦고 로고"
-                className="w-10 h-10 rounded-full object-cover shadow-sm ring-2 ring-primary/20"
+                className="w-14 h-14 rounded-full object-cover shadow-sm ring-2 ring-primary/20"
               />
-              <span className="text-xl font-extrabold text-[#003d9b] tracking-tight leading-none">
-                쓸고닦고
-              </span>
             </a>
           </div>
 
@@ -7488,30 +7544,35 @@ export default function WebClntCom010000({ onNavigate }) {
                 </button>
               </>
             ) : (
-              /* [이용자 GNB: 홈, 청소·시공 매칭, 견적 요청, 이용후기, 내 정보, 고객센터] */
+              /* [이용자 GNB: 3대 청소 용역 대분류, 이용 절차 4단계 워크플로우, 실시간 발주·매칭 현황, 쓸고닦고 전문 시공사 파트너 모집] */
               <>
                 <button
                   type="button"
                   className="px-3.5 py-1.5 rounded-full font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all cursor-pointer"
-                  onClick={() => setIsReqModalOpen(true)}
+                  onClick={() => document.getElementById('section-core-services')?.scrollIntoView({ behavior: 'smooth' })}
                 >
-                  청소·시공 매칭
+                  3대 청소 용역 대분류
                 </button>
                 <button
                   type="button"
                   className="px-3.5 py-1.5 rounded-full font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all cursor-pointer"
-                  onClick={() => setIsReqModalOpen(true)}
+                  onClick={() => document.getElementById('section-how-it-works')?.scrollIntoView({ behavior: 'smooth' })}
                 >
-                  견적 요청
+                  이용 절차 4단계 워크플로우
                 </button>
                 <button
                   type="button"
                   className="px-3.5 py-1.5 rounded-full font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all cursor-pointer"
-                  onClick={() => {
-                    alert('실제 시공을 완료한 이용 고객님들의 실시간 생생 후기 모음입니다.');
-                  }}
+                  onClick={() => document.getElementById('section-live-matching')?.scrollIntoView({ behavior: 'smooth' })}
                 >
-                  이용후기
+                  실시간 발주·매칭 현황
+                </button>
+                <button
+                  type="button"
+                  className="px-3.5 py-1.5 rounded-full font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all cursor-pointer"
+                  onClick={() => document.getElementById('section-partner-recruit')?.scrollIntoView({ behavior: 'smooth' })}
+                >
+                  쓸고닦고 전문 시공사 파트너 모집
                 </button>
               </>
             )}
@@ -7723,13 +7784,13 @@ export default function WebClntCom010000({ onNavigate }) {
                     <div className="px-4 py-3 border-b border-slate-100 flex items-center justify-between bg-slate-50/70">
                       <div className="flex items-center gap-2">
                         <span className="font-extrabold text-sm text-slate-900">알림 센터</span>
-                        {unreadNotiCount > 0 && (
+                        {!userInfo?.isGuest && userInfo?.USER_NO !== 'GUEST' && unreadNotiCount > 0 && (
                           <span className="text-[11px] font-bold px-1.5 py-0.5 bg-red-100 text-red-600 rounded-full font-mono">
                             {unreadNotiCount}건 미확인
                           </span>
                         )}
                       </div>
-                      {unreadNotiCount > 0 && (
+                      {!userInfo?.isGuest && userInfo?.USER_NO !== 'GUEST' && unreadNotiCount > 0 && (
                         <button
                           type="button"
                           onClick={handleMarkAllNotiRead}
@@ -7879,494 +7940,227 @@ export default function WebClntCom010000({ onNavigate }) {
       {/* ====================================================================
           MAIN CONTENT
       ==================================================================== */}
-      <main className="w-full pt-[72px] min-h-[calc(100vh-280px)] bg-surface">
-        <div className="max-w-[1200px] mx-auto px-margin py-space-lg">
-          <div className="flex flex-col w-full space-y-12 pb-24">
-            {/* Top Visual Accent & Breadcrumb Ribbon */}
-            <div className="flex items-center justify-between py-2 text-on-surface-variant font-caption text-caption">
-              <div className="flex items-center gap-2">
-                <span className="text-on-surface-variant font-body-sm text-body-sm font-bold text-slate-800">
-                  {userInfo?.USER_ROLE_CD === 'S' ? '시공사 메인 홈' : '고객 메인 홈'}
-                </span>
-                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-surface-container-high text-secondary text-xs font-medium ml-1 border border-secondary/20">
-                  <span className="material-symbols-outlined text-[14px]">location_on</span>
-                  {regionInfo.DISPLAY_NM}
-                </span>
-              </div>
-            </div>
-
-            {/* ==============================================================
-                SECTION 1: Hero & 3대 청소 대분류 퀵 선택 카드
-            ============================================================== */}
-            <section className="flex flex-col space-y-8">
-              <div className="space-y-3">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-surface-container-high text-primary font-label-sm text-label-sm shadow-sm">
-                  <span className="material-symbols-outlined text-[15px] text-secondary">
-                    verified_user
-                  </span>
-                  역경매 없는 투명한 100% 고객 지정가 매칭 시스템
+      <main className="w-full pt-[72px] bg-surface flex-1">
+        <div className="max-w-[1440px] mx-auto px-margin-mobile lg:px-margin flex flex-col gap-0">
+          {/* Section 2: Hero Banner & Quick Order Button */}
+          <section className="relative py-12 lg:py-20">
+            <div className="absolute -top-10 -left-10 w-96 h-96 rounded-full bg-primary/5 blur-3xl pointer-events-none" />
+            <div className="absolute bottom-0 right-0 w-96 h-96 rounded-full bg-secondary/10 blur-3xl pointer-events-none" />
+            <div className="relative grid grid-cols-1 lg:grid-cols-12 gap-space-xl items-center">
+              <div className="lg:col-span-7 flex flex-col gap-space-lg min-w-0">
+                <div className="inline-flex items-center gap-space-xs self-start px-space-md py-space-2xs rounded-full bg-secondary-container text-on-secondary-container font-label-sm text-label-sm font-semibold">
+                  <span className="material-symbols-outlined text-[16px]">verified</span>
+                  <span>고객 직접 확정 지정가 · 단독 매칭</span>
                 </div>
-                <h1 className="font-headline-lg text-headline-lg text-on-surface tracking-tight font-bold">
-                  원하는 청소 서비스를 선택하고 확정 금액으로 바로 발주하세요
+                <h1 className="font-display-hero text-display-hero text-on-surface tracking-tight leading-tight">
+                  내가 정한 요금 그대로!<br />정기청소.입주이사청소.계절가전 분해케어를 요청해보세요
                 </h1>
-                <p className="font-body-lg text-body-lg text-on-surface-variant max-w-3xl">
-                  쓸고닦고는 업체의 과다 견적 경쟁을 지양합니다. 고객이 책정한 정찰제 발주가로 동네 검증 마스터가 1:1 직접 매칭되며, 시공비는 검수 후 현장에서 직불합니다.
+                <p className="font-body-lg text-body-lg text-on-surface-variant max-w-2xl">
+                  정기청소부터 계절가전 분해케어, 입주·이사 청소까지 고객님이 직접 지불할 용역 요금을 결정해 입력하면, 검증된 전문 시공사가 가격 흥정 없이 단독 매칭됩니다.
                 </p>
               </div>
-
-              {/* 3-Column Large Card Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-gutter">
-                {/* Card 1: 정기청소 (REGULAR) */}
-                <article
-                  className="group relative flex flex-col p-6 rounded-xl bg-surface-container-lowest shadow-sm hover:shadow-xl transition-all duration-300 cursor-pointer border border-transparent hover:border-primary/20"
-                  data-clean-large="REGULAR"
-                  onClick={() => openRequestModal('REGULAR')}
+              <div className="lg:col-span-5 min-w-0 flex items-center justify-center lg:justify-end h-full">
+                <button
+                  type="button"
+                  onClick={() => handleOpenReqModal()}
+                  className="inline-flex items-center justify-center gap-3 px-8 py-5 rounded-2xl bg-[#005f56] hover:bg-[#004d46] text-white shadow-lg transition-colors font-bold text-lg cursor-pointer"
                 >
-                  <div className="space-y-5">
-                    <div className="flex items-center justify-between">
-                      <span className="px-2.5 py-1 rounded-full bg-secondary-container text-on-secondary-container font-label-sm text-label-sm">
-                        최소 3개월(90일) 락
-                      </span>
-                      <span className="font-caption text-caption text-outline uppercase font-mono tracking-wider">
-                        CODE: REGULAR
-                      </span>
-                    </div>
-                    {/* Building Icon Graphic */}
-                    <div className="flex items-center gap-4">
-                      <div className="w-14 h-14 rounded-xl bg-surface-container flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-on-primary transition-colors">
-                        <svg
-                          className="w-8 h-8"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="1.8"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                          />
-                        </svg>
-                      </div>
-                      <div>
-                        <h2 className="font-headline-sm text-headline-sm text-on-surface font-bold">
-                          건물 정기관리
-                        </h2>
-                        <p className="font-body-sm text-body-sm text-on-surface-variant">
-                          계단, 복도, 외곽, 분리수거장 공용부 케어
-                        </p>
-                      </div>
-                    </div>
-                    {/* Image Preview for Visual Richness */}
-                    <div className="overflow-hidden rounded-lg h-36 relative">
-                      <img
-                        alt="빌라·원룸·상가주택 공용부"
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                        data-alt="Spotless modern residential apartment building staircase and hallway polished pristine floor illuminated with clean daylight professional domestic maintenance style navy teal highlights"
-                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuCQrJd6U17hxg14WD26N5fwT0NrJibmU2eBON6qbohtbuE0_g9AjKSzKLQHAbd5-uSGXrB5ahmajwvJXWAYyPVVEMpu7zeaxmCN3AWxKfACG7evJLPk0GqhllYmTNZR19V0aB0jYgSGd6J2fYsCZ51Xnp8K1tYb5oigCudt24stCZZK7cJkrtSiHKL_1KHDQObBgffiQjf95oyozR03g6dPBk0ee3N07o3vT4jezlU"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-primary/60 via-transparent to-transparent"></div>
-                      <span className="absolute bottom-2 left-3 font-caption text-caption text-on-primary font-semibold">
-                        빌라·원룸·상가주택 공용부
-                      </span>
-                    </div>
-                  </div>
-                </article>
-
-                {/* Card 2: 계절가전 (APPLIANCE) */}
-                <article
-                  className="group relative flex flex-col p-6 rounded-xl bg-surface-container-lowest shadow-sm hover:shadow-xl transition-all duration-300 cursor-pointer border border-transparent hover:border-primary/20"
-                  data-clean-large="APPLIANCE"
-                  onClick={() => openRequestModal('APPLIANCE')}
-                >
-                  <div className="space-y-5">
-                    <div className="flex items-center justify-between">
-                      <span className="px-2.5 py-1 rounded-full bg-surface-container-highest text-on-primary-fixed-variant font-label-sm text-label-sm">
-                        완전분해 살균세척
-                      </span>
-                      <span className="font-caption text-caption text-outline uppercase font-mono tracking-wider">
-                        CODE: APPLIANCE
-                      </span>
-                    </div>
-                    {/* Appliance Icon Graphic */}
-                    <div className="flex items-center gap-4">
-                      <div className="w-14 h-14 rounded-xl bg-surface-container flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-on-primary transition-colors">
-                        <svg
-                          className="w-8 h-8"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="1.8"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                          />
-                        </svg>
-                      </div>
-                      <div>
-                        <h2 className="font-headline-sm text-headline-sm text-on-surface font-bold">
-                          가전 분해청소
-                        </h2>
-                        <p className="font-body-sm text-body-sm text-on-surface-variant">
-                          시스템/벽걸이 에어컨, 세탁기 고압 스팀
-                        </p>
-                      </div>
-                    </div>
-                    {/* Image Preview for Visual Richness */}
-                    <div className="overflow-hidden rounded-lg h-36 relative">
-                      <img
-                        alt="벽걸이·스탠드·천장형 시스템"
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                        data-alt="Professional air conditioner disassembly cleaning technician high pressure eco steam wash hygiene equipment focused indoor air conditioning maintenance clean navy lighting"
-                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuDN88rR-7g3MXiXHGjW2KcQY9jjssKs7wUTC70WkIxEmBZzDqvEV8YF4_RUmQyxZsUeQgqUPPtGW5WZeFs5B-G4BXtWyPSTfi3YdBu439YRdD4l-hm-eoA2AFcCa7Ke3uOQdL--99VS2Fi2gPJ7iWsvdO2qObIfgG2rGi-BVJwifw4bupVz7DzloBv-ShUJWBB9rbzxq0wrZVK8bYZISwGBH0D6QsoegH050YGZQPk"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-primary/60 via-transparent to-transparent"></div>
-                      <span className="absolute bottom-2 left-3 font-caption text-caption text-on-primary font-semibold">
-                        벽걸이·스탠드·천장형 시스템
-                      </span>
-                    </div>
-                  </div>
-                </article>
-
-                {/* Card 3: 입주청소 (MOVEIN) */}
-                <article
-                  className="group relative flex flex-col p-6 rounded-xl bg-surface-container-lowest shadow-sm hover:shadow-xl transition-all duration-300 cursor-pointer border border-transparent hover:border-primary/20"
-                  data-clean-large="MOVEIN"
-                  onClick={() => openRequestModal('MOVEIN')}
-                >
-                  <div className="space-y-5">
-                    <div className="flex items-center justify-between">
-                      <span className="px-2.5 py-1 rounded-full bg-primary-fixed text-on-primary-fixed-variant font-label-sm text-label-sm">
-                        실내 전용공간 케어
-                      </span>
-                      <span className="font-caption text-caption text-outline uppercase font-mono tracking-wider">
-                        CODE: MOVEIN
-                      </span>
-                    </div>
-                    {/* Move-in Icon Graphic */}
-                    <div className="flex items-center gap-4">
-                      <div className="w-14 h-14 rounded-xl bg-surface-container flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-on-primary transition-colors">
-                        <svg
-                          className="w-8 h-8"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="1.8"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                          />
-                        </svg>
-                      </div>
-                      <div>
-                        <h2 className="font-headline-sm text-headline-sm text-on-surface font-bold">
-                          입주/이사 대청소
-                        </h2>
-                        <p className="font-body-sm text-body-sm text-on-surface-variant">
-                          신축 입주, 이사 전 분진/찌든 때 정밀 케어
-                        </p>
-                      </div>
-                    </div>
-                    {/* Image Preview for Visual Richness */}
-                    <div className="overflow-hidden rounded-lg h-36 relative">
-                      <img
-                        alt="아파트·오피스텔·빌라 주거공간"
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                        data-alt="Pristine interior of a modern newly built apartment living room floor-to-ceiling windows shining wood floors spotless kitchen sanitized clean sunlight ambiance"
-                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuBfVCkHDfYj9AdDiT1ztZNi7q11XXpNQZUktEmlPGROUg0I2tGa5MYqoprZz4I49j02JdlVwW_2xDjUV5YnD7paNBq4cCHp_dXC5i-WTMRD7ZkVSB4Ffunx7e55RATLf5ayaTwHh3643ecUVzvbpyNE-VtdX3hn0fiTxbZdxRVBd2m8yHOelJubqc9AHVeI_AuzPZt82ODjPO3aR7NV4pGYS43S1gHZCx4zOsvVCDw"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-primary/60 via-transparent to-transparent"></div>
-                      <span className="absolute bottom-2 left-3 font-caption text-caption text-on-primary font-semibold">
-                        아파트·오피스텔·빌라 주거공간
-                      </span>
-                    </div>
-                  </div>
-                </article>
+                  <span className="material-symbols-outlined text-[28px]">post_add</span>
+                  <span>우리집 청소 요청 등록하기</span>
+                </button>
               </div>
-            </section>
+            </div>
+          </section>
 
-            {/* ==============================================================
-                SECTION 2: 내 동네 실시간 접수 현황
-            ============================================================== */}
-            <section className="flex flex-col space-y-4">
-              <div className="flex items-center justify-between p-4 rounded-xl bg-surface-container-lowest shadow-sm">
-                <div className="flex items-center gap-2">
-                  <span className="w-2.5 h-2.5 rounded-full bg-secondary animate-ping"></span>
-                  <h2 className="font-headline-sm text-headline-sm text-on-surface font-bold flex items-center gap-1.5">
-                    <span>📍 내 동네 실시간 접수 현황</span>
-                    <span
-                      className="px-2 py-0.5 rounded-full bg-surface-container-high text-primary font-label-sm text-label-sm"
-                      data-field="SIGUNGU_CD"
-                    >
-                      {regionInfo.SHORT_NM}
-                    </span>
-                  </h2>
-                </div>
-                <span className="font-caption text-caption text-outline">
-                  실시간 자동 갱신중 (10초 주기)
-                </span>
+          {/* Section 3: 3대 청소 용역 대분류 */}
+          <section id="section-core-services" className="scroll-mt-20 py-8 flex flex-col gap-space-md border-t border-outline-variant/50">
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-space-md">
+              <div className="flex flex-col gap-space-2xs">
+                <span className="font-label-sm text-label-sm text-primary uppercase tracking-wider font-bold">01 / CORE SERVICES</span>
+                <h2 className="font-headline-xl text-headline-xl text-on-surface">3대 청소 용역 대분류</h2>
               </div>
-
-              {/* Real-time Order List (5 items bound from feedList state) */}
-              <div className="space-y-3">
-                {feedList.map((order) => (
-                  <div
-                    className="p-4 rounded-xl bg-surface-container-lowest shadow-sm hover:shadow-md transition-shadow flex flex-col sm:flex-row sm:items-center justify-between gap-3"
-                    key={order.ORDER_NO}
-                  >
-                    <div className="space-y-1.5 min-w-0">
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <span
-                          className="font-caption text-caption font-mono text-outline"
-                          data-field="ORDER_NO"
-                        >
-                          {order.ORDER_NO}
-                        </span>
-                        <span
-                          className={getCategoryBadgeClass(order.CLEAN_LARGE_CD)}
-                          data-field="CLEAN_LARGE_CD"
-                        >
-                          {getCategoryName(order.CLEAN_LARGE_CD, order.CLEAN_LARGE_NM)}
-                        </span>
-                        {renderOrderStatusBadge(order)}
-                      </div>
-                      <div
-                        className="font-body-md text-body-md text-on-surface font-semibold truncate"
-                        data-field="ADDR_TEXT"
-                      >
-                        {order.ADDR_TEXT}
-                      </div>
-                      <div className="flex items-center gap-2 font-caption text-caption text-on-surface-variant">
-                        <span>{order.SUB_SPEC_TEXT || '고객 지정가 확정 발주'}</span>
-                        <span>•</span>
-                        <span className="text-outline" data-field="REG_DT">
-                          {order.REG_DT}
-                        </span>
-                      </div>
+              <p className="font-body-md text-body-md text-on-surface-variant max-w-md">
+                공간과 가전의 특성에 맞춘 표준화된 서비스 영역에서 원하는 확정가로 투명하게 발주하세요.
+              </p>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-space-lg">
+              <div className="bg-surface-container-lowest rounded-2xl shadow-sm hover:shadow-md transition-all overflow-hidden flex flex-col border border-outline-variant/60">
+                <img
+                  src="/storage/sseuldakgo/page_main/20261126_v0.01/regular_cleaning_service.jpg"
+                  alt="정기청소 (계단·건물관리)"
+                  className="w-full h-48 object-cover"
+                />
+                <div className="p-space-lg flex flex-col gap-space-sm justify-between flex-1">
+                  <div className="flex flex-col gap-space-xs">
+                    <div className="inline-flex items-center self-start px-space-sm py-0.5 rounded-full bg-secondary-container text-on-secondary-container font-label-sm text-label-sm font-semibold">
+                      최소 3개월 의무 계약
                     </div>
-                    <div className="text-left sm:text-right shrink-0">
-                      <span className="block font-caption text-caption text-on-surface-variant">
-                        고객 지정 발주가
-                      </span>
-                      <span
-                        className="font-headline-sm text-headline-sm text-secondary font-bold"
-                        data-field="PROPOSED_PRICE"
-                      >
-                        {order.PRICE_PREFIX ||
-                          (order.CLEAN_LARGE_CD === 'REGULAR' ? '월 ' : '')}
-                        {Number(order.PROPOSED_PRICE).toLocaleString()}원
-                      </span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </section>
-
-            {/* ==============================================================
-                SECTION 3: 4단계 검증 마스터 배너
-            ============================================================== */}
-            <section className="p-6 md:p-8 rounded-2xl bg-surface-container-lowest shadow-sm flex flex-col space-y-6">
-              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div className="space-y-1">
-                  <span className="text-secondary font-label-md text-label-md tracking-wide">
-                    VERIFIED PRO VETTING PROCESS
-                  </span>
-                  <h2 className="font-headline-md text-headline-md text-on-surface font-bold">
-                    오직 엄선된 4단계 검증 마스터만 현장에 투입됩니다
-                  </h2>
-                  <p className="font-body-md text-body-md text-on-surface-variant">
-                    불안한 비대면 외주 기사가 아닌, 신원과 기술력이 사전 입증된 우리 동네 전담 기술 파트너입니다.
-                  </p>
-                </div>
-                <div className="flex items-center gap-2 shrink-0">
-                  <span className="px-3 py-1.5 rounded-lg bg-surface-container text-primary font-label-sm text-label-sm font-semibold">
-                    파트너 누적 합격률 14.8%
-                  </span>
-                </div>
-              </div>
-              {/* 4 Steps Visual Flow */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                <div className="p-5 rounded-xl bg-surface-container-low flex flex-col space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span className="font-mono text-caption text-primary font-bold">STEP 01</span>
-                    <span className="material-symbols-outlined text-secondary text-[24px]">
-                      badge
-                    </span>
-                  </div>
-                  <h3 className="font-label-lg text-label-lg text-on-surface font-bold">
-                    실명 및 신원 검증
-                  </h3>
-                  <p className="font-caption text-caption text-on-surface-variant">
-                    사업자등록증, 신분증 진위 확인 및 주거지역 정밀 조회 시스템을 통과한 파트너만 활동을 인가합니다.
-                  </p>
-                </div>
-                <div className="p-5 rounded-xl bg-surface-container-low flex flex-col space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span className="font-mono text-caption text-primary font-bold">STEP 02</span>
-                    <span className="material-symbols-outlined text-secondary text-[24px]">
-                      security
-                    </span>
-                  </div>
-                  <h3 className="font-label-lg text-label-lg text-on-surface font-bold">
-                    영업배상보험 1억
-                  </h3>
-                  <p className="font-caption text-caption text-on-surface-variant">
-                    작업 중 발생할 수 있는 시설물 파손 및 가전 결함에 대비하여 배상책임보험 1억원 가입을 필수 의무화합니다.
-                  </p>
-                </div>
-                <div className="p-5 rounded-xl bg-surface-container-low flex flex-col space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span className="font-mono text-caption text-primary font-bold">STEP 03</span>
-                    <span className="material-symbols-outlined text-secondary text-[24px]">
-                      school
-                    </span>
-                  </div>
-                  <h3 className="font-label-lg text-label-lg text-on-surface font-bold">
-                    표준 CS·위생 교육
-                  </h3>
-                  <p className="font-caption text-caption text-on-surface-variant">
-                    분해세척 매뉴얼 및 고객 접점 응대 표준, 친환경 약제 배합 기준 과정을 수료한 마스터에게만 매칭 티켓을 부여합니다.
-                  </p>
-                </div>
-                <div className="p-5 rounded-xl bg-surface-container-low flex flex-col space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span className="font-mono text-caption text-primary font-bold">STEP 04</span>
-                    <span className="material-symbols-outlined text-secondary text-[24px]">
-                      hotel_class
-                    </span>
-                  </div>
-                  <h3 className="font-label-lg text-label-lg text-on-surface font-bold">
-                    평점 4.5 이상 유지
-                  </h3>
-                  <p className="font-caption text-caption text-on-surface-variant">
-                    실제 시공 고객의 리뷰 평점이 4.5점 미만으로 하락할 경우 자동 활동 중지 및 추가 기술 재검증을 진행합니다.
-                  </p>
-                </div>
-              </div>
-            </section>
-
-            {/* ==============================================================
-                Sticky Bottom Floating CTA Bar
-            ============================================================== */}
-            <aside className="sticky bottom-4 z-40 w-full">
-              <div className="mx-auto max-w-[1200px] p-4 rounded-2xl bg-surface-container-lowest/95 backdrop-blur-md shadow-2xl flex flex-col sm:flex-row items-center justify-between gap-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center shrink-0">
-                    <span className="material-symbols-outlined text-[20px]">add_task</span>
-                  </div>
-                  <div className="space-y-0.5">
-                    <p className="font-label-lg text-label-lg text-on-surface font-bold">
-                      원하는 조건과 금액으로 청소를 발주하고 기사님을 매칭받으세요!
-                    </p>
-                    <p className="font-caption text-caption text-secondary">
-                      비회원 작성 시 브라우저 자동 임시 저장 지원 • 로그인 시 100% 자동 복원
+                    <h3 className="font-headline-md text-headline-md text-on-surface">정기청소 (계단·건물관리)</h3>
+                    <p className="font-body-md text-body-md text-on-surface-variant">
+                      빌라·상가 계단, 건물주위, 지하주차장 구역별 맞춤 관리 (안정적 관리를 위한 최소 3개월 의무 계약, 구역별 3개월 요금 직접 입력)
                     </p>
                   </div>
-                </div>
-                <div className="w-full sm:w-auto shrink-0">
-                  <button
-                    className="w-full sm:w-auto h-[52px] px-6 rounded-xl bg-secondary text-on-secondary font-label-lg text-label-lg font-bold flex items-center justify-center gap-2 hover:bg-secondary-container hover:text-on-secondary-container transition-colors shadow-md"
-                    onClick={() => openRequestModal('REGULAR')}
-                    type="button"
-                  >
-                    <span className="material-symbols-outlined text-[20px]">post_add</span>
-                    <span>우리집 청소 요청 등록하기</span>
+                  <button type="button" onClick={() => handleOpenReqModal('REGULAR')} className="inline-flex items-center gap-space-2xs font-label-md text-label-md text-primary hover:text-sky-700 font-semibold pt-space-xs cursor-pointer">
+                    <span>정기청소 발주하기</span>
+                    <span className="material-symbols-outlined text-[16px]">chevron_right</span>
                   </button>
                 </div>
               </div>
-            </aside>
+              <div className="bg-surface-container-lowest rounded-2xl shadow-sm hover:shadow-md transition-all overflow-hidden flex flex-col border border-outline-variant/60">
+                <img
+                  src="/storage/sseuldakgo/page_main/20261126_v0.01/appliances_care_service.jpg"
+                  alt="계절가전 분해케어"
+                  className="w-full h-48 object-cover"
+                />
+                <div className="p-space-lg flex flex-col gap-space-sm justify-between flex-1">
+                  <div className="flex flex-col gap-space-xs">
+                    <div className="inline-flex items-center self-start px-space-sm py-0.5 rounded-full bg-secondary-container text-on-secondary-container font-label-sm text-label-sm font-semibold">
+                      완전 분해 고압 살균
+                    </div>
+                    <h3 className="font-headline-md text-headline-md text-on-surface">계절가전 분해케어</h3>
+                    <p className="font-body-md text-body-md text-on-surface-variant">
+                      벽걸이·스탠드·시스템 에어컨, 드럼·통돌이 세탁기, 냉장고 완전 분해 고압 살균 세척 (품목·수량별 희망 요금 직접 입력)
+                    </p>
+                  </div>
+                  <button type="button" onClick={() => handleOpenReqModal('APPLIANCE')} className="inline-flex items-center gap-space-2xs font-label-md text-label-md text-primary hover:text-sky-700 font-semibold pt-space-xs cursor-pointer">
+                    <span>가전 분해케어 발주하기</span>
+                    <span className="material-symbols-outlined text-[16px]">chevron_right</span>
+                  </button>
+                </div>
+              </div>
+              <div className="bg-surface-container-lowest rounded-2xl shadow-sm hover:shadow-md transition-all overflow-hidden flex flex-col border border-outline-variant/60">
+                <img
+                  src="/storage/sseuldakgo/page_main/20261126_v0.01/move_in_cleaning_service.jpg"
+                  alt="입주·이사 청소"
+                  className="w-full h-48 object-cover"
+                />
+                <div className="p-space-lg flex flex-col gap-space-sm justify-between flex-1">
+                  <div className="flex flex-col gap-space-xs">
+                    <div className="inline-flex items-center self-start px-space-sm py-0.5 rounded-full bg-secondary-container text-on-secondary-container font-label-sm text-label-sm font-semibold">
+                      스팀·살균 대청소
+                    </div>
+                    <h3 className="font-headline-md text-headline-md text-on-surface">입주·이사 청소</h3>
+                    <p className="font-body-md text-body-md text-on-surface-variant">
+                      아파트, 오피스텔, 빌라, 사무실 입주 및 이사 전후 구석구석 스팀·살균 대청소 (건별 희망 요금 직접 입력)
+                    </p>
+                  </div>
+                  <button type="button" onClick={() => handleOpenReqModal('MOVEIN')} className="inline-flex items-center gap-space-2xs font-label-md text-label-md text-primary hover:text-sky-700 font-semibold pt-space-xs cursor-pointer">
+                    <span>입주·이사 청소 발주하기</span>
+                    <span className="material-symbols-outlined text-[16px]">chevron_right</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </section>
 
-            {/* ==============================================================
-                Interactive Modal: WEB-CLNT-REQ-010100 (청소 의뢰 등록)
-            ============================================================== */}
-            <WebClntReq010100
-              initialTab={selectedCategory}
-              isOpen={isReqModalOpen}
-              onClose={() => setIsReqModalOpen(false)}
-              onOpenLogin={() => {
-                setIsReqModalOpen(false);
-                setIsLoginModalOpen(true);
-              }}
-              onOrderCreated={handleOrderCreated}
-              regionInfo={regionInfo}
-              userNo={userInfo.USER_NO}
-            />
+          {/* Section 5: 이용 절차 4단계 워크플로우 */}
+          <section id="section-how-it-works" className="scroll-mt-20 py-8 flex flex-col gap-space-md border-t border-outline-variant/50">
+            <div className="flex flex-col gap-space-2xs">
+              <span className="font-label-sm text-label-sm text-primary uppercase tracking-wider font-bold">02 / HOW IT WORKS</span>
+              <h2 className="font-headline-xl text-headline-xl text-on-surface">이용 절차 4단계 워크플로우</h2>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-space-md">
+              {[
+                { num: '01', icon: 'edit_document', title: '1단계. 희망 요금 결정 및 발주', desc: '지역, 일정, 세부 구역/기종과 고객이 원하는 용역 대금을 직접 결정해 발주 등록', color: 'text-primary', img: '/storage/sseuldakgo/page_main/20261126_v0.01/Web_main_workflow_01.png' },
+                { num: '02', icon: 'handshake', title: '2단계. 전문 시공사 단독 청약', desc: '검증된 파트너의 청약 접수 및 고객 확인 후 데이터 이용료 결제·계약 확정', color: 'text-primary', img: '/storage/sseuldakgo/page_main/20261126_v0.01/Web_main_workflow_02.png' },
+                { num: '03', icon: 'cleaning_services', title: '3단계. 안심번호 연결 및 전문 시공', desc: '개인정보 걱정 없는 안심번호 소통 및 표준 매뉴얼에 따른 꼼꼼한 전문 시공', color: 'text-secondary', img: '/storage/sseuldakgo/page_main/20261126_v0.01/Web_main_workflow_03.png' },
+                { num: '04', icon: 'task_alt', title: '4단계. 사진 검수 및 현장 직불 정산', desc: '시공 전·후 사진 확인 및 고객 최종 승인 후 파트너에게 용역 대금 100% 직접 지불', color: 'text-secondary', img: '/storage/sseuldakgo/page_main/20261126_v0.01/Web_main_workflow_04.png' },
+              ].map((s) => (
+                <div key={s.num} className="bg-surface-container-lowest rounded-xl shadow-sm overflow-hidden flex flex-col border border-outline-variant/60">
+                  <img
+                    src={s.img}
+                    alt={s.title}
+                    className="w-full h-40 object-cover"
+                  />
+                  <div className="p-space-md flex flex-col gap-space-sm flex-1">
+                    <div className="flex items-center justify-between">
+                      <span className={`font-metric-num-lg text-metric-num-lg font-bold ${s.color}`}>{s.num}</span>
+                      <span className={`material-symbols-outlined text-[24px] ${s.color}`}>{s.icon}</span>
+                    </div>
+                    <div className="flex flex-col gap-space-xs">
+                      <h3 className="font-title-md text-title-md text-on-surface font-bold">{s.title}</h3>
+                      <p className="font-body-md text-body-md text-on-surface-variant">{s.desc}</p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
 
-            {/* ==============================================================
-                Interactive Modal: WEB-CLNT-ATH-010100 (고객 및 시공사 로그인)
-            ============================================================== */}
-            <WebClntAth010100
-              isOpen={isLoginModalOpen}
-              onClose={() => setIsLoginModalOpen(false)}
-              onOpenRegister={(socialData) => {
-                setIsLoginModalOpen(false);
-                if (socialData) setSocialPrefill(socialData);
-                setIsRegisterModalOpen(true);
-              }}
-              onSuccessLogin={(userData) => {
-                const roleCd = userData.userRoleCd || userData.USER_ROLE_CD || (userData.userNo?.startsWith('S') ? 'S' : 'C');
-                const updated = {
-                  isGuest: false,
-                  USER_NO: userData.userNo || userData.USER_NO || (roleCd === 'S' ? 'S20261100001' : 'C20261100001'),
-                  USER_NM: userData.userNm || userData.USER_NM || userData.name || (roleCd === 'S' ? '공간다원' : '고객'),
-                  USER_ROLE_CD: roleCd,
-                  USER_EMAIL: userData.userEmail || userData.USER_EMAIL || '',
-                };
-                localStorage.setItem('SSEULDAKGO_KEEP_LOGIN', 'Y');
-                localStorage.setItem('SSEULDAKGO_AUTH_USER', JSON.stringify(updated));
-                sessionStorage.setItem('SSEULDAKGO_AUTH_USER', JSON.stringify(updated));
-                setUserInfo(updated);
-                setActiveNavPath('WEB-CLNT-MYP-010100'); // 로그인 성공 시 '내정보 관리' 화면을 메인 홈 대신 기본 출력
-                const hasSavedDraft = typeof window !== 'undefined' && Boolean(localStorage.getItem('SSEULDAKGO_GUEST_TEMP_REQ'));
-                if (userData.hasTempReq || hasSavedDraft) {
-                  setIsReqModalOpen(true);
-                }
-              }}
-            />
+          {/* Section 6: 실시간 발주·매칭 현황 */}
+          <section id="section-live-matching" className="scroll-mt-20 py-8 flex flex-col gap-space-md border-t border-outline-variant/50">
+            <div className="flex flex-col gap-space-2xs">
+              <span className="font-label-sm text-label-sm text-secondary uppercase tracking-wider font-bold">03 / LIVE MATCHING STATUS</span>
+              <h2 className="font-headline-xl text-headline-xl text-on-surface">실시간 발주·매칭 현황</h2>
+            </div>
+            <div className="bg-surface-container-lowest rounded-2xl shadow-sm p-space-md flex flex-col gap-space-sm border border-outline-variant/60 w-full">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-space-xs">
+                  <span className="w-2.5 h-2.5 rounded-full bg-secondary animate-pulse" />
+                  <h3 className="font-headline-sm text-headline-sm text-on-surface font-bold">실시간 매칭 현황</h3>
+                </div>
+                <span className="font-label-sm text-label-sm text-on-surface-variant">LIVE UPDATE</span>
+              </div>
+              <div className="flex flex-col gap-space-xs">
+                {(feedList && feedList.length > 0 ? feedList.slice(0, 5) : [
+                  { ORDER_NO: 'LIVE-1', ADDR_TEXT: '경기 고양시 덕양구 | 32평 입주·이사 청소', PROPOSED_PRICE: 380000, ORDER_STATUS: '계약 확정' },
+                  { ORDER_NO: 'LIVE-2', ADDR_TEXT: '서울 서대문구 | 시스템에어컨 2대 분해케어', PROPOSED_PRICE: 180000, ORDER_STATUS: '청약 대기중' },
+                  { ORDER_NO: 'LIVE-3', ADDR_TEXT: '경기 고양시 일산동구 | 빌라 계단 정기청소 3개월', PROPOSED_PRICE: 270000, ORDER_STATUS: '시공 완료' },
+                ]).map((ord, idx) => (
+                  <div key={ord.ORDER_NO || idx} className="p-space-xs rounded-xl bg-surface-container-low flex flex-col sm:flex-row sm:items-center justify-between gap-space-xs border border-outline-variant/40">
+                    <div className="flex flex-col gap-space-2xs min-w-0">
+                      <span className="font-label-md text-label-md text-on-surface truncate font-semibold">{ord.ADDR_TEXT}</span>
+                      <span className="font-body-sm text-body-sm text-primary font-bold">고객 지정가 {Number(ord.PROPOSED_PRICE || 0).toLocaleString()}원</span>
+                    </div>
+                    <span className="self-start sm:self-center px-space-sm py-space-2xs rounded-full bg-primary-fixed text-on-primary-fixed font-label-sm text-label-sm whitespace-nowrap font-semibold">
+                      {ord.ORDER_STATUS || '청약 대기중'}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
 
-            {/* ==============================================================
-                Interactive Modal: WEB-CLNT-ATH-010200 (통합 회원가입 및 4대 약관 정독)
-            ============================================================== */}
-            <WebClntAth010200
-              isOpen={isRegisterModalOpen}
-              initialSocial={socialPrefill}
-              onClose={() => {
-                setIsRegisterModalOpen(false);
-                setSocialPrefill(null);
-              }}
-              onOpenLogin={() => {
-                setIsRegisterModalOpen(false);
-                setSocialPrefill(null);
-                setIsLoginModalOpen(true);
-              }}
-              onSuccessRegister={(userData) => {
-                setIsRegisterModalOpen(false);
-                if (userData && (userData.userRoleCd === 'C' || !userData.userRoleCd)) {
-                  setWelcomeUserInfo(userData);
-                  setIsWelcomeModalOpen(true);
-                } else {
-                  setIsLoginModalOpen(true);
-                }
-              }}
-            />
-
-            {/* ==============================================================
-                Interactive Modal: WEB-CLNT-ATH-010200201 (고객 가입 완료 환영 안내)
-            ============================================================== */}
-            <WebClntAth010200201
-              isOpen={isWelcomeModalOpen}
-              userInfo={welcomeUserInfo}
-              onClose={() => setIsWelcomeModalOpen(false)}
-              onOpenRequestModal={() => {
-                setIsWelcomeModalOpen(false);
-                setIsReqModalOpen(true);
-              }}
-            />
-          </div>
+          {/* Section 7: Partner Recruitment & App Download */}
+          <section id="section-partner-recruit" className="scroll-mt-20 py-16 lg:py-20 border-t border-outline-variant/50">
+            <div className="flex flex-col gap-space-2xs mb-space-md">
+              <span className="font-label-sm text-label-sm text-secondary uppercase tracking-wider font-bold">03 / 쓸고닦고 전문 시공사 파트너 모집</span>
+            </div>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-space-lg">
+              <div className="bg-primary text-on-primary rounded-2xl p-space-xl lg:p-10 shadow-md flex flex-col justify-between gap-space-lg">
+                <div className="flex flex-col gap-space-xs">
+                  <span className="font-label-sm text-label-sm text-sky-200 uppercase tracking-wider font-bold">PARTNER RECRUITMENT</span>
+                  <h3 className="font-headline-lg text-headline-lg text-on-primary font-bold">쓸고닦고 전문 시공사 파트너 모집</h3>
+                  <p className="font-body-md text-body-md text-sky-100">
+                    검증된 청소·가전분해 전문가라면 불필요한 광고비와 수수료 부담 없이 고객 확정가 발주 건을 단독 매칭받으세요.
+                  </p>
+                </div>
+                <button type="button" onClick={() => setIsLoginModalOpen(true)} className="self-start px-space-lg py-space-sm rounded-xl bg-surface-container-lowest text-primary hover:bg-sky-50 font-label-md text-label-md inline-flex items-center gap-space-xs transition-colors font-bold shadow-sm cursor-pointer">
+                  <span>사업자·자격증 인증 후 직불 매칭 시작하기</span>
+                  <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
+                </button>
+              </div>
+              <div className="bg-surface-container-lowest rounded-2xl p-space-xl lg:p-10 shadow-md flex flex-col justify-between gap-space-lg border border-outline-variant/60">
+                <div className="flex flex-col gap-space-xs">
+                  <span className="font-label-sm text-label-sm text-secondary uppercase tracking-wider font-bold">MOBILE APP</span>
+                  <h3 className="font-headline-lg text-headline-lg text-on-surface font-bold">모바일 앱으로 더 간편하게 발주·검수하세요</h3>
+                  <p className="font-body-md text-body-md text-on-surface-variant">
+                    실시간 청약 알림부터 시공 전·후 사진 검수, 0507 안심번호 연결까지 스마트폰으로 한 번에 관리할 수 있습니다.
+                  </p>
+                </div>
+                <div className="flex flex-wrap items-center gap-space-md">
+                  <a className="px-space-lg py-space-sm rounded-xl bg-slate-900 text-white hover:bg-slate-800 font-label-md text-label-md inline-flex items-center gap-space-xs transition-colors font-semibold" href="#google-play">
+                    <span className="material-symbols-outlined text-[20px]">shop</span>
+                    <span>Google Play</span>
+                  </a>
+                  <a className="px-space-lg py-space-sm rounded-xl bg-surface-container-low text-on-surface hover:bg-surface-container font-label-md text-label-md inline-flex items-center gap-space-xs transition-colors border border-outline-variant/60 font-semibold" href="#app-store">
+                    <span className="material-symbols-outlined text-[20px]">phone_iphone</span>
+                    <span>App Store</span>
+                  </a>
+                </div>
+              </div>
+            </div>
+          </section>
         </div>
       </main>
 
@@ -8449,6 +8243,49 @@ export default function WebClntCom010000({ onNavigate }) {
           </div>
         </div>
       </footer>
+
+      {/* 청소 요청 등록 모달 (WEB-CLNT-REQ-010100) */}
+      <WebClntReq010100
+        isOpen={isReqModalOpen}
+        initialTab={selectedCategory}
+        onClose={() => setIsReqModalOpen(false)}
+        onOrderCreated={handleOrderCreated}
+      />
+
+      {/* 로그인 모달 (WEB-CLNT-ATH-010100) */}
+      <WebClntAth010100
+        isOpen={isLoginModalOpen}
+        onClose={() => setIsLoginModalOpen(false)}
+        onSuccessLogin={(user) => {
+          const userNo = user?.USER_NO || user?.userNo || '';
+          const userRoleCd = user?.USER_ROLE_CD || user?.userRoleCd || (userNo.startsWith('S') ? 'S' : 'C');
+          const userNm = user?.USER_NM || user?.userNm || (userRoleCd === 'S' ? '시공사' : '고객');
+          setUserInfo({ isGuest: false, ...user, USER_NO: userNo, USER_NM: userNm, USER_ROLE_CD: userRoleCd });
+          setIsLoginModalOpen(false);
+        }}
+        onOpenRegister={() => {
+          setIsLoginModalOpen(false);
+          setIsRegisterModalOpen(true);
+        }}
+      />
+
+      {/* 회원가입 모달 (WEB-CLNT-ATH-010200) */}
+      <WebClntAth010200
+        isOpen={isRegisterModalOpen}
+        onClose={() => setIsRegisterModalOpen(false)}
+        initialSocial={socialPrefill}
+        onSuccessRegister={(user) => {
+          const userNo = user?.USER_NO || user?.userNo || '';
+          const userRoleCd = user?.USER_ROLE_CD || user?.userRoleCd || (userNo.startsWith('S') ? 'S' : 'C');
+          const userNm = user?.USER_NM || user?.userNm || (userRoleCd === 'S' ? '시공사' : '고객');
+          setUserInfo({ isGuest: false, ...user, USER_NO: userNo, USER_NM: userNm, USER_ROLE_CD: userRoleCd });
+          setIsRegisterModalOpen(false);
+        }}
+        onOpenLogin={() => {
+          setIsRegisterModalOpen(false);
+          setIsLoginModalOpen(true);
+        }}
+      />
 
       {/* ==============================================================
           알림 상세 안내 및 청약 접수 모달 (activeNotiModal)
@@ -10004,7 +9841,7 @@ export function WebClntOrd010100({
                   <div className="flex flex-col">
                     <h4 className="font-label-lg text-label-lg font-bold text-on-surface">3개월 무상 A/S 보증</h4>
                     <p className="font-caption text-caption text-on-surface-variant mt-1 leading-relaxed">
-                      정기 계약 기간 중 발생한 미흡 구간 및 현장 클레임 발생 시 24시간 내 재방문 조치를 지원합니다.
+                      정기청소 및 분해케어 시공 후 하자 발생 시 3개월 무상 A/S를 보증합니다.
                     </p>
                   </div>
                 </div>
@@ -10013,34 +9850,6 @@ export function WebClntOrd010100({
           </div>
         </div>
       </main>
-
-      {/* ====================================================================
-          INTERACTIVE CONFIRMATION MODAL: WEB-CLNT-PAY-010100 결제 및 배차 확정 모달
-      ==================================================================== */}
-      {isPayModalOpen && selectedApply && (
-        <WebClntPay010100
-          isOpen={isPayModalOpen}
-          orderData={{
-            ...order,
-            categories: [order.cleanLargeCd || 'REGULAR']
-          }}
-          applyData={selectedApply}
-          currentUser={currentUser}
-          onClose={() => setIsPayModalOpen(false)}
-          onPaymentSuccess={(contractData) => {
-            console.log('[PAY_SUCCESS]', contractData);
-            if (onNavigate) {
-              onNavigate('my-application-status');
-            } else if (typeof window !== 'undefined') {
-              window.location.hash = '#my-application-status';
-            }
-          }}
-        />
-      )}
-
-      {/* ====================================================================
-          FOOTER: 하단 법적 고지 및 고객센터 정보
-      ==================================================================== */}
       <footer className="w-full bg-surface-container-low text-on-surface-variant py-space-xl shadow-[0_-1px_6px_rgba(0,0,0,0.02)] border-t border-slate-200/60">
         <div className="max-w-[1200px] mx-auto px-margin flex flex-col gap-space-lg">
           <div className="flex flex-wrap items-center justify-between gap-space-md pb-space-md border-b border-slate-200/60">
@@ -10303,11 +10112,8 @@ export function WebClntJob010100({
               <img
                 src="/storage/sseuldakgo/logo/Logo_쓸고딱고.jpg"
                 alt="쓸고닦고 공식 로고"
-                className="w-10 h-10 object-contain rounded-full shadow-xs"
+                className="w-12 h-12 object-contain rounded-full shadow-xs"
               />
-              <span className="font-headline-sm text-headline-sm text-primary font-bold tracking-tight">
-                쓸고닦고
-              </span>
             </button>
           </div>
 
@@ -10378,601 +10184,229 @@ export function WebClntJob010100({
       {/* ====================================================================
           MAIN BODY
       ==================================================================== */}
-      <main className="w-full pt-[72px] bg-background flex-1">
-        <div className="flex flex-col w-full">
-          
-          {/* Top Context & Breadcrumb Bar */}
-          <div className="max-w-[1200px] w-full mx-auto px-margin pt-space-lg pb-space-sm flex flex-col gap-space-xs">
-            <div className="flex items-center justify-between">
-              <button
-                type="button"
-                onClick={() => onNavigate ? onNavigate('my-requests') : (window.location.hash = '#my-requests')}
-                className="inline-flex items-center gap-1.5 text-on-surface-variant hover:text-primary font-label-md text-label-md transition-colors group cursor-pointer"
-              >
-                <span className="material-symbols-outlined text-[18px] transition-transform group-hover:-translate-x-0.5">arrow_back</span>
-                <span>나의 신청현황으로 이동 (WEB-CLNT-ORD-010000)</span>
-              </button>
-              <div className="flex items-center gap-space-xs">
-                <span className="text-on-surface-variant font-label-sm text-label-sm">화면 ID:</span>
-                <span className="font-mono font-semibold text-primary font-label-sm text-label-sm bg-surface-container-high px-2 py-0.5 rounded-full">
-                  WEB-CLNT-JOB-010100
-                </span>
-              </div>
-            </div>
-          </div>
-
-          {/* Hero Header Section */}
-          <section className="max-w-[1200px] w-full mx-auto px-margin pb-space-lg">
-            <div className="bg-surface-container-lowest rounded-2xl p-space-lg shadow-sm border border-slate-200/60 flex flex-col md:flex-row md:items-center justify-between gap-space-md">
-              <div className="flex flex-col gap-space-xs">
-                <div className="flex flex-wrap items-center gap-space-xs">
-                  <span className="font-label-sm text-label-sm text-secondary font-bold uppercase tracking-wider bg-secondary-container/40 px-2 py-0.5 rounded">
-                    Inspection &amp; Settlement
-                  </span>
-                  <span className="text-outline-variant">•</span>
-                  <span className="font-caption text-caption text-on-surface-variant">
-                    계약번호 <span className="font-mono font-bold text-on-surface" data-field="CONTRACT_NO">{contract.contractNo}</span>
-                  </span>
+      <main className="w-full pt-[72px] bg-surface flex-1">
+        <div className="max-w-[1440px] mx-auto px-margin-mobile lg:px-margin flex flex-col gap-0">
+          {/* Section 2: Hero Banner & Quick Order Button */}
+          <section className="relative py-12 lg:py-20">
+            <div className="absolute -top-10 -left-10 w-96 h-96 rounded-full bg-primary/5 blur-3xl pointer-events-none" />
+            <div className="absolute bottom-0 right-0 w-96 h-96 rounded-full bg-secondary/10 blur-3xl pointer-events-none" />
+            <div className="relative grid grid-cols-1 lg:grid-cols-12 gap-space-xl items-center">
+              <div className="lg:col-span-7 flex flex-col gap-space-lg min-w-0">
+                <div className="inline-flex items-center gap-space-xs self-start px-space-md py-space-2xs rounded-full bg-secondary-container text-on-secondary-container font-label-sm text-label-sm font-semibold">
+                  <span className="material-symbols-outlined text-[16px]">verified</span>
+                  <span>고객 직접 확정 지정가 · 단독 매칭</span>
                 </div>
-                <h1 className="font-headline-md text-headline-md text-primary font-bold">
-                  청소 시공 현장 검수 및 직불 승인
+                <h1 className="font-display-hero text-display-hero text-on-surface tracking-tight leading-tight">
+                  내가 정한 요금 그대로!<br />정기청소.입주이사청소.계절가전 분해케어를 요청해보세요
                 </h1>
-                <p className="font-body-md text-body-md text-on-surface-variant">
-                  기사님이 실시간 등록한 시공 전/후 사진을 비교 확인하고, 현장 대면 검수 완료 후 용역 대금을 직접 정산해 주세요.
+                <p className="font-body-lg text-body-lg text-on-surface-variant max-w-2xl">
+                  정기청소부터 계절가전 분해케어, 입주·이사 청소까지 고객님이 직접 지불할 용역 요금을 결정해 입력하면, 검증된 전문 시공사가 가격 흥정 없이 단독 매칭됩니다.
                 </p>
               </div>
-
-              {/* Status Badge */}
-              <div className="flex flex-col sm:flex-row md:flex-col items-start md:items-end gap-space-xs shrink-0">
-                <div
-                  className={`px-3.5 py-1.5 rounded-full font-label-md text-label-md font-bold inline-flex items-center gap-2 shadow-sm ${
-                    isCompleted
-                      ? 'bg-secondary-container text-on-secondary-container'
-                      : 'bg-surface-container-low text-secondary border border-secondary/30'
-                  }`}
-                  data-field="CONTRACT_STAT_CD"
+              <div className="lg:col-span-5 min-w-0 flex items-center justify-center lg:justify-end h-full">
+                <button
+                  type="button"
+                  onClick={() => handleOpenReqModal()}
+                  className="inline-flex items-center justify-center gap-3 px-8 py-5 rounded-2xl bg-[#005f56] hover:bg-[#004d46] text-white shadow-lg transition-colors font-bold text-lg cursor-pointer"
                 >
-                  <span className={`w-2.5 h-2.5 rounded-full ${isCompleted ? 'bg-secondary' : 'bg-secondary animate-ping'}`}></span>
-                  <span>{isCompleted ? '시공 및 직불 승인완료 (SVC_COMPLETED)' : '시공완료 · 현장검수대기'}</span>
-                </div>
-                <span className="font-caption text-caption text-outline">
-                  작업 보고 등록: {contract.reportRegDt || '2026.11.02 13:45'}
-                </span>
+                  <span className="material-symbols-outlined text-[28px]">post_add</span>
+                  <span>우리집 청소 요청 등록하기</span>
+                </button>
               </div>
             </div>
           </section>
 
-          {/* Main Content Grid Layout (8 cols + 4 cols sticky sidebar) */}
-          <div className="max-w-[1200px] w-full mx-auto px-margin pb-space-xl">
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-gutter items-start">
-              
-              {/* ================================================================
-                  LEFT COLUMN (8 Cols): Site Overview & Photo Comparison
-              ================================================================ */}
-              <div className="lg:col-span-8 flex flex-col gap-space-lg">
-                
-                {/* 2-Column Overview Cards */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-space-md">
-                  
-                  {/* Site Info Card */}
-                  <div className="bg-surface-container-lowest rounded-xl p-space-md shadow-sm border border-slate-200/60 flex flex-col justify-between gap-space-md">
-                    <div>
-                      <div className="flex items-center justify-between pb-space-sm border-b border-slate-100">
-                        <span className="font-label-lg text-label-lg text-primary font-bold flex items-center gap-1.5">
-                          <span className="material-symbols-outlined text-secondary text-[20px]">apartment</span>
-                          시공 현장 개요
-                        </span>
-                        <span className="bg-secondary-container/50 text-on-secondary-container font-label-sm text-label-sm font-bold px-2.5 py-0.5 rounded-full" data-field="CLEAN_LARGE_CD">
-                          {contract.cleanLargeNm}
-                        </span>
-                      </div>
-                      <div className="flex flex-col gap-space-xs pt-space-xs font-body-sm text-body-sm">
-                        <div className="flex items-start gap-2">
-                          <span className="text-outline shrink-0 w-16">시공 공간</span>
-                          <span className="font-semibold text-on-surface" data-field="CLEAN_MID_CD">
-                            {contract.cleanMidNm}
-                          </span>
-                        </div>
-                        <div className="flex items-start gap-2">
-                          <span className="text-outline shrink-0 w-16">현장 주소</span>
-                          <div className="flex flex-col">
-                            <span className="text-on-surface font-medium" data-field="ADDR_TEXT">{contract.addrText}</span>
-                            <span className="text-on-surface-variant font-caption text-caption" data-field="ADDR_DETAIL">{contract.addrDetail}</span>
-                          </div>
-                        </div>
-                        <div className="flex items-start gap-2">
-                          <span className="text-outline shrink-0 w-16">시공 일시</span>
-                          <div className="flex items-center gap-1.5 flex-wrap">
-                            <span className="font-bold text-on-surface" data-field="CONFIRMED_DATE">{contract.confirmedDate}</span>
-                            <span className="font-bold text-secondary" data-field="CONFIRMED_TIME">{contract.confirmedTime}</span>
-                            <span className="text-outline-variant font-caption text-caption">({contract.workDurationText})</span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="bg-surface-container-low px-3 py-2 rounded-lg flex items-center justify-between">
-                      <span className="font-caption text-caption text-on-surface-variant">현장 주문번호</span>
-                      <span className="font-mono font-label-sm text-label-sm font-semibold text-primary" data-field="ORDER_NO">
-                        {contract.orderNo}
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Partner Master Card */}
-                  <div className="bg-surface-container-lowest rounded-xl p-space-md shadow-sm border border-slate-200/60 flex flex-col justify-between gap-space-md">
-                    <div>
-                      <div className="flex items-center justify-between pb-space-sm border-b border-slate-100">
-                        <span className="font-label-lg text-label-lg text-primary font-bold flex items-center gap-1.5">
-                          <span className="material-symbols-outlined text-secondary text-[20px]">verified_user</span>
-                          담당 시공 마스터
-                        </span>
-                        <span className="bg-primary/10 text-primary font-label-sm text-label-sm font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
-                          <span className="material-symbols-outlined text-[14px]">stars</span>
-                          MASTER TIER
-                        </span>
-                      </div>
-                      <div className="flex items-start gap-3 pt-space-xs">
-                        <div className="w-12 h-12 rounded-full bg-secondary-container/60 flex items-center justify-center shrink-0">
-                          <span className="material-symbols-outlined text-on-secondary-container text-[26px]">cleaning_services</span>
-                        </div>
-                        <div className="flex flex-col min-w-0">
-                          <div className="flex items-center gap-1.5">
-                            <strong className="font-headline-sm text-headline-sm text-on-surface truncate" data-field="COMPANY_NM">
-                              {contract.partner?.companyNm}
-                            </strong>
-                            <span className="text-on-surface-variant font-body-sm text-body-sm shrink-0" data-field="USER_NM">
-                              ({contract.partner?.userNm})
-                            </span>
-                          </div>
-                          <div className="flex flex-wrap gap-1.5 mt-1">
-                            <span className="bg-surface-container px-2 py-0.5 rounded text-secondary font-label-sm text-label-sm font-semibold">
-                              영업배상책임 1억원
-                            </span>
-                            <span className="bg-surface-container px-2 py-0.5 rounded text-primary font-label-sm text-label-sm font-semibold">
-                              신원·경력 검증
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="flex items-center justify-between pt-space-xs border-t border-slate-100">
-                      <div className="flex flex-col">
-                        <span className="font-caption text-caption text-outline">파트너 안심번호</span>
-                        <span className="font-mono font-label-md text-label-md text-on-surface font-bold" data-field="SAFE_TEL_NO">
-                          {contract.safeTelNo}
-                        </span>
-                      </div>
-                      <a
-                        className="h-[40px] px-4 rounded-xl bg-surface-container hover:bg-surface-container-high text-primary font-label-md text-label-md inline-flex items-center gap-1.5 transition-colors shadow-xs"
-                        href={`tel:${(contract.safeTelNo || '').replace(/-/g, '')}`}
-                      >
-                        <span className="material-symbols-outlined text-[18px]">call</span>
-                        <span>전화걸기</span>
-                      </a>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Before & After Photo Gallery */}
-                <section className="bg-surface-container-lowest rounded-2xl p-space-lg shadow-sm border border-slate-200/60 flex flex-col gap-space-lg">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-space-sm border-b border-slate-100 pb-space-sm">
-                    <div className="flex flex-col gap-space-xs">
-                      <div className="flex items-center gap-2">
-                        <h2 className="font-headline-sm text-headline-sm text-primary font-bold">
-                          시공 전/후 현장 검증 사진 비교
-                        </h2>
-                        <span className="bg-secondary-container/40 text-on-secondary-container font-label-sm text-label-sm font-bold px-2 py-0.5 rounded-full">
-                          총 <span data-field="PHOTO_COUNT">{(photoList.length || 3) * 2}</span>장 등록
-                        </span>
-                      </div>
-                      <p className="font-caption text-caption text-on-surface-variant">
-                        모든 구역은 청소 전 상태와 완료 후 살균·코팅 마감 상태가 1:1로 증빙됩니다.
-                      </p>
-                    </div>
-
-                    {/* View Tab Controls */}
-                    <div className="inline-flex items-center p-1 bg-surface-container-low rounded-xl gap-1 shrink-0" id="photoTabControls">
-                      <button
-                        className={`tab-btn px-3 py-1.5 rounded-lg font-label-sm text-label-sm transition-all cursor-pointer ${
-                          activePhotoTab === 'all'
-                            ? 'bg-surface-container-lowest text-primary font-bold shadow-sm'
-                            : 'text-on-surface-variant hover:text-on-surface'
-                        }`}
-                        onClick={() => setActivePhotoTab('all')}
-                        type="button"
-                      >
-                        전체 1:1 비교
-                      </button>
-                      <button
-                        className={`tab-btn px-3 py-1.5 rounded-lg font-label-sm text-label-sm transition-all cursor-pointer ${
-                          activePhotoTab === 'before'
-                            ? 'bg-surface-container-lowest text-primary font-bold shadow-sm'
-                            : 'text-on-surface-variant hover:text-on-surface'
-                        }`}
-                        onClick={() => setActivePhotoTab('before')}
-                        type="button"
-                      >
-                        📷 작업 전 (BEFORE)
-                      </button>
-                      <button
-                        className={`tab-btn px-3 py-1.5 rounded-lg font-label-sm text-label-sm transition-all cursor-pointer ${
-                          activePhotoTab === 'after'
-                            ? 'bg-surface-container-lowest text-primary font-bold shadow-sm'
-                            : 'text-on-surface-variant hover:text-on-surface'
-                        }`}
-                        onClick={() => setActivePhotoTab('after')}
-                        type="button"
-                      >
-                        ✨ 작업 후 (AFTER)
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* Photo Cards List */}
-                  <div className="flex flex-col gap-space-lg" id="photoCardContainer">
-                    {photoList.map((pair, idx) => (
-                      <div key={pair.pairId || idx} className="bg-surface-container-low/50 rounded-xl p-space-md flex flex-col gap-space-md border border-slate-200/40">
-                        
-                        {/* Section Header */}
-                        <div className="flex items-center justify-between flex-wrap gap-2">
-                          <div className="flex items-center gap-2">
-                            <span className="w-6 h-6 rounded-full bg-primary text-on-primary font-label-sm text-label-sm flex items-center justify-center font-bold">
-                              {String(idx + 1).padStart(2, '0')}
-                            </span>
-                            <span className="font-label-lg text-label-lg text-on-surface font-bold">
-                              {pair.title}
-                            </span>
-                          </div>
-                          <span className="text-secondary font-label-sm text-label-sm font-semibold flex items-center gap-1 bg-secondary-container/30 px-2 py-0.5 rounded">
-                            <span className="material-symbols-outlined text-[16px]">check_circle</span>
-                            {pair.treatmentNote}
-                          </span>
-                        </div>
-
-                        {/* Photo Grid */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-space-md">
-                          
-                          {/* Before Photo */}
-                          {(activePhotoTab === 'all' || activePhotoTab === 'before') && (
-                            <div className="photo-item photo-before flex flex-col gap-space-xs group">
-                              <div className="relative overflow-hidden rounded-xl bg-surface-container aspect-[4/3] shadow-xs">
-                                <img
-                                  className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105 cursor-pointer"
-                                  onClick={() => setSelectedPhotoUrl(pair.before.src)}
-                                  src={pair.before.src}
-                                  alt={pair.before.altText}
-                                />
-                                <div className="absolute top-3 left-3 bg-inverse-surface/85 backdrop-blur text-inverse-on-surface px-2.5 py-1 rounded-full font-label-sm text-label-sm font-bold flex items-center gap-1.5 shadow">
-                                  <span className="w-2 h-2 rounded-full bg-error animate-pulse"></span>
-                                  작업 전 (BEFORE)
-                                </div>
-                                <button
-                                  className="absolute bottom-3 right-3 bg-surface-container-lowest/90 hover:bg-surface-container-lowest text-primary p-2 rounded-lg shadow-sm opacity-90 group-hover:opacity-100 transition-opacity cursor-pointer"
-                                  onClick={() => setSelectedPhotoUrl(pair.before.src)}
-                                  title="원본 사진 확대"
-                                  type="button"
-                                >
-                                  <span className="material-symbols-outlined text-[18px]">zoom_in</span>
-                                </button>
-                              </div>
-                              <div className="flex items-center justify-between text-outline font-caption text-caption px-1">
-                                <span>촬영 시각: {pair.before.takenTimeText}</span>
-                                <span className="font-mono">{pair.before.photoNo}</span>
-                              </div>
-                            </div>
-                          )}
-
-                          {/* After Photo */}
-                          {(activePhotoTab === 'all' || activePhotoTab === 'after') && (
-                            <div className="photo-item photo-after flex flex-col gap-space-xs group">
-                              <div className="relative overflow-hidden rounded-xl bg-surface-container aspect-[4/3] shadow-xs">
-                                <img
-                                  className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105 cursor-pointer"
-                                  onClick={() => setSelectedPhotoUrl(pair.after.src)}
-                                  src={pair.after.src}
-                                  alt={pair.after.altText}
-                                />
-                                <div className="absolute top-3 left-3 bg-secondary text-on-secondary px-2.5 py-1 rounded-full font-label-sm text-label-sm font-bold flex items-center gap-1.5 shadow">
-                                  <span className="w-2 h-2 rounded-full bg-secondary-fixed"></span>
-                                  작업 후 (AFTER)
-                                </div>
-                                <button
-                                  className="absolute bottom-3 right-3 bg-surface-container-lowest/90 hover:bg-surface-container-lowest text-secondary p-2 rounded-lg shadow-sm opacity-90 group-hover:opacity-100 transition-opacity cursor-pointer"
-                                  onClick={() => setSelectedPhotoUrl(pair.after.src)}
-                                  title="원본 사진 확대"
-                                  type="button"
-                                >
-                                  <span className="material-symbols-outlined text-[18px]">zoom_in</span>
-                                </button>
-                              </div>
-                              <div className="flex items-center justify-between text-secondary font-caption text-caption px-1">
-                                <span className="font-medium">세척 마감: {pair.after.takenTimeText}</span>
-                                <span className="font-mono">{pair.after.photoNo}</span>
-                              </div>
-                            </div>
-                          )}
-
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-
-                  {/* Quality Assurance Notice */}
-                  <div className="bg-surface-container-low p-space-md rounded-xl flex items-start gap-space-sm border border-slate-200/50">
-                    <span className="material-symbols-outlined text-secondary text-[24px] shrink-0 mt-0.5">verified</span>
-                    <div className="flex flex-col gap-1">
-                      <span className="font-label-md text-label-md text-on-surface font-semibold">
-                        쓸고닦고 안심 시공 보증제 운영 안내
-                      </span>
-                      <p className="font-body-sm text-body-sm text-on-surface-variant">
-                        승인 완료 후 발견된 미흡 구역에 대해서는 시공 파트너의 의무 A/S 규정에 따라 시공일 기준 최대 7일 이내 무상 재방문 보완 조치가 보장됩니다.
-                      </p>
-                    </div>
-                  </div>
-                </section>
+          {/* Section 3: 3대 청소 용역 대분류 */}
+          <section id="section-core-services" className="scroll-mt-20 py-8 flex flex-col gap-space-md border-t border-outline-variant/50">
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-space-md">
+              <div className="flex flex-col gap-space-2xs">
+                <span className="font-label-sm text-label-sm text-primary uppercase tracking-wider font-bold">01 / CORE SERVICES</span>
+                <h2 className="font-headline-xl text-headline-xl text-on-surface">3대 청소 용역 대분류</h2>
               </div>
-
-              {/* ================================================================
-                  RIGHT COLUMN (4 Cols): Direct Settlement Sticky Sidebar
-              ================================================================ */}
-              <div className="lg:col-span-4 flex flex-col gap-space-md lg:sticky lg:top-[92px]">
-                
-                {/* Navy Direct Settlement Card */}
-                <div className="bg-primary text-on-primary rounded-2xl p-space-lg shadow-md flex flex-col gap-space-md relative overflow-hidden">
-                  <div className="absolute right-0 top-0 w-36 h-36 bg-secondary/15 rounded-full blur-2xl pointer-events-none"></div>
-
-                  {/* Direct Settlement Header Tag */}
-                  <div className="flex items-center justify-between">
-                    <span className="inline-flex items-center gap-1.5 bg-secondary-container/20 text-secondary-fixed px-2.5 py-1 rounded-full font-label-sm text-label-sm font-semibold">
-                      <span className="material-symbols-outlined text-[15px]">payments</span>
-                      현장 직불제 정산 원칙
-                    </span>
-                    <span className="text-secondary-fixed-dim font-caption text-caption">
-                      중개수수료 0원
-                    </span>
-                  </div>
-
-                  {/* Amount Display */}
-                  <div className="flex flex-col gap-1">
-                    <span className="font-caption text-caption text-primary-fixed-dim">
-                      최종 현장 지급 노무 대금
-                    </span>
-                    <div className="flex items-baseline gap-2">
-                      <span className="font-display-hero text-display-hero text-secondary-fixed font-black tracking-tight" data-field="TOTAL_SERVICE_AMT">
-                        {Number(contract.totalServiceAmt || 720000).toLocaleString()}
-                      </span>
-                      <span className="font-headline-sm text-headline-sm text-on-primary font-bold">
-                        원
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-1.5 text-primary-fixed font-caption text-caption">
-                      <span className="material-symbols-outlined text-[16px]">check</span>
-                      <span>견적 확정 금액 · 추가 청구 및 팁 일체 없음</span>
-                    </div>
-                  </div>
-
-                  {/* Partner Direct Transfer Account Container */}
-                  <div className="bg-primary-container/80 rounded-xl p-space-md flex flex-col gap-space-sm backdrop-blur-sm border border-white/10">
-                    <div className="flex items-center justify-between">
-                      <span className="font-label-sm text-label-sm text-secondary-fixed-dim font-medium">
-                        기사님 지정 수취 계좌
-                      </span>
-                      <span className="font-label-sm text-label-sm text-on-primary font-bold" data-field="BANK_NAME">
-                        {contract.partner?.bankName || 'IBK기업은행'}
-                      </span>
-                    </div>
-                    <div className="flex items-center justify-between gap-2 bg-primary/60 px-3 py-2.5 rounded-lg border border-white/10">
-                      <div className="flex flex-col min-w-0">
-                        <span className="font-mono text-body-lg font-bold text-secondary-fixed tracking-wider truncate" data-field="ACCOUNT_NO">
-                          {contract.partner?.accountNo || '110-123-456789'}
-                        </span>
-                        <span className="font-caption text-caption text-primary-fixed-dim">
-                          예금주: <span className="text-on-primary font-medium" data-field="ACCOUNT_HOLDER">{contract.partner?.accountHolder || '이충훈 (반짝빌라클린)'}</span>
-                        </span>
-                      </div>
-                      <button
-                        className="shrink-0 h-[36px] px-3 rounded-lg bg-secondary hover:bg-secondary/90 text-on-secondary font-label-sm text-label-sm font-semibold transition-colors flex items-center gap-1 cursor-pointer"
-                        id="copyAccountBtn"
-                        onClick={handleCopyAccount}
-                        type="button"
-                      >
-                        <span className="material-symbols-outlined text-[16px]">content_copy</span>
-                        <span id="copyBtnText">{copyFeedback}</span>
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* Important Escrow Disclaimer */}
-                  <div className="bg-error-container/20 rounded-xl p-space-sm flex items-start gap-2 border border-error/20">
-                    <span className="material-symbols-outlined text-tertiary-fixed text-[18px] shrink-0 mt-0.5">info</span>
-                    <p className="font-caption text-caption text-tertiary-fixed leading-relaxed">
-                      <strong>[직불 정산 필수 고지]</strong> 본 플랫폼은 시공 노무비를 보유하지 않으며 에스크로 결제를 지원하지 않습니다. 사진 확인 및 현장 대면 점검 후 마스터 기사님께 전액 직접 계좌이체 또는 현금 지급해 주시기 바랍니다.
-                    </p>
-                  </div>
-                </div>
-
-                {/* Approval & Action Box */}
-                <div className="bg-surface-container-lowest rounded-2xl p-space-lg shadow-sm border border-slate-200/60 flex flex-col gap-space-md">
-                  <h3 className="font-label-lg text-label-lg text-primary font-bold">
-                    검수 확인 및 승인 진행
-                  </h3>
-
-                  {/* Confirmation Checkbox */}
-                  <label className="flex items-start gap-3 p-3 bg-surface-container-low rounded-xl cursor-pointer hover:bg-surface-container transition-colors group border border-slate-200/50">
-                    <input
-                      checked={isAgreedInspect || isCompleted}
-                      disabled={isCompleted}
-                      className="w-5 h-5 rounded mt-0.5 text-secondary accent-secondary focus:ring-0 cursor-pointer shrink-0"
-                      id="inspectionCheck"
-                      onChange={(e) => setIsAgreedInspect(e.target.checked)}
-                      type="checkbox"
-                    />
-                    <span className="font-body-sm text-body-sm text-on-surface leading-snug select-none">
-                      현장 시공 상태와 전/후 증빙 사진을 모두 확인하였으며, 안내된 청소 범위가 성실하게 이행되었음을 최종 승인합니다.
-                    </span>
-                  </label>
-
-                  {/* Main CTA Button */}
-                  <button
-                    className={`w-full h-[56px] rounded-xl font-label-lg text-label-lg font-bold flex items-center justify-center gap-2 transition-all ${
-                      isCompleted
-                        ? 'bg-secondary-container text-on-secondary-container cursor-default'
-                        : isAgreedInspect && !isSubmitting
-                        ? 'bg-secondary hover:bg-[#005049] text-on-secondary shadow-md cursor-pointer active:scale-[0.99]'
-                        : 'bg-outline-variant/60 text-on-surface-variant/70 cursor-not-allowed'
-                    }`}
-                    disabled={!isAgreedInspect || isSubmitting || isCompleted}
-                    id="approveBtn"
-                    onClick={handleApproveInspection}
-                    type="button"
-                  >
-                    {isSubmitting ? (
-                      <>
-                        <span className="inline-block w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
-                        <span>승인 처리 중...</span>
-                      </>
-                    ) : isCompleted ? (
-                      <>
-                        <span className="material-symbols-outlined text-[20px]">task_alt</span>
-                        <span>시공 및 직불 승인 완료</span>
-                      </>
-                    ) : (
-                      <>
-                        <span className="material-symbols-outlined text-[20px]">task_alt</span>
-                        <span>최종 청소 완료 승인하기</span>
-                      </>
-                    )}
-                  </button>
-
-                  {/* Re-work / AS Inquiries Action */}
-                  <div className="pt-space-xs flex flex-col gap-2 border-t border-slate-100">
-                    <div className="flex items-center justify-between text-outline font-caption text-caption">
-                      <span>미흡 구역 또는 재작업 문의</span>
-                      <span className="text-secondary font-semibold">무상 A/S 안심보장</span>
-                    </div>
-                    <div className="grid grid-cols-2 gap-2">
-                      <button
-                        className="h-[44px] rounded-xl bg-surface-container hover:bg-surface-container-high text-on-surface font-label-sm text-label-sm flex items-center justify-center gap-1 transition-colors cursor-pointer"
-                        onClick={() => alert(`[현장 A/S 재요청 접수]\n파트너(${contract.partner?.companyNm})에게 보완 작업 요청 알림이 전송됩니다.`)}
-                        type="button"
-                      >
-                        <span className="material-symbols-outlined text-[16px] text-error">build</span>
-                        <span>현장 A/S 재요청</span>
-                      </button>
-                      <button
-                        className="h-[44px] rounded-xl bg-surface-container hover:bg-surface-container-high text-on-surface font-label-sm text-label-sm flex items-center justify-center gap-1 transition-colors cursor-pointer"
-                        onClick={() => alert('[고객센터 접수]\n고객센터(02-429-5459)로 연결합니다.')}
-                        type="button"
-                      >
-                        <span className="material-symbols-outlined text-[16px] text-primary">support_agent</span>
-                        <span>고객센터 접수</span>
-                      </button>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Help Card */}
-                <div className="bg-surface-container-low rounded-xl p-space-md flex items-center gap-space-sm border border-slate-200/50">
-                  <div className="w-10 h-10 rounded-full bg-secondary-container/50 flex items-center justify-center shrink-0">
-                    <span className="material-symbols-outlined text-on-secondary-container text-[20px]">headset_mic</span>
-                  </div>
-                  <div className="flex flex-col min-w-0">
-                    <span className="font-label-sm text-label-sm text-on-surface font-semibold">
-                      도움이 필요하신가요?
-                    </span>
-                    <span className="font-caption text-caption text-on-surface-variant">
-                      쓸고닦고 안심 중재팀: 02-429-5459
-                    </span>
-                  </div>
-                </div>
-
-              </div>
-            </div>
-          </div>
-        </div>
-      </main>
-
-      {/* ====================================================================
-          LIGHTBOX MODAL (사진 고해상도 확대 오버레이)
-      ==================================================================== */}
-      {selectedPhotoUrl && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-md animate-in fade-in"
-          onClick={() => setSelectedPhotoUrl(null)}
-        >
-          <div className="relative max-w-4xl w-full max-h-[90vh] flex flex-col items-center">
-            <button
-              className="absolute -top-12 right-0 text-white hover:text-secondary p-2 transition-colors cursor-pointer"
-              onClick={() => setSelectedPhotoUrl(null)}
-              type="button"
-            >
-              <span className="material-symbols-outlined text-[32px]">close</span>
-            </button>
-            <img
-              src={selectedPhotoUrl}
-              alt="확대 사진"
-              className="max-h-[85vh] w-auto object-contain rounded-2xl shadow-2xl border border-white/20"
-              onClick={(e) => e.stopPropagation()}
-            />
-          </div>
-        </div>
-      )}
-
-      {/* ====================================================================
-          INSPECTION COMPLETE SUCCESS MODAL
-      ==================================================================== */}
-      {isSuccessModalOpen && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/65 backdrop-blur-sm animate-in fade-in"
-          id="successModal"
-        >
-          <div className="bg-surface-container-lowest rounded-2xl max-w-md w-full p-space-lg shadow-2xl flex flex-col gap-space-md border border-slate-200/80 animate-in zoom-in-95">
-            <div className="w-14 h-14 rounded-full bg-secondary-container text-secondary mx-auto flex items-center justify-center shadow-sm">
-              <span className="material-symbols-outlined text-[32px]">check_circle</span>
-            </div>
-            <div className="flex flex-col text-center gap-1">
-              <span className="font-headline-sm text-headline-sm text-primary font-bold">
-                검수 및 승인이 완료되었습니다
-              </span>
-              <p className="font-body-sm text-body-sm text-on-surface-variant">
-                담당 기사님께 현장 직불 대금 송금이 완료되었는지 최종 확인해 주시기 바랍니다.
+              <p className="font-body-md text-body-md text-on-surface-variant max-w-md">
+                공간과 가전의 특성에 맞춘 표준화된 서비스 영역에서 원하는 확정가로 투명하게 발주하세요.
               </p>
             </div>
-            <div className="bg-surface-container-low rounded-xl p-space-md flex flex-col gap-space-xs font-body-sm text-body-sm border border-slate-200/50">
-              <div className="flex justify-between items-center">
-                <span className="text-outline">승인 상태</span>
-                <span className="font-bold text-secondary">SVC_COMPLETED (완료)</span>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-space-lg">
+              <div className="bg-surface-container-lowest rounded-2xl shadow-sm hover:shadow-md transition-all overflow-hidden flex flex-col border border-outline-variant/60">
+                <img
+                  src="/storage/sseuldakgo/page_main/20261126_v0.01/regular_cleaning_service.jpg"
+                  alt="정기청소 (계단·건물관리)"
+                  className="w-full h-48 object-cover"
+                />
+                <div className="p-space-lg flex flex-col gap-space-sm justify-between flex-1">
+                  <div className="flex flex-col gap-space-xs">
+                    <div className="inline-flex items-center self-start px-space-sm py-0.5 rounded-full bg-secondary-container text-on-secondary-container font-label-sm text-label-sm font-semibold">
+                      최소 3개월 의무 계약
+                    </div>
+                    <h3 className="font-headline-md text-headline-md text-on-surface">정기청소 (계단·건물관리)</h3>
+                    <p className="font-body-md text-body-md text-on-surface-variant">
+                      빌라·상가 계단, 건물주위, 지하주차장 구역별 맞춤 관리 (안정적 관리를 위한 최소 3개월 의무 계약, 구역별 3개월 요금 직접 입력)
+                    </p>
+                  </div>
+                  <button type="button" onClick={() => handleOpenReqModal('REGULAR')} className="inline-flex items-center gap-space-2xs font-label-md text-label-md text-primary hover:text-sky-700 font-semibold pt-space-xs cursor-pointer">
+                    <span>정기청소 발주하기</span>
+                    <span className="material-symbols-outlined text-[16px]">chevron_right</span>
+                  </button>
+                </div>
               </div>
-              <div className="flex justify-between items-center">
-                <span className="text-outline">정산 금액</span>
-                <span className="font-bold text-primary">
-                  {Number(contract.totalServiceAmt || 720000).toLocaleString()}원 (현장 직불)
-                </span>
+              <div className="bg-surface-container-lowest rounded-2xl shadow-sm hover:shadow-md transition-all overflow-hidden flex flex-col border border-outline-variant/60">
+                <img
+                  src="/storage/sseuldakgo/page_main/20261126_v0.01/appliances_care_service.jpg"
+                  alt="계절가전 분해케어"
+                  className="w-full h-48 object-cover"
+                />
+                <div className="p-space-lg flex flex-col gap-space-sm justify-between flex-1">
+                  <div className="flex flex-col gap-space-xs">
+                    <div className="inline-flex items-center self-start px-space-sm py-0.5 rounded-full bg-secondary-container text-on-secondary-container font-label-sm text-label-sm font-semibold">
+                      완전 분해 고압 살균
+                    </div>
+                    <h3 className="font-headline-md text-headline-md text-on-surface">계절가전 분해케어</h3>
+                    <p className="font-body-md text-body-md text-on-surface-variant">
+                      벽걸이·스탠드·시스템 에어컨, 드럼·통돌이 세탁기, 냉장고 완전 분해 고압 살균 세척 (품목·수량별 희망 요금 직접 입력)
+                    </p>
+                  </div>
+                  <button type="button" onClick={() => handleOpenReqModal('APPLIANCE')} className="inline-flex items-center gap-space-2xs font-label-md text-label-md text-primary hover:text-sky-700 font-semibold pt-space-xs cursor-pointer">
+                    <span>가전 분해케어 발주하기</span>
+                    <span className="material-symbols-outlined text-[16px]">chevron_right</span>
+                  </button>
+                </div>
               </div>
-              <div className="flex justify-between items-center">
-                <span className="text-outline">승인 일시</span>
-                <span className="font-mono text-on-surface">
-                  {new Date().toLocaleString()}
-                </span>
+              <div className="bg-surface-container-lowest rounded-2xl shadow-sm hover:shadow-md transition-all overflow-hidden flex flex-col border border-outline-variant/60">
+                <img
+                  src="/storage/sseuldakgo/page_main/20261126_v0.01/move_in_cleaning_service.jpg"
+                  alt="입주·이사 청소"
+                  className="w-full h-48 object-cover"
+                />
+                <div className="p-space-lg flex flex-col gap-space-sm justify-between flex-1">
+                  <div className="flex flex-col gap-space-xs">
+                    <div className="inline-flex items-center self-start px-space-sm py-0.5 rounded-full bg-secondary-container text-on-secondary-container font-label-sm text-label-sm font-semibold">
+                      스팀·살균 대청소
+                    </div>
+                    <h3 className="font-headline-md text-headline-md text-on-surface">입주·이사 청소</h3>
+                    <p className="font-body-md text-body-md text-on-surface-variant">
+                      아파트, 오피스텔, 빌라, 사무실 입주 및 이사 전후 구석구석 스팀·살균 대청소 (건별 희망 요금 직접 입력)
+                    </p>
+                  </div>
+                  <button type="button" onClick={() => handleOpenReqModal('MOVEIN')} className="inline-flex items-center gap-space-2xs font-label-md text-label-md text-primary hover:text-sky-700 font-semibold pt-space-xs cursor-pointer">
+                    <span>입주·이사 청소 발주하기</span>
+                    <span className="material-symbols-outlined text-[16px]">chevron_right</span>
+                  </button>
+                </div>
               </div>
             </div>
-            <div className="flex flex-col gap-2 pt-space-xs">
-              <button
-                className="h-[48px] w-full bg-primary hover:bg-primary-container text-on-primary font-label-md text-label-md font-bold rounded-xl transition-colors shadow-sm cursor-pointer"
-                id="closeModalBtn"
-                onClick={handleSuccessClose}
-                type="button"
-              >
-                확인 및 나의 신청현황으로 이동
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+          </section>
 
-      {/* ====================================================================
-          FOOTER: 법적 고지 및 회사 정보
-      ==================================================================== */}
+          {/* Section 5: 이용 절차 4단계 워크플로우 */}
+          <section id="section-how-it-works" className="scroll-mt-20 py-8 flex flex-col gap-space-md border-t border-outline-variant/50">
+            <div className="flex flex-col gap-space-2xs">
+              <span className="font-label-sm text-label-sm text-primary uppercase tracking-wider font-bold">02 / HOW IT WORKS</span>
+              <h2 className="font-headline-xl text-headline-xl text-on-surface">이용 절차 4단계 워크플로우</h2>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-space-md">
+              {[
+                { num: '01', icon: 'edit_document', title: '1단계. 희망 요금 결정 및 발주', desc: '지역, 일정, 세부 구역/기종과 고객이 원하는 용역 대금을 직접 결정해 발주 등록', color: 'text-primary', img: '/storage/sseuldakgo/page_main/20261126_v0.01/Web_main_workflow_01.png' },
+                { num: '02', icon: 'handshake', title: '2단계. 전문 시공사 단독 청약', desc: '검증된 파트너의 청약 접수 및 고객 확인 후 데이터 이용료 결제·계약 확정', color: 'text-primary', img: '/storage/sseuldakgo/page_main/20261126_v0.01/Web_main_workflow_02.png' },
+                { num: '03', icon: 'cleaning_services', title: '3단계. 안심번호 연결 및 전문 시공', desc: '개인정보 걱정 없는 안심번호 소통 및 표준 매뉴얼에 따른 꼼꼼한 전문 시공', color: 'text-secondary', img: '/storage/sseuldakgo/page_main/20261126_v0.01/Web_main_workflow_03.png' },
+                { num: '04', icon: 'task_alt', title: '4단계. 사진 검수 및 현장 직불 정산', desc: '시공 전·후 사진 확인 및 고객 최종 승인 후 파트너에게 용역 대금 100% 직접 지불', color: 'text-secondary', img: '/storage/sseuldakgo/page_main/20261126_v0.01/Web_main_workflow_04.png' },
+              ].map((s) => (
+                <div key={s.num} className="bg-surface-container-lowest rounded-xl shadow-sm overflow-hidden flex flex-col border border-outline-variant/60">
+                  <img
+                    src={s.img}
+                    alt={s.title}
+                    className="w-full h-40 object-cover"
+                  />
+                  <div className="p-space-md flex flex-col gap-space-sm flex-1">
+                    <div className="flex items-center justify-between">
+                      <span className={`font-metric-num-lg text-metric-num-lg font-bold ${s.color}`}>{s.num}</span>
+                      <span className={`material-symbols-outlined text-[24px] ${s.color}`}>{s.icon}</span>
+                    </div>
+                    <div className="flex flex-col gap-space-xs">
+                      <h3 className="font-title-md text-title-md text-on-surface font-bold">{s.title}</h3>
+                      <p className="font-body-md text-body-md text-on-surface-variant">{s.desc}</p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          {/* Section 6: 실시간 발주·매칭 현황 */}
+          <section id="section-live-matching" className="scroll-mt-20 py-8 flex flex-col gap-space-md border-t border-outline-variant/50">
+            <div className="flex flex-col gap-space-2xs">
+              <span className="font-label-sm text-label-sm text-secondary uppercase tracking-wider font-bold">03 / LIVE MATCHING STATUS</span>
+              <h2 className="font-headline-xl text-headline-xl text-on-surface">실시간 발주·매칭 현황</h2>
+            </div>
+            <div className="bg-surface-container-lowest rounded-2xl shadow-sm p-space-md flex flex-col gap-space-sm border border-outline-variant/60 w-full">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-space-xs">
+                  <span className="w-2.5 h-2.5 rounded-full bg-secondary animate-pulse" />
+                  <h3 className="font-headline-sm text-headline-sm text-on-surface font-bold">실시간 매칭 현황</h3>
+                </div>
+                <span className="font-label-sm text-label-sm text-on-surface-variant">LIVE UPDATE</span>
+              </div>
+              <div className="flex flex-col gap-space-xs">
+                {(feedList && feedList.length > 0 ? feedList.slice(0, 5) : [
+                  { ORDER_NO: 'LIVE-1', ADDR_TEXT: '경기 고양시 덕양구 | 32평 입주·이사 청소', PROPOSED_PRICE: 380000, ORDER_STATUS: '계약 확정' },
+                  { ORDER_NO: 'LIVE-2', ADDR_TEXT: '서울 서대문구 | 시스템에어컨 2대 분해케어', PROPOSED_PRICE: 180000, ORDER_STATUS: '청약 대기중' },
+                  { ORDER_NO: 'LIVE-3', ADDR_TEXT: '경기 고양시 일산동구 | 빌라 계단 정기청소 3개월', PROPOSED_PRICE: 270000, ORDER_STATUS: '시공 완료' },
+                ]).map((ord, idx) => (
+                  <div key={ord.ORDER_NO || idx} className="p-space-xs rounded-xl bg-surface-container-low flex flex-col sm:flex-row sm:items-center justify-between gap-space-xs border border-outline-variant/40">
+                    <div className="flex flex-col gap-space-2xs min-w-0">
+                      <span className="font-label-md text-label-md text-on-surface truncate font-semibold">{ord.ADDR_TEXT}</span>
+                      <span className="font-body-sm text-body-sm text-primary font-bold">고객 지정가 {Number(ord.PROPOSED_PRICE || 0).toLocaleString()}원</span>
+                    </div>
+                    <span className="self-start sm:self-center px-space-sm py-space-2xs rounded-full bg-primary-fixed text-on-primary-fixed font-label-sm text-label-sm whitespace-nowrap font-semibold">
+                      {ord.ORDER_STATUS || '청약 대기중'}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
+
+          {/* Section 7: Partner Recruitment & App Download */}
+          <section id="section-partner-recruit" className="scroll-mt-20 py-16 lg:py-20 border-t border-outline-variant/50">
+            <div className="flex flex-col gap-space-2xs mb-space-md">
+              <span className="font-label-sm text-label-sm text-secondary uppercase tracking-wider font-bold">03 / 쓸고닦고 전문 시공사 파트너 모집</span>
+            </div>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-space-lg">
+              <div className="bg-primary text-on-primary rounded-2xl p-space-xl lg:p-10 shadow-md flex flex-col justify-between gap-space-lg">
+                <div className="flex flex-col gap-space-xs">
+                  <span className="font-label-sm text-label-sm text-sky-200 uppercase tracking-wider font-bold">PARTNER RECRUITMENT</span>
+                  <h3 className="font-headline-lg text-headline-lg text-on-primary font-bold">쓸고닦고 전문 시공사 파트너 모집</h3>
+                  <p className="font-body-md text-body-md text-sky-100">
+                    검증된 청소·가전분해 전문가라면 불필요한 광고비와 수수료 부담 없이 고객 확정가 발주 건을 단독 매칭받으세요.
+                  </p>
+                </div>
+                <button type="button" onClick={() => setIsLoginModalOpen(true)} className="self-start px-space-lg py-space-sm rounded-xl bg-surface-container-lowest text-primary hover:bg-sky-50 font-label-md text-label-md inline-flex items-center gap-space-xs transition-colors font-bold shadow-sm cursor-pointer">
+                  <span>사업자·자격증 인증 후 직불 매칭 시작하기</span>
+                  <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
+                </button>
+              </div>
+              <div className="bg-surface-container-lowest rounded-2xl p-space-xl lg:p-10 shadow-md flex flex-col justify-between gap-space-lg border border-outline-variant/60">
+                <div className="flex flex-col gap-space-xs">
+                  <span className="font-label-sm text-label-sm text-secondary uppercase tracking-wider font-bold">MOBILE APP</span>
+                  <h3 className="font-headline-lg text-headline-lg text-on-surface font-bold">모바일 앱으로 더 간편하게 발주·검수하세요</h3>
+                  <p className="font-body-md text-body-md text-on-surface-variant">
+                    실시간 청약 알림부터 시공 전·후 사진 검수, 0507 안심번호 연결까지 스마트폰으로 한 번에 관리할 수 있습니다.
+                  </p>
+                </div>
+                <div className="flex flex-wrap items-center gap-space-md">
+                  <a className="px-space-lg py-space-sm rounded-xl bg-slate-900 text-white hover:bg-slate-800 font-label-md text-label-md inline-flex items-center gap-space-xs transition-colors font-semibold" href="#google-play">
+                    <span className="material-symbols-outlined text-[20px]">shop</span>
+                    <span>Google Play</span>
+                  </a>
+                  <a className="px-space-lg py-space-sm rounded-xl bg-surface-container-low text-on-surface hover:bg-surface-container font-label-md text-label-md inline-flex items-center gap-space-xs transition-colors border border-outline-variant/60 font-semibold" href="#app-store">
+                    <span className="material-symbols-outlined text-[20px]">phone_iphone</span>
+                    <span>App Store</span>
+                  </a>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+      </main>
       <footer className="w-full bg-surface-container-low text-on-surface-variant py-space-xl shadow-[0_-1px_6px_rgba(0,0,0,0.02)] border-t border-slate-200/60 mt-space-xl">
         <div className="max-w-[1200px] mx-auto px-margin flex flex-col gap-space-lg">
           <div className="flex flex-wrap items-center justify-between gap-space-md pb-space-md border-b border-slate-200/60">
