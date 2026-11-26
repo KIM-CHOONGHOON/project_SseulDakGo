@@ -1042,6 +1042,54 @@ app.post('/api/web/service/job_020200', processWebSrvcJob020200);
 // ============================================================================
 // [API 라우트] WEB-SRVC-MYP-010100 / 010200 / 010201 (시공사 내정보·지역관리·회원탈회)
 // ============================================================================
+app.put('/api/srvc/myp/020100', async (req, res) => {
+  try {
+    const { userNo, bizName, ceoName, bizNo, certs } = req.body || {};
+    if (!userNo) return res.status(400).json({ success: false, message: 'userNo가 필요합니다.' });
+    await executeQuery(
+      `INSERT INTO TB_PARTNER_BIZ (USER_NO, BIZ_NM, CEO_NM, BIZ_REG_NO, REG_DT, MOD_DT)
+       VALUES (?, ?, ?, ?, NOW(), NOW())
+       ON DUPLICATE KEY UPDATE BIZ_NM = VALUES(BIZ_NM), CEO_NM = VALUES(CEO_NM), BIZ_REG_NO = VALUES(BIZ_REG_NO), MOD_DT = NOW()`,
+      [userNo, bizName || '', ceoName || '', bizNo || '']
+    ).catch(() => {});
+    if (Array.isArray(certs)) {
+      await executeQuery(`DELETE FROM TB_PARTNER_CERT WHERE USER_NO = ?`, [userNo]).catch(() => {});
+      for (const c of certs.slice(0, 5)) {
+        await executeQuery(
+          `INSERT INTO TB_PARTNER_CERT (USER_NO, CERT_NM, ISSU_ORG_NM, ACQ_DT, CERT_NO, STAT_CD, REG_DT)
+           VALUES (?, ?, ?, ?, ?, ?, NOW())`,
+          [userNo, c.name || '', c.org || '', c.date || '', c.certNo || '', c.status || '심사대기']
+        ).catch(() => {});
+      }
+    }
+    return res.json({ success: true, message: '사업자 및 자격·수료 정보가 DB에 저장되었습니다.' });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error?.message || '저장 오류' });
+  }
+});
+
+app.all('/api/srvc/myp/020101', async (req, res) => {
+  try {
+    const { Readable } = await import('stream');
+    const mod = await import('../SseulDakGo_Web/Service/backend/api_WEB_SRVC_MYP_020101/route.js');
+    const handler = mod[req.method];
+    if (!handler) return res.status(405).json({ success: false, message: 'Method Not Allowed' });
+    const fullUrl = `${req.protocol}://${req.get('host')}${req.originalUrl}`;
+    const webReq = new Request(fullUrl, {
+      method: req.method,
+      headers: req.headers,
+      body: ['GET', 'HEAD'].includes(req.method) ? undefined : Readable.toWeb(req),
+      duplex: 'half',
+    });
+    const webRes = await handler(webReq);
+    const data = await webRes.json();
+    return res.status(webRes.status || 200).json(data);
+  } catch (error) {
+    console.error('[020101 API ERROR]', error);
+    return res.status(500).json({ success: false, message: error?.message || 'PDF OCR 처리 오류' });
+  }
+});
+
 app.all('/api/srvc/myp/010100', async (req, res) => {
   try {
     const result = await processWebSrvcMyp010100(req.body || {}, req.query || {}, req.method);
@@ -1369,6 +1417,190 @@ app.get(['/job_020000', '/job_020000.html', '/preview/job_020000', '/preview/job
 // APP-CLNT-MYP-020100 모바일 파트너 자격증 및 경력 등록 프리뷰 라우트
 app.get(['/app_myp_020100', '/app_myp_020100.html', '/preview/app_myp_020100', '/preview/app_myp_020100.html'], (req, res) => {
   res.sendFile(path.join(__dirname, 'app_myp_020100.html'));
+});
+
+// [WEB-SRVC-COM-010000] 시공사 파트너 메인 대시보드 통합 조회 (탭 건수, 탭 목록 10건 페이징, 내 활동 내역 조회)
+app.get('/api/srvc/com/010000', async (req, res) => {
+  try {
+    const tab = String(req.query.tab || 'waiting-bid');
+    const page = Math.max(1, parseInt(req.query.page, 10) || 1);
+    const pageSize = Math.max(1, Math.min(50, parseInt(req.query.pageSize, 10) || 10));
+    const actPage = Math.max(1, parseInt(req.query.actPage, 10) || 1);
+    const cleaningType = String(req.query.cleaningType || 'ALL');
+
+    const now = new Date();
+    const y = now.getFullYear();
+    const m = String(now.getMonth() + 1).padStart(2, '0');
+    const lastDay = String(new Date(y, now.getMonth() + 1, 0).getDate()).padStart(2, '0');
+    const normDate = (val, fallback) => {
+      const cleaned = String(val || '').trim().replace(/\./g, '-');
+      return /^\d{4}-\d{2}-\d{2}$/.test(cleaned) ? cleaned : fallback;
+    };
+    const dateFrom = normDate(req.query.dateFrom, `${y}-${m}-01`);
+    const dateTo = normDate(req.query.dateTo, `${y}-${m}-${lastDay}`);
+
+    const fromObj = new Date(`${dateFrom}T00:00:00`);
+    const toObj = new Date(`${dateTo}T00:00:00`);
+    const maxToObj = new Date(fromObj);
+    maxToObj.setFullYear(maxToObj.getFullYear() + 1);
+    if (fromObj > toObj || toObj > maxToObj) {
+      return res.status(400).json({ success: false, message: '조회기간은 최대 1년까지만 조회 가능합니다.' });
+    }
+
+    const countRows = await executeQuery(
+      `SELECT
+         SUM(CASE WHEN M.ORDER_STATUS = 'BID_OPEN' THEN 1 ELSE 0 END) AS waitingBidCount,
+         SUM(CASE WHEN M.ORDER_STATUS IN ('BID_APPLIED', 'PAY_WAIT_1', 'PAY_WAIT_2', 'PAYMENT_WAITING') THEN 1 ELSE 0 END) AS waitingPaymentCount,
+         SUM(CASE WHEN M.ORDER_STATUS IN ('CONTRACTED', 'IN_PROGRESS', 'SVC_IN_PROGRESS', 'CLEANING_WAITING') THEN 1 ELSE 0 END) AS waitingCleaningCount
+       FROM TB_ORDER_MSTR M`
+    );
+    const counts = countRows?.[0] || {};
+    const tabCounts = {
+      waitingBid: Number(counts.waitingBidCount || 0),
+      waitingPayment: Number(counts.waitingPaymentCount || 0),
+      waitingCleaning: Number(counts.waitingCleaningCount || 0),
+    };
+
+    const statusConditionMap = {
+      'waiting-bid': "M.ORDER_STATUS = 'BID_OPEN'",
+      'waiting-payment': "M.ORDER_STATUS IN ('BID_APPLIED', 'PAY_WAIT_1', 'PAY_WAIT_2', 'PAYMENT_WAITING')",
+      'waiting-cleaning': "M.ORDER_STATUS IN ('CONTRACTED', 'IN_PROGRESS', 'SVC_IN_PROGRESS', 'CLEANING_WAITING')",
+    };
+    const statusWhere = statusConditionMap[tab] || statusConditionMap['waiting-bid'];
+    const totalTabCount =
+      tab === 'waiting-payment'
+        ? tabCounts.waitingPayment
+        : tab === 'waiting-cleaning'
+          ? tabCounts.waitingCleaning
+          : tabCounts.waitingBid;
+    const totalTabPages = Math.max(1, Math.ceil(totalTabCount / pageSize));
+    const safeTabPage = Math.min(page, totalTabPages);
+    const tabOffset = (safeTabPage - 1) * pageSize;
+
+    const tabRows = await executeQuery(
+      `SELECT M.ORDER_NO,
+              M.ORDER_STATUS,
+              M.PROPOSED_PRICE,
+              M.ADDR_TEXT,
+              DATE_FORMAT(M.REG_DT, '%Y-%m-%d') AS regDate,
+              D.CLEAN_LARGE_CD,
+              D.SELECTED_SRV_ITEMS,
+              D.SUPPLY_PYEONG
+         FROM TB_ORDER_MSTR M
+         JOIN TB_ORDER_DTL D ON M.ORDER_NO = D.ORDER_NO
+        WHERE ${statusWhere}
+        ORDER BY M.REG_DT DESC
+        LIMIT ? OFFSET ?`,
+      [pageSize, tabOffset]
+    );
+
+    const catMap = {
+      REGULAR: { badge: '정기청소', icon: 'repeat', iconBg: 'bg-surface-container-high text-tertiary', badgeCls: 'text-tertiary' },
+      MOVE_IN: { badge: '입주·이사 청소', icon: 'cleaning_services', iconBg: 'bg-secondary-fixed text-secondary', badgeCls: 'text-secondary' },
+      MOVEIN: { badge: '입주·이사 청소', icon: 'cleaning_services', iconBg: 'bg-secondary-fixed text-secondary', badgeCls: 'text-secondary' },
+      APPLIANCE: { badge: '계절가전 분해케어', icon: 'mode_fan', iconBg: 'bg-primary-fixed text-primary', badgeCls: 'text-primary' },
+    };
+
+    const formatDoSi = (addr) => String(addr || '').trim().split(/\s+/).slice(0, 2).join(' ');
+    const formatPrice = (val) => `${Number(val || 0).toLocaleString('ko-KR')}원`;
+    const tabItems = (tabRows || []).map((r) => {
+      const meta = catMap[r.CLEAN_LARGE_CD] || catMap.REGULAR;
+      const scope = r.SELECTED_SRV_ITEMS || (r.SUPPLY_PYEONG ? `공급 ${r.SUPPLY_PYEONG}평형` : meta.badge);
+      return {
+        orderNo: r.ORDER_NO,
+        badge: meta.badge,
+        icon: meta.icon,
+        title: formatDoSi(r.ADDR_TEXT) || `발주 ${r.ORDER_NO}`,
+        tag: r.ORDER_STATUS === 'BID_OPEN' ? '신규 등록' : r.ORDER_STATUS,
+        desc: `${scope} | 등록일: ${r.regDate} | 발주번호: ${r.ORDER_NO}`,
+        price: formatPrice(r.PROPOSED_PRICE),
+        fee: '16,500원',
+        btn: '2차 데이터 이용료 결제',
+      };
+    });
+
+    const userNo = String(req.query.userNo || '').trim();
+    const actParams = [dateFrom, dateTo];
+    let actWhere = 'DATE(M.REG_DT) BETWEEN ? AND ?';
+    if (userNo) {
+      actWhere += ' AND EXISTS (SELECT 1 FROM TB_QUOTE_APPLY Q WHERE Q.ORDER_NO = M.ORDER_NO AND Q.SERVICE_USER_NO = ?)';
+      actParams.push(userNo);
+    }
+    if (cleaningType !== 'ALL') {
+      if (cleaningType === 'MOVE_IN') {
+        actWhere += " AND D.CLEAN_LARGE_CD IN ('MOVE_IN', 'MOVEIN')";
+      } else {
+        actWhere += ' AND D.CLEAN_LARGE_CD = ?';
+        actParams.push(cleaningType);
+      }
+    }
+
+    const actCountRows = await executeQuery(
+      `SELECT COUNT(*) AS cnt
+         FROM TB_ORDER_MSTR M
+         JOIN TB_ORDER_DTL D ON M.ORDER_NO = D.ORDER_NO
+        WHERE ${actWhere}`,
+      actParams
+    );
+    const totalActCount = Number(actCountRows?.[0]?.cnt || 0);
+    const totalActPages = Math.max(1, Math.ceil(totalActCount / pageSize));
+    const safeActPage = Math.min(actPage, totalActPages);
+    const actOffset = (safeActPage - 1) * pageSize;
+
+    const actRows = await executeQuery(
+      `SELECT M.ORDER_NO,
+              M.ORDER_STATUS,
+              M.PROPOSED_PRICE,
+              M.ADDR_TEXT,
+              DATE_FORMAT(M.REG_DT, '%Y-%m-%d') AS regDate,
+              D.CLEAN_LARGE_CD,
+              D.SELECTED_SRV_ITEMS,
+              D.SUPPLY_PYEONG
+         FROM TB_ORDER_MSTR M
+         JOIN TB_ORDER_DTL D ON M.ORDER_NO = D.ORDER_NO
+        WHERE ${actWhere}
+        ORDER BY M.REG_DT DESC
+        LIMIT ? OFFSET ?`,
+      [...actParams, pageSize, actOffset]
+    );
+
+    const activities = (actRows || []).map((r) => {
+      const meta = catMap[r.CLEAN_LARGE_CD] || catMap.REGULAR;
+      const scope = r.SELECTED_SRV_ITEMS || (r.SUPPLY_PYEONG ? `공급 ${r.SUPPLY_PYEONG}평형` : meta.badge);
+      return {
+        id: r.ORDER_NO,
+        type: r.CLEAN_LARGE_CD === 'MOVEIN' ? 'MOVE_IN' : r.CLEAN_LARGE_CD,
+        badge: meta.badge,
+        badgeCls: meta.badgeCls,
+        icon: meta.icon,
+        iconBg: meta.iconBg,
+        title: r.ADDR_TEXT || `발주 ${r.ORDER_NO}`,
+        desc: `${scope} | 등록일: ${r.regDate} | 상태: ${r.ORDER_STATUS}`,
+        priceLabel: r.CLEAN_LARGE_CD === 'REGULAR' ? '고객 확정 지정가 (월)' : '고객 확정 지정가',
+        price: formatPrice(r.PROPOSED_PRICE),
+      };
+    });
+
+    return res.status(200).json({
+      success: true,
+      tabCounts,
+      tabData: {
+        items: tabItems,
+        totalCount: totalTabCount,
+        page: safeTabPage,
+        totalPages: totalTabPages,
+      },
+      activityData: {
+        items: activities,
+        totalCount: totalActCount,
+        page: safeActPage,
+        totalPages: totalActPages,
+      },
+    });
+  } catch (err) {
+    console.error('[GET /api/srvc/com/010000] 오류:', err);
+    return res.status(500).json({ success: false, message: '대시보드 조회 중 오류가 발생했습니다.' });
+  }
 });
 
 // 모바일 하이브리드 앱 웹뷰 프리뷰 라우트

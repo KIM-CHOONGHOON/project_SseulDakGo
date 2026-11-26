@@ -76,8 +76,8 @@ export async function processWebClntReq010100(body = {}) {
     clientUserNo = 'C20261000001',
     cleanLargeCd = 'REGULAR',
     companyOrOrgNm = null,
-    contactPersonNm = '홍길동',
-    contactTel = '010-8921-5459',
+    contactPersonNm = '',
+    contactTel = '',
     contactEmail = null,
     facilityTypeCd = 'COMM_BLDG',
     parkingAvailCd = 'YES',
@@ -106,6 +106,52 @@ export async function processWebClntReq010100(body = {}) {
     washerTotalCnt = 0,
     kitchenTotalCnt = 0,
   } = body;
+
+  // 1-2. 담당자 성명/연락처/이메일 미입력 시 로그인 이용자(TB_USER) 정보 조회 조립
+  let resolvedContactNm = String(contactPersonNm || '').trim();
+  let resolvedContactTel = String(contactTel || '').trim();
+  let resolvedContactEmail = String(contactEmail || '').trim();
+  if ((!resolvedContactNm || !resolvedContactTel || !resolvedContactEmail) && clientUserNo && clientUserNo !== 'GUEST') {
+    try {
+      const userRows = await executeQuery(
+        `SELECT USER_NM, USER_TEL, USER_EMAIL FROM TB_USER WHERE USER_NO = ? LIMIT 1`,
+        [clientUserNo]
+      );
+      if (userRows && userRows.length > 0) {
+        if (!resolvedContactNm) resolvedContactNm = userRows[0].USER_NM || '';
+        if (!resolvedContactTel) resolvedContactTel = userRows[0].USER_TEL || '';
+        if (!resolvedContactEmail) resolvedContactEmail = userRows[0].USER_EMAIL || '';
+      }
+    } catch {
+      // ignore
+    }
+  }
+
+  // 1-3. TB_COM_CODE 기반 CLEAN_LARGE_CD 및 SERVICE_STATUS('WAIT_BID') 공통코드 유효성 검증
+  let resolvedServiceStatus = 'WAIT_BID';
+  try {
+    const largeCodeRows = await executeQuery(
+      `SELECT COM_CD FROM TB_COM_CODE WHERE GRP_CD = 'CLEAN_LARGE_CD' AND COM_CD = ? AND USE_YN = 'Y' LIMIT 1`,
+      [cleanLargeCd]
+    );
+    if (largeCodeRows && largeCodeRows.length === 0) {
+      const allLarge = await executeQuery(`SELECT COUNT(*) AS cnt FROM TB_COM_CODE WHERE GRP_CD = 'CLEAN_LARGE_CD' AND USE_YN = 'Y'`);
+      if (allLarge?.[0]?.cnt > 0) {
+        return {
+          status: 400,
+          body: { success: false, code: 'ERR_INVALID_CLEAN_LARGE_CD', message: `유효하지 않은 청소 대분류 코드입니다: ${cleanLargeCd}` },
+        };
+      }
+    }
+    const statusRows = await executeQuery(
+      `SELECT COM_CD FROM TB_COM_CODE WHERE GRP_CD = 'SERVICE_STATUS' AND COM_CD = 'WAIT_BID' AND USE_YN = 'Y' LIMIT 1`
+    );
+    if (statusRows && statusRows.length > 0) {
+      resolvedServiceStatus = statusRows[0].COM_CD;
+    }
+  } catch {
+    // ignore if common code table is unavailable
+  }
 
   // 1. 유효성 검증 (Validation)
   if (!addrText || String(addrText).trim().length === 0) {
@@ -204,9 +250,9 @@ export async function processWebClntReq010100(body = {}) {
         effectiveClientUserNo,
         numPrice,
         companyOrOrgNm,
-        contactPersonNm,
-        contactTel,
-        contactEmail,
+        resolvedContactNm || null,
+        resolvedContactTel || null,
+        resolvedContactEmail || null,
         facilityTypeCd || 'OFFICE',
         parkingAvailCd || 'YES',
         sidoCd || '41',
@@ -474,6 +520,17 @@ export async function processWebClntReq010100(body = {}) {
         );
 
         if (Array.isArray(partners) && partners.length > 0) {
+          const seenEmails = new Set();
+          const seenTels = new Set();
+          const uniquePartners = partners.filter((p) => {
+            const email = String(p.USER_EMAIL || '').trim().toLowerCase();
+            const tel = String(p.USER_TEL || '').replace(/[^0-9]/g, '');
+            if (email && seenEmails.has(email)) return false;
+            if (tel && seenTels.has(tel)) return false;
+            if (email) seenEmails.add(email);
+            if (tel) seenTels.add(tel);
+            return true;
+          });
           const nowStr = new Date().toISOString().slice(0, 10).replace(/-/g, '');
           const notiDatePrefix = `NT${nowStr}`;
 
@@ -491,12 +548,12 @@ export async function processWebClntReq010100(body = {}) {
             console.warn('[NOTI_SEQ_WARN]', seqErr.message);
           }
 
-          for (let idx = 0; idx < partners.length; idx++) {
-            const partner = partners[idx];
+          for (let idx = 0; idx < uniquePartners.length; idx++) {
+            const partner = uniquePartners[idx];
             const notiSeqStr = String(baseSeq + idx).padStart(5, '0');
             const notiId = `${notiDatePrefix}${notiSeqStr}`;
-            const cleanLargeNm = cleanLargeCd === 'REGULAR' ? '정기청소' : cleanLargeCd === 'MOVEIN' ? '입주/이사 청소' : '계절 가전 청소';
-            const notiTitle = `[신규 청소 발주] 새로운 ${cleanLargeNm} 요청이 접수되었습니다.`;
+            const cleanLargeNm = cleanLargeCd === 'REGULAR' ? '정기청소' : cleanLargeCd === 'MOVE_IN' ? '입주청소' : '계절가전청소';
+            const notiTitle = `신규 ${cleanLargeNm} 요청이 접수되었습니다.`;
             const notiContent = `[쓸고닦고] 발주번호: ${orderNo}\n현장 주소: ${addrText || ''} ${addrDetail || ''}\n고객 지정가: ${Number(numPrice).toLocaleString()}원\n시공사에 메시지가 정상 전달되었습니다.`;
 
             await connection.execute(

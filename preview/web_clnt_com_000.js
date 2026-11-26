@@ -5214,20 +5214,154 @@ const ACTIVITY_ORDERS = [
  * 화면 ID: WEB-SRVC-COM-010000
  * 화면명: 시공사 파트너 메인 대시보드
  */
-function WebSrvcCom010000({ userInfo, onNavigate }) {
+function getCurrentMonthRange() {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = now.getMonth() + 1;
+    const lastDay = new Date(year, month, 0).getDate();
+    const mm = String(month).padStart(2, '0');
+    const dd = String(lastDay).padStart(2, '0');
+    return {
+        from: `${year}.${mm}.01`,
+        to: `${year}.${mm}.${dd}`,
+    };
+}
+function PaginationBar({ page, totalPages, onPageChange }) {
+    const safeTotal = Math.max(1, totalPages || 1);
+    const safePage = Math.min(Math.max(1, page || 1), safeTotal);
+    const startPage = Math.floor((safePage - 1) / 5) * 5 + 1;
+    const endPage = Math.min(safeTotal, startPage + 4);
+    const pages = [];
+    for (let p = startPage; p <= endPage; p += 1) {
+        pages.push(p);
+    }
+    const btnBase = 'px-2.5 py-1.5 rounded-lg border border-slate-300 bg-surface-container-lowest text-label-sm font-semibold text-on-surface-variant hover:bg-surface-container-low disabled:opacity-40 disabled:cursor-not-allowed transition cursor-pointer';
+    return (React.createElement("div", { className: "flex flex-wrap items-center justify-end gap-1.5 pt-4 mt-auto border-t border-slate-200" },
+        React.createElement("button", { type: "button", onClick: () => onPageChange(1), disabled: safePage <= 1, className: btnBase }, "\uB9E8\uCC98\uC74C"),
+        React.createElement("button", { type: "button", onClick: () => onPageChange(safePage - 1), disabled: safePage <= 1, className: btnBase }, "\uC774\uC804\uD398\uC774\uC9C0"),
+        pages.map((p) => (React.createElement("button", { key: p, type: "button", onClick: () => onPageChange(p), className: `min-w-[32px] px-2.5 py-1.5 rounded-lg border text-label-sm font-bold transition cursor-pointer ${p === safePage
+                ? 'bg-primary text-on-primary border-primary shadow-sm'
+                : 'bg-surface-container-lowest text-on-surface border-slate-300 hover:bg-surface-container-low'}` }, p))),
+        React.createElement("button", { type: "button", onClick: () => onPageChange(safePage + 1), disabled: safePage >= safeTotal, className: btnBase }, "\uB2E4\uC74C\uD398\uC774\uC9C0"),
+        React.createElement("button", { type: "button", onClick: () => onPageChange(safeTotal), disabled: safePage >= safeTotal, className: btnBase }, "\uB9C8\uC9C0\uB9C9\uD398\uC774\uC9C0"),
+        React.createElement("span", { className: "ml-2 font-label-sm text-label-sm text-on-surface-variant font-medium" },
+            "\uC804\uCCB4 ",
+            safeTotal,
+            "\uD398\uC774\uC9C0")));
+}
+/**
+ * 화면 ID: WEB-SRVC-COM-010000
+ * 화면명: 시공사 파트너 메인 대시보드
+ */
+function WebSrvcCom010000({ userInfo }) {
     const partnerName = userInfo?.USER_NM || '클린마스터 김태호';
+    const defaultRange = getCurrentMonthRange();
     const [activeTab, setActiveTab] = useState('waiting-bid');
+    const [tabPage, setTabPage] = useState(1);
+    const [tabCounts, setTabCounts] = useState({ waitingBid: 0, waitingPayment: 0, waitingCleaning: 0 });
+    const [tabItems, setTabItems] = useState([]);
+    const [tabTotalPages, setTabTotalPages] = useState(1);
     const [cleaningType, setCleaningType] = useState('ALL');
-    const [dateFrom, setDateFrom] = useState('2025.11.20');
-    const [dateTo, setDateTo] = useState('2026.11.20');
+    const [dateFrom, setDateFrom] = useState(defaultRange.from);
+    const [dateTo, setDateTo] = useState(defaultRange.to);
+    const [actPage, setActPage] = useState(1);
+    const [activityItems, setActivityItems] = useState([]);
+    const [actTotalPages, setActTotalPages] = useState(1);
     const [toastMsg, setToastMsg] = useState('');
     const showToast = (msg) => {
         setToastMsg(msg);
         setTimeout(() => setToastMsg(''), 3200);
     };
-    const filteredActivities = cleaningType === 'ALL'
-        ? ACTIVITY_ORDERS
-        : ACTIVITY_ORDERS.filter((o) => o.type === cleaningType);
+    const fetchDashboardData = useCallback(async ({ tabVal, tPage, aPage, cType, dFrom, dTo }) => {
+        try {
+            const params = new URLSearchParams({
+                userNo: String(userInfo?.USER_NO || userInfo?.userNo || ''),
+                tab: tabVal,
+                page: String(tPage),
+                pageSize: '10',
+                actPage: String(aPage),
+                cleaningType: cType,
+                dateFrom: dFrom,
+                dateTo: dTo,
+            });
+            const res = await fetch(`/api/srvc/com/010000?${params.toString()}`);
+            const data = await res.json();
+            if (data?.success) {
+                setTabCounts(data.tabCounts || { waitingBid: 0, waitingPayment: 0, waitingCleaning: 0 });
+                setTabItems(data.tabData?.items || []);
+                setTabTotalPages(data.tabData?.totalPages || 1);
+                setActivityItems(data.activityData?.items || []);
+                setActTotalPages(data.activityData?.totalPages || 1);
+            }
+        }
+        catch (err) {
+            console.error('[WEB-SRVC-COM-010000] 대시보드 데이터 조회 실패:', err);
+        }
+    }, []);
+    useEffect(() => {
+        fetchDashboardData({
+            tabVal: activeTab,
+            tPage: tabPage,
+            aPage: actPage,
+            cType: cleaningType,
+            dFrom: dateFrom,
+            dTo: dateTo,
+        });
+    }, [activeTab, tabPage, actPage, fetchDashboardData]);
+    const handleTabClick = (tabId) => {
+        setActiveTab(tabId);
+        setTabPage(1);
+    };
+    const handleSearchActivity = () => {
+        const parseYmd = (val) => {
+            const m = String(val || '').trim().match(/^(\d{4})[.\-](\d{2})[.\-](\d{2})$/);
+            if (!m)
+                return null;
+            const d = new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]));
+            return Number.isNaN(d.getTime()) ? null : d;
+        };
+        const fromD = parseYmd(dateFrom);
+        const toD = parseYmd(dateTo);
+        if (!fromD || !toD) {
+            showToast('조회기간은 YYYY.MM.DD 형식으로 입력해주세요.');
+            return;
+        }
+        if (fromD > toD) {
+            showToast('조회 시작일은 종료일보다 클 수 없습니다.');
+            return;
+        }
+        const maxToD = new Date(fromD);
+        maxToD.setFullYear(maxToD.getFullYear() + 1);
+        if (toD > maxToD) {
+            showToast('조회기간은 최대 1년까지만 입력 가능합니다.');
+            return;
+        }
+        setActPage(1);
+        fetchDashboardData({
+            tabVal: activeTab,
+            tPage: tabPage,
+            aPage: 1,
+            cType: cleaningType,
+            dFrom: dateFrom,
+            dTo: dateTo,
+        });
+        showToast('활동 내역을 조회했습니다.');
+    };
+    const handleResetActivity = () => {
+        const freshRange = getCurrentMonthRange();
+        setCleaningType('ALL');
+        setDateFrom(freshRange.from);
+        setDateTo(freshRange.to);
+        setActPage(1);
+        fetchDashboardData({
+            tabVal: activeTab,
+            tPage: tabPage,
+            aPage: 1,
+            cType: 'ALL',
+            dFrom: freshRange.from,
+            dTo: freshRange.to,
+        });
+    };
     return (React.createElement("main", { className: "w-full pt-[70px] bg-surface flex flex-col flex-1 overflow-y-auto overflow-x-hidden" },
         toastMsg && (React.createElement("div", { className: "fixed top-24 right-8 z-50 flex items-center gap-2 bg-inverse-surface text-inverse-on-surface px-4 py-2.5 rounded-lg shadow-xl" },
             React.createElement("span", { className: "material-symbols-outlined text-[20px] text-secondary-fixed" }, "check_circle"),
@@ -5235,93 +5369,49 @@ function WebSrvcCom010000({ userInfo, onNavigate }) {
         React.createElement("div", { className: "w-full max-w-[1440px] mx-auto px-margin-mobile md:px-margin py-space-xl flex flex-col gap-space-xl" },
             React.createElement("section", { className: "bg-surface-container-lowest rounded-xl p-space-lg shadow-sm flex flex-col lg:flex-row items-start lg:items-center justify-between gap-space-lg relative overflow-hidden" },
                 React.createElement("div", { className: "absolute -right-16 -top-16 w-64 h-64 bg-secondary-fixed/20 rounded-full blur-3xl pointer-events-none" }),
-                React.createElement("div", { className: "flex flex-col lg:flex-row items-start lg:items-center gap-6 relative z-10 w-full" },
-                    React.createElement("div", { className: "flex flex-col items-center gap-2 shrink-0" },
-                        React.createElement("div", { className: "w-28 h-28 rounded-xl border border-slate-200 bg-surface-container-lowest p-3 shadow-sm flex flex-col items-center justify-center gap-1.5 text-center" },
-                            React.createElement("div", { className: "w-12 h-12 rounded-xl bg-primary-fixed/20 text-primary flex items-center justify-center shrink-0" },
-                                React.createElement("span", { className: "material-symbols-outlined text-[28px]" }, "corporate_fare")),
-                            React.createElement("span", { className: "font-label-sm text-label-sm font-bold text-on-surface truncate max-w-[90px]" }, "(\uC8FC)\uD074\uB9B0\uD30C\uD2B8\uB108\uC2A4")),
-                        React.createElement("button", { type: "button", onClick: () => showToast('로고 이미지를 선택해 주세요.'), className: "flex items-center gap-1 px-3 py-1 rounded-lg border border-slate-300 bg-surface-container-lowest hover:bg-surface-container-low text-on-surface-variant hover:text-on-surface text-label-sm font-semibold transition cursor-pointer" },
-                            React.createElement("span", { className: "material-symbols-outlined text-[14px]" }, "photo_camera"),
-                            React.createElement("span", null, "\uB85C\uACE0\uBCC0\uACBD"))),
-                    React.createElement("div", { className: "flex flex-col gap-space-xs max-w-2xl" },
-                        React.createElement("div", { className: "flex items-center gap-space-xs" },
-                            React.createElement("span", { className: "font-label-sm text-label-sm uppercase tracking-wider text-secondary font-bold" }, "WEB-SRVC-COM-010000 \u00B7 PARTNER DASHBOARD"),
-                            React.createElement("span", { className: "w-1.5 h-1.5 rounded-full bg-secondary" }),
-                            React.createElement("span", { className: "font-label-sm text-label-sm text-on-surface-variant font-medium" }, "\uC2E4\uC2DC\uAC04 \uC6B4\uC601 \uBAA8\uB4DC")),
-                        React.createElement("h1", { className: "font-headline-lg text-headline-lg text-on-surface font-extrabold tracking-tight" },
-                            partnerName,
-                            " \uD30C\uD2B8\uB108\uB2D8, \uD658\uC601\uD569\uB2C8\uB2E4"),
-                        React.createElement("div", { className: "flex flex-col gap-2 mt-1" },
-                            React.createElement("div", { className: "flex flex-wrap items-center gap-1.5" },
-                                React.createElement("span", { className: "inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-surface-container-high text-on-surface-variant font-label-sm text-label-sm font-semibold" },
-                                    React.createElement("span", { className: "material-symbols-outlined text-[14px] text-primary" }, "cleaning_services"),
-                                    "\uCCAD\uC18C \uC804\uBB38 \uBD84\uC57C"),
-                                React.createElement("span", { className: "px-2 py-0.5 rounded-full bg-surface-container-low border border-slate-200 text-on-surface font-label-sm text-label-sm font-medium" }, "\uC815\uAE30\uCCAD\uC18C (\uC0C1\uAC00\u00B7\uACC4\uB2E8\u00B7\uC0AC\uBB34\uC2E4)"),
-                                React.createElement("span", { className: "px-2 py-0.5 rounded-full bg-surface-container-low border border-slate-200 text-on-surface font-label-sm text-label-sm font-medium" }, "\uC785\uC8FC\u00B7\uC774\uC0AC \uCCAD\uC18C"),
-                                React.createElement("span", { className: "px-2 py-0.5 rounded-full bg-surface-container-low border border-slate-200 text-on-surface font-label-sm text-label-sm font-medium" }, "\uACC4\uC808\uAC00\uC804 \uBD84\uD574\uCF00\uC5B4 (\uC5D0\uC5B4\uCEE8\u00B7\uC138\uD0C1\uAE30)")),
-                            React.createElement("div", { className: "flex flex-wrap items-center gap-1.5" },
-                                React.createElement("span", { className: "inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-secondary-fixed/30 text-on-secondary-fixed font-label-sm text-label-sm font-semibold" },
-                                    React.createElement("span", { className: "material-symbols-outlined text-[14px] text-secondary" }, "verified_user"),
-                                    "\uBCF4\uC720 \uC790\uACA9 \uBC0F \uC778\uC99D"),
-                                React.createElement("span", { className: "px-2 py-0.5 rounded-full bg-surface-container-lowest border border-slate-200 text-on-surface-variant font-label-sm text-label-sm" }, "\uC704\uC0DD\uAD00\uB9AC\uC6A9\uC5ED\uC5C5 \uB4F1\uB85D"),
-                                React.createElement("span", { className: "px-2 py-0.5 rounded-full bg-surface-container-lowest border border-slate-200 text-on-surface-variant font-label-sm text-label-sm" }, "\uBC29\uC5ED\uC18C\uB3C5\uC804\uBB38\uAC00 1\uAE09"),
-                                React.createElement("span", { className: "px-2 py-0.5 rounded-full bg-surface-container-lowest border border-slate-200 text-on-surface-variant font-label-sm text-label-sm" }, "\uAC00\uC804\uAD00\uB9AC\uC0AC \uC218\uB8CC(\uD55C\uAD6D\uCCAD\uC18C\uC704\uC0DD\uD611\uD68C)"),
-                                React.createElement("span", { className: "px-2 py-0.5 rounded-full bg-secondary-fixed/20 text-secondary font-label-sm text-label-sm font-semibold" }, "\uC0BC\uC131\u00B7LG \uAC00\uC804\uCF00\uC5B4 8\uB144 \uACBD\uB825"))),
-                        React.createElement("div", { className: "flex flex-wrap items-center gap-space-sm mt-space-2xs text-on-surface-variant" },
+                React.createElement("div", { className: "flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6 relative z-10 w-full" },
+                    React.createElement("div", { className: "flex items-center gap-6 shrink-0" },
+                        React.createElement("div", { className: "flex flex-col items-center gap-2 shrink-0" },
+                            React.createElement("div", { className: "w-28 h-28 rounded-xl border border-slate-200 bg-surface-container-lowest p-3 shadow-sm flex flex-col items-center justify-center gap-1.5 text-center" },
+                                React.createElement("div", { className: "w-12 h-12 rounded-xl bg-primary-fixed/20 text-primary flex items-center justify-center shrink-0" },
+                                    React.createElement("span", { className: "material-symbols-outlined text-[28px]" }, "corporate_fare")),
+                                React.createElement("span", { className: "font-label-sm text-label-sm font-bold text-on-surface truncate max-w-[90px]" }, "(\uC8FC)\uD074\uB9B0\uD30C\uD2B8\uB108\uC2A4")),
+                            React.createElement("button", { type: "button", onClick: () => showToast('[WEB-SRVC-COM-010100] 로고 이미지 변경 모달을 호출합니다.'), className: "flex items-center gap-1 px-3 py-1 rounded-lg border border-slate-300 bg-surface-container-lowest hover:bg-surface-container-low text-on-surface-variant hover:text-on-surface text-label-sm font-semibold transition cursor-pointer" },
+                                React.createElement("span", { className: "material-symbols-outlined text-[14px]" }, "photo_camera"),
+                                React.createElement("span", null, "\uB85C\uACE0\uBCC0\uACBD"))),
+                        React.createElement("div", { className: "flex flex-col gap-space-xs" },
+                            React.createElement("div", { className: "flex items-center gap-space-xs" },
+                                React.createElement("span", { className: "font-label-sm text-label-sm uppercase tracking-wider text-secondary font-bold" }, "WEB-SRVC-COM-010000 \u00B7 PARTNER DASHBOARD"),
+                                React.createElement("span", { className: "w-1.5 h-1.5 rounded-full bg-secondary" }),
+                                React.createElement("span", { className: "font-label-sm text-label-sm text-on-surface-variant font-medium" }, "\uC2E4\uC2DC\uAC04 \uC6B4\uC601 \uBAA8\uB4DC")),
+                            React.createElement("h1", { className: "font-headline-lg text-headline-lg text-on-surface font-extrabold tracking-tight" },
+                                partnerName,
+                                " \uD30C\uD2B8\uB108\uB2D8, \uD658\uC601\uD569\uB2C8\uB2E4"))),
+                    React.createElement("div", { className: "flex flex-col gap-2.5 flex-1 lg:max-w-xl" },
+                        React.createElement("div", { className: "flex flex-wrap items-center gap-1.5" },
+                            React.createElement("span", { className: "inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-surface-container-high text-on-surface-variant font-label-sm text-label-sm font-semibold" },
+                                React.createElement("span", { className: "material-symbols-outlined text-[14px] text-primary" }, "cleaning_services"),
+                                "\uCCAD\uC18C \uC804\uBB38 \uBD84\uC57C"),
+                            React.createElement("span", { className: "px-2 py-0.5 rounded-full bg-surface-container-low border border-slate-200 text-on-surface font-label-sm text-label-sm font-medium" }, "\uC815\uAE30\uCCAD\uC18C (\uC0C1\uAC00\u00B7\uACC4\uB2E8\u00B7\uC0AC\uBB34\uC2E4)"),
+                            React.createElement("span", { className: "px-2 py-0.5 rounded-full bg-surface-container-low border border-slate-200 text-on-surface font-label-sm text-label-sm font-medium" }, "\uC785\uC8FC\u00B7\uC774\uC0AC \uCCAD\uC18C"),
+                            React.createElement("span", { className: "px-2 py-0.5 rounded-full bg-surface-container-low border border-slate-200 text-on-surface font-label-sm text-label-sm font-medium" }, "\uACC4\uC808\uAC00\uC804 \uBD84\uD574\uCF00\uC5B4 (\uC5D0\uC5B4\uCEE8\u00B7\uC138\uD0C1\uAE30)")),
+                        React.createElement("div", { className: "flex flex-wrap items-center gap-1.5" },
+                            React.createElement("span", { className: "inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-secondary-fixed/30 text-on-secondary-fixed font-label-sm text-label-sm font-semibold" },
+                                React.createElement("span", { className: "material-symbols-outlined text-[14px] text-secondary" }, "verified_user"),
+                                "\uBCF4\uC720 \uC790\uACA9 \uBC0F \uC778\uC99D"),
+                            React.createElement("span", { className: "px-2 py-0.5 rounded-full bg-surface-container-lowest border border-slate-200 text-on-surface-variant font-label-sm text-label-sm" }, "\uC704\uC0DD\uAD00\uB9AC\uC6A9\uC5ED\uC5C5 \uB4F1\uB85D"),
+                            React.createElement("span", { className: "px-2 py-0.5 rounded-full bg-surface-container-lowest border border-slate-200 text-on-surface-variant font-label-sm text-label-sm" }, "\uBC29\uC5ED\uC18C\uB3C5\uC804\uBB38\uAC00 1\uAE09"),
+                            React.createElement("span", { className: "px-2 py-0.5 rounded-full bg-surface-container-lowest border border-slate-200 text-on-surface-variant font-label-sm text-label-sm" }, "\uAC00\uC804\uAD00\uB9AC\uC0AC \uC218\uB8CC(\uD55C\uAD6D\uCCAD\uC18C\uC704\uC0DD\uD611\uD68C)"),
+                            React.createElement("span", { className: "px-2 py-0.5 rounded-full bg-secondary-fixed/20 text-secondary font-label-sm text-label-sm font-semibold" }, "\uC0BC\uC131\u00B7LG \uAC00\uC804\uCF00\uC5B4 8\uB144 \uACBD\uB825")),
+                        React.createElement("div", { className: "flex flex-wrap items-center gap-space-sm text-on-surface-variant" },
                             React.createElement("div", { className: "flex items-center gap-1.5 bg-surface-container-low px-space-sm py-1 rounded-full font-label-md text-label-md text-tertiary" },
                                 React.createElement("span", { className: "material-symbols-outlined text-[17px] text-primary" }, "location_on"),
                                 React.createElement("span", null, "\uD65C\uB3D9 \uAD8C\uC5ED: \uACBD\uAE30 \uACE0\uC591\uC2DC \uB355\uC591\uAD6C \u00B7 \uC77C\uC0B0\uB3D9\uAD6C \u00B7 \uC11C\uC6B8 \uC11C\uB300\uBB38\uAD6C"),
                                 React.createElement("span", { className: "text-secondary font-semibold ml-1" }, "(3/10\uAC1C \uAD6C\uC5ED \uC124\uC815)")),
-                            React.createElement("button", { type: "button", onClick: () => onNavigate ? onNavigate('WEB-SRVC-MYP-020100') : showToast('지역 설정 관리 페이지(WEB-SRVC-MYP-020100)로 이동합니다.'), className: "font-label-sm text-label-sm text-primary hover:underline font-semibold flex items-center cursor-pointer" },
+                            React.createElement("button", { type: "button", onClick: () => showToast('[WEB-SRVC-MYP-010100] 시공사 내정보 및 활동 권역 관리 화면을 호출합니다.'), className: "font-label-sm text-label-sm text-primary hover:underline font-semibold flex items-center cursor-pointer" },
                                 "\uAD8C\uC5ED \uC218\uC815 ",
                                 React.createElement("span", { className: "material-symbols-outlined text-[15px]" }, "arrow_forward")))))),
-            React.createElement("section", { className: "grid grid-cols-1 md:grid-cols-3 gap-space-lg" },
-                React.createElement("div", { className: "bg-surface-container-lowest rounded-xl p-space-lg shadow-sm flex flex-col justify-between hover:shadow-md transition-shadow" },
-                    React.createElement("div", { className: "flex items-start justify-between" },
-                        React.createElement("div", { className: "flex flex-col" },
-                            React.createElement("span", { className: "font-label-md text-label-md text-on-surface-variant font-medium" }, "\uAE08\uC77C \uC608\uC815 \uC2DC\uACF5"),
-                            React.createElement("div", { className: "flex items-baseline gap-space-2xs mt-space-2xs" },
-                                React.createElement("span", { className: "font-metric-num-lg text-metric-num-lg text-primary font-black tracking-tight" }, "2"),
-                                React.createElement("span", { className: "font-headline-sm text-headline-sm text-on-surface font-bold" }, "\uAC74"))),
-                        React.createElement("div", { className: "w-12 h-12 rounded-xl bg-primary-fixed flex items-center justify-center text-primary" },
-                            React.createElement("span", { className: "material-symbols-outlined text-[26px]" }, "assignment_turned_in"))),
-                    React.createElement("div", { className: "mt-space-md pt-space-sm flex items-center justify-between text-on-surface-variant" },
-                        React.createElement("span", { className: "font-body-sm text-body-sm text-tertiary" }, "\uD604\uC7A5 5\uB2E8\uACC4 \uC2DC\uACF5 \uAD00\uB9AC \uD504\uB85C\uC138\uC2A4"),
-                        React.createElement("span", { className: "font-label-sm text-label-sm text-primary font-bold flex items-center" },
-                            "\uAD00\uB9AC ",
-                            React.createElement("span", { className: "material-symbols-outlined text-[14px]" }, "arrow_forward")))),
-                React.createElement("div", { className: "bg-surface-container-lowest rounded-xl p-space-lg shadow-sm flex flex-col justify-between hover:shadow-md transition-shadow" },
-                    React.createElement("div", { className: "flex items-start justify-between" },
-                        React.createElement("div", { className: "flex flex-col" },
-                            React.createElement("span", { className: "font-label-md text-label-md text-on-surface-variant font-medium" }, "\uC9C4\uD589 \uC911 \uCCAD\uC57D / 2\uCC28 \uACB0\uC81C\uB300\uAE30"),
-                            React.createElement("div", { className: "flex items-baseline gap-space-2xs mt-space-2xs" },
-                                React.createElement("span", { className: "font-metric-num-lg text-metric-num-lg text-secondary font-black tracking-tight" }, "1"),
-                                React.createElement("span", { className: "font-headline-sm text-headline-sm text-on-surface font-bold" }, "\uAC74"))),
-                        React.createElement("div", { className: "w-12 h-12 rounded-xl bg-secondary-container flex items-center justify-center text-on-secondary-container" },
-                            React.createElement("span", { className: "material-symbols-outlined text-[26px]" }, "handshake"))),
-                    React.createElement("div", { className: "mt-space-md pt-space-sm flex items-center justify-between text-on-surface-variant" },
-                        React.createElement("span", { className: "font-body-sm text-body-sm text-tertiary" }, "\uB2E8\uB3C5 \uCCAD\uC57D \uC811\uC218 \uBC0F 2\uCC28 \uAD6C\uAC04\uC774\uC6A9\uB8CC \uD655\uC778"),
-                        React.createElement("span", { className: "font-label-sm text-label-sm text-secondary font-bold flex items-center" },
-                            "\uACB0\uC81C\uD655\uC778 ",
-                            React.createElement("span", { className: "material-symbols-outlined text-[14px]" }, "arrow_forward")))),
-                React.createElement("div", { className: "bg-surface-container-lowest rounded-xl p-space-lg shadow-sm flex flex-col justify-between hover:shadow-md transition-shadow" },
-                    React.createElement("div", { className: "flex items-start justify-between" },
-                        React.createElement("div", { className: "flex flex-col" },
-                            React.createElement("span", { className: "font-label-md text-label-md text-on-surface-variant font-medium" }, "\uBCF4\uC720 \uC778\uC99D \uBC43\uC9C0 \u00B7 \uC9C1\uBD88 \uC218\uB839"),
-                            React.createElement("div", { className: "flex items-baseline gap-space-2xs mt-space-2xs" },
-                                React.createElement("span", { className: "font-metric-num-sm text-metric-num-sm text-on-surface font-extrabold tracking-tight" }, "\uC778\uC99D \uD30C\uD2B8\uB108"),
-                                React.createElement("span", { className: "font-label-sm text-label-sm text-secondary font-bold" }, "LV.1 \uB9C8\uC2A4\uD130"))),
-                        React.createElement("div", { className: "w-12 h-12 rounded-xl bg-surface-container-high flex items-center justify-center text-on-surface" },
-                            React.createElement("span", { className: "material-symbols-outlined text-[26px]" }, "verified"))),
-                    React.createElement("div", { className: "mt-space-md pt-space-sm flex flex-wrap items-center gap-space-xs" },
-                        React.createElement("span", { className: "inline-flex items-center gap-1 bg-secondary-fixed/50 text-on-secondary-fixed font-label-sm text-label-sm px-2.5 py-0.5 rounded-full font-bold" },
-                            React.createElement("span", { className: "material-symbols-outlined text-[13px]" }, "badge"),
-                            " \uC0AC\uC5C5\uC790 \uC778\uC99D\uC644\uB8CC"),
-                        React.createElement("span", { className: "inline-flex items-center gap-1 bg-surface-container-high text-tertiary font-label-sm text-label-sm px-2.5 py-0.5 rounded-full font-semibold" },
-                            React.createElement("span", { className: "material-symbols-outlined text-[13px]" }, "military_tech"),
-                            " \uC804\uBB38\uC790\uACA9 \uBCF4\uC720")))),
-            React.createElement("section", { className: "bg-surface-container-lowest rounded-xl p-space-lg shadow-sm flex flex-col gap-space-md", id: "section-quote-process" },
+            React.createElement("section", { className: "bg-surface-container-lowest border-2 border-blue-500 rounded-xl p-space-lg shadow-sm flex flex-col gap-space-md", id: "section-quote-process" },
                 React.createElement("div", { className: "flex flex-col md:flex-row md:items-center justify-between gap-space-md pb-space-xs border-b border-surface-container-high/60" },
                     React.createElement("div", { className: "flex items-center gap-space-xs" },
                         React.createElement("div", { className: "w-2.5 h-6 bg-primary rounded-full" }),
@@ -5329,27 +5419,31 @@ function WebSrvcCom010000({ userInfo, onNavigate }) {
                             React.createElement("h2", { className: "font-headline-sm text-headline-sm text-on-surface font-bold tracking-tight" }, "\uD1B5\uD569 \uC2DC\uACF5\u00B7\uCCAD\uC57D \uACF5\uC815 \uAD00\uB9AC"),
                             React.createElement("p", { className: "font-body-sm text-body-sm text-on-surface-variant" }, "\uCCAD\uC57D \uC811\uC218\uBD80\uD130 \uB370\uC774\uD130 \uC774\uC6A9\uB8CC \uACB0\uC81C, \uD604\uC7A5 \uC2DC\uACF5 \uC0AC\uC9C4 \uB4F1\uB85D\uAE4C\uC9C0 \uC2E4\uC2DC\uAC04 \uC9C4\uD589 \uB2E8\uACC4\uB97C \uAD00\uB9AC\uD569\uB2C8\uB2E4."))),
                     React.createElement("div", { className: "flex items-center gap-2 self-start md:self-auto flex-wrap", role: "tablist" }, [
-                        { id: 'waiting-bid', icon: 'assignment_late', label: '청약대기', count: 3 },
-                        { id: 'waiting-payment', icon: 'credit_card', label: '결제대기', count: 2 },
-                        { id: 'waiting-cleaning', icon: 'cleaning_services', label: '청소완료대기', count: 2 },
+                        { id: 'waiting-bid', icon: 'assignment_late', label: '청약대기', count: tabCounts.waitingBid },
+                        { id: 'waiting-payment', icon: 'credit_card', label: '결제대기', count: tabCounts.waitingPayment },
+                        { id: 'waiting-cleaning', icon: 'cleaning_services', label: '청소완료대기', count: tabCounts.waitingCleaning },
                     ].map((tab) => {
                         const isActive = activeTab === tab.id;
-                        return (React.createElement("button", { key: tab.id, type: "button", role: "tab", "aria-selected": isActive, onClick: () => setActiveTab(tab.id), className: `flex items-center gap-1.5 px-4 py-2 rounded-lg font-title-md text-title-md font-bold shadow-sm transition-all duration-200 cursor-pointer ${isActive ? 'bg-[#eab308] text-slate-900 ring-2 ring-[#ca8a04]/40' : 'bg-[#003d9b] hover:bg-[#0052cc] text-white'}` },
+                        return (React.createElement("button", { key: tab.id, type: "button", role: "tab", "aria-selected": isActive, onClick: () => handleTabClick(tab.id), className: `flex items-center gap-1.5 px-4 py-2 rounded-lg font-title-md text-title-md font-bold shadow-sm transition-all duration-200 cursor-pointer ${isActive ? 'bg-[#eab308] text-slate-900 ring-2 ring-[#ca8a04]/40' : 'bg-[#003d9b] hover:bg-[#0052cc] text-white'}` },
                             React.createElement("span", { className: "material-symbols-outlined text-[18px]" }, tab.icon),
                             React.createElement("span", null, tab.label),
                             React.createElement("span", { className: `px-1.5 py-0.2 rounded-full text-[12px] font-black ${isActive ? 'bg-black/10' : 'bg-white/20'}` }, tab.count)));
                     }))),
-                activeTab === 'waiting-bid' && (React.createElement("div", { className: "flex flex-col gap-space-sm" },
-                    React.createElement("div", { className: "bg-surface-container-low px-space-md py-2 rounded-lg flex items-center justify-between text-body-sm text-on-surface-variant" },
-                        React.createElement("div", { className: "flex items-center gap-1.5" },
-                            React.createElement("span", { className: "material-symbols-outlined text-[18px] text-primary" }, "info"),
-                            React.createElement("span", null, "\uC774\uC6A9\uC790\uAC00 \uC2E0\uADDC \uB4F1\uB85D\uD588\uAC70\uB098, \uC2DC\uACF5\uC0AC \uCDE8\uC18C/\uC774\uC6A9\uC790 \uBCC0\uACBD \uC694\uCCAD\uC73C\uB85C \uC7AC\uC624\uD508\uB418\uC5B4 \uC989\uC2DC \uB2E8\uB3C5 \uCCAD\uC57D\uC774 \uAC00\uB2A5\uD55C \uBAA9\uB85D\uC785\uB2C8\uB2E4.")),
-                        React.createElement("span", { className: "font-label-sm text-label-sm text-primary font-bold hidden sm:inline-block" }, "\uC120\uCC29\uC21C 1\uAC1C\uC0AC \uC989\uC2DC \uB9E4\uCE6D")),
-                    [
-                        { badge: '계절가전 분해케어', title: '경기 고양시 덕양구 화정동 백양마을', tag: '신규 등록', desc: '시스템에어컨 2대 분해세척 | 희망 시공일: 2026-11-28 (오후) | 사유: 이용자 신규 등록 오더 (청약 가능)', price: '180,000원', icon: 'mode_fan' },
-                        { badge: '입주·이사 청소', title: '서울 은평구 응암동 신축빌라', tag: '시공사 취소 재오픈', desc: '28평형 신축빌라 입주청소 전체 | 희망 시공일: 2026-12-01 (오전) | 상태: 이전 시공사 청약 취소로 긴급 재오픈', price: '340,000원', icon: 'apartment' },
-                        { badge: '정기청소 3개월', title: '경기 고양시 일산동구 마두동', tag: '시공자 재배정 요청', desc: '4층 빌라 계단 관리 정기청소 | 계약 기간: 2026-12-01 ~ 2027-02-28 | 상태: 이용자의 시공자 재배정 요청 건', price: '270,000원', icon: 'repeat' },
-                    ].map((item, idx) => (React.createElement("div", { key: idx, className: "bg-surface-container-low hover:bg-surface-container rounded-xl p-space-md flex flex-col md:flex-row md:items-center justify-between gap-space-md transition-colors" },
+                React.createElement("div", { className: "bg-surface-container-low px-space-md py-2 rounded-lg flex items-center justify-between text-body-sm text-on-surface-variant" },
+                    React.createElement("div", { className: "flex items-center gap-1.5" },
+                        React.createElement("span", { className: "material-symbols-outlined text-[18px] text-primary" }, activeTab === 'waiting-payment' ? 'payments' : activeTab === 'waiting-cleaning' ? 'task_alt' : 'info'),
+                        React.createElement("span", null, activeTab === 'waiting-payment'
+                            ? '고객이 1차 데이터 이용료를 납부 완료한 건입니다. 시공사 2차 구간이용료를 결제하면 최종 배정 및 계약이 확정됩니다.'
+                            : activeTab === 'waiting-cleaning'
+                                ? '계약이 최종 체결되어 현장 시공이 진행 중인 목록입니다. 시공 완료 후 [청소 사진 등록]을 완료해야 고객 검수 및 정산이 진행됩니다.'
+                                : '이용자가 신규 등록했거나, 시공사 취소/이용자 변경 요청으로 재오픈되어 즉시 단독 청약이 가능한 목록입니다.')),
+                    React.createElement("span", { className: "font-label-sm text-label-sm text-primary font-bold hidden sm:inline-block" }, activeTab === 'waiting-payment'
+                        ? '결제 기한 내 미납 시 자동 취소'
+                        : activeTab === 'waiting-cleaning'
+                            ? '현장 직불 100% 보장'
+                            : '선착순 1개사 즉시 매칭')),
+                React.createElement("div", { className: "min-h-[780px] flex flex-col justify-between" },
+                    React.createElement("div", { className: "flex flex-col gap-space-sm" }, tabItems.length === 0 ? (React.createElement("div", { className: "py-16 text-center text-body-md text-on-surface-variant" }, "\uC870\uD68C\uB41C \uBAA9\uB85D\uC774 \uC5C6\uC2B5\uB2C8\uB2E4.")) : (tabItems.map((item, idx) => (React.createElement("div", { key: item.orderNo || idx, className: "bg-surface-container-low hover:bg-surface-container rounded-xl p-space-md flex flex-col md:flex-row md:items-center justify-between gap-space-md transition-colors" },
                         React.createElement("div", { className: "flex items-start md:items-center gap-space-md" },
                             React.createElement("div", { className: "w-10 h-10 rounded-lg bg-primary-fixed text-primary flex items-center justify-center shrink-0" },
                                 React.createElement("span", { className: "material-symbols-outlined text-[22px]" }, item.icon)),
@@ -5357,60 +5451,33 @@ function WebSrvcCom010000({ userInfo, onNavigate }) {
                                 React.createElement("div", { className: "flex flex-wrap items-center gap-space-xs" },
                                     React.createElement("span", { className: "font-label-sm text-label-sm bg-surface-container-lowest text-primary font-bold px-2 py-0.5 rounded" }, item.badge),
                                     React.createElement("span", { className: "font-title-md text-title-md font-bold text-on-surface" }, item.title),
-                                    React.createElement("span", { className: "font-label-sm text-label-sm bg-primary/10 text-primary font-semibold px-2 py-0.5 rounded-full" }, item.tag)),
+                                    item.tag && (React.createElement("span", { className: "font-label-sm text-label-sm bg-primary/10 text-primary font-semibold px-2 py-0.5 rounded-full" }, item.tag))),
                                 React.createElement("p", { className: "font-body-sm text-body-sm text-on-surface-variant" }, item.desc))),
                         React.createElement("div", { className: "flex items-center justify-between md:justify-end gap-space-lg shrink-0" },
                             React.createElement("div", { className: "flex flex-col md:items-end" },
-                                React.createElement("span", { className: "font-label-sm text-label-sm text-on-surface-variant" }, "\uACE0\uAC1D \uD655\uC815 \uC9C0\uC815\uAC00"),
-                                React.createElement("span", { className: "font-title-md text-title-md font-black text-primary" }, item.price)),
-                            React.createElement("button", { type: "button", onClick: () => showToast(`${item.title} 단독 청약 신청서로 이동합니다.`), className: "bg-primary hover:bg-primary-container text-on-primary font-title-md text-title-md font-bold px-space-lg py-2.5 rounded-lg shadow-sm transition cursor-pointer" }, "\uB2E8\uB3C5 \uCCAD\uC57D\uD558\uAE30"))))))),
-                activeTab === 'waiting-payment' && (React.createElement("div", { className: "flex flex-col gap-space-sm" },
-                    React.createElement("div", { className: "bg-surface-container-low px-space-md py-2 rounded-lg flex items-center justify-between text-body-sm text-on-surface-variant" },
-                        React.createElement("div", { className: "flex items-center gap-1.5" },
-                            React.createElement("span", { className: "material-symbols-outlined text-[18px] text-secondary" }, "payments"),
-                            React.createElement("span", null, "\uACE0\uAC1D\uC774 1\uCC28 \uB370\uC774\uD130 \uC774\uC6A9\uB8CC\uB97C \uB0A9\uBD80 \uC644\uB8CC\uD55C \uAC74\uC785\uB2C8\uB2E4. \uC2DC\uACF5\uC0AC 2\uCC28 \uAD6C\uAC04\uC774\uC6A9\uB8CC\uB97C \uACB0\uC81C\uD558\uBA74 \uCD5C\uC885 \uBC30\uC815 \uBC0F \uACC4\uC57D\uC774 \uD655\uC815\uB429\uB2C8\uB2E4.")),
-                        React.createElement("span", { className: "font-label-sm text-label-sm text-error font-bold hidden sm:flex items-center gap-1" },
-                            React.createElement("span", { className: "material-symbols-outlined text-[16px]" }, "alarm"),
-                            " \uACB0\uC81C \uAE30\uD55C \uB0B4 \uBBF8\uB0A9 \uC2DC \uC790\uB3D9 \uCDE8\uC18C")),
-                    [
-                        { badge: '정기청소 (3개월 계약)', title: '경기 고양시 일산동구 마두동 · 4층 빌라 계단', desc: '고객 1차 결제 완료 (2026-11-20) | 고객 확정 용역비: 270,000원 (현장 직불 100%)', fee: '16,500원', btn: '2차 데이터 이용료 결제 (계약 확정)' },
-                        { badge: '계절가전 분해케어', title: '서울 서대문구 창천동 신촌르메이에르', desc: '시스템에어컨 2대 분해세척 | 고객 확정 용역비: 180,000원 (현장 직불)', fee: '16,500원', btn: '2차 데이터 이용료 결제' },
-                    ].map((item, idx) => (React.createElement("div", { key: idx, className: "bg-surface-container-low hover:bg-surface-container rounded-xl p-space-md flex flex-col md:flex-row md:items-center justify-between gap-space-md transition-colors" },
-                        React.createElement("div", { className: "flex flex-col gap-0.5" },
-                            React.createElement("div", { className: "flex flex-wrap items-center gap-space-xs" },
-                                React.createElement("span", { className: "font-label-sm text-label-sm bg-surface-container-lowest text-secondary font-bold px-2 py-0.5 rounded" }, item.badge),
-                                React.createElement("span", { className: "font-title-md text-title-md font-bold text-on-surface" }, item.title)),
-                            React.createElement("p", { className: "font-body-sm text-body-sm text-on-surface-variant" }, item.desc)),
-                        React.createElement("div", { className: "flex items-center justify-between md:justify-end gap-space-lg shrink-0" },
-                            React.createElement("div", { className: "flex flex-col md:items-end" },
-                                React.createElement("span", { className: "font-label-sm text-label-sm text-secondary font-bold" }, "\uC2DC\uACF5\uC0AC \uAD6C\uAC04\uC774\uC6A9\uB8CC (2\uCC28)"),
-                                React.createElement("span", { className: "font-title-md text-title-md font-black text-secondary" }, item.fee)),
-                            React.createElement("button", { type: "button", onClick: () => showToast('2차 데이터 이용료 결제 및 계약 확정 페이지로 이동합니다.'), className: "bg-secondary hover:opacity-90 text-on-secondary font-title-md text-title-md font-bold px-space-md py-2.5 rounded-lg shadow-sm transition flex items-center gap-1.5 cursor-pointer" },
+                                React.createElement("span", { className: "font-label-sm text-label-sm text-on-surface-variant" }, activeTab === 'waiting-payment'
+                                    ? '시공사 구간이용료 (2차)'
+                                    : activeTab === 'waiting-cleaning'
+                                        ? '현장 직불 수령 예정액'
+                                        : '고객 확정 지정가'),
+                                React.createElement("span", { className: "font-title-md text-title-md font-black text-primary" }, activeTab === 'waiting-payment' ? item.fee : item.price)),
+                            activeTab === 'waiting-bid' && (React.createElement("button", { type: "button", onClick: () => {
+                                    const bizNo = userInfo?.BIZ_REG_NO || userInfo?.bizRegNo;
+                                    const bizStat = userInfo?.BIZ_STAT_CD || userInfo?.bizStatCd || 'ACTIVE';
+                                    if (!bizNo || ['CLOSED', 'SUSPENDED', '폐업', '휴업'].includes(bizStat)) {
+                                        showToast('사업자등록 정보가 미등록되었거나 휴·폐업 상태이므로 청약할 수 없습니다.');
+                                        return;
+                                    }
+                                    showToast('[WEB-SRVC-QOT-010100] 확정가 청소용역 단독 청약 신청 모달을 호출합니다.');
+                                }, className: "bg-primary hover:bg-primary-container text-on-primary font-title-md text-title-md font-bold px-space-lg py-2.5 rounded-lg shadow-sm transition cursor-pointer" }, "\uB2E8\uB3C5 \uCCAD\uC57D\uD558\uAE30")),
+                            activeTab === 'waiting-payment' && (React.createElement("button", { type: "button", onClick: () => showToast('[WEB-SRVC-PAY-010000] 시공사 2차 구간 데이터 이용료 결제 화면을 호출합니다.'), className: "bg-secondary hover:opacity-90 text-on-secondary font-title-md text-title-md font-bold px-space-md py-2.5 rounded-lg shadow-sm transition flex items-center gap-1.5 cursor-pointer" },
                                 React.createElement("span", { className: "material-symbols-outlined text-[18px]" }, "credit_card"),
-                                item.btn))))))),
-                activeTab === 'waiting-cleaning' && (React.createElement("div", { className: "flex flex-col gap-space-sm" },
-                    React.createElement("div", { className: "bg-surface-container-low px-space-md py-2 rounded-lg flex items-center justify-between text-body-sm text-on-surface-variant" },
-                        React.createElement("div", { className: "flex items-center gap-1.5" },
-                            React.createElement("span", { className: "material-symbols-outlined text-[18px] text-primary" }, "task_alt"),
-                            React.createElement("span", null, "\uACC4\uC57D\uC774 \uCD5C\uC885 \uCCB4\uACB0\uB418\uC5B4 \uD604\uC7A5 \uC2DC\uACF5\uC774 \uC9C4\uD589 \uC911\uC778 \uBAA9\uB85D\uC785\uB2C8\uB2E4. \uC2DC\uACF5 \uC644\uB8CC \uD6C4 [\uCCAD\uC18C \uC0AC\uC9C4 \uB4F1\uB85D]\uC744 \uC644\uB8CC\uD574\uC57C \uACE0\uAC1D \uAC80\uC218 \uBC0F \uC815\uC0B0\uC774 \uC9C4\uD589\uB429\uB2C8\uB2E4.")),
-                        React.createElement("span", { className: "font-label-sm text-label-sm text-primary font-bold hidden sm:inline-block" }, "\uD604\uC7A5 \uC9C1\uBD88 100% \uBCF4\uC7A5")),
-                    [
-                        { badge: '입주·이사 청소', title: '경기 고양시 덕양구 화정동 백양마을 (32평형)', desc: '고객: 김*훈 고객님 (0504-****-1982 안심번호) | 시공 시간: 10:00 시작 (진행률 60%)', price: '380,000원' },
-                        { badge: '계절가전 분해케어', title: '서울 서대문구 연희동 단독주택 · 스탠드+벽걸이 2in1', desc: '고객: 이*영 고객님 (0504-****-8321 안심번호) | 예약 시간: 14:30 예정', price: '190,000원' },
-                    ].map((item, idx) => (React.createElement("div", { key: idx, className: "bg-surface-container-low hover:bg-surface-container rounded-xl p-space-md flex flex-col md:flex-row md:items-center justify-between gap-space-md transition-colors" },
-                        React.createElement("div", { className: "flex flex-col gap-0.5" },
-                            React.createElement("div", { className: "flex flex-wrap items-center gap-space-xs" },
-                                React.createElement("span", { className: "font-label-sm text-label-sm bg-primary text-on-primary font-bold px-2 py-0.5 rounded" }, item.badge),
-                                React.createElement("span", { className: "font-title-md text-title-md font-bold text-on-surface" }, item.title)),
-                            React.createElement("p", { className: "font-body-sm text-body-sm text-on-surface-variant" }, item.desc)),
-                        React.createElement("div", { className: "flex items-center justify-between md:justify-end gap-space-lg shrink-0" },
-                            React.createElement("div", { className: "flex flex-col md:items-end" },
-                                React.createElement("span", { className: "font-label-sm text-label-sm text-on-surface-variant" }, "\uD604\uC7A5 \uC9C1\uBD88 \uC218\uB839 \uC608\uC815\uC561"),
-                                React.createElement("span", { className: "font-title-md text-title-md font-black text-primary" }, item.price)),
-                            React.createElement("button", { type: "button", onClick: () => showToast('현장 청소 사진 등록 모달을 호출합니다.'), className: "bg-primary hover:bg-primary-container text-on-primary font-title-md text-title-md font-bold px-space-lg py-2.5 rounded-lg shadow-sm transition flex items-center gap-1.5 cursor-pointer" },
+                                item.btn)),
+                            activeTab === 'waiting-cleaning' && (React.createElement("button", { type: "button", onClick: () => showToast('[WEB-SRVC-JOB-020100] 현장 시공 사진 첨부 모달을 호출합니다.'), className: "bg-primary hover:bg-primary-container text-on-primary font-title-md text-title-md font-bold px-space-lg py-2.5 rounded-lg shadow-sm transition flex items-center gap-1.5 cursor-pointer" },
                                 React.createElement("span", { className: "material-symbols-outlined text-[20px]" }, "photo_camera"),
                                 "\uCCAD\uC18C \uC0AC\uC9C4 \uB4F1\uB85D")))))))),
-            React.createElement("section", { className: "bg-surface-container-lowest rounded-xl p-space-lg shadow-sm flex flex-col gap-space-md", id: "section-activity-history" },
+                    React.createElement(PaginationBar, { page: tabPage, totalPages: tabTotalPages, onPageChange: (p) => setTabPage(p) }))),
+            React.createElement("section", { className: "bg-surface-container-lowest border-2 border-pink-500 rounded-xl p-space-lg shadow-sm flex flex-col gap-space-md", id: "section-activity-history" },
                 React.createElement("div", { className: "flex items-center gap-space-xs" },
                     React.createElement("div", { className: "w-2.5 h-6 bg-primary rounded-full" }),
                     React.createElement("div", null,
@@ -5436,26 +5503,28 @@ function WebSrvcCom010000({ userInfo, onNavigate }) {
                                 React.createElement("option", { value: "MOVE_IN" }, "\uC785\uC8FC \uCCAD\uC18C"),
                                 React.createElement("option", { value: "APPLIANCE" }, "\uACC4\uC808\uAC00\uC804 \uCCAD\uC18C")))),
                     React.createElement("div", { className: "flex items-center gap-2 shrink-0" },
-                        React.createElement("button", { type: "button", onClick: () => { setCleaningType('ALL'); setDateFrom('2025.11.20'); setDateTo('2026.11.20'); }, className: "flex items-center gap-1.5 px-3 py-2 rounded-lg border border-slate-300 bg-surface-container-lowest text-on-surface-variant font-label-md text-label-md hover:bg-surface-container-low transition cursor-pointer" },
+                        React.createElement("button", { type: "button", onClick: handleResetActivity, className: "flex items-center gap-1.5 px-3 py-2 rounded-lg border border-slate-300 bg-surface-container-lowest text-on-surface-variant font-label-md text-label-md hover:bg-surface-container-low transition cursor-pointer" },
                             React.createElement("span", { className: "material-symbols-outlined text-[16px]" }, "restart_alt"),
                             React.createElement("span", null, "\uCD08\uAE30\uD654")),
-                        React.createElement("button", { type: "button", onClick: () => showToast('활동 내역을 조회했습니다.'), className: "flex items-center gap-1.5 px-4 py-2 rounded-lg bg-primary hover:bg-primary-container text-on-primary font-title-md text-title-md font-bold shadow-sm transition cursor-pointer" },
+                        React.createElement("button", { type: "button", onClick: handleSearchActivity, className: "flex items-center gap-1.5 px-4 py-2 rounded-lg bg-primary hover:bg-primary-container text-on-primary font-title-md text-title-md font-bold shadow-sm transition cursor-pointer" },
                             React.createElement("span", { className: "material-symbols-outlined text-[16px]" }, "search"),
                             React.createElement("span", null, "\uC870\uD68C")))),
-                React.createElement("div", { className: "flex flex-col gap-space-sm" }, filteredActivities.map((act) => (React.createElement("div", { key: act.id, className: "bg-surface-container-low hover:bg-surface-container rounded-xl p-space-md flex flex-col md:flex-row md:items-center justify-between gap-space-md transition-colors" },
-                    React.createElement("div", { className: "flex items-start md:items-center gap-space-md" },
-                        React.createElement("div", { className: `w-10 h-10 rounded-lg flex items-center justify-center shrink-0 ${act.iconBg}` },
-                            React.createElement("span", { className: "material-symbols-outlined text-[22px]" }, act.icon)),
-                        React.createElement("div", { className: "flex flex-col gap-0.5" },
-                            React.createElement("div", { className: "flex flex-wrap items-center gap-space-xs" },
-                                React.createElement("span", { className: `font-label-sm text-label-sm bg-surface-container-lowest font-bold px-2 py-0.5 rounded ${act.badgeCls}` }, act.badge),
-                                React.createElement("span", { className: "font-title-md text-title-md font-bold text-on-surface" }, act.title)),
-                            React.createElement("p", { className: "font-body-sm text-body-sm text-on-surface-variant" }, act.desc))),
-                    React.createElement("div", { className: "flex items-center justify-between md:justify-end gap-space-lg shrink-0" },
-                        React.createElement("div", { className: "flex flex-col md:items-end" },
-                            React.createElement("span", { className: "font-label-sm text-label-sm text-on-surface-variant" }, act.priceLabel),
-                            React.createElement("span", { className: "font-title-md text-title-md font-black text-primary" }, act.price)),
-                        React.createElement("button", { type: "button", onClick: () => showToast('활동 내역 상세 조회 페이지로 이동합니다.'), className: "bg-surface-container-lowest hover:bg-surface-container border border-slate-300 text-on-surface font-title-md text-title-md font-bold px-space-lg py-2.5 rounded-lg shadow-sm transition cursor-pointer" }, "\uC0C1\uC138 \uC870\uD68C"))))))),
+                React.createElement("div", { className: "min-h-[780px] flex flex-col justify-between" },
+                    React.createElement("div", { className: "flex flex-col gap-space-sm" }, activityItems.length === 0 ? (React.createElement("div", { className: "py-16 text-center text-body-md text-on-surface-variant" }, "\uC870\uD68C\uB41C \uD65C\uB3D9 \uB0B4\uC5ED\uC774 \uC5C6\uC2B5\uB2C8\uB2E4.")) : (activityItems.map((act) => (React.createElement("div", { key: act.id, className: "bg-surface-container-low hover:bg-surface-container rounded-xl p-space-md flex flex-col md:flex-row md:items-center justify-between gap-space-md transition-colors" },
+                        React.createElement("div", { className: "flex items-start md:items-center gap-space-md" },
+                            React.createElement("div", { className: `w-10 h-10 rounded-lg flex items-center justify-center shrink-0 ${act.iconBg}` },
+                                React.createElement("span", { className: "material-symbols-outlined text-[22px]" }, act.icon)),
+                            React.createElement("div", { className: "flex flex-col gap-0.5" },
+                                React.createElement("div", { className: "flex flex-wrap items-center gap-space-xs" },
+                                    React.createElement("span", { className: `font-label-sm text-label-sm bg-surface-container-lowest font-bold px-2 py-0.5 rounded ${act.badgeCls}` }, act.badge),
+                                    React.createElement("span", { className: "font-title-md text-title-md font-bold text-on-surface" }, act.title)),
+                                React.createElement("p", { className: "font-body-sm text-body-sm text-on-surface-variant" }, act.desc))),
+                        React.createElement("div", { className: "flex items-center justify-between md:justify-end gap-space-lg shrink-0" },
+                            React.createElement("div", { className: "flex flex-col md:items-end" },
+                                React.createElement("span", { className: "font-label-sm text-label-sm text-on-surface-variant" }, act.priceLabel),
+                                React.createElement("span", { className: "font-title-md text-title-md font-black text-primary" }, act.price)),
+                            React.createElement("button", { type: "button", onClick: () => showToast('[WEB-SRVC-COM-010200] 내 활동 내역 상세 조회 모달을 호출합니다.'), className: "bg-surface-container-lowest hover:bg-surface-container border border-slate-300 text-on-surface font-title-md text-title-md font-bold px-space-lg py-2.5 rounded-lg shadow-sm transition cursor-pointer" }, "\uC0C1\uC138 \uC870\uD68C"))))))),
+                    React.createElement(PaginationBar, { page: actPage, totalPages: actTotalPages, onPageChange: (p) => setActPage(p) }))),
             React.createElement("section", { className: "bg-secondary-fixed/30 rounded-xl p-space-lg flex flex-col md:flex-row items-stretch md:items-center justify-between gap-space-lg" },
                 React.createElement("div", { className: "flex items-center gap-space-md" },
                     React.createElement("div", { className: "w-12 h-12 rounded-xl bg-secondary text-on-secondary flex items-center justify-center shrink-0 shadow-sm" },
@@ -5480,258 +5549,394 @@ function WebSrvcCom010000({ userInfo, onNavigate }) {
                             "100% \uD604\uC7A5 \uC9C1\uBD88"),
                         React.createElement("span", { className: "font-body-sm text-body-sm text-on-surface-variant" }, "\uAC80\uC218 \uC644\uB8CC \uD6C4 \uACE0\uAC1D \uC989\uC2DC \uC815\uC0B0")))))));
 }
-const SAMPLE_ORDERS = [
-    { id: 'ORD-202611-0082', type: '입주·이사 청소', badgeBg: 'bg-sky-600', status: '단독 청약 접수 완료', statusCls: 'text-sky-800 bg-sky-100 border-sky-300', addr: '경기 고양시 덕양구 화정동 · 32평형 (방3/화2)', date: '희망일: 2026.11.20 (금) 오전', price: '380,000원', priceNote: '(작업 완료 후 현장 직불 100%)', rightTop: '선착순 1:1 청약 도착', rightSub: '(주)클린파워 시공마스터', btnText: '청약 시공사 확인·선택', btnSub: '(WEB-CLNT-ORD-010100)', btnCls: 'bg-[#0284C7] hover:bg-[#0369A1] text-white', action: 'WEB-CLNT-ORD-010100' },
-    { id: 'ORD-202611-0079', type: '계절가전 분해케어', badgeBg: 'bg-[#14B8A6]', status: '1차 이용료 결제대기', statusCls: 'text-teal-800 bg-teal-100 border-teal-300', addr: '경기 고양시 일산동구 마두동 · 시스템에어컨 2대 분해살균', date: '희망일: 2026.11.23 (월) 14:00', price: '180,000원', priceNote: '(시공사: 한결홈케어 매칭 확정 대기)', rightTop: '고정 이용료: 16,500원', rightSub: '토스페이먼츠 간편결제', btnText: '데이터 이용료 16,500원 결제', btnSub: '(WEB-CLNT-PAY-010000)', btnCls: 'bg-[#14B8A6] hover:bg-teal-700 text-white', action: 'WEB-CLNT-PAY-010000' },
-    { id: 'ORD-202611-0065', type: '정기청소 (3개월 계약)', badgeBg: 'bg-slate-700', status: '시공 사진 검수요청', statusCls: 'text-amber-700 bg-amber-100 border-amber-300', addr: '서울 서대문구 창천동 · 빌라 계단·주차장 1회차 완료', date: '현장 전·후 검수사진 8장 등록 완료', price: '270,000원', priceNote: '검수 승인 후 100% 현장 직불', rightTop: '시공 기사: 박준영 마스터', rightSub: '0507 안심번호 연결 상태', btnText: '전·후 사진 검수 및 완료 확정', btnSub: '(WEB-CLNT-JOB-010000)', btnCls: 'bg-slate-900 hover:bg-slate-800 text-white', action: 'WEB-CLNT-JOB-010000' },
-    { id: 'ORD-202611-0058', type: '입주·이사 청소', badgeBg: 'bg-sky-600', status: '청소 청약 접수중', statusCls: 'text-sky-800 bg-sky-100 border-sky-300', addr: '경기 파주시 운정동 · 아파트 25평형 (방3/화1)', date: '희망일: 2026.11.27 (금) 09:00', price: '310,000원', priceNote: '(단독 선착순 청약 진행 중)', rightTop: '시공사 열람 중', rightSub: '평균 청약 소요: 18분', btnText: '발주 상세 조회', btnSub: '', btnCls: 'bg-white border border-slate-300 hover:bg-slate-50 text-slate-700', action: 'WEB-CLNT-ORD-010000' },
-    { id: 'ORD-202611-0052', type: '계절가전 분해케어', badgeBg: 'bg-[#14B8A6]', status: '청소 청약 접수중', statusCls: 'text-sky-800 bg-sky-100 border-sky-300', addr: '인천 연수구 송도동 · 드럼세탁기 18kg 분해살균', date: '희망일: 2026.11.28 (토) 10:00', price: '130,000원', priceNote: '(1:1 단독 매칭 대기)', rightTop: '시공사 접수중', rightSub: '검증 마스터 매칭 대기', btnText: '발주 상세 조회', btnSub: '', btnCls: 'bg-white border border-slate-300 hover:bg-slate-50 text-slate-700', action: 'WEB-CLNT-ORD-010000' },
-    { id: 'ORD-202611-0047', type: '정기청소 (6개월 계약)', badgeBg: 'bg-slate-700', status: '시공 확정/진행중', statusCls: 'text-teal-800 bg-teal-100 border-teal-300', addr: '서울 강남구 역삼동 · 소형 오피스 35평 2회차', date: '시공일시: 2026.11.24 (화) 19:00', price: '350,000원', priceNote: '(작업 완료 후 직불 결제)', rightTop: '담당: 강남클린케어', rightSub: '0507-1330-8841', btnText: '진행상황 확인', btnSub: '', btnCls: 'bg-teal-600 hover:bg-teal-700 text-white', action: 'WEB-CLNT-JOB-010000' },
-    { id: 'ORD-202611-0041', type: '입주·이사 청소', badgeBg: 'bg-sky-600', status: '청소 청약 접수중', statusCls: 'text-sky-800 bg-sky-100 border-sky-300', addr: '경기 성남시 분당구 정자동 · 오피스텔 18평형', date: '희망일: 2026.11.26 (목) 13:00', price: '240,000원', priceNote: '(단독 선착순 청약 진행 중)', rightTop: '시공사 열람 중', rightSub: '단독 청약 도착 시 즉시 알림', btnText: '발주 상세 조회', btnSub: '', btnCls: 'bg-white border border-slate-300 hover:bg-slate-50 text-slate-700', action: 'WEB-CLNT-ORD-010000' },
-    { id: 'ORD-202611-0036', type: '입주·이사 청소', badgeBg: 'bg-sky-600', status: '시공 완료 및 정산완료', statusCls: 'text-emerald-600 bg-emerald-50 border-emerald-200/60', addr: '서울 은평구 불광동 · 신축빌라 20평형 입주청소', date: '완료일: 2026.11.18 (수)', price: '260,000원', priceNote: '직불 정상 영수증 발급완료', rightTop: '검수 완료 만족도 ★★★★★', rightSub: '클린스타트 시공팀', btnText: '완료 증빙서류', btnSub: '', btnCls: 'bg-slate-100 hover:bg-slate-200 text-slate-700', action: 'WEB-CLNT-ORD-010000' },
-    { id: 'ORD-202611-0029', type: '계절가전 분해케어', badgeBg: 'bg-[#14B8A6]', status: '청소 청약 접수중', statusCls: 'text-sky-800 bg-sky-100 border-sky-300', addr: '경기 하남시 미사동 · 벽걸이 에어컨 2대 고압세척', date: '희망일: 2026.11.30 (월) 15:00', price: '160,000원', priceNote: '(단독 매칭 접수 대기)', rightTop: '시공사 열람 중', rightSub: '단독 1:1 청약 접수중', btnText: '발주 상세 조회', btnSub: '', btnCls: 'bg-white border border-slate-300 hover:bg-slate-50 text-slate-700', action: 'WEB-CLNT-ORD-010000' },
-    { id: 'ORD-202611-0015', type: '정기청소 (3개월 계약)', badgeBg: 'bg-slate-700', status: '청소 청약 접수중', statusCls: 'text-sky-800 bg-sky-100 border-sky-300', addr: '서울 마포구 공덕동 · 빌라 4개 층 복도·계단 정기청소', date: '계약 희망일: 2026.12.01 (화)', price: '250,000원', priceNote: '(단독 선착순 시공사 배정 대기)', rightTop: '시공사 열람 중', rightSub: '평균 소요 25분 내 매칭', btnText: '발주 상세 조회', btnSub: '', btnCls: 'bg-white border border-slate-300 hover:bg-slate-50 text-slate-700', action: 'WEB-CLNT-ORD-010000' },
+const INITIAL_CERTS = [
+    { id: 1, name: '가전관리사 1급', org: '한국청소위생협회', cat: '계절가전 분해케어', catCls: 'bg-blue-50 text-blue-700 border-blue-100', level: '1급', date: '2023.05.14', certNo: '제2023-C-0842호', status: '검수완료', statusCls: 'bg-emerald-50 text-emerald-700 border-emerald-200', dotCls: 'bg-emerald-500', icon: 'award_star', iconBg: 'bg-teal-50 text-teal-700 border-teal-200' },
+    { id: 2, name: '방역소독전문가 1급', org: '사단법인 한국방역협회', cat: '입주·이사 청소', catCls: 'bg-teal-50 text-teal-700 border-teal-100', level: '전문가', date: '2022.11.20', certNo: '제2022-DS-1093호', status: '심사대기', statusCls: 'bg-amber-50 text-amber-700 border-amber-200', dotCls: 'bg-amber-500', icon: 'license', iconBg: 'bg-blue-50 text-blue-700 border-blue-200' },
 ];
-/**
- * 화면 ID: WEB-CLNT-COM-010200
- * 화면명: 고객 홈 페이지 (Client Main Dashboard)
- */
-function WebClntCom010200({ userInfo, onOpenReqModal, onNavigate }) {
-    const userName = userInfo?.USER_NM || '고객';
-    const [dateFrom, setDateFrom] = useState('2025.11.20');
-    const [dateTo, setDateTo] = useState('2026.11.20');
-    const [orderStatus, setOrderStatus] = useState('REQ_APPLY');
-    const [currentPage, setCurrentPage] = useState(1);
-    const totalPages = 3;
-    const setPeriodRange = (days) => {
-        const toDate = new Date(2026, 10, 20);
-        const fromDate = new Date(toDate.getTime() - days * 24 * 60 * 60 * 1000);
-        const fmt = (d) => `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`;
-        setDateFrom(fmt(fromDate));
-        setDateTo(fmt(toDate));
+function WebSrvcMyp020100({ userInfo, onBack }) {
+    const [bizName, setBizName] = useState(userInfo?.USER_NM || '(주)클린파트너스');
+    const [ceoName, setCeoName] = useState('김태호');
+    const [bizNo, setBizNo] = useState('120-88-29401');
+    const [docType, setDocType] = useState('ALL');
+    const [serviceCat, setServiceCat] = useState('ALL');
+    const [keyword, setKeyword] = useState('');
+    const [certs, setCerts] = useState(INITIAL_CERTS);
+    const [isOcrModalOpen, setIsOcrModalOpen] = useState(false);
+    const [showEmptyBizModal, setShowEmptyBizModal] = useState(!bizNo || !bizName);
+    const [certPage, setCertPage] = useState(1);
+    const pageSize = 5;
+    const totalCertPages = Math.max(1, Math.ceil(certs.length / pageSize));
+    const pagedCerts = certs.slice((certPage - 1) * pageSize, certPage * pageSize);
+    const [toastMsg, setToastMsg] = useState('');
+    const showToast = (msg) => {
+        setToastMsg(msg);
+        setTimeout(() => setToastMsg(''), 2500);
     };
-    const resetFilter = () => {
-        setDateFrom('2025.11.20');
-        setDateTo('2026.11.20');
-        setOrderStatus('REQ_APPLY');
-        setCurrentPage(1);
-    };
-    const startItem = (currentPage - 1) * 10 + 1;
-    const endItem = Math.min(currentPage * 10, 28);
-    return (React.createElement("main", { className: "w-full pt-[72px] bg-slate-50 flex-1" },
-        React.createElement("div", { className: "max-w-[1440px] mx-auto px-6 py-5 flex flex-col gap-4" },
-            React.createElement("section", { className: "bg-white rounded-2xl p-6 border border-slate-200/90 shadow-sm relative overflow-hidden flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6" },
-                React.createElement("div", { className: "absolute -right-20 -top-24 w-80 h-80 bg-gradient-to-br from-sky-100/60 to-teal-50/40 rounded-full blur-3xl pointer-events-none" }),
-                React.createElement("div", { className: "relative z-10 flex-1" },
-                    React.createElement("div", { className: "flex items-center gap-2 mb-2" },
-                        React.createElement("span", { className: "px-2.5 py-1 rounded-md text-[11px] font-extrabold bg-sky-50 text-sky-700 border border-sky-200 tracking-wider" }, "WEB-CLNT-COM-010200 \u00B7 CLIENT DASHBOARD"),
-                        React.createElement("span", { className: "flex items-center gap-1 text-[11px] font-medium text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200/60" },
-                            React.createElement("span", { className: "w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping" }),
-                            "\uC2E4\uC2DC\uAC04 \uCCAD\uC57D \uB9E4\uCE6D \uD65C\uC131\uD654")),
-                    React.createElement("h1", { className: "text-2xl sm:text-[28px] font-extrabold text-slate-900 tracking-tight leading-tight" },
-                        userName,
-                        " \uACE0\uAC1D\uB2D8, \uD658\uC601\uD569\uB2C8\uB2E4!"),
-                    React.createElement("p", { className: "mt-2 text-sm sm:text-base text-slate-600 leading-relaxed max-w-3xl" },
-                        "\uACE0\uAC1D\uB2D8\uC774 ",
-                        React.createElement("span", { className: "font-bold text-sky-700 underline decoration-sky-300 underline-offset-4" }, "\uC9C1\uC811 \uC815\uD55C \uC694\uAE08 \uADF8\uB300\uB85C!"),
-                        " \uD765\uC815\u00B7\uC5ED\uACBD\uB9E4 \uC5C6\uB294 1:1 \uB2E8\uB3C5 \uC120\uCC29\uC21C \uB9E4\uCE6D\uC73C\uB85C \uC815\uAE30\uCCAD\uC18C\u00B7\uC785\uC8FC\uC774\uC0AC\uCCAD\uC18C\u00B7\uACC4\uC808\uAC00\uC804 \uBD84\uD574\uCF00\uC5B4\uB97C \uAC04\uD3B8\uD558\uAC8C \uBC1C\uC8FC\uD558\uACE0 \uC2E4\uC2DC\uAC04 \uC9C4\uD589 \uD604\uD669\uC744 \uD655\uC778\uD558\uC138\uC694.")),
-                React.createElement("div", { className: "relative z-10 flex-shrink-0 flex items-center gap-3 w-full lg:w-auto" },
-                    React.createElement("button", { type: "button", onClick: () => onOpenReqModal?.(), className: "w-full lg:w-auto px-7 py-4 rounded-xl font-bold text-base text-white bg-[#0284C7] hover:bg-[#0369A1] active:scale-[0.99] transition-all shadow-md shadow-sky-500/20 flex items-center justify-center gap-2 cursor-pointer" },
-                        React.createElement("span", { className: "material-symbols-outlined text-[22px]" }, "post_add"),
-                        React.createElement("span", null, "\uD655\uC815 \uC9C0\uC815\uAC00\uB85C \uCCAD\uC18C \uBC1C\uC8FC\uD558\uAE30"),
-                        React.createElement("span", { className: "material-symbols-outlined text-[18px]" }, "arrow_forward")))),
-            React.createElement("section", { className: "grid grid-cols-1 md:grid-cols-3 gap-5" },
-                React.createElement("div", { className: "bg-white rounded-2xl p-6 border border-slate-200/90 shadow-sm hover:shadow-md transition-shadow" },
-                    React.createElement("div", { className: "flex items-center justify-between" },
-                        React.createElement("span", { className: "text-xs font-bold text-slate-500 tracking-wide uppercase" }, "STEP 01"),
-                        React.createElement("span", { className: "p-2 bg-sky-50 text-sky-600 rounded-xl" },
-                            React.createElement("span", { className: "material-symbols-outlined text-[22px]" }, "how_to_reg"))),
-                    React.createElement("h3", { className: "mt-3 text-sm font-semibold text-slate-700" }, "\uCCAD\uC57D \uB300\uAE30 / \uC120\uD0DD \uD544\uC694"),
-                    React.createElement("div", { className: "mt-2 flex items-baseline gap-2" },
-                        React.createElement("span", { className: "text-4xl font-extrabold text-[#0284C7] tracking-tight" }, "1"),
-                        React.createElement("span", { className: "text-base font-bold text-slate-600" }, "\uAC74"),
-                        React.createElement("span", { className: "ml-auto text-[11px] font-semibold text-sky-700 bg-sky-100/70 px-2 py-0.5 rounded-full" }, "\uAC80\uD1A0 \uAD8C\uC7A5")),
-                    React.createElement("p", { className: "mt-3 text-xs text-slate-500 border-t border-slate-100 pt-3 flex items-center gap-1.5" },
-                        React.createElement("span", { className: "material-symbols-outlined text-[15px] text-sky-500" }, "info"),
-                        "\uC2DC\uACF5\uC0AC \uB2E8\uB3C5 \uCCAD\uC57D \uB3C4\uCC29 \uC2DC \uC989\uC2DC \uD655\uC778 \uAC00\uB2A5")),
-                React.createElement("div", { className: "bg-white rounded-2xl p-6 border border-slate-200/90 shadow-sm hover:shadow-md transition-shadow" },
-                    React.createElement("div", { className: "flex items-center justify-between" },
-                        React.createElement("span", { className: "text-xs font-bold text-slate-500 tracking-wide uppercase" }, "STEP 02"),
-                        React.createElement("span", { className: "p-2 bg-teal-50 text-teal-600 rounded-xl" },
-                            React.createElement("span", { className: "material-symbols-outlined text-[22px]" }, "credit_card"))),
-                    React.createElement("h3", { className: "mt-3 text-sm font-semibold text-slate-700" }, "\uACB0\uC81C \uB300\uAE30 / \uACC4\uC57D \uD655\uC815"),
-                    React.createElement("div", { className: "mt-2 flex items-baseline gap-2" },
-                        React.createElement("span", { className: "text-4xl font-extrabold text-[#14B8A6] tracking-tight" }, "1"),
-                        React.createElement("span", { className: "text-base font-bold text-slate-600" }, "\uAC74"),
-                        React.createElement("span", { className: "ml-auto text-[11px] font-semibold text-teal-800 bg-teal-100/70 px-2 py-0.5 rounded-full" }, "\uD1A0\uC2A4\uD398\uC774\uBA3C\uCE20")),
-                    React.createElement("p", { className: "mt-3 text-xs text-slate-500 border-t border-slate-100 pt-3 flex items-center gap-1.5" },
-                        React.createElement("span", { className: "material-symbols-outlined text-[15px] text-teal-500" }, "verified"),
-                        "\uB370\uC774\uD130 \uC774\uC6A9\uB8CC ",
-                        React.createElement("strong", { className: "text-slate-700" }, "16,500\uC6D0 \uACE0\uC815 \uACB0\uC81C"),
-                        " (\uC6A9\uC5ED\uBE44 \uBCC4\uB3C4)")),
-                React.createElement("div", { className: "bg-white rounded-2xl p-6 border border-slate-200/90 shadow-sm hover:shadow-md transition-shadow" },
-                    React.createElement("div", { className: "flex items-center justify-between" },
-                        React.createElement("span", { className: "text-xs font-bold text-slate-500 tracking-wide uppercase" }, "STEP 03"),
-                        React.createElement("span", { className: "p-2 bg-slate-100 text-slate-700 rounded-xl" },
-                            React.createElement("span", { className: "material-symbols-outlined text-[22px]" }, "checklist_rtl"))),
-                    React.createElement("h3", { className: "mt-3 text-sm font-semibold text-slate-700" }, "\uC2DC\uACF5 \uC9C4\uD589 / \uC0AC\uC9C4 \uAC80\uC218"),
-                    React.createElement("div", { className: "mt-2 flex items-baseline gap-2" },
-                        React.createElement("span", { className: "text-4xl font-extrabold text-[#0F172A] tracking-tight" }, "0"),
-                        React.createElement("span", { className: "text-base font-bold text-slate-600" }, "\uAC74"),
-                        React.createElement("span", { className: "ml-auto text-[11px] font-semibold text-slate-600 bg-slate-100 px-2 py-0.5 rounded-full" }, "\uC9C1\uBD88 \uC815\uC0B0")),
-                    React.createElement("p", { className: "mt-3 text-xs text-slate-500 border-t border-slate-100 pt-3 flex items-center gap-1.5" },
-                        React.createElement("span", { className: "material-symbols-outlined text-[15px] text-slate-600" }, "photo_library"),
-                        "\uC804\u00B7\uD6C4 \uC0AC\uC9C4 \uCD5C\uC885 \uAC80\uC218 \uD6C4 ",
-                        React.createElement("strong", { className: "text-slate-700" }, "100% \uD604\uC7A5 \uC9C1\uBD88")))),
-            React.createElement("section", { className: "bg-white rounded-2xl p-6 border border-slate-200/90 shadow-sm flex flex-col gap-5" },
-                React.createElement("div", { className: "flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-slate-100 gap-2" },
+    return (React.createElement("main", { className: "w-full pt-[72px] bg-[#f7f9fb] text-slate-800 flex-1 overflow-y-auto overflow-x-hidden" },
+        React.createElement("div", { className: "max-w-5xl mx-auto p-4 sm:p-8 flex flex-col gap-6" },
+            React.createElement("header", { className: "bg-white rounded-2xl p-6 sm:p-8 border border-slate-200/90 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-5 relative overflow-hidden" },
+                React.createElement("div", { className: "absolute -right-10 -bottom-10 w-44 h-44 bg-blue-50/60 rounded-full blur-2xl pointer-events-none" }),
+                React.createElement("div", { className: "relative z-10" },
+                    React.createElement("div", { className: "flex items-center gap-2 mb-1.5" },
+                        React.createElement("span", { className: "px-2.5 py-0.5 rounded-md bg-blue-50 text-blue-700 text-xs font-bold tracking-wide border border-blue-100" }, "WEB-SRVC-MYP-020100"),
+                        React.createElement("span", { className: "text-xs text-slate-400 font-medium" }, "\uD1B5\uD569 \uC785\uC810/\uC790\uACA9 \uC2EC\uC0AC \uAD00\uB9AC")),
+                    React.createElement("h1", { className: "text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight" }, "\uC0AC\uC5C5\uC790\uB4F1\uB85D \uBC0F \uC790\uACA9\uC99D\u00B7\uC218\uB8CC\uC99D \uB4F1\uB85D"),
+                    React.createElement("p", { className: "text-sm text-slate-500 mt-2 leading-relaxed max-w-2xl" }, "\uAD6D\uC138\uCCAD \uC9C4\uC704\uD655\uC778, \uD648\uD0DD\uC2A4 PDF OCR \uC790\uB3D9 \uD30C\uC2F1 \uBC0F \uD45C\uC900 \uC790\uACA9\u00B7\uC218\uB8CC \uD56D\uBAA9 \uAC80\uC0C9/\uB4F1\uB85D(\uCD5C\uB300 5\uAC74)\uC744 \uC6D0\uC2A4\uD1B1\uC73C\uB85C \uCC98\uB9AC\uD569\uB2C8\uB2E4.")),
+                React.createElement("div", { className: "flex flex-col sm:items-end gap-2 shrink-0 relative z-10" },
+                    React.createElement("span", { className: "inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 shadow-sm" },
+                        React.createElement("span", { className: "w-2 h-2 rounded-full bg-emerald-500 animate-pulse" }),
+                        "\uC778\uC99D \uD30C\uD2B8\uB108 \uC2EC\uC0AC \uC5F0\uB3D9"),
+                    React.createElement("span", { className: "text-[11px] text-slate-400 font-medium" }, "\uACF5\uACF5 \uB370\uC774\uD130 API \uC2E4\uC2DC\uAC04 \uC5F0\uACB0\uB428"))),
+            React.createElement("section", { className: "bg-white rounded-2xl p-6 sm:p-7 border border-slate-200/90 shadow-sm flex flex-col gap-5" },
+                React.createElement("div", { className: "flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-100 gap-3" },
+                    React.createElement("div", { className: "flex items-center gap-2.5" },
+                        React.createElement("div", { className: "w-9 h-9 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600 border border-blue-100" },
+                            React.createElement("span", { className: "material-symbols-outlined text-[22px]" }, "badge")),
+                        React.createElement("div", null,
+                            React.createElement("h2", { className: "text-lg font-bold text-slate-900" }, "1. \uC0AC\uC5C5\uC790\uB4F1\uB85D \uBC0F \uAD6D\uC138\uCCAD \uC9C4\uC704\uD655\uC778"),
+                            React.createElement("p", { className: "text-xs text-slate-500" }, "\uC0AC\uC5C5\uC790 \uC815\uBCF4 \uC785\uB825 \uBC0F \uAD6D\uC138\uCCAD \uD734\u00B7\uD3D0\uC5C5 \uBC0F \uC9C4\uC704\uD655\uC778 \uC2E4\uC2DC\uAC04 \uB300\uC870"))),
+                    React.createElement("button", { type: "button", onClick: () => setIsOcrModalOpen(true), className: "inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-xs font-bold text-slate-700 border border-slate-200 transition-colors cursor-pointer" },
+                        React.createElement("span", { className: "material-symbols-outlined text-base text-slate-600" }, "document_scanner"),
+                        "\uD648\uD0DD\uC2A4 PDF OCR \uC5C5\uB85C\uB4DC")),
+                React.createElement("div", { className: "grid grid-cols-1 md:grid-cols-3 gap-4 text-sm" },
+                    React.createElement("div", null,
+                        React.createElement("label", { className: "block text-xs font-bold text-slate-700 mb-1.5" },
+                            "\uC0C1\uD638\uBA85 (\uBC95\uC778\uBA85) ",
+                            React.createElement("span", { className: "text-rose-500" }, "*")),
+                        React.createElement("input", { type: "text", value: bizName, onChange: (e) => setBizName(e.target.value), className: "w-full bg-slate-50/50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm font-medium text-slate-800 focus:bg-white focus:outline-none focus:border-blue-600" })),
+                    React.createElement("div", null,
+                        React.createElement("label", { className: "block text-xs font-bold text-slate-700 mb-1.5" },
+                            "\uB300\uD45C\uC790 \uC131\uBA85 ",
+                            React.createElement("span", { className: "text-rose-500" }, "*")),
+                        React.createElement("input", { type: "text", value: ceoName, onChange: (e) => setCeoName(e.target.value), className: "w-full bg-slate-50/50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm font-medium text-slate-800 focus:bg-white focus:outline-none focus:border-blue-600" })),
+                    React.createElement("div", null,
+                        React.createElement("label", { className: "block text-xs font-bold text-slate-700 mb-1.5" },
+                            "\uC0AC\uC5C5\uC790\uB4F1\uB85D\uBC88\uD638 (10\uC790\uB9AC) ",
+                            React.createElement("span", { className: "text-rose-500" }, "*")),
+                        React.createElement("input", { type: "text", value: bizNo, onChange: (e) => setBizNo(e.target.value), className: "w-full bg-slate-50/50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm font-medium text-slate-800 focus:bg-white focus:outline-none focus:border-blue-600" }))),
+                React.createElement("div", { className: "flex items-center justify-between p-3.5 bg-emerald-50/70 border border-emerald-200 rounded-xl text-xs text-emerald-800" },
                     React.createElement("div", { className: "flex items-center gap-2" },
-                        React.createElement("span", { className: "p-1.5 bg-sky-100 text-sky-700 rounded-lg" },
-                            React.createElement("span", { className: "material-symbols-outlined text-[20px]" }, "sync_alt")),
-                        React.createElement("h2", { className: "text-lg font-bold text-slate-900 tracking-tight" }, "\uB0B4 \uC9C4\uD589 \uC911\uC778 \uCCAD\uC18C \uBC1C\uC8FC \uD604\uD669"),
-                        React.createElement("span", { className: "text-xs font-bold bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full" },
-                            "\uCD1D 28\uAC74 (\uD398\uC774\uC9C0 ",
-                            currentPage,
-                            "/",
-                            totalPages,
-                            ")")),
-                    React.createElement("button", { type: "button", onClick: () => onNavigate?.('WEB-CLNT-ORD-010000'), className: "text-xs sm:text-sm font-semibold text-sky-600 hover:text-sky-800 flex items-center gap-1 cursor-pointer" },
-                        "\uC804\uCCB4 \uBC1C\uC8FC \uBAA9\uB85D \uBCF4\uAE30",
-                        React.createElement("span", { className: "material-symbols-outlined text-[16px]" }, "arrow_forward"),
-                        React.createElement("span", { className: "text-[10px] text-slate-400 font-mono" }, "(WEB-CLNT-ORD-010000)"))),
-                React.createElement("div", { className: "bg-slate-50/80 p-4 rounded-xl border border-slate-200/80 flex flex-col gap-3.5" },
-                    React.createElement("div", { className: "grid grid-cols-1 lg:grid-cols-12 gap-3.5 items-end" },
-                        React.createElement("div", { className: "lg:col-span-7 flex flex-col gap-1.5" },
-                            React.createElement("div", { className: "flex items-center justify-between" },
-                                React.createElement("label", { className: "text-xs font-bold text-slate-700 flex items-center gap-1" },
-                                    React.createElement("span", { className: "material-symbols-outlined text-[16px] text-slate-500" }, "calendar_today"),
-                                    "\uC870\uD68C\uAE30\uAC04"),
-                                React.createElement("span", { className: "text-[11px] text-slate-400" }, "\uCD5C\uB300 1\uB144(365\uC77C) \uBC94\uC704 \uB0B4\uC5D0\uC11C\uB9CC \uC870\uD68C\uAC00 \uAC00\uB2A5\uD569\uB2C8\uB2E4")),
-                            React.createElement("div", { className: "flex flex-wrap sm:flex-nowrap items-center gap-2" },
-                                React.createElement("div", { className: "flex items-center gap-1.5 flex-1 min-w-[240px]" },
-                                    React.createElement("input", { type: "text", value: dateFrom, onChange: (e) => setDateFrom(e.target.value), className: "w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs font-medium text-slate-800 focus:outline-none focus:border-sky-500 font-mono text-center", placeholder: "YYYY.MM.DD" }),
-                                    React.createElement("span", { className: "text-slate-400 text-xs font-bold" }, "~"),
-                                    React.createElement("input", { type: "text", value: dateTo, onChange: (e) => setDateTo(e.target.value), className: "w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs font-medium text-slate-800 focus:outline-none focus:border-sky-500 font-mono text-center", placeholder: "YYYY.MM.DD" })),
-                                React.createElement("div", { className: "inline-flex items-center gap-1 flex-shrink-0" }, [
-                                    { days: 30, label: '최근 1개월' },
-                                    { days: 90, label: '3개월' },
-                                    { days: 180, label: '6개월' },
-                                    { days: 365, label: '1년' },
-                                ].map((p) => (React.createElement("button", { key: p.days, type: "button", onClick: () => setPeriodRange(p.days), className: "px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-white border border-slate-200 text-slate-600 hover:bg-slate-100 hover:text-sky-700 transition-colors cursor-pointer" }, p.label)))))),
-                        React.createElement("div", { className: "lg:col-span-3 flex flex-col gap-1.5" },
-                            React.createElement("label", { className: "text-xs font-bold text-slate-700 flex items-center gap-1" },
-                                React.createElement("span", { className: "material-symbols-outlined text-[16px] text-slate-500" }, "filter_list"),
-                                "\uC9C4\uD589\uC0C1\uD0DC"),
-                            React.createElement("select", { value: orderStatus, onChange: (e) => setOrderStatus(e.target.value), className: "w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs font-semibold text-slate-800 focus:outline-none focus:border-sky-500 cursor-pointer" },
-                                React.createElement("option", { value: "ALL" }, "\uC804\uCCB4 (ALL)"),
-                                React.createElement("option", { value: "REQ_APPLY" }, "\uCCAD\uC18C \uCCAD\uC57D (REQ_APPLY)"),
-                                React.createElement("option", { value: "APPLY_CMPL" }, "\uB2E8\uB3C5 \uCCAD\uC57D \uC811\uC218 \uC644\uB8CC (APPLY_CMPL)"),
-                                React.createElement("option", { value: "PAY_WAIT" }, "1\uCC28 \uC774\uC6A9\uB8CC \uACB0\uC81C\uB300\uAE30 (PAY_WAIT)"),
-                                React.createElement("option", { value: "JOB_ING" }, "\uC2DC\uACF5 \uD655\uC815/\uC9C4\uD589\uC911 (JOB_ING)"),
-                                React.createElement("option", { value: "JOB_INSPECT" }, "\uC2DC\uACF5 \uC0AC\uC9C4 \uAC80\uC218/\uC2B9\uC778\uB300\uAE30 (JOB_INSPECT)"),
-                                React.createElement("option", { value: "JOB_CMPL" }, "\uC2DC\uACF5 \uC644\uB8CC (JOB_CMPL)"),
-                                React.createElement("option", { value: "ORDER_CANCEL" }, "\uBC1C\uC8FC \uCDE8\uC18C (ORDER_CANCEL)"))),
-                        React.createElement("div", { className: "lg:col-span-2 flex items-center gap-2" },
-                            React.createElement("button", { type: "button", onClick: resetFilter, className: "flex-1 px-3 py-2 rounded-lg text-xs font-semibold bg-white border border-slate-200 text-slate-600 hover:bg-slate-100 flex items-center justify-center gap-1 cursor-pointer" },
-                                React.createElement("span", { className: "material-symbols-outlined text-[16px]" }, "restart_alt"),
-                                "\uCD08\uAE30\uD654"),
-                            React.createElement("button", { type: "button", onClick: () => setCurrentPage(1), className: "flex-1 px-3.5 py-2 rounded-lg text-xs font-bold bg-[#0284C7] hover:bg-[#0369A1] text-white flex items-center justify-center gap-1 shadow-sm cursor-pointer" },
-                                React.createElement("span", { className: "material-symbols-outlined text-[16px]" }, "search"),
-                                "\uC870\uD68C")))),
-                React.createElement("div", { className: "flex flex-col gap-3.5" }, SAMPLE_ORDERS.map((ord) => (React.createElement("div", { key: ord.id, className: "p-5 rounded-xl border border-slate-200 bg-slate-50/40 hover:bg-sky-50/40 transition-all flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4" },
-                    React.createElement("div", { className: "flex-1 flex flex-col gap-2" },
-                        React.createElement("div", { className: "flex flex-wrap items-center gap-2" },
-                            React.createElement("span", { className: `px-2.5 py-1 rounded-md text-xs font-bold text-white ${ord.badgeBg}` }, ord.type),
-                            React.createElement("span", { className: `text-xs font-bold px-2 py-0.5 rounded border ${ord.statusCls}` }, ord.status),
-                            React.createElement("span", { className: "text-xs text-slate-400 font-mono" },
-                                "\uBC1C\uC8FC\uBC88\uD638: ",
-                                ord.id)),
-                        React.createElement("div", { className: "flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-sm font-medium text-slate-800" },
-                            React.createElement("span", { className: "flex items-center gap-1" },
-                                React.createElement("span", { className: "material-symbols-outlined text-[18px] text-slate-400" }, "location_on"),
-                                ord.addr),
-                            React.createElement("span", { className: "hidden sm:inline text-slate-300" }, "|"),
-                            React.createElement("span", { className: "flex items-center gap-1 text-slate-600" },
-                                React.createElement("span", { className: "material-symbols-outlined text-[18px] text-slate-400" }, "calendar_month"),
-                                ord.date)),
-                        React.createElement("div", { className: "text-xs font-semibold text-slate-700 flex items-center gap-2" },
-                            React.createElement("span", { className: "text-slate-500" }, "\uACE0\uAC1D \uD655\uC815 \uC9C0\uC815\uAC00:"),
-                            React.createElement("span", { className: "text-base font-extrabold text-[#0284C7]" }, ord.price),
-                            React.createElement("span", { className: "text-slate-400 text-[11px]" }, ord.priceNote))),
-                    React.createElement("div", { className: "w-full lg:w-auto flex flex-col sm:flex-row items-stretch sm:items-center gap-2" },
-                        React.createElement("div", { className: "text-right sm:mr-2" },
-                            React.createElement("span", { className: "inline-flex items-center gap-1 text-xs font-bold text-slate-700" }, ord.rightTop),
-                            React.createElement("div", { className: "text-[11px] text-slate-400" }, ord.rightSub)),
-                        React.createElement("button", { type: "button", onClick: () => onNavigate?.(ord.action), className: `px-5 py-2.5 rounded-xl font-bold text-xs sm:text-sm shadow-sm flex items-center justify-center gap-1.5 transition-all cursor-pointer ${ord.btnCls}` },
-                            React.createElement("span", null, ord.btnText),
-                            ord.btnSub && React.createElement("span", { className: "text-[10px] opacity-80 font-mono" }, ord.btnSub))))))),
-                React.createElement("div", { className: "flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t border-slate-200/80 select-none" },
-                    React.createElement("div", { className: "text-xs text-slate-500 flex items-center gap-1.5 font-medium" },
-                        React.createElement("span", { className: "material-symbols-outlined text-[16px] text-slate-400" }, "format_list_bulleted"),
+                        React.createElement("span", { className: "material-symbols-outlined text-emerald-600 text-lg" }, "verified"),
                         React.createElement("span", null,
-                            "\uC804\uCCB4 ",
-                            React.createElement("strong", { className: "text-slate-800 font-bold" }, "28"),
-                            "\uAC74 \uC911 ",
-                            React.createElement("strong", { className: "text-sky-700 font-bold" },
-                                startItem,
-                                "-",
-                                endItem),
-                            "\uAC74 \uD45C\uC2DC"),
-                        React.createElement("span", { className: "text-slate-300" }, "|"),
-                        React.createElement("span", { className: "text-[11px] text-slate-400" }, "\uD398\uC774\uC9C0\uB2F9 10\uAC74")),
-                    React.createElement("nav", { "aria-label": "\uCCAD\uC18C \uBC1C\uC8FC \uBAA9\uB85D \uD398\uC774\uC9C0 \uC774\uB3D9", className: "inline-flex items-center gap-1 rounded-xl bg-slate-50/80 p-1 border border-slate-200/80 shadow-sm" },
-                        React.createElement("button", { type: "button", disabled: currentPage === 1, onClick: () => setCurrentPage(1), className: "h-8 w-8 inline-flex items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-700 disabled:text-slate-400 disabled:opacity-50 font-mono text-xs font-bold cursor-pointer" }, "<<"),
-                        React.createElement("button", { type: "button", disabled: currentPage === 1, onClick: () => setCurrentPage((p) => Math.max(1, p - 1)), className: "h-8 w-8 inline-flex items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-700 disabled:text-slate-400 disabled:opacity-50 font-mono text-xs font-bold cursor-pointer" }, "<"),
-                        React.createElement("div", { className: "inline-flex items-center gap-1 px-1" }, [1, 2, 3].map((p) => (React.createElement("button", { key: p, type: "button", onClick: () => setCurrentPage(p), className: `h-8 min-w-[32px] px-2.5 inline-flex items-center justify-center rounded-lg text-xs font-bold transition-all cursor-pointer ${currentPage === p ? 'shadow-sm bg-[#0284C7] text-white' : 'text-slate-600 hover:bg-white hover:text-sky-700'}` }, p)))),
-                        React.createElement("button", { type: "button", disabled: currentPage === totalPages, onClick: () => setCurrentPage((p) => Math.min(totalPages, p + 1)), className: "h-8 w-8 inline-flex items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-700 disabled:text-slate-400 disabled:opacity-50 font-mono text-xs font-bold cursor-pointer" }, ">"),
-                        React.createElement("button", { type: "button", disabled: currentPage === totalPages, onClick: () => setCurrentPage(totalPages), className: "h-8 w-8 inline-flex items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-700 disabled:text-slate-400 disabled:opacity-50 font-mono text-xs font-bold cursor-pointer" }, ">>")))),
-            React.createElement("section", { className: "flex flex-col gap-4" },
-                React.createElement("div", { className: "flex items-center justify-between" },
+                            React.createElement("strong", null, "\uAD6D\uC138\uCCAD \uC804\uC0B0 \uD655\uC778 \uC644\uB8CC:"),
+                            " \uC815\uC0C1 \uACC4\uC18D\uC0AC\uC5C5\uC790 (\uC77C\uBC18\uACFC\uC138\uC790, \uAC1C\uC5C5\uC77C: 2021-03-15)")),
+                    React.createElement("span", { className: "font-bold text-emerald-700 bg-white px-2 py-0.5 rounded border border-emerald-200" }, "\uC778\uC99D \uC720\uD6A8"))),
+            React.createElement("section", { className: "bg-white rounded-2xl p-6 sm:p-7 border border-slate-200/90 shadow-sm flex flex-col gap-5" },
+                React.createElement("div", { className: "flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-100 gap-2" },
+                    React.createElement("div", { className: "flex items-center gap-2.5" },
+                        React.createElement("div", { className: "w-9 h-9 rounded-xl bg-teal-50 flex items-center justify-center text-teal-700 border border-teal-100" },
+                            React.createElement("span", { className: "material-symbols-outlined text-[22px]" }, "verified_user")),
+                        React.createElement("div", null,
+                            React.createElement("div", { className: "flex items-center gap-2" },
+                                React.createElement("h2", { className: "text-lg font-bold text-slate-900" }, "2. \uD45C\uC900 \uC790\uACA9\u00B7\uC218\uB8CC \uD56D\uBAA9 \uAC80\uC0C9 \uBC0F \uB4F1\uB85D"),
+                                React.createElement("span", { className: "text-xs font-bold text-teal-700 bg-teal-50 px-2 py-0.5 rounded-full border border-teal-200" }, "\uCD5C\uB300 5\uAC74")),
+                            React.createElement("p", { className: "text-xs text-slate-500" }, "\uBCF8\uC0AC \uC2EC\uC0AC \uC2B9\uC778 \uC2DC \uACE0\uAC1D \uB300\uC2DC\uBCF4\uB4DC \uBC0F \uC0C1\uC138 \uACAC\uC801 \uD504\uB85C\uD544\uC5D0 \uACF5\uC2DD \uC778\uC99D \uB9C8\uD06C \uBD80\uC5EC"))),
+                    React.createElement("span", { className: "text-xs font-semibold text-slate-500 flex items-center gap-1" },
+                        React.createElement("span", { className: "material-symbols-outlined text-sm text-slate-400" }, "filter_list"),
+                        "\uC8FC\uB825 \uBD84\uC57C(\uC785\uC8FC\uCCAD\uC18C/\uAC00\uC804\uCF00\uC5B4) \uC6B0\uC120 \uC815\uB82C")),
+                React.createElement("div", { className: "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 bg-slate-50 p-4 rounded-xl border border-slate-200/80 text-sm" },
                     React.createElement("div", null,
-                        React.createElement("span", { className: "text-xs font-bold text-sky-600 tracking-wider" }, "DIRECT ORDER CATEGORIES"),
-                        React.createElement("h2", { className: "text-lg font-bold text-slate-900" }, "\uC6D0\uD558\uB294 \uCCAD\uC18C \uC11C\uBE44\uC2A4\uB97C \uC120\uD0DD\uD574 \uC9C1\uC811 \uC694\uAE08\uC744 \uC815\uD558\uACE0 \uBC1C\uC8FC\uD558\uC138\uC694")),
-                    React.createElement("span", { className: "text-xs text-slate-500 hidden sm:inline" }, "\u203B \uC5ED\uACBD\uB9E4\u00B7\uB364\uD551\u00B7\uCD94\uAC00\uC694\uAE08 \uC5C6\uB294 100% \uACE0\uAC1D \uC9C0\uC815\uAC00 \uB4F1\uB85D")),
-                React.createElement("div", { className: "grid grid-cols-1 md:grid-cols-3 gap-6" }, [
-                    { key: 'REGULAR', cat: 'CATEGORY 01', title: '정기청소 (계단·건물관리)', badge: '최소 3개월(90일) 의무 계약', desc: '빌라·상가 계단, 건물주위, 지하주차장 구역별 맞춤 정기 관리. 안정적 관리를 위한 3개월 지정가 직접 입력.', price: '240,000 ~ 300,000원', btn: '정기청소 발주하기', img: '/storage/sseuldakgo/page_main/20261126_v0.01/regular_cleaning_service.jpg' },
-                    { key: 'APPLIANCE', cat: 'CATEGORY 02', title: '계절가전 분해케어', badge: '완전 분해 고압 살균 세척', desc: '벽걸이·스탠드·시스템 에어컨, 세탁기, 냉장고 완전 분해 고압 살균 세척. 품목 및 수량별 희망 요금 직접 지정.', price: '90,000 ~ 190,000원', btn: '가전 분해케어 발주하기', img: '/storage/sseuldakgo/page_main/20261126_v0.01/appliances_care_service.jpg' },
-                    { key: 'MOVEIN', cat: 'CATEGORY 03', title: '입주·이사 청소', badge: '친환경 약품 & 스팀 살균', desc: '아파트, 오피스텔, 빌라, 상가 입주·이사 전후 구석구석 정밀 스팀 대청소. 건별 희망 요금을 직접 지정 발주.', price: '300,000 ~ 450,000원', btn: '입주·이사 청소 발주하기', img: '/storage/sseuldakgo/page_main/20261126_v0.01/move_in_cleaning_service.jpg' },
-                ].map((c) => (React.createElement("div", { key: c.key, className: "bg-white rounded-2xl border border-slate-200/90 shadow-sm overflow-hidden flex flex-col hover:border-sky-300 hover:shadow-md transition-all" },
-                    React.createElement("div", { className: "relative h-44 overflow-hidden bg-slate-100" },
-                        React.createElement("img", { src: c.img, alt: c.title, className: "w-full h-full object-cover" }),
-                        React.createElement("div", { className: "absolute inset-0 bg-gradient-to-t from-slate-900/70 via-transparent to-transparent" }),
-                        React.createElement("span", { className: "absolute top-3 left-3 bg-sky-600/90 text-white text-[11px] font-bold px-2.5 py-1 rounded-lg" }, c.badge),
-                        React.createElement("div", { className: "absolute bottom-3 left-3 right-3 text-white" },
-                            React.createElement("span", { className: "text-xs text-sky-200 font-semibold" }, c.cat),
-                            React.createElement("h3", { className: "text-base font-bold" }, c.title))),
-                    React.createElement("div", { className: "p-5 flex-1 flex flex-col justify-between gap-4" },
-                        React.createElement("p", { className: "text-xs sm:text-sm text-slate-600 leading-relaxed" }, c.desc),
-                        React.createElement("div", { className: "bg-slate-50 p-3 rounded-xl border border-slate-100 flex items-center justify-between text-xs" },
-                            React.createElement("span", { className: "text-slate-500" }, "\uD3C9\uADE0 \uACE0\uAC1D \uB4F1\uB85D \uC9C0\uC815\uAC00"),
-                            React.createElement("span", { className: "font-bold text-slate-800" }, c.price)),
-                        React.createElement("button", { type: "button", onClick: () => onOpenReqModal?.(c.key), className: "w-full py-3 rounded-xl font-bold text-sm bg-sky-50 text-sky-700 hover:bg-sky-600 hover:text-white border border-sky-200 transition-all flex items-center justify-center gap-1.5 cursor-pointer" },
-                            React.createElement("span", null, c.btn),
-                            React.createElement("span", { className: "material-symbols-outlined text-[16px]" }, "arrow_forward")))))))),
-            React.createElement("section", { className: "bg-sky-50/80 border border-sky-200/80 rounded-2xl p-5 flex flex-col md:flex-row items-center justify-between gap-4" },
-                React.createElement("div", { className: "flex items-start gap-3 flex-1" },
-                    React.createElement("div", { className: "p-2 bg-sky-600 text-white rounded-xl flex-shrink-0" },
-                        React.createElement("span", { className: "material-symbols-outlined text-[20px]" }, "verified_user")),
+                        React.createElement("label", { className: "block text-[11px] font-bold text-slate-500 mb-1" }, "\uBB38\uC11C \uAD6C\uBD84 (CERT_DOC_TYPE)"),
+                        React.createElement("select", { value: docType, onChange: (e) => setDocType(e.target.value), className: "w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs font-semibold text-slate-700" },
+                            React.createElement("option", { value: "ALL" }, "\uC804\uCCB4 \uAD6C\uBD84 (\uC804\uCCB4 \uBB38\uC11C)"),
+                            React.createElement("option", { value: "LICENSE" }, "\uAD6D\uAC00/\uBBFC\uAC04 \uC790\uACA9\uC99D"),
+                            React.createElement("option", { value: "COMPLETION" }, "\uD611\uD68C \uC218\uB8CC\uC99D"),
+                            React.createElement("option", { value: "BUSINESS" }, "\uC704\uC0DD\uAD00\uB9AC\uC6A9\uC5ED\uC5C5 \uC2E0\uACE0\uC99D"))),
                     React.createElement("div", null,
-                        React.createElement("h4", { className: "text-sm font-bold text-slate-900" }, "100% \uACE0\uAC1D \uC9C1\uC811 \uD655\uC815 \uC9C0\uC815\uAC00"),
-                        React.createElement("p", { className: "text-xs text-slate-600 mt-0.5" }, "\uC2DC\uACF5\uC0AC\uC758 \uC77C\uBC29\uC801 \uC5ED\uACBD\uB9E4\uB098 \uB364\uD551, \uD604\uC7A5 \uBD80\uB2F9 \uCD94\uAC00\uC694\uAE08\uC744 \uC6D0\uCC9C \uCC28\uB2E8\uD569\uB2C8\uB2E4."))),
-                React.createElement("div", { className: "hidden md:block w-px h-10 bg-sky-200" }),
-                React.createElement("div", { className: "flex items-start gap-3 flex-1" },
-                    React.createElement("div", { className: "p-2 bg-teal-600 text-white rounded-xl flex-shrink-0" },
-                        React.createElement("span", { className: "material-symbols-outlined text-[20px]" }, "handshake")),
+                        React.createElement("label", { className: "block text-[11px] font-bold text-slate-500 mb-1" }, "\uC11C\uBE44\uC2A4 \uC804\uBB38 \uBD84\uC57C"),
+                        React.createElement("select", { value: serviceCat, onChange: (e) => setServiceCat(e.target.value), className: "w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs font-semibold text-slate-700" },
+                            React.createElement("option", { value: "ALL" }, "\uC804\uCCB4 \uBD84\uC57C (\uC8FC\uB825 \uC6B0\uC120)"),
+                            React.createElement("option", { value: "MOVE_IN" }, "\uC785\uC8FC\u00B7\uC774\uC0AC \uCCAD\uC18C"),
+                            React.createElement("option", { value: "APPLIANCE" }, "\uACC4\uC808\uAC00\uC804 \uBD84\uD574\uCF00\uC5B4"),
+                            React.createElement("option", { value: "REGULAR" }, "\uC815\uAE30\uCCAD\uC18C"))),
                     React.createElement("div", null,
-                        React.createElement("h4", { className: "text-sm font-bold text-slate-900" }, "1\uAC1C \uC2DC\uACF5\uC0AC \uB2E8\uB3C5 \uC120\uCC29\uC21C \uCCAD\uC57D"),
-                        React.createElement("p", { className: "text-xs text-slate-600 mt-0.5" }, "\uBCF8\uC0AC \uC0AC\uC5C5\uC790\uB4F1\uB85D\uC99D \uBC0F \uC790\uACA9 \uAC80\uC99D\uC744 \uD1B5\uACFC\uD55C \uD30C\uD2B8\uB108\uAC00 1:1 \uCC45\uC784 \uCCAD\uC57D\uD569\uB2C8\uB2E4."))),
-                React.createElement("div", { className: "hidden md:block w-px h-10 bg-sky-200" }),
-                React.createElement("div", { className: "flex items-start gap-3 flex-1" },
-                    React.createElement("div", { className: "p-2 bg-slate-800 text-white rounded-xl flex-shrink-0" },
-                        React.createElement("span", { className: "material-symbols-outlined text-[20px]" }, "fact_check")),
-                    React.createElement("div", null,
-                        React.createElement("h4", { className: "text-sm font-bold text-slate-900" }, "0507 \uC548\uC2EC\uBC88\uD638 & \uC804\u00B7\uD6C4 \uC0AC\uC9C4 \uAC80\uC218"),
-                        React.createElement("p", { className: "text-xs text-slate-600 mt-0.5" }, "\uC2DC\uACF5 \uC0AC\uC9C4\uC744 \uC9C1\uC811 \uCD5C\uC885 \uC2B9\uC778\uD55C \uD6C4, \uC6A9\uC5ED \uB300\uAE08 100%\uB97C \uD604\uC7A5\uC5D0\uC11C \uC9C1\uBD88\uD569\uB2C8\uB2E4.")))))));
+                        React.createElement("label", { className: "block text-[11px] font-bold text-slate-500 mb-1" }, "\uC790\uACA9\u00B7\uC218\uB8CC\uC99D \uBA85\uCE6D"),
+                        React.createElement("input", { type: "text", value: keyword, onChange: (e) => setKeyword(e.target.value), placeholder: "\uC608: \uBC29\uC5ED\uC18C\uB3C5, \uAC00\uC804\uAD00\uB9AC", className: "w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-800" })),
+                    React.createElement("div", { className: "flex items-end" },
+                        React.createElement("button", { type: "button", onClick: () => showToast('표준 자격 항목 검색을 완료했습니다.'), className: "w-full bg-[#0d9488] hover:bg-[#0f766e] text-white rounded-lg px-4 py-2 text-xs font-bold flex items-center justify-center gap-1.5 shadow-sm cursor-pointer" },
+                            React.createElement("span", { className: "material-symbols-outlined text-base" }, "search"),
+                            "\uD56D\uBAA9 \uAC80\uC0C9"))),
+                React.createElement("div", { className: "bg-slate-50/80 rounded-xl p-4 border border-slate-200/70" },
+                    React.createElement("div", { className: "flex items-center justify-between text-xs mb-3 pb-2.5 border-b border-slate-200/60" },
+                        React.createElement("div", { className: "flex items-center gap-2" },
+                            React.createElement("span", { className: "font-bold text-slate-900 text-sm flex items-center gap-1.5" },
+                                React.createElement("span", { className: "material-symbols-outlined text-teal-600 text-lg" }, "verified"),
+                                "\uB4F1\uB85D \uC790\uACA9\u00B7\uC218\uB8CC\uC99D"),
+                            React.createElement("span", { className: "text-[11px] font-semibold text-teal-700 bg-teal-50 px-2 py-0.5 rounded-full border border-teal-200" },
+                                "(",
+                                certs.length,
+                                "/5\uAC74 \uB4F1\uB85D\uB428)")),
+                        React.createElement("span", { className: "text-xs text-slate-500 font-medium" },
+                            "\uC794\uC5EC ",
+                            React.createElement("strong", { className: "text-blue-600 font-bold" },
+                                Math.max(0, 5 - certs.length),
+                                "\uAC74"),
+                            " \uCD94\uAC00 \uAC00\uB2A5")),
+                    React.createElement("div", { className: "flex flex-col gap-2.5" }, pagedCerts.map((c) => (React.createElement("div", { key: c.id, className: "flex flex-col lg:flex-row lg:items-center justify-between gap-3 p-3 bg-white border border-slate-200/80 rounded-xl" },
+                        React.createElement("div", { className: "flex flex-wrap items-center gap-2.5 text-xs" },
+                            React.createElement("span", { className: `inline-flex items-center justify-center w-6 h-6 rounded-lg border shrink-0 ${c.iconBg}` },
+                                React.createElement("span", { className: "material-symbols-outlined text-sm" }, c.icon)),
+                            React.createElement("span", { className: "font-bold text-slate-900 text-sm" }, c.name),
+                            React.createElement("span", { className: `px-2 py-0.5 rounded text-[11px] font-semibold border ${c.catCls}` }, c.cat),
+                            React.createElement("span", { className: "px-1.5 py-0.5 rounded bg-slate-100 text-slate-600 text-[10px] font-bold" }, c.level),
+                            React.createElement("span", { className: "text-slate-300" }, "|"),
+                            React.createElement("span", { className: "text-slate-500 text-[11px]" },
+                                "\uCDE8\uB4DD\uC77C: ",
+                                c.date),
+                            React.createElement("span", { className: "text-slate-300" }, "|"),
+                            React.createElement("span", { className: "text-slate-500 text-[11px]" },
+                                "\uBC1C\uAE09\uAE30\uAD00: ",
+                                c.org,
+                                " (",
+                                c.certNo,
+                                ")"),
+                            React.createElement("span", { className: `inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-semibold border ${c.statusCls}` },
+                                React.createElement("span", { className: `w-1 h-1 rounded-full ${c.dotCls}` }),
+                                c.status)),
+                        React.createElement("div", { className: "flex items-center gap-2 shrink-0" },
+                            React.createElement("button", { type: "button", onClick: () => showToast(`${c.name} 증빙 사진을 확인합니다.`), className: "inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-slate-50 hover:bg-slate-100 border border-slate-200 text-xs font-semibold text-slate-700 cursor-pointer" },
+                                React.createElement("span", { className: "material-symbols-outlined text-sm text-slate-500" }, "image"),
+                                "\uC790\uACA9\uC99D\uC0AC\uC9C4"),
+                            React.createElement("button", { type: "button", onClick: () => setCerts((prev) => prev.filter((x) => x.id !== c.id)), className: "inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-white hover:bg-rose-50 border border-slate-200 hover:border-rose-200 text-xs font-semibold text-slate-500 hover:text-rose-600 cursor-pointer" },
+                                React.createElement("span", { className: "material-symbols-outlined text-sm" }, "delete"),
+                                "\uC0AD\uC81C")))))),
+                    React.createElement("div", { className: "flex items-center justify-between pt-3 mt-3 border-t border-slate-200/70" },
+                        React.createElement("span", { className: "text-xs text-slate-500" },
+                            "\uCD1D ",
+                            React.createElement("strong", { className: "text-slate-800" }, certs.length),
+                            "\uAC74 (\uD398\uC774\uC9C0 ",
+                            certPage,
+                            "/",
+                            totalCertPages,
+                            ")"),
+                        React.createElement("nav", { "aria-label": "\uC790\uACA9\u00B7\uC218\uB8CC\uC99D \uBAA9\uB85D \uD398\uC774\uC9C0 \uC774\uB3D9", className: "inline-flex items-center gap-1 rounded-xl bg-white p-1 border border-slate-200 shadow-2xs" },
+                            React.createElement("button", { type: "button", disabled: certPage === 1, onClick: () => setCertPage(1), title: "\uB9E8\uC55E\uD398\uC774\uC9C0", className: "h-7 px-2 inline-flex items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-700 disabled:text-slate-400 disabled:opacity-50 text-xs font-bold cursor-pointer" }, "<<"),
+                            React.createElement("button", { type: "button", disabled: certPage === 1, onClick: () => setCertPage((p) => Math.max(1, p - 1)), title: "\uC804\uD398\uC774\uC9C0", className: "h-7 px-2 inline-flex items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-700 disabled:text-slate-400 disabled:opacity-50 text-xs font-bold cursor-pointer" }, "<"),
+                            Array.from({ length: totalCertPages }, (_, i) => i + 1).map((p) => (React.createElement("button", { key: p, type: "button", onClick: () => setCertPage(p), className: `h-7 min-w-[28px] px-2 inline-flex items-center justify-center rounded-lg text-xs font-bold cursor-pointer ${certPage === p ? 'bg-[#0284c7] text-white shadow-xs' : 'text-slate-600 hover:bg-slate-100'}` }, p))),
+                            React.createElement("button", { type: "button", disabled: certPage === totalCertPages, onClick: () => setCertPage((p) => Math.min(totalCertPages, p + 1)), title: "\uB2E4\uC74C\uD398\uC774\uC9C0", className: "h-7 px-2 inline-flex items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-700 disabled:text-slate-400 disabled:opacity-50 text-xs font-bold cursor-pointer" }, ">"),
+                            React.createElement("button", { type: "button", disabled: certPage === totalCertPages, onClick: () => setCertPage(totalCertPages), title: "\uB9E8\uB4A4\uD398\uC774\uC9C0", className: "h-7 px-2 inline-flex items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-700 disabled:text-slate-400 disabled:opacity-50 text-xs font-bold cursor-pointer" }, ">>")))),
+                React.createElement("div", { className: "flex flex-col sm:flex-row items-center justify-between gap-3 pt-4 border-t border-slate-100" },
+                    React.createElement("p", { className: "text-xs text-slate-400 flex items-center gap-1" },
+                        React.createElement("span", { className: "material-symbols-outlined text-sm text-slate-400" }, "info"),
+                        "\uB4F1\uB85D\uB41C \uC815\uBCF4\uB294 \uD50C\uB7AB\uD3FC \uBCF8\uC0AC \uC804\uBB38 \uAC80\uC218\uD300\uC5D0 \uC758\uD574 \uC601\uC5C5\uC77C \uAE30\uC900 24\uC2DC\uAC04 \uC774\uB0B4 \uC2B9\uC778\uB429\uB2C8\uB2E4."),
+                    React.createElement("div", { className: "flex items-center gap-2.5 w-full sm:w-auto" },
+                        React.createElement("button", { type: "button", onClick: onBack, className: "flex-1 sm:flex-none px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold cursor-pointer" }, "\uCDE8\uC18C \uBC0F \uB3CC\uC544\uAC00\uAE30"),
+                        React.createElement("button", { type: "button", onClick: async () => {
+                                try {
+                                    const res = await fetch('/api/srvc/myp/020100', {
+                                        method: 'PUT',
+                                        headers: { 'Content-Type': 'application/json' },
+                                        body: JSON.stringify({
+                                            userNo: userInfo?.USER_NO || 'S20261100002',
+                                            bizName,
+                                            ceoName,
+                                            bizNo,
+                                            certs,
+                                        }),
+                                    });
+                                    const json = await res.json();
+                                    showToast(json?.message || '사업자 및 자격·수료 정보가 저장되었습니다.');
+                                }
+                                catch {
+                                    showToast('저장 요청 중 오류가 발생했습니다.');
+                                }
+                            }, className: "flex-1 sm:flex-none px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shadow-sm flex items-center justify-center gap-1.5 cursor-pointer" },
+                            React.createElement("span", { className: "material-symbols-outlined text-base" }, "save"),
+                            "\uC0AC\uC5C5\uC790 \uBC0F \uC790\uACA9\u00B7\uC218\uB8CC \uC815\uBCF4 \uC800\uC7A5"))))),
+        toastMsg && (React.createElement("div", { className: "fixed bottom-6 right-6 z-50 bg-slate-900 text-white px-4 py-3 rounded-xl shadow-xl flex items-center gap-2 text-xs font-medium" },
+            React.createElement("span", { className: "material-symbols-outlined text-emerald-400 text-base" }, "check_circle"),
+            React.createElement("span", null, toastMsg))),
+        React.createElement(WebSrvcMyp020101, { isOpen: isOcrModalOpen, onClose: () => setIsOcrModalOpen(false), onApplyData: (data) => {
+                if (data?.bizName)
+                    setBizName(data.bizName);
+                if (data?.ceoName)
+                    setCeoName(data.ceoName);
+                if (data?.bizNo)
+                    setBizNo(data.bizNo);
+                showToast('OCR 추출 정보가 사업자등록 폼에 반영되었습니다.');
+            } }),
+        showEmptyBizModal && (React.createElement("div", { className: "fixed inset-0 z-[9999] bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4" },
+            React.createElement("div", { className: "w-full max-w-sm bg-white rounded-2xl shadow-2xl border border-slate-200 p-6 flex flex-col items-center text-center gap-4" },
+                React.createElement("div", { className: "w-12 h-12 rounded-full bg-amber-50 text-amber-600 flex items-center justify-center" },
+                    React.createElement("span", { className: "material-symbols-outlined text-[28px]" }, "info")),
+                React.createElement("p", { className: "text-sm font-bold text-slate-800" }, "\uC0AC\uC5C5\uC790 \uB4F1\uB85D \uBC0F \uC790\uACA9\uC99D\u00B7\uC218\uB8CC \uC815\uBCF4\uB97C \uC785\uB825\uD558\uC138\uC694."),
+                React.createElement("button", { type: "button", onClick: () => setShowEmptyBizModal(false), className: "w-full py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold cursor-pointer" }, "\uB2EB\uAE30"))))));
+}
+/**
+ * 화면 ID: WEB-SRVC-MYP-020101
+ * 화면명: 홈택스 PDF OCR 업로드 및 자동 인식 모달 (Modal)
+ */
+function WebSrvcMyp020101({ isOpen, onClose, onApplyData }) {
+    const fileInputRef = useRef(null);
+    const [fileInfo, setFileInfo] = useState({
+        name: '사업자등록증명_공간다원_202611.pdf',
+        sizeText: '1.24 MB',
+        issueNo: '2026-1120-7492-9401 (국세청 진위 전산 대조 통과)',
+    });
+    const [ocrData, setOcrData] = useState({
+        bizName: '공간다원',
+        ceoName: '김충훈',
+        bizNo: '120-88-29401',
+        openDateAndType: '2021-03-15 (일반과세자)',
+        industryCode: '749200',
+        industryName: '사업시설 유지관리 및 건물·산업설비 청소업 / 가전제품 수리·세척',
+    });
+    const [isParsing, setIsParsing] = useState(false);
+    if (!isOpen)
+        return null;
+    const handleFileChange = async (e) => {
+        const file = e.target.files?.[0];
+        if (!file)
+            return;
+        if (!file.name.toLowerCase().endsWith('.pdf')) {
+            alert('PDF 원본 파일만 업로드 가능합니다.');
+            return;
+        }
+        if (file.size > 10 * 1024 * 1024) {
+            alert('파일 용량은 최대 10MB까지 업로드 가능합니다.');
+            return;
+        }
+        setFileInfo({
+            name: file.name,
+            sizeText: `${(file.size / (1024 * 1024)).toFixed(2)} MB`,
+            issueNo: 'OCR 분석 중...',
+        });
+        setIsParsing(true);
+        try {
+            const formData = new FormData();
+            formData.append('userNo', 'S20261100002');
+            formData.append('file', file);
+            const res = await fetch('/api/srvc/myp/020101', { method: 'POST', body: formData });
+            const json = await res.json();
+            if (res.ok && json?.success && json?.data?.ocrResult) {
+                const r = json.data.ocrResult;
+                setFileInfo({
+                    name: file.name,
+                    sizeText: `${(file.size / (1024 * 1024)).toFixed(2)} MB`,
+                    issueNo: json.data.issueNo || '전자발급본 OCR 판독 완료',
+                });
+                setOcrData((prev) => ({
+                    ...prev,
+                    bizName: r.bizName ? `${r.bizName} - ${r.bizStatNm || '정상'}` : prev.bizName,
+                    ceoName: r.ceoName || prev.ceoName,
+                    bizNo: r.bizNo || prev.bizNo,
+                    openDateAndType: r.openDateAndType || prev.openDateAndType,
+                    industryCode: r.industryCode ?? prev.industryCode,
+                    industryName: r.industryName || prev.industryName,
+                    bizStatCd: r.bizStatCd || 'ACTIVE',
+                    bizStatNm: r.bizStatNm || '정상',
+                }));
+            }
+        }
+        catch {
+            // ignore network error in preview
+        }
+        finally {
+            setIsParsing(false);
+        }
+    };
+    return (React.createElement("div", { className: "fixed inset-0 z-[9999] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6 overflow-x-hidden" },
+        React.createElement("div", { className: "relative z-10 w-full max-w-2xl bg-white rounded-2xl border border-slate-200/90 shadow-2xl overflow-hidden flex flex-col max-h-[92vh]", onClick: (e) => e.stopPropagation() },
+            React.createElement("div", { className: "px-6 py-5 border-b border-slate-100 bg-white flex items-start justify-between gap-4 shrink-0" },
+                React.createElement("div", { className: "flex flex-col" },
+                    React.createElement("div", { className: "flex items-center gap-2 mb-1.5 flex-wrap" },
+                        React.createElement("span", { className: "inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-blue-50 text-blue-700 border border-blue-200 font-mono" }, "WEB-SRVC-MYP-020101"),
+                        React.createElement("span", { className: "text-slate-300" }, "\u00B7"),
+                        React.createElement("span", { className: "text-xs text-slate-500 font-medium flex items-center gap-1" },
+                            React.createElement("span", { className: "material-symbols-outlined text-[15px] text-sky-600" }, "document_scanner"),
+                            "\uD648\uD0DD\uC2A4 \uC0AC\uC5C5\uC790\uB4F1\uB85D\uC99D\uBA85 OCR \uC790\uB3D9 \uD30C\uC2F1")),
+                    React.createElement("h2", { className: "text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight" }, "\uD648\uD0DD\uC2A4 PDF OCR \uC5C5\uB85C\uB4DC \uBC0F \uC790\uB3D9 \uC778\uC2DD"),
+                    React.createElement("p", { className: "text-xs sm:text-sm text-slate-500 mt-1 leading-relaxed" }, "\uAD6D\uC138\uCCAD \uD648\uD0DD\uC2A4\uC5D0\uC11C \uBC1C\uAE09\uBC1B\uC740 \uC0AC\uC5C5\uC790\uB4F1\uB85D\uC99D(\uBA85) \uC6D0\uBCF8 PDF\uB97C \uC5C5\uB85C\uB4DC\uD558\uBA74 \uC5C5\uC885\uCF54\uB4DC\uC640 \uC0AC\uC5C5\uC790 \uC815\uBCF4\uAC00 \uC790\uB3D9 \uCD94\uCD9C\uB429\uB2C8\uB2E4.")),
+                React.createElement("button", { type: "button", onClick: onClose, title: "\uB2EB\uAE30 (ESC)", className: "text-slate-400 hover:text-slate-700 hover:bg-slate-100 p-2 rounded-full transition-colors shrink-0 cursor-pointer" },
+                    React.createElement("span", { className: "material-symbols-outlined text-[22px] block" }, "close"))),
+            React.createElement("div", { className: "overflow-y-auto p-6 flex flex-col gap-5 text-slate-800" },
+                React.createElement("div", { className: "flex flex-col gap-3" },
+                    React.createElement("div", { className: "flex items-center justify-between" },
+                        React.createElement("span", { className: "text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5" },
+                            React.createElement("span", { className: "w-1.5 h-3.5 bg-blue-600 rounded-full inline-block" }),
+                            "\uD648\uD0DD\uC2A4 \uC6D0\uBCF8 PDF \uB4F1\uB85D"),
+                        React.createElement("span", { className: "text-[11px] font-semibold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-md border border-blue-100" }, "\uC815\uBD8024 / \uD648\uD0DD\uC2A4 \uC804\uC790\uBC1C\uAE09\uBCF8 100% \uC9C0\uC6D0")),
+                    React.createElement("input", { ref: fileInputRef, type: "file", accept: "application/pdf,.pdf", className: "hidden", onChange: handleFileChange }),
+                    React.createElement("div", { onClick: () => fileInputRef.current?.click(), className: "group relative border-2 border-dashed border-blue-200 hover:border-blue-500 bg-blue-50/20 hover:bg-blue-50/40 rounded-2xl p-6 text-center transition-all cursor-pointer flex flex-col items-center justify-center gap-3" },
+                        React.createElement("div", { className: "w-12 h-12 rounded-2xl bg-blue-100/90 text-blue-600 flex items-center justify-center shadow-xs" },
+                            React.createElement("span", { className: "material-symbols-outlined text-[28px]" }, "upload_file")),
+                        React.createElement("div", null,
+                            React.createElement("p", { className: "font-bold text-slate-800 text-sm sm:text-base" }, "\uD648\uD0DD\uC2A4 \uBC1C\uAE09 \uC0AC\uC5C5\uC790\uB4F1\uB85D\uC99D(\uBA85) PDF \uD30C\uC77C\uC744 \uB4DC\uB798\uADF8\uD558\uAC70\uB098 \uD074\uB9AD\uD558\uC5EC \uC120\uD0DD\uD558\uC138\uC694"),
+                            React.createElement("p", { className: "text-xs text-slate-400 mt-1" }, "\uC9C0\uC6D0 \uD615\uC2DD: PDF \uC6D0\uBCF8 \uD30C\uC77C\uB9CC \uAC00\uB2A5 (\uC2A4\uCE94 \uC774\uBBF8\uC9C0\u00B7\uC0AC\uC9C4 \uBD88\uAC00 / \uCD5C\uB300 10MB)")),
+                        React.createElement("div", { className: "mt-1 flex items-center gap-2" },
+                            React.createElement("span", { className: "px-4 py-2 rounded-xl bg-white border border-slate-200 text-xs font-bold text-slate-700 shadow-xs flex items-center gap-1.5" },
+                                React.createElement("span", { className: "material-symbols-outlined text-[16px] text-blue-600" }, "search"),
+                                "PDF \uD30C\uC77C \uCC3E\uC544\uBCF4\uAE30"))),
+                    fileInfo && (React.createElement("div", { className: "bg-slate-50 border border-slate-200/90 rounded-xl px-4 py-3 flex items-center justify-between gap-3" },
+                        React.createElement("div", { className: "flex items-center gap-3 min-w-0" },
+                            React.createElement("div", { className: "w-9 h-9 rounded-lg bg-rose-50 border border-rose-100 flex items-center justify-center shrink-0" },
+                                React.createElement("span", { className: "material-symbols-outlined text-[20px] text-rose-600" }, "picture_as_pdf")),
+                            React.createElement("div", { className: "flex flex-col min-w-0" },
+                                React.createElement("div", { className: "flex items-center gap-2 flex-wrap" },
+                                    React.createElement("span", { className: "font-bold text-xs text-slate-900 truncate" }, fileInfo.name),
+                                    React.createElement("span", { className: "text-[11px] text-slate-400 font-mono" },
+                                        "(",
+                                        fileInfo.sizeText,
+                                        ")"),
+                                    React.createElement("span", { className: "inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200" },
+                                        React.createElement("span", { className: "w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" }),
+                                        "OCR \uD310\uB3C5 \uC644\uB8CC")),
+                                React.createElement("span", { className: "text-[11px] text-slate-500 mt-0.5" },
+                                    "\uBC1C\uAE09\uBC88\uD638: ",
+                                    fileInfo.issueNo))),
+                        React.createElement("div", { className: "flex items-center gap-1 shrink-0" },
+                            React.createElement("button", { type: "button", onClick: () => fileInputRef.current?.click(), className: "px-2.5 py-1 text-xs font-semibold text-slate-600 hover:text-blue-600 hover:bg-white rounded-lg cursor-pointer" }, "\uB2E4\uC2DC\uC62C\uB9AC\uAE30"),
+                            React.createElement("button", { type: "button", onClick: () => setFileInfo(null), className: "p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg cursor-pointer", title: "\uD30C\uC77C \uC0AD\uC81C" },
+                                React.createElement("span", { className: "material-symbols-outlined text-[18px] block" }, "delete")))))),
+                React.createElement("div", { className: "flex flex-col gap-3 pt-1" },
+                    React.createElement("div", { className: "flex items-center justify-between flex-wrap gap-2" },
+                        React.createElement("div", { className: "flex items-center gap-2" },
+                            React.createElement("span", { className: "w-1.5 h-3.5 bg-teal-600 rounded-full inline-block" }),
+                            React.createElement("h3", { className: "text-sm font-bold text-slate-900" }, "OCR \uC790\uB3D9 \uCD94\uCD9C \uACB0\uACFC (\uC218\uC815 \uAC00\uB2A5)")),
+                        React.createElement("span", { className: "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200" },
+                            React.createElement("span", { className: "material-symbols-outlined text-[15px] text-emerald-600" }, "verified"),
+                            "\uC2E0\uB8B0\uB3C4 99.4% \u00B7 \uC6D0\uBCF8 \uB300\uC870 \uC77C\uCE58")),
+                    React.createElement("div", { className: "bg-slate-50/80 border border-slate-200 rounded-xl p-4 sm:p-5 grid grid-cols-1 sm:grid-cols-2 gap-3.5 text-xs" },
+                        React.createElement("div", null,
+                            React.createElement("label", { className: "block font-bold text-slate-600 mb-1.5" }, "\uC0C1\uD638\uBA85 (\uBC95\uC778\uBA85) *"),
+                            React.createElement("input", { type: "text", value: ocrData.bizName, onChange: (e) => setOcrData({ ...ocrData, bizName: e.target.value }), className: "w-full bg-white border border-slate-200 rounded-xl px-3.5 py-2.5 text-slate-900 font-semibold text-xs" })),
+                        React.createElement("div", null,
+                            React.createElement("label", { className: "block font-bold text-slate-600 mb-1.5" }, "\uB300\uD45C\uC790 \uC131\uBA85 *"),
+                            React.createElement("input", { type: "text", value: ocrData.ceoName, onChange: (e) => setOcrData({ ...ocrData, ceoName: e.target.value }), className: "w-full bg-white border border-slate-200 rounded-xl px-3.5 py-2.5 text-slate-900 font-semibold text-xs" })),
+                        React.createElement("div", null,
+                            React.createElement("label", { className: "block font-bold text-slate-600 mb-1.5" }, "\uC0AC\uC5C5\uC790\uB4F1\uB85D\uBC88\uD638 (10\uC790\uB9AC) *"),
+                            React.createElement("input", { type: "text", value: ocrData.bizNo, onChange: (e) => setOcrData({ ...ocrData, bizNo: e.target.value }), className: "w-full bg-white border border-slate-200 rounded-xl px-3.5 py-2.5 text-slate-900 font-semibold text-xs font-mono" })),
+                        React.createElement("div", null,
+                            React.createElement("label", { className: "block font-bold text-slate-600 mb-1.5" }, "\uAC1C\uC5C5\uC5F0\uC6D4\uC77C / \uACFC\uC138\uC720\uD615 *"),
+                            React.createElement("input", { type: "text", value: ocrData.openDateAndType, onChange: (e) => setOcrData({ ...ocrData, openDateAndType: e.target.value }), className: "w-full bg-white border border-slate-200 rounded-xl px-3.5 py-2.5 text-slate-900 font-semibold text-xs" })),
+                        React.createElement("div", { className: "sm:col-span-2 pt-1" },
+                            React.createElement("label", { className: "block font-bold text-slate-700 mb-1.5" }, "\uC8FC\uC5C5\uC885 \uCF54\uB4DC \uBC0F \uC5C5\uD0DC\u00B7\uC885\uBAA9 (\uAD6D\uC138\uCCAD \uD45C\uC900\uBD84\uB958) *"),
+                            React.createElement("div", { className: "p-3 bg-white border border-blue-200 rounded-xl flex items-center justify-between gap-3" },
+                                React.createElement("div", { className: "flex items-center gap-2.5 min-w-0 flex-1" },
+                                    React.createElement("div", { className: "flex items-center gap-1 bg-blue-50 border border-blue-200 text-blue-700 font-mono font-bold text-xs rounded-lg px-2 py-1 shrink-0" },
+                                        React.createElement("span", null, "\uCF54\uB4DC:"),
+                                        React.createElement("input", { type: "text", value: ocrData.industryCode, onChange: (e) => setOcrData({ ...ocrData, industryCode: e.target.value }), placeholder: "6\uC790\uB9AC \uC785\uB825", className: "w-16 bg-transparent focus:outline-none text-blue-800 font-mono font-bold" })),
+                                    React.createElement("input", { type: "text", value: ocrData.industryName, onChange: (e) => setOcrData({ ...ocrData, industryName: e.target.value }), className: "font-bold text-slate-800 text-xs sm:text-sm flex-1 min-w-0 bg-transparent focus:outline-none" })),
+                                React.createElement("span", { className: "material-symbols-outlined text-emerald-600 text-[20px] shrink-0" }, "verified"))))),
+                React.createElement("div", { className: "bg-amber-50/70 border border-amber-200/90 rounded-xl p-3.5 sm:p-4 text-xs flex items-start gap-3" },
+                    React.createElement("span", { className: "material-symbols-outlined text-amber-600 text-[18px] shrink-0 mt-0.5" }, "warning"),
+                    React.createElement("div", { className: "flex flex-col gap-1 text-amber-900 leading-relaxed" },
+                        React.createElement("p", { className: "font-bold" }, "\uAD6D\uC138\uCCAD \uC6D0\uBCF8 \uC9C4\uC704\uD655\uC778 \uBC0F \uBCF4\uC548 \uC548\uB0B4"),
+                        React.createElement("ul", { className: "list-disc list-inside text-[11px] text-amber-800 space-y-0.5" },
+                            React.createElement("li", null, "\uC815\uBD8024 \uBC0F \uD648\uD0DD\uC2A4 \uC704\uBCC0\uC870 \uBC29\uC9C0 \uBC14\uCF54\uB4DC\uAC00 \uC190\uC0C1\uB418\uC5C8\uAC70\uB098 \uCEA1\uCC98\uB41C \uC2A4\uD06C\uB9B0\uC0F7\uC740 \uC778\uC2DD\uC774 \uBC18\uB824\uB420 \uC218 \uC788\uC2B5\uB2C8\uB2E4."),
+                            React.createElement("li", null, "\uC8FC\uBBFC\uB4F1\uB85D\uBC88\uD638 \uB4B7\uC790\uB9AC\uB294 \uC790\uB3D9 \uB9C8\uC2A4\uD0B9(\uBE44\uC2DD\uBCC4\uD654) \uCC98\uB9AC\uB418\uC5B4 \uC548\uC804\uD558\uAC8C \uC800\uC7A5\uB429\uB2C8\uB2E4."))))),
+            React.createElement("div", { className: "px-6 py-4 bg-slate-50 border-t border-slate-200/90 flex flex-col-reverse sm:flex-row items-center justify-between gap-3 shrink-0" },
+                React.createElement("div", { className: "flex items-center gap-2 text-xs text-slate-500" },
+                    React.createElement("span", { className: "material-symbols-outlined text-[16px] text-emerald-600" }, "security"),
+                    React.createElement("span", null, "SSL 256-bit \uACF5\uACF5 \uB370\uC774\uD130 \uC804\uC1A1 \uBCF4\uC548 \uC801\uC6A9")),
+                React.createElement("div", { className: "flex items-center gap-2 w-full sm:w-auto justify-end" },
+                    React.createElement("button", { type: "button", onClick: onClose, className: "w-full sm:w-auto px-5 py-2.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-100 text-xs font-bold text-slate-700 cursor-pointer" }, "\uCDE8\uC18C \uBC0F \uB2EB\uAE30"),
+                    React.createElement("button", { type: "button", onClick: () => {
+                            onApplyData?.(ocrData);
+                            onClose?.();
+                        }, className: "w-full sm:w-auto px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shadow-sm flex items-center justify-center gap-1.5 cursor-pointer" },
+                        React.createElement("span", { className: "material-symbols-outlined text-[16px]" }, "task_alt"),
+                        "\uC778\uC2DD \uC815\uBCF4 \uD654\uBA74\uC5D0 \uC790\uB3D9 \uBC18\uC601\uD558\uAE30"))))));
 }
 function WebClntCom010000({ onNavigate }) {
     // 1. 필수 상태 관리 (요구사항 명세 100% 반영)
@@ -6209,7 +6414,19 @@ function WebClntCom010000({ onNavigate }) {
         React.createElement("header", { className: "fixed top-0 left-0 w-full z-50 bg-surface-container-lowest/95 backdrop-blur-md shadow-[0_1px_8px_rgba(0,0,0,0.06)]" },
             React.createElement("div", { className: "h-[72px] max-w-[1200px] mx-auto px-margin flex items-center justify-between gap-space-md" },
                 React.createElement("div", { className: "flex items-center gap-4 shrink-0" },
-                    React.createElement("a", { className: "flex items-center gap-2 group cursor-pointer", "data-path": "home", href: "#home", onClick: (e) => handleNavClick(e, 'home') },
+                    React.createElement("a", { className: "flex items-center gap-2 group cursor-pointer", "data-path": "home", href: "#home", onClick: (e) => {
+                            e.preventDefault();
+                            const role = userInfo?.USER_ROLE_CD || userInfo?.userRoleCd;
+                            if (userInfo && (role === 'S' || role === 'SERVICE')) {
+                                handleNavClick(e, 'WEB-SRVC-COM-010000');
+                            }
+                            else if (userInfo && (role === 'C' || role === 'CLIENT')) {
+                                handleNavClick(e, 'WEB-CLNT-COM-010200');
+                            }
+                            else {
+                                handleNavClick(e, 'home');
+                            }
+                        } },
                         React.createElement("img", { src: "/logo.png", alt: "\uC4F8\uACE0\uB2E6\uACE0 \uB85C\uACE0", className: "w-14 h-14 rounded-full object-cover shadow-sm ring-2 ring-primary/20" }))),
                 React.createElement("nav", { className: "hidden md:flex items-center gap-1 bg-surface-container-lowest p-1 rounded-full shadow-xs border border-outline-variant/30", "data-active-classes": "bg-secondary-container text-on-secondary-container font-label-md" },
                     userInfo?.USER_ROLE_CD === 'S' ? (React.createElement(React.Fragment, null,
@@ -6231,23 +6448,29 @@ function WebClntCom010000({ onNavigate }) {
                         React.createElement("button", { type: "button", className: "px-3.5 py-1.5 rounded-full font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all cursor-pointer", onClick: () => document.getElementById('section-how-it-works')?.scrollIntoView({ behavior: 'smooth' }) }, "\uC774\uC6A9 \uC808\uCC28 4\uB2E8\uACC4 \uC6CC\uD06C\uD50C\uB85C\uC6B0"),
                         React.createElement("button", { type: "button", className: "px-3.5 py-1.5 rounded-full font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all cursor-pointer", onClick: () => document.getElementById('section-live-matching')?.scrollIntoView({ behavior: 'smooth' }) }, "\uC2E4\uC2DC\uAC04 \uBC1C\uC8FC\u00B7\uB9E4\uCE6D \uD604\uD669"),
                         React.createElement("button", { type: "button", className: "px-3.5 py-1.5 rounded-full font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all cursor-pointer", onClick: () => document.getElementById('section-partner-recruit')?.scrollIntoView({ behavior: 'smooth' }) }, "\uC4F8\uACE0\uB2E6\uACE0 \uC804\uBB38 \uC2DC\uACF5\uC0AC \uD30C\uD2B8\uB108 \uBAA8\uC9D1"))),
-                    React.createElement("div", { className: "relative", onMouseEnter: () => setIsMyMenuOpen(true), onMouseLeave: () => setIsMyMenuOpen(false) },
+                    React.createElement("div", { className: "relative" },
                         React.createElement("button", { type: "button", className: activeNavPath === 'my-account' || activeNavPath === 'WEB-CLNT-MYP-010100' || isMyMenuOpen
                                 ? 'px-3.5 py-1.5 rounded-full transition-all bg-secondary-container text-on-secondary-container font-label-md flex items-center gap-1 cursor-pointer font-bold'
                                 : 'px-3.5 py-1.5 rounded-full font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all flex items-center gap-1 cursor-pointer', onClick: (e) => {
                                 e.stopPropagation();
                                 if (userInfo && !userInfo.isGuest) {
-                                    setActiveNavPath('WEB-CLNT-MYP-010100');
-                                    setIsMyMenuOpen(!isMyMenuOpen);
+                                    if (userInfo.USER_ROLE_CD === 'S') {
+                                        setActiveNavPath('WEB-SRVC-MYP-020100');
+                                        if (typeof onNavigate === 'function')
+                                            onNavigate('WEB-SRVC-MYP-020100');
+                                    }
+                                    else {
+                                        setIsMyMenuOpen(!isMyMenuOpen);
+                                    }
                                 }
                                 else {
                                     alert('내 정보 관리를 위해 먼저 로그인해 주세요.');
                                     setIsLoginModalOpen(true);
                                 }
                             } },
-                            React.createElement("span", null, "\uB0B4 \uC815\uBCF4"),
+                            React.createElement("span", null, "\uB0B4 \uC815\uBCF4 \uAD00\uB9AC"),
                             React.createElement("span", { className: "material-symbols-outlined text-[16px] transition-transform duration-200" }, isMyMenuOpen ? 'arrow_drop_up' : 'arrow_drop_down')),
-                        isMyMenuOpen && (React.createElement("div", { className: "absolute right-0 top-full mt-1 w-56 bg-white rounded-2xl shadow-xl border border-slate-200/80 py-2 z-[200] animate-in fade-in slide-in-from-top-1 duration-150" },
+                        isMyMenuOpen && userInfo?.USER_ROLE_CD !== 'S' && (React.createElement("div", { className: "absolute right-0 top-full mt-1 w-56 bg-white rounded-2xl shadow-xl border border-slate-200/80 py-2 z-[200] animate-in fade-in slide-in-from-top-1 duration-150" },
                             React.createElement("div", { className: "px-3.5 py-2 border-b border-slate-100 flex items-center justify-between text-xs" },
                                 React.createElement("span", { className: "font-bold text-slate-800" }, userInfo?.USER_ROLE_CD === 'S' ? '시공사 회원' : (userInfo?.isGuest ? '비회원' : '고객 회원')),
                                 React.createElement("span", { className: "text-[10px] px-1.5 py-0.2 rounded font-mono font-bold bg-slate-100 text-slate-600" }, userInfo?.isGuest ? 'GUEST' : (userInfo?.USER_ROLE_CD === 'S' ? 'PARTNER' : 'CLIENT'))),
@@ -6375,7 +6598,7 @@ function WebClntCom010000({ onNavigate }) {
                                 e.preventDefault();
                                 setIsRegisterModalOpen(true);
                             } }, "\uD68C\uC6D0\uAC00\uC785")))))),
-        userInfo?.USER_ROLE_CD === 'S' && (activeNavPath === 'WEB-SRVC-COM-010000' || activeNavPath === 'home') ? (React.createElement(WebSrvcCom010000, { userInfo: userInfo, onNavigate: setActiveNavPath })) : userInfo?.USER_ROLE_CD === 'C' && activeNavPath === 'WEB-CLNT-COM-010200' ? (React.createElement(WebClntCom010200, { userInfo: userInfo, onOpenReqModal: handleOpenReqModal, onNavigate: setActiveNavPath })) : (React.createElement("main", { className: "w-full pt-[72px] bg-surface flex-1 overflow-y-auto overflow-x-hidden" },
+        userInfo?.USER_ROLE_CD === 'S' && (activeNavPath === 'WEB-SRVC-COM-010000' || activeNavPath === 'home') ? (React.createElement(WebSrvcCom010000, { userInfo: userInfo, onNavigate: setActiveNavPath })) : userInfo?.USER_ROLE_CD === 'C' && activeNavPath === 'WEB-CLNT-COM-010200' ? (React.createElement(WebClntCom010200, { userInfo: userInfo, onOpenReqModal: handleOpenReqModal, onNavigate: setActiveNavPath })) : userInfo?.USER_ROLE_CD === 'S' && activeNavPath === 'WEB-SRVC-MYP-020100' ? (React.createElement(WebSrvcMyp020100, { userInfo: userInfo, onBack: () => setActiveNavPath('WEB-SRVC-COM-010000') })) : (React.createElement("main", { className: "w-full pt-[72px] bg-surface flex-1 overflow-y-auto overflow-x-hidden" },
             React.createElement("div", { className: "max-w-[1440px] mx-auto px-margin-mobile lg:px-margin flex flex-col gap-0" },
                 React.createElement("section", { className: "relative py-12 lg:py-20" },
                     React.createElement("div", { className: "absolute -top-10 -left-10 w-96 h-96 rounded-full bg-primary/5 blur-3xl pointer-events-none" }),

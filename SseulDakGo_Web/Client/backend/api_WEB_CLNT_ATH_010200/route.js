@@ -429,6 +429,25 @@ export async function processWebClntAth010200200(payload = {}) {
         };
       }
 
+      // 동일 역할(이용자 C / 시공사 S) 내 휴대폰 번호(USER_TEL) 중복 검증
+      const cleanTel = String(userTel || '').replace(/[^0-9]/g, '');
+      if (cleanTel) {
+        const dupTelRows = await db.executeQuery(
+          `SELECT USER_NO FROM TB_USER WHERE SUBSTRING(USER_NO, 1, 1) = ? AND REPLACE(USER_TEL, '-', '') = ? AND USER_STAT_CD <> 'WITHDRAWN' LIMIT 1`,
+          [rolePrefix, cleanTel]
+        );
+        if (dupTelRows && dupTelRows.length > 0) {
+          return {
+            status: 409,
+            data: {
+              success: false,
+              code: 'ERR_DUPLICATE_TEL',
+              message: `이미 가입된 ${roleNm} 휴대폰 번호입니다. 해당 계정으로 로그인해 주세요.`
+            }
+          };
+        }
+      }
+
       // 채번 및 해싱
       const userNo = await generateUserNo(normalizedRole, db);
       const { salt, hash } = userPwd ? hashPassword(userPwd) : { salt: null, hash: null };
