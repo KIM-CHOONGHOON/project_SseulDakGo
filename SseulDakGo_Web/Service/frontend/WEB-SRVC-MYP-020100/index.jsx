@@ -73,7 +73,7 @@ export default function WebSrvcMyp020100({ userInfo, onBack }) {
               className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-xs font-bold text-slate-700 border border-slate-200 transition-colors cursor-pointer"
             >
               <span className="material-symbols-outlined text-base text-slate-600">document_scanner</span>
-              홈택스 PDF OCR 업로드
+              사업자 등록증 업로드
             </button>
           </div>
 

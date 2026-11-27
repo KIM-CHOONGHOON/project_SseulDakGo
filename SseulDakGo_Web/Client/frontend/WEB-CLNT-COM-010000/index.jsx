@@ -7931,6 +7931,11 @@ function WebSrvcCom010000({ userInfo }) {
 }
 
 
+const INITIAL_CERTS = [
+  { id: 1, name: '가전관리사 1급', org: '한국청소위생협회', cat: '계절가전 분해케어', catCls: 'bg-blue-50 text-blue-700 border-blue-100', level: '1급', date: '2023.05.14', certNo: '제2023-C-0842호', status: '검수완료', statusCls: 'bg-emerald-50 text-emerald-700 border-emerald-200', dotCls: 'bg-emerald-500', icon: 'award_star', iconBg: 'bg-teal-50 text-teal-700 border-teal-200' },
+  { id: 2, name: '방역소독전문가 1급', org: '사단법인 한국방역협회', cat: '입주·이사 청소', catCls: 'bg-teal-50 text-teal-700 border-teal-100', level: '전문가', date: '2022.11.20', certNo: '제2022-DS-1093호', status: '심사대기', statusCls: 'bg-amber-50 text-amber-700 border-amber-200', dotCls: 'bg-amber-500', icon: 'license', iconBg: 'bg-blue-50 text-blue-700 border-blue-200' },
+];
+
 function WebSrvcMyp020100({ userInfo, onBack }) {
   const [bizName, setBizName] = useState(userInfo?.USER_NM || '(주)클린파트너스');
   const [ceoName, setCeoName] = useState('김태호');
@@ -7995,7 +8000,7 @@ function WebSrvcMyp020100({ userInfo, onBack }) {
               className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-xs font-bold text-slate-700 border border-slate-200 transition-colors cursor-pointer"
             >
               <span className="material-symbols-outlined text-base text-slate-600">document_scanner</span>
-              홈택스 PDF OCR 업로드
+              사업자 등록증 업로드
             </button>
           </div>
 
@@ -8313,7 +8318,7 @@ function WebSrvcMyp020101({ isOpen, onClose, onApplyData }) {
               </span>
             </div>
             <h2 className="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight">
-              홈택스 PDF OCR 업로드 및 자동 인식
+              사업자 등록증 업로드 및 자동 인식
             </h2>
             <p className="text-xs sm:text-sm text-slate-500 mt-1 leading-relaxed">
               국세청 홈택스에서 발급받은 사업자등록증(명) 원본 PDF를 업로드하면 업종코드와 사업자 정보가 자동 추출됩니다.
@@ -9115,6 +9120,20 @@ export default function WebClntCom010000({ onNavigate }) {
                   }}
                 >
                   내 활동 내역
+                </button>
+                <button
+                  type="button"
+                  className={
+                    activeNavPath === 'WEB-SRVC-MYP-020100'
+                      ? 'px-3.5 py-1.5 rounded-full transition-all bg-secondary-container text-on-secondary-container font-label-md cursor-pointer font-bold'
+                      : 'px-3.5 py-1.5 rounded-full font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all cursor-pointer'
+                  }
+                  onClick={() => {
+                    setActiveNavPath('WEB-SRVC-MYP-020100');
+                    if (typeof onNavigate === 'function') onNavigate('WEB-SRVC-MYP-020100');
+                  }}
+                >
+                  내 정보 관리
                 </button>
               </>
             ) : (

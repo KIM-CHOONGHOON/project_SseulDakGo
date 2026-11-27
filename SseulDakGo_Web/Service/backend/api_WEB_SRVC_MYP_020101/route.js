@@ -5,18 +5,32 @@ import { executeQuery } from '../../../../lib/db.ts';
 
 const require = createRequire(import.meta.url);
 const { PDFParse } = require('pdf-parse');
+const { createWorker } = require('tesseract.js');
 
 async function extractPdfText(buffer) {
-  const parser = new PDFParse({ data: buffer });
-  const data = await parser.getText();
-  return (data?.text || '').replace(/\r/g, '');
+  let text = '';
+  try {
+    const parser = new PDFParse({ data: buffer });
+    const data = await parser.getText();
+    text = (data?.text || '').replace(/\r/g, '');
+  } catch (_) {}
+
+  if (!text.trim()) {
+    try {
+      const worker = await createWorker('kor+eng');
+      const { data } = await worker.recognize(buffer);
+      await worker.terminate();
+      text = (data?.text || '').replace(/\r/g, '');
+    } catch (_) {}
+  }
+  return text;
 }
 
 function parseHometaxPdfText(text) {
-  const issueNo = (text.match(/(\d{4}-\d{3}-\d{4}-\d{3})/) || [])[1] || '';
-  const bizNo = (text.match(/(\d{3}-\d{2}-\d{5})/) || [])[1] || '';
+  const issueNo = (text.match(/(\d{4}\s*-\s*\d{3}\s*-\s*\d{4}\s*-\s*\d{3})/) || [])[1]?.replace(/\s+/g, '') || '';
+  const bizNo = (text.match(/(\d{3}\s*-\s*\d{2}\s*-\s*\d{5})/) || [])[1]?.replace(/\s+/g, '') || '';
   const taxType = (text.match(/(일반과세자|간이과세자|면세사업자|법인사업자)/) || [])[1] || '일반과세자';
-  const openDate = (text.match(/개\s*업\s*일\s*(\d{4}년\s*\d{1,2}월\s*\d{1,2}일)/) || text.match(/(\d{4}년\s*\d{1,2}월\s*\d{1,2}일)/) || [])[1] || '';
+  const openDate = (text.match(/개\s*업\s*일[^\d]*(\d{4}\s*년\s*\d{1,2}\s*월\s*\d{1,2}\s*일)/) || text.match(/(\d{4}\s*년\s*\d{1,2}\s*월\s*\d{1,2}\s*일)/) || [])[1]?.replace(/\s+/g, ' ').trim() || '';
   const bizName = (text.match(/상\s*호\s*\(\s*법\s*인\s*명\s*\)\s*([^\r\n]+)/) || [])[1]?.trim() || '';
   const ceoName = (text.match(/대\s*표\s*자\s*성\s*명[^\r\n]*?\)\s*([^\r\n]+)/) || [])[1]?.trim() || '';
   const bizType = (text.match(/업\s*태\s*([^\r\n]+)/) || [])[1]?.trim() || '';
