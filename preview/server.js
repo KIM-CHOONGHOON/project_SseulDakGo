@@ -1603,6 +1603,81 @@ app.get('/api/srvc/com/010000', async (req, res) => {
   }
 });
 
+import {
+  handleGetPartnerLogo,
+  handleUploadPartnerLogo,
+  handleResetPartnerLogo,
+} from '../SseulDakGo_Web/Service/backend/api_WEB_SRVC_COM_010100/route.js';
+
+function parseMultipartLogo(req) {
+  const ct = String(req.headers['content-type'] || '');
+  const m = ct.match(/boundary=(?:"([^"]+)"|([^;]+))/i);
+  if (!m || !Buffer.isBuffer(req.body)) return {};
+  const boundary = `--${m[1] || m[2]}`;
+  const raw = req.body.toString('latin1');
+  const parts = raw.split(boundary).slice(1, -1);
+  let userNo = '';
+  let file = null;
+  for (const part of parts) {
+    const sep = part.indexOf('\r\n\r\n');
+    if (sep === -1) continue;
+    const header = part.slice(0, sep);
+    const bodyStr = part.slice(sep + 4, part.endsWith('\r\n') ? -2 : undefined);
+    if (header.includes('name="userNo"')) {
+      userNo = Buffer.from(bodyStr, 'latin1').toString('utf8').trim();
+    } else if (header.includes('name="logoFile"')) {
+      const fnMatch = header.match(/filename="([^"]*)"/i);
+      const mtMatch = header.match(/Content-Type:\s*([^\r\n]+)/i);
+      file = {
+        originalname: fnMatch ? Buffer.from(fnMatch[1], 'latin1').toString('utf8') : 'logo.png',
+        mimetype: mtMatch ? mtMatch[1].trim() : 'image/png',
+        buffer: Buffer.from(bodyStr, 'latin1'),
+      };
+    }
+  }
+  return { userNo, file };
+}
+
+// [WEB-SRVC-COM-010100] 파트너 대표 로고 이미지 조회 / 업로드 / 초기화
+app.get('/api/srvc/com/010100', async (req, res) => {
+  try {
+    const userNo = String(req.query.userNo || '').trim();
+    const result = await handleGetPartnerLogo(userNo);
+    return res.status(result.status).json(result.body);
+  } catch (err) {
+    console.error('[GET /api/srvc/com/010100] 오류:', err);
+    return res.status(500).json({ success: false, message: '로고 조회 중 오류가 발생했습니다.' });
+  }
+});
+
+app.post('/api/srvc/com/010100', express.raw({ type: 'multipart/form-data', limit: '6mb' }), async (req, res) => {
+  try {
+    const { userNo: bodyUserNo, file } = parseMultipartLogo(req);
+    const userNo = String(bodyUserNo || req.query?.userNo || '').trim();
+    const result = await handleUploadPartnerLogo({
+      userNo,
+      origName: file?.originalname,
+      mimeType: file?.mimetype,
+      buffer: file?.buffer,
+    });
+    return res.status(result.status).json(result.body);
+  } catch (err) {
+    console.error('[POST /api/srvc/com/010100] 오류:', err);
+    return res.status(500).json({ success: false, message: '로고 저장 중 오류가 발생했습니다.' });
+  }
+});
+
+app.delete('/api/srvc/com/010100', async (req, res) => {
+  try {
+    const userNo = String(req.query.userNo || req.body?.userNo || '').trim();
+    const result = await handleResetPartnerLogo(userNo);
+    return res.status(result.status).json(result.body);
+  } catch (err) {
+    console.error('[DELETE /api/srvc/com/010100] 오류:', err);
+    return res.status(500).json({ success: false, message: '로고 초기화 중 오류가 발생했습니다.' });
+  }
+});
+
 // 모바일 하이브리드 앱 웹뷰 프리뷰 라우트
 app.get(['/app', '/app/client/com_000', '/app/client/req_000', '/preview/app', '/preview/app.html'], (req, res) => {
   res.sendFile(path.join(__dirname, 'app.html'));

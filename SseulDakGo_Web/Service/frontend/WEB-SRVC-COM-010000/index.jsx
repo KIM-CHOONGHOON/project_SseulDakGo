@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import WebSrvcCom010100 from '../WEB-SRVC-COM-010100/index.jsx';
 
 function getCurrentMonthRange() {
   const now = new Date();
@@ -83,6 +84,8 @@ export default function WebSrvcCom010000({ userInfo }) {
   const [actTotalPages, setActTotalPages] = useState(1);
 
   const [toastMsg, setToastMsg] = useState('');
+  const [isLogoModalOpen, setIsLogoModalOpen] = useState(false);
+  const [partnerLogoUrl, setPartnerLogoUrl] = useState(userInfo?.PROFILE_IMG_URL || null);
 
   const showToast = (msg) => {
     setToastMsg(msg);
@@ -128,6 +131,19 @@ export default function WebSrvcCom010000({ userInfo }) {
       dTo: dateTo,
     });
   }, [activeTab, tabPage, actPage, fetchDashboardData]);
+
+  useEffect(() => {
+    const uNo = userInfo?.USER_NO || userInfo?.userNo;
+    if (!uNo) return;
+    fetch(`/api/srvc/com/010100?userNo=${encodeURIComponent(uNo)}`)
+      .then((r) => r.json())
+      .then((d) => {
+        if (d?.success && d.data?.currentLogoUrl) {
+          setPartnerLogoUrl(d.data.currentLogoUrl);
+        }
+      })
+      .catch(() => {});
+  }, [userInfo]);
 
   const handleTabClick = (tabId) => {
     setActiveTab(tabId);
@@ -196,21 +212,24 @@ export default function WebSrvcCom010000({ userInfo }) {
 
       <div className="w-full max-w-[1440px] mx-auto px-margin-mobile md:px-margin py-space-xl flex flex-col gap-space-xl">
         {/* Section 2: Partner Welcome */}
-        <section className="bg-surface-container-lowest rounded-xl p-space-lg shadow-sm flex flex-col lg:flex-row items-start lg:items-center justify-between gap-space-lg relative overflow-hidden">
+        <section className="bg-surface-container-lowest border-2 border-blue-500 rounded-xl p-space-lg shadow-sm flex flex-col lg:flex-row items-start lg:items-center justify-between gap-space-lg relative overflow-hidden">
           <div className="absolute -right-16 -top-16 w-64 h-64 bg-secondary-fixed/20 rounded-full blur-3xl pointer-events-none" />
           <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6 relative z-10 w-full">
             <div className="flex items-center gap-6 shrink-0">
-              <div className="flex flex-col items-center gap-2 shrink-0">
-                <div className="w-28 h-28 rounded-xl border border-slate-200 bg-surface-container-lowest p-3 shadow-sm flex flex-col items-center justify-center gap-1.5 text-center">
-                  <div className="w-12 h-12 rounded-xl bg-primary-fixed/20 text-primary flex items-center justify-center shrink-0">
-                    <span className="material-symbols-outlined text-[28px]">corporate_fare</span>
-                  </div>
-                  <span className="font-label-sm text-label-sm font-bold text-on-surface truncate max-w-[90px]">(주)클린파트너스</span>
+              <div className="flex flex-col items-center gap-2 shrink-0 border-2 border-blue-500 rounded-xl p-2 bg-surface-container-lowest">
+                <div className="w-28 h-28 rounded-xl border border-slate-200 bg-surface-container-lowest p-3 shadow-sm flex flex-col items-center justify-center gap-1.5 text-center overflow-hidden">
+                  {partnerLogoUrl ? (
+                    <img src={partnerLogoUrl} alt="파트너 대표 로고" className="w-20 h-20 rounded-xl object-cover shrink-0" />
+                  ) : (
+                    <div className="w-12 h-12 rounded-xl bg-primary-fixed/20 text-primary flex items-center justify-center shrink-0">
+                      <span className="material-symbols-outlined text-[28px]">corporate_fare</span>
+                    </div>
+                  )}
                 </div>
                 <button
                   type="button"
-                  onClick={() => showToast('[WEB-SRVC-COM-010100] 로고 이미지 변경 모달을 호출합니다.')}
-                  className="flex items-center gap-1 px-3 py-1 rounded-lg border border-slate-300 bg-surface-container-lowest hover:bg-surface-container-low text-on-surface-variant hover:text-on-surface text-label-sm font-semibold transition cursor-pointer"
+                  onClick={() => setIsLogoModalOpen(true)}
+                  className="flex items-center gap-1 px-3 py-1 rounded-lg border-2 border-red-500 bg-surface-container-lowest hover:bg-surface-container-low text-on-surface-variant hover:text-on-surface text-label-sm font-semibold transition cursor-pointer"
                 >
                   <span className="material-symbols-outlined text-[14px]">photo_camera</span>
                   <span>로고변경</span>
@@ -256,7 +275,7 @@ export default function WebSrvcCom010000({ userInfo }) {
                 <button
                   type="button"
                   onClick={() => showToast('[WEB-SRVC-MYP-010100] 시공사 내정보 및 활동 권역 관리 화면을 호출합니다.')}
-                  className="font-label-sm text-label-sm text-primary hover:underline font-semibold flex items-center cursor-pointer"
+                  className="font-label-sm text-label-sm text-primary hover:underline font-semibold flex items-center gap-1 px-3 py-1 rounded-lg border-2 border-red-500 cursor-pointer"
                 >
                   권역 수정 <span className="material-symbols-outlined text-[15px]">arrow_forward</span>
                 </button>
@@ -366,21 +385,30 @@ export default function WebSrvcCom010000({ userInfo }) {
                         </span>
                       </div>
                       {activeTab === 'waiting-bid' && (
-                        <button
-                          type="button"
-                          onClick={() => {
-                            const bizNo = userInfo?.BIZ_REG_NO || userInfo?.bizRegNo;
-                            const bizStat = userInfo?.BIZ_STAT_CD || userInfo?.bizStatCd || 'ACTIVE';
-                            if (!bizNo || ['CLOSED', 'SUSPENDED', '폐업', '휴업'].includes(bizStat)) {
-                              showToast('사업자등록 정보가 미등록되었거나 휴·폐업 상태이므로 청약할 수 없습니다.');
-                              return;
-                            }
-                            showToast('[WEB-SRVC-QOT-010100] 확정가 청소용역 단독 청약 신청 모달을 호출합니다.');
-                          }}
-                          className="bg-primary hover:bg-primary-container text-on-primary font-title-md text-title-md font-bold px-space-lg py-2.5 rounded-lg shadow-sm transition cursor-pointer"
-                        >
-                          단독 청약하기
-                        </button>
+                        <div className="flex items-center gap-2">
+                          <button
+                            type="button"
+                            onClick={() => showToast(`[WEB-SRVC-QOT-010000] 발주(${item.orderNo}) 상세조회 모달을 호출합니다.`)}
+                            className="bg-surface-container-lowest hover:bg-surface-container border border-slate-300 text-on-surface font-title-md text-title-md font-bold px-space-lg py-2.5 rounded-lg shadow-sm transition cursor-pointer"
+                          >
+                            상세조회
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const bizNo = userInfo?.BIZ_REG_NO || userInfo?.bizRegNo;
+                              const bizStat = userInfo?.BIZ_STAT_CD || userInfo?.bizStatCd || 'ACTIVE';
+                              if (!bizNo || ['CLOSED', 'SUSPENDED', '폐업', '휴업'].includes(bizStat)) {
+                                showToast('사업자등록 정보가 미등록되었거나 휴·폐업 상태이므로 청약할 수 없습니다.');
+                                return;
+                              }
+                              showToast('[WEB-SRVC-QOT-010100] 확정가 청소용역 단독 청약 신청 모달을 호출합니다.');
+                            }}
+                            className="bg-primary hover:bg-primary-container text-on-primary font-title-md text-title-md font-bold px-space-lg py-2.5 rounded-lg shadow-sm transition cursor-pointer"
+                          >
+                            단독 청약하기
+                          </button>
+                        </div>
                       )}
                       {activeTab === 'waiting-payment' && (
                         <button
@@ -414,7 +442,7 @@ export default function WebSrvcCom010000({ userInfo }) {
 
         {/* Section 5: 내 활동 내역 */}
         <section
-          className="bg-surface-container-lowest border-2 border-pink-500 rounded-xl p-space-lg shadow-sm flex flex-col gap-space-md"
+          className="bg-surface-container-lowest border-2 border-blue-500 rounded-xl p-space-lg shadow-sm flex flex-col gap-space-md"
           id="section-activity-history"
         >
           <div className="flex items-center gap-space-xs">
@@ -425,7 +453,7 @@ export default function WebSrvcCom010000({ userInfo }) {
             </div>
           </div>
 
-          <div className="bg-surface-container-lowest border border-slate-200 rounded-2xl p-4 shadow-sm flex flex-col xl:flex-row items-stretch xl:items-center justify-between gap-4">
+          <div className="bg-surface-container-lowest border-2 border-blue-500 rounded-2xl p-4 shadow-sm flex flex-col xl:flex-row items-stretch xl:items-center justify-between gap-4">
             <div className="flex flex-col lg:flex-row items-start lg:items-center gap-3 flex-wrap flex-1">
               <div className="flex items-center gap-2">
                 <div className="flex items-center gap-1.5 font-title-md text-title-md font-bold text-on-surface shrink-0">
@@ -476,6 +504,14 @@ export default function WebSrvcCom010000({ userInfo }) {
               </button>
               <button
                 type="button"
+                onClick={() => window.print()}
+                className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-[#eab308] hover:bg-[#ca8a04] text-slate-900 font-title-md text-title-md font-bold shadow-sm transition cursor-pointer"
+              >
+                <span className="material-symbols-outlined text-[16px]">print</span>
+                <span>출력하기</span>
+              </button>
+              <button
+                type="button"
                 onClick={handleSearchActivity}
                 className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-primary hover:bg-primary-container text-on-primary font-title-md text-title-md font-bold shadow-sm transition cursor-pointer"
               >
@@ -518,6 +554,21 @@ export default function WebSrvcCom010000({ userInfo }) {
                         className="bg-surface-container-lowest hover:bg-surface-container border border-slate-300 text-on-surface font-title-md text-title-md font-bold px-space-lg py-2.5 rounded-lg shadow-sm transition cursor-pointer"
                       >
                         상세 조회
+                      </button>
+                      <button
+                        type="button"
+                        disabled={!act.hasReview}
+                        onClick={() => {
+                          if (!act.hasReview) return;
+                          showToast('[WEB-SRVC-COM-010300] 이용후기 답글쓰기 모달을 호출합니다.');
+                        }}
+                        className={`font-title-md text-title-md font-bold px-space-lg py-2.5 rounded-lg border transition ${
+                          act.hasReview
+                            ? 'bg-primary hover:bg-primary-container text-on-primary border-primary shadow-sm cursor-pointer'
+                            : 'bg-surface-container text-on-surface-variant border-slate-300 opacity-40 cursor-not-allowed'
+                        }`}
+                      >
+                        답글쓰기
                       </button>
                     </div>
                   </div>
@@ -562,6 +613,15 @@ export default function WebSrvcCom010000({ userInfo }) {
           </div>
         </section>
       </div>
+      <WebSrvcCom010100
+        isOpen={isLogoModalOpen}
+        userInfo={userInfo}
+        onClose={() => setIsLogoModalOpen(false)}
+        onSuccess={(newUrl) => {
+          setPartnerLogoUrl(newUrl);
+          showToast(newUrl ? '파트너 대표 로고가 변경되었습니다.' : '기본 파트너 뱃지로 초기화되었습니다.');
+        }}
+      />
     </main>
   );
 }
