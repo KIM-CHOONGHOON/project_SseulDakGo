@@ -1042,6 +1042,27 @@ app.post('/api/web/service/job_020200', processWebSrvcJob020200);
 // ============================================================================
 // [API 라우트] WEB-SRVC-MYP-010100 / 010200 / 010201 (시공사 내정보·지역관리·회원탈회)
 // ============================================================================
+app.get('/api/srvc/myp/020100', async (req, res) => {
+  try {
+    const userNo = String(req.query?.userNo || '').trim();
+    if (!userNo) {
+      return res.status(200).json({ success: true, certs: [] });
+    }
+    const rows = await executeQuery(
+      `SELECT CERT_SEQ, USER_NO, CERT_NM, ISSUER_ORG, SERVICE_CAT, CERT_LEVEL,
+              DATE_FORMAT(ISSUE_DT, '%Y.%m.%d') AS issueDt, CERT_NO, VERIFY_STAT_CD
+         FROM TB_SERVICE_CERT
+        WHERE USER_NO = ?
+        ORDER BY REG_DT DESC`,
+      [userNo]
+    );
+    return res.status(200).json({ success: true, certs: rows || [] });
+  } catch (err) {
+    console.error('[GET /api/srvc/myp/020100] 오류:', err);
+    return res.status(500).json({ success: false, message: '자격·수료증 조회 중 오류가 발생했습니다.' });
+  }
+});
+
 app.put('/api/srvc/myp/020100', async (req, res) => {
   try {
     const { userNo, bizName, ceoName, bizNo, certs } = req.body || {};
@@ -1078,7 +1099,7 @@ app.all('/api/srvc/myp/020101', async (req, res) => {
     const webReq = new Request(fullUrl, {
       method: req.method,
       headers: req.headers,
-      body: ['GET', 'HEAD'].includes(req.method) ? undefined : Readable.toWeb(req),
+      body: ['GET', 'HEAD'].includes(req.method) ? undefined : (req.is('application/json') ? JSON.stringify(req.body || {}) : Readable.toWeb(req)),
       duplex: 'half',
     });
     const webRes = await handler(webReq);
@@ -1581,8 +1602,44 @@ app.get('/api/srvc/com/010000', async (req, res) => {
       };
     });
 
+    let partnerCerts = [];
+    if (userNo) {
+      try {
+        partnerCerts = await executeQuery(
+          `SELECT CERT_NM, SERVICE_CAT FROM TB_SERVICE_CERT WHERE USER_NO = ? ORDER BY REG_DT DESC LIMIT 5`,
+          [userNo]
+        );
+      } catch (_) {}
+    }
+
+    const partnerSpecialties = Array.from(
+      new Set((partnerCerts || []).map((c) => c.SERVICE_CAT).filter(Boolean))
+    );
+
+    let isBizRestricted = false;
+    if (userNo) {
+      try {
+        const docRows = await executeQuery(
+          `SELECT BIZ_REG_NO, CEO_NM, VERIFY_YN FROM TB_SERVICE_DOC WHERE USER_NO = ? LIMIT 1`,
+          [userNo]
+        );
+        if (docRows && docRows.length > 0) {
+          const doc = docRows[0];
+          const noBizNo = !doc.BIZ_REG_NO || doc.BIZ_REG_NO === '000-00-00000';
+          const noCeo = !doc.CEO_NM || doc.CEO_NM === '대표자';
+          const badVerify = doc.VERIFY_YN === 'N';
+          if (noBizNo || noCeo || badVerify) {
+            isBizRestricted = true;
+          }
+        }
+      } catch (_) {}
+    }
+
     return res.status(200).json({
       success: true,
+      isBizRestricted,
+      partnerSpecialties,
+      partnerCerts: (partnerCerts || []).map((c) => c.CERT_NM).filter(Boolean),
       tabCounts,
       tabData: {
         items: tabItems,

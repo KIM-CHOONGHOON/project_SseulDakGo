@@ -66,6 +66,27 @@ async function verifyContractorSession(userNo) {
   return { ok: true, user };
 }
 
+export async function GET(req) {
+  try {
+    const url = new URL(req.url);
+    const userNo = url.searchParams.get('userNo') || '';
+    if (!userNo) {
+      return Response.json({ success: false, message: 'userNo가 필요합니다.' }, { status: 400 });
+    }
+    const rows = await executeQuery(
+      `SELECT USER_NO, COMP_NM, CEO_NM, BIZ_REG_NO, OPEN_DT, TAX_TYPE_NM, IND_CD, IND_NM, VERIFY_YN
+         FROM TB_SERVICE_DOC
+        WHERE USER_NO = ?
+        LIMIT 1`,
+      [userNo]
+    );
+    return Response.json({ success: true, data: rows?.[0] || null });
+  } catch (err) {
+    console.error('[GET /api/srvc/myp/020101] 오류:', err);
+    return Response.json({ success: false, message: '사업자 정보 조회 중 오류가 발생했습니다.' }, { status: 500 });
+  }
+}
+
 export async function POST(req) {
   try {
     const formData = await req.formData();
@@ -148,11 +169,93 @@ export async function POST(req) {
 export async function PUT(req) {
   try {
     const body = await req.json();
-    const auth = await verifyContractorSession(body?.userNo);
+    const userNo = body?.userNo || 'S20261100002';
+    const auth = await verifyContractorSession(userNo);
     if (!auth.ok) {
       return Response.json({ success: false, message: auth.message }, { status: auth.status });
     }
-    return Response.json({ success: true, message: 'OCR 추출 정보가 반영되었습니다.', data: body?.ocrData || {} });
+    const d = body?.ocrData || body || {};
+    const compNm = String(d.bizName || '').replace(/\s*-\s*(정상|휴업|폐업).*$/, '').trim() || '공간다원';
+    const ceoNm = String(d.ceoName || '').trim() || '대표자';
+    const bizRegNo = String(d.bizNo || '').trim() || '000-00-00000';
+    const openRaw = String(d.openDateAndType || '');
+    const dtMatch = openRaw.match(/(\d{4})[년.\-\s]+(\d{1,2})[월.\-\s]+(\d{1,2})/);
+    const openDt = dtMatch ? `${dtMatch[1]}-${dtMatch[2].padStart(2, '0')}-${dtMatch[3].padStart(2, '0')}` : null;
+    const taxMatch = openRaw.match(/\(([^)]+)\)/);
+    const taxTypeNm = taxMatch ? taxMatch[1].trim() : '일반과세자';
+    const indCd = String(d.industryCode || '').trim() || null;
+    const indNm = String(d.industryName || '').trim() || null;
+
+    const ntsBaseUrl = process.env.NTS_API_BASE_URL || 'https://api.odcloud.kr/api/nts-businessman/v1';
+    const ntsServiceKey = process.env.NTS_API_SERVICE_KEY || 'b1780c93f90e1cbf0caf0ad328692fe985dd4231417a0c432b6f5a1aac666291';
+    const cleanBizNo = bizRegNo.replace(/[^0-9]/g, '');
+    const cleanOpenDt = (openDt || '').replace(/[^0-9]/g, '');
+
+    if (cleanBizNo.length !== 10 || cleanOpenDt.length !== 8 || !ceoNm) {
+      return Response.json(
+        { success: false, message: '국세청 진위확인을 위해 사업자등록번호(10자리), 개업일자(8자리), 대표자 성명이 필요합니다.' },
+        { status: 400 }
+      );
+    }
+
+    const ntsRes = await fetch(`${ntsBaseUrl}/validate?serviceKey=${encodeURIComponent(ntsServiceKey)}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+      body: JSON.stringify({
+        businesses: [
+          {
+            b_no: cleanBizNo,
+            start_dt: cleanOpenDt,
+            p_nm: ceoNm,
+            p_nm2: '',
+            b_nm: compNm,
+            corp_no: '',
+            b_sector: '',
+            b_type: '',
+          },
+        ],
+      }),
+    });
+    const ntsData = await ntsRes.json();
+    const ntsItem = ntsData?.data?.[0];
+
+    if (ntsData?.status_code !== 'OK' || !ntsItem) {
+      return Response.json({ success: false, message: '국세청 사업자등록정보 진위확인 API 호출에 실패했습니다.' }, { status: 502 });
+    }
+    if (ntsItem.valid !== '01') {
+      return Response.json(
+        { success: false, message: '국세청 등록 정보와 일치하지 않습니다. 사업자등록번호, 대표자 성명, 개업연월일을 확인해 주세요.' },
+        { status: 400 }
+      );
+    }
+    if (ntsItem.status?.b_stt_cd === '02') {
+      return Response.json({ success: false, message: '현재 휴업 상태인 사업자는 시공사 등록이 불가합니다.' }, { status: 400 });
+    }
+    if (ntsItem.status?.b_stt_cd === '03' || ntsItem.status?.b_stt_cd !== '01') {
+      return Response.json({ success: false, message: '폐업 처리된 사업자등록번호는 등록할 수 없습니다.' }, { status: 400 });
+    }
+
+    const verifiedTaxType = ntsItem.status?.tax_type || taxTypeNm;
+
+    await executeQuery(
+      `INSERT INTO TB_SERVICE_DOC
+         (USER_NO, COMP_NM, CEO_NM, BIZ_REG_NO, OPEN_DT, TAX_TYPE_NM, IND_CD, IND_NM, VERIFY_YN, REG_DT, REG_ID, MOD_DT, MOD_ID)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'Y', NOW(), ?, NOW(), ?)
+       ON DUPLICATE KEY UPDATE
+         COMP_NM = VALUES(COMP_NM),
+         CEO_NM = VALUES(CEO_NM),
+         BIZ_REG_NO = VALUES(BIZ_REG_NO),
+         OPEN_DT = COALESCE(VALUES(OPEN_DT), OPEN_DT),
+         TAX_TYPE_NM = VALUES(TAX_TYPE_NM),
+         IND_CD = COALESCE(VALUES(IND_CD), IND_CD),
+         IND_NM = COALESCE(VALUES(IND_NM), IND_NM),
+         VERIFY_YN = 'Y',
+         MOD_DT = NOW(),
+         MOD_ID = VALUES(MOD_ID)`,
+      [userNo, compNm, ceoNm, bizRegNo, openDt, verifiedTaxType, indCd, indNm, userNo, userNo]
+    );
+
+    return Response.json({ success: true, message: '사업자 정보가 TB_SERVICE_DOC에 정상 저장되었습니다.', data: d });
   } catch (err) {
     return Response.json({ success: false, message: err?.message || '반영 처리 중 오류가 발생했습니다.' }, { status: 500 });
   }

@@ -86,6 +86,10 @@ export default function WebSrvcCom010000({ userInfo }) {
   const [toastMsg, setToastMsg] = useState('');
   const [isLogoModalOpen, setIsLogoModalOpen] = useState(false);
   const [partnerLogoUrl, setPartnerLogoUrl] = useState(userInfo?.PROFILE_IMG_URL || null);
+  const [partnerCerts, setPartnerCerts] = useState([]);
+  const [partnerSpecialties, setPartnerSpecialties] = useState([]);
+  const [isBizRestricted, setIsBizRestricted] = useState(false);
+  const [showBizNotice, setShowBizNotice] = useState(false);
 
   const showToast = (msg) => {
     setToastMsg(msg);
@@ -108,6 +112,14 @@ export default function WebSrvcCom010000({ userInfo }) {
         const res = await fetch(`/api/srvc/com/010000?${params.toString()}`);
         const data = await res.json();
         if (data?.success) {
+          if (data.isBizRestricted) {
+            setIsBizRestricted(true);
+            setShowBizNotice(true);
+          } else {
+            setIsBizRestricted(false);
+          }
+          if (Array.isArray(data.partnerSpecialties)) setPartnerSpecialties(data.partnerSpecialties);
+          if (Array.isArray(data.partnerCerts)) setPartnerCerts(data.partnerCerts);
           setTabCounts(data.tabCounts || { waitingBid: 0, waitingPayment: 0, waitingCleaning: 0 });
           setTabItems(data.tabData?.items || []);
           setTabTotalPages(data.tabData?.totalPages || 1);
@@ -210,6 +222,21 @@ export default function WebSrvcCom010000({ userInfo }) {
         </div>
       )}
 
+      {showBizNotice && (
+        <div
+          onClick={() => setShowBizNotice(false)}
+          className="max-w-[1440px] w-full mx-auto px-margin-mobile md:px-margin pt-4 cursor-pointer"
+        >
+          <div className="bg-red-50 border-2 border-red-500 text-red-700 px-5 py-3.5 rounded-xl shadow-sm flex items-center justify-between gap-3">
+            <div className="flex items-center gap-2 font-bold text-sm">
+              <span className="material-symbols-outlined text-red-600">warning</span>
+              <span>상단 메뉴에서 "내 정보 관리" 선택후 사업자등록 정보 입력하세요!.</span>
+            </div>
+            <span className="text-xs text-red-500 font-semibold shrink-0">(클릭 시 닫힘)</span>
+          </div>
+        </div>
+      )}
+
       <div className="w-full max-w-[1440px] mx-auto px-margin-mobile md:px-margin py-space-xl flex flex-col gap-space-xl">
         {/* Section 2: Partner Welcome */}
         <section className="bg-surface-container-lowest border-2 border-blue-500 rounded-xl p-space-lg shadow-sm flex flex-col lg:flex-row items-start lg:items-center justify-between gap-space-lg relative overflow-hidden">
@@ -253,32 +280,25 @@ export default function WebSrvcCom010000({ userInfo }) {
                 <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-surface-container-high text-on-surface-variant font-label-sm text-label-sm font-semibold">
                   <span className="material-symbols-outlined text-[14px] text-primary">cleaning_services</span>청소 전문 분야
                 </span>
-                <span className="px-2 py-0.5 rounded-full bg-surface-container-low border border-slate-200 text-on-surface font-label-sm text-label-sm font-medium">정기청소 (상가·계단·사무실)</span>
-                <span className="px-2 py-0.5 rounded-full bg-surface-container-low border border-slate-200 text-on-surface font-label-sm text-label-sm font-medium">입주·이사 청소</span>
-                <span className="px-2 py-0.5 rounded-full bg-surface-container-low border border-slate-200 text-on-surface font-label-sm text-label-sm font-medium">계절가전 분해케어 (에어컨·세탁기)</span>
+                {partnerSpecialties.length === 0 ? (
+                  <span className="px-2 py-0.5 rounded-full bg-surface-container-low border border-slate-200 text-on-surface-variant font-label-sm text-label-sm">등록된 청소 전문 분야가 없습니다.</span>
+                ) : (
+                  partnerSpecialties.map((sp, idx) => (
+                    <span key={idx} className="px-2 py-0.5 rounded-full bg-surface-container-low border border-slate-200 text-on-surface font-label-sm text-label-sm font-medium">{sp}</span>
+                  ))
+                )}
               </div>
               <div className="flex flex-wrap items-center gap-1.5">
                 <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-secondary-fixed/30 text-on-secondary-fixed font-label-sm text-label-sm font-semibold">
                   <span className="material-symbols-outlined text-[14px] text-secondary">verified_user</span>보유 자격 및 인증
                 </span>
-                <span className="px-2 py-0.5 rounded-full bg-surface-container-lowest border border-slate-200 text-on-surface-variant font-label-sm text-label-sm">위생관리용역업 등록</span>
-                <span className="px-2 py-0.5 rounded-full bg-surface-container-lowest border border-slate-200 text-on-surface-variant font-label-sm text-label-sm">방역소독전문가 1급</span>
-                <span className="px-2 py-0.5 rounded-full bg-surface-container-lowest border border-slate-200 text-on-surface-variant font-label-sm text-label-sm">가전관리사 수료(한국청소위생협회)</span>
-                <span className="px-2 py-0.5 rounded-full bg-secondary-fixed/20 text-secondary font-label-sm text-label-sm font-semibold">삼성·LG 가전케어 8년 경력</span>
-              </div>
-              <div className="flex flex-wrap items-center gap-space-sm text-on-surface-variant">
-                <div className="flex items-center gap-1.5 bg-surface-container-low px-space-sm py-1 rounded-full font-label-md text-label-md text-tertiary">
-                  <span className="material-symbols-outlined text-[17px] text-primary">location_on</span>
-                  <span>활동 권역: 경기 고양시 덕양구 · 일산동구 · 서울 서대문구</span>
-                  <span className="text-secondary font-semibold ml-1">(3/10개 구역 설정)</span>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => showToast('[WEB-SRVC-MYP-010100] 시공사 내정보 및 활동 권역 관리 화면을 호출합니다.')}
-                  className="font-label-sm text-label-sm text-primary hover:underline font-semibold flex items-center gap-1 px-3 py-1 rounded-lg border-2 border-red-500 cursor-pointer"
-                >
-                  권역 수정 <span className="material-symbols-outlined text-[15px]">arrow_forward</span>
-                </button>
+                {partnerCerts.length === 0 ? (
+                  <span className="px-2 py-0.5 rounded-full bg-surface-container-lowest border border-slate-200 text-on-surface-variant font-label-sm text-label-sm">등록된 자격 및 인증이 없습니다.</span>
+                ) : (
+                  partnerCerts.map((certNm, idx) => (
+                    <span key={idx} className="px-2 py-0.5 rounded-full bg-surface-container-lowest border border-slate-200 text-on-surface-variant font-label-sm text-label-sm">{certNm}</span>
+                  ))
+                )}
               </div>
             </div>
           </div>
@@ -396,6 +416,10 @@ export default function WebSrvcCom010000({ userInfo }) {
                           <button
                             type="button"
                             onClick={() => {
+                              if (isBizRestricted) {
+                                showToast('상단 메뉴에서 "내 정보 관리" 선택후 사업자등록 정보 입력하세요!.');
+                                return;
+                              }
                               const bizNo = userInfo?.BIZ_REG_NO || userInfo?.bizRegNo;
                               const bizStat = userInfo?.BIZ_STAT_CD || userInfo?.bizStatCd || 'ACTIVE';
                               if (!bizNo || ['CLOSED', 'SUSPENDED', '폐업', '휴업'].includes(bizStat)) {

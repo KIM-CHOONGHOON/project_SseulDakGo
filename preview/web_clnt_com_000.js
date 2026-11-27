@@ -5229,6 +5229,44 @@ function WebSrvcCom010100({ isOpen, userInfo, onClose, onSuccess }) {
     const [isDragging, setIsDragging] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [toastMsg, setToastMsg] = useState('');
+    useEffect(() => {
+        const uNo = userInfo?.USER_NO || userInfo?.userNo || 'S20261100002';
+        fetch(`/api/srvc/myp/020101?userNo=${encodeURIComponent(uNo)}`)
+            .then((res) => res.json())
+            .then((json) => {
+            if (json?.success && json.data) {
+                if (json.data.COMP_NM)
+                    setBizName(json.data.COMP_NM);
+                if (json.data.CEO_NM)
+                    setCeoName(json.data.CEO_NM);
+                if (json.data.BIZ_REG_NO)
+                    setBizNo(json.data.BIZ_REG_NO);
+            }
+        })
+            .catch(() => { });
+        fetch(`/api/srvc/myp/020100?userNo=${encodeURIComponent(uNo)}`)
+            .then((res) => res.json())
+            .then((json) => {
+            if (json?.success && Array.isArray(json.certs)) {
+                setCerts(json.certs.map((c, idx) => ({
+                    id: c.CERT_SEQ || idx + 1,
+                    name: c.CERT_NM || '',
+                    org: c.ISSUER_ORG || '',
+                    cat: c.SERVICE_CAT || '공통',
+                    catCls: 'bg-blue-50 text-blue-700 border-blue-100',
+                    level: c.CERT_LEVEL || '1급',
+                    date: c.issueDt || '',
+                    certNo: c.CERT_NO || '',
+                    status: c.VERIFY_STAT_CD === 'APPROVED' ? '검수완료' : '심사대기',
+                    statusCls: c.VERIFY_STAT_CD === 'APPROVED' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-amber-50 text-amber-700 border-amber-200',
+                    dotCls: c.VERIFY_STAT_CD === 'APPROVED' ? 'bg-emerald-500' : 'bg-amber-500',
+                    icon: 'award_star',
+                    iconBg: 'bg-teal-50 text-teal-700 border-teal-200',
+                })));
+            }
+        })
+            .catch(() => { });
+    }, [userInfo]);
     const showToast = (msg) => {
         setToastMsg(msg);
         setTimeout(() => setToastMsg(''), 3200);
@@ -5502,8 +5540,50 @@ function WebSrvcCom010000({ userInfo }) {
     const [activityItems, setActivityItems] = useState([]);
     const [actTotalPages, setActTotalPages] = useState(1);
     const [toastMsg, setToastMsg] = useState('');
+    useEffect(() => {
+        const uNo = userInfo?.USER_NO || userInfo?.userNo || 'S20261100002';
+        fetch(`/api/srvc/myp/020101?userNo=${encodeURIComponent(uNo)}`)
+            .then((res) => res.json())
+            .then((json) => {
+            if (json?.success && json.data) {
+                if (json.data.COMP_NM)
+                    setBizName(json.data.COMP_NM);
+                if (json.data.CEO_NM)
+                    setCeoName(json.data.CEO_NM);
+                if (json.data.BIZ_REG_NO)
+                    setBizNo(json.data.BIZ_REG_NO);
+            }
+        })
+            .catch(() => { });
+        fetch(`/api/srvc/myp/020100?userNo=${encodeURIComponent(uNo)}`)
+            .then((res) => res.json())
+            .then((json) => {
+            if (json?.success && Array.isArray(json.certs)) {
+                setCerts(json.certs.map((c, idx) => ({
+                    id: c.CERT_SEQ || idx + 1,
+                    name: c.CERT_NM || '',
+                    org: c.ISSUER_ORG || '',
+                    cat: c.SERVICE_CAT || '공통',
+                    catCls: 'bg-blue-50 text-blue-700 border-blue-100',
+                    level: c.CERT_LEVEL || '1급',
+                    date: c.issueDt || '',
+                    certNo: c.CERT_NO || '',
+                    status: c.VERIFY_STAT_CD === 'APPROVED' ? '검수완료' : '심사대기',
+                    statusCls: c.VERIFY_STAT_CD === 'APPROVED' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-amber-50 text-amber-700 border-amber-200',
+                    dotCls: c.VERIFY_STAT_CD === 'APPROVED' ? 'bg-emerald-500' : 'bg-amber-500',
+                    icon: 'award_star',
+                    iconBg: 'bg-teal-50 text-teal-700 border-teal-200',
+                })));
+            }
+        })
+            .catch(() => { });
+    }, [userInfo]);
     const [isLogoModalOpen, setIsLogoModalOpen] = useState(false);
     const [partnerLogoUrl, setPartnerLogoUrl] = useState(userInfo?.PROFILE_IMG_URL || null);
+    const [partnerCerts, setPartnerCerts] = useState([]);
+    const [partnerSpecialties, setPartnerSpecialties] = useState([]);
+    const [isBizRestricted, setIsBizRestricted] = useState(false);
+    const [showBizNotice, setShowBizNotice] = useState(false);
     const showToast = (msg) => {
         setToastMsg(msg);
         setTimeout(() => setToastMsg(''), 3200);
@@ -5523,6 +5603,17 @@ function WebSrvcCom010000({ userInfo }) {
             const res = await fetch(`/api/srvc/com/010000?${params.toString()}`);
             const data = await res.json();
             if (data?.success) {
+                if (data.isBizRestricted) {
+                    setIsBizRestricted(true);
+                    setShowBizNotice(true);
+                }
+                else {
+                    setIsBizRestricted(false);
+                }
+                if (Array.isArray(data.partnerSpecialties))
+                    setPartnerSpecialties(data.partnerSpecialties);
+                if (Array.isArray(data.partnerCerts))
+                    setPartnerCerts(data.partnerCerts);
                 setTabCounts(data.tabCounts || { waitingBid: 0, waitingPayment: 0, waitingCleaning: 0 });
                 setTabItems(data.tabData?.items || []);
                 setTabTotalPages(data.tabData?.totalPages || 1);
@@ -5553,6 +5644,28 @@ function WebSrvcCom010000({ userInfo }) {
             .then((d) => {
             if (d?.success && d.data?.currentLogoUrl) {
                 setPartnerLogoUrl(d.data.currentLogoUrl);
+            }
+        })
+            .catch(() => { });
+        fetch(`/api/srvc/myp/020100?userNo=${encodeURIComponent(uNo)}`)
+            .then((res) => res.json())
+            .then((json) => {
+            if (json?.success && Array.isArray(json.certs)) {
+                setCerts(json.certs.map((c, idx) => ({
+                    id: c.CERT_SEQ || idx + 1,
+                    name: c.CERT_NM || '',
+                    org: c.ISSUER_ORG || '',
+                    cat: c.SERVICE_CAT || '공통',
+                    catCls: 'bg-blue-50 text-blue-700 border-blue-100',
+                    level: c.CERT_LEVEL || '1급',
+                    date: c.issueDt || '',
+                    certNo: c.CERT_NO || '',
+                    status: c.VERIFY_STAT_CD === 'APPROVED' ? '검수완료' : '심사대기',
+                    statusCls: c.VERIFY_STAT_CD === 'APPROVED' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-amber-50 text-amber-700 border-amber-200',
+                    dotCls: c.VERIFY_STAT_CD === 'APPROVED' ? 'bg-emerald-500' : 'bg-amber-500',
+                    icon: 'award_star',
+                    iconBg: 'bg-teal-50 text-teal-700 border-teal-200',
+                })));
             }
         })
             .catch(() => { });
@@ -5615,6 +5728,12 @@ function WebSrvcCom010000({ userInfo }) {
         toastMsg && (React.createElement("div", { className: "fixed top-24 right-8 z-50 flex items-center gap-2 bg-inverse-surface text-inverse-on-surface px-4 py-2.5 rounded-lg shadow-xl" },
             React.createElement("span", { className: "material-symbols-outlined text-[20px] text-secondary-fixed" }, "check_circle"),
             React.createElement("span", { className: "font-body-md text-body-md font-medium" }, toastMsg))),
+        showBizNotice && (React.createElement("div", { onClick: () => setShowBizNotice(false), className: "max-w-[1440px] w-full mx-auto px-margin-mobile md:px-margin pt-4 cursor-pointer" },
+            React.createElement("div", { className: "bg-red-50 border-2 border-red-500 text-red-700 px-5 py-3.5 rounded-xl shadow-sm flex items-center justify-between gap-3" },
+                React.createElement("div", { className: "flex items-center gap-2 font-bold text-sm" },
+                    React.createElement("span", { className: "material-symbols-outlined text-red-600" }, "warning"),
+                    React.createElement("span", null, "\uC0C1\uB2E8 \uBA54\uB274\uC5D0\uC11C \"\uB0B4 \uC815\uBCF4 \uAD00\uB9AC\" \uC120\uD0DD\uD6C4 \uC0AC\uC5C5\uC790\uB4F1\uB85D \uC815\uBCF4 \uC785\uB825\uD558\uC138\uC694!.")),
+                React.createElement("span", { className: "text-xs text-red-500 font-semibold shrink-0" }, "(\uD074\uB9AD \uC2DC \uB2EB\uD798)")))),
         React.createElement("div", { className: "w-full max-w-[1440px] mx-auto px-margin-mobile md:px-margin py-space-xl flex flex-col gap-space-xl" },
             React.createElement("section", { className: "bg-surface-container-lowest border-2 border-blue-500 rounded-xl p-space-lg shadow-sm flex flex-col lg:flex-row items-start lg:items-center justify-between gap-space-lg relative overflow-hidden" },
                 React.createElement("div", { className: "absolute -right-16 -top-16 w-64 h-64 bg-secondary-fixed/20 rounded-full blur-3xl pointer-events-none" }),
@@ -5639,25 +5758,12 @@ function WebSrvcCom010000({ userInfo }) {
                             React.createElement("span", { className: "inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-surface-container-high text-on-surface-variant font-label-sm text-label-sm font-semibold" },
                                 React.createElement("span", { className: "material-symbols-outlined text-[14px] text-primary" }, "cleaning_services"),
                                 "\uCCAD\uC18C \uC804\uBB38 \uBD84\uC57C"),
-                            React.createElement("span", { className: "px-2 py-0.5 rounded-full bg-surface-container-low border border-slate-200 text-on-surface font-label-sm text-label-sm font-medium" }, "\uC815\uAE30\uCCAD\uC18C (\uC0C1\uAC00\u00B7\uACC4\uB2E8\u00B7\uC0AC\uBB34\uC2E4)"),
-                            React.createElement("span", { className: "px-2 py-0.5 rounded-full bg-surface-container-low border border-slate-200 text-on-surface font-label-sm text-label-sm font-medium" }, "\uC785\uC8FC\u00B7\uC774\uC0AC \uCCAD\uC18C"),
-                            React.createElement("span", { className: "px-2 py-0.5 rounded-full bg-surface-container-low border border-slate-200 text-on-surface font-label-sm text-label-sm font-medium" }, "\uACC4\uC808\uAC00\uC804 \uBD84\uD574\uCF00\uC5B4 (\uC5D0\uC5B4\uCEE8\u00B7\uC138\uD0C1\uAE30)")),
+                            partnerSpecialties.length === 0 ? (React.createElement("span", { className: "px-2 py-0.5 rounded-full bg-surface-container-low border border-slate-200 text-on-surface-variant font-label-sm text-label-sm" }, "\uB4F1\uB85D\uB41C \uCCAD\uC18C \uC804\uBB38 \uBD84\uC57C\uAC00 \uC5C6\uC2B5\uB2C8\uB2E4.")) : (partnerSpecialties.map((sp, idx) => (React.createElement("span", { key: idx, className: "px-2 py-0.5 rounded-full bg-surface-container-low border border-slate-200 text-on-surface font-label-sm text-label-sm font-medium" }, sp))))),
                         React.createElement("div", { className: "flex flex-wrap items-center gap-1.5" },
                             React.createElement("span", { className: "inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-secondary-fixed/30 text-on-secondary-fixed font-label-sm text-label-sm font-semibold" },
                                 React.createElement("span", { className: "material-symbols-outlined text-[14px] text-secondary" }, "verified_user"),
                                 "\uBCF4\uC720 \uC790\uACA9 \uBC0F \uC778\uC99D"),
-                            React.createElement("span", { className: "px-2 py-0.5 rounded-full bg-surface-container-lowest border border-slate-200 text-on-surface-variant font-label-sm text-label-sm" }, "\uC704\uC0DD\uAD00\uB9AC\uC6A9\uC5ED\uC5C5 \uB4F1\uB85D"),
-                            React.createElement("span", { className: "px-2 py-0.5 rounded-full bg-surface-container-lowest border border-slate-200 text-on-surface-variant font-label-sm text-label-sm" }, "\uBC29\uC5ED\uC18C\uB3C5\uC804\uBB38\uAC00 1\uAE09"),
-                            React.createElement("span", { className: "px-2 py-0.5 rounded-full bg-surface-container-lowest border border-slate-200 text-on-surface-variant font-label-sm text-label-sm" }, "\uAC00\uC804\uAD00\uB9AC\uC0AC \uC218\uB8CC(\uD55C\uAD6D\uCCAD\uC18C\uC704\uC0DD\uD611\uD68C)"),
-                            React.createElement("span", { className: "px-2 py-0.5 rounded-full bg-secondary-fixed/20 text-secondary font-label-sm text-label-sm font-semibold" }, "\uC0BC\uC131\u00B7LG \uAC00\uC804\uCF00\uC5B4 8\uB144 \uACBD\uB825")),
-                        React.createElement("div", { className: "flex flex-wrap items-center gap-space-sm text-on-surface-variant" },
-                            React.createElement("div", { className: "flex items-center gap-1.5 bg-surface-container-low px-space-sm py-1 rounded-full font-label-md text-label-md text-tertiary" },
-                                React.createElement("span", { className: "material-symbols-outlined text-[17px] text-primary" }, "location_on"),
-                                React.createElement("span", null, "\uD65C\uB3D9 \uAD8C\uC5ED: \uACBD\uAE30 \uACE0\uC591\uC2DC \uB355\uC591\uAD6C \u00B7 \uC77C\uC0B0\uB3D9\uAD6C \u00B7 \uC11C\uC6B8 \uC11C\uB300\uBB38\uAD6C"),
-                                React.createElement("span", { className: "text-secondary font-semibold ml-1" }, "(3/10\uAC1C \uAD6C\uC5ED \uC124\uC815)")),
-                            React.createElement("button", { type: "button", onClick: () => showToast('[WEB-SRVC-MYP-010100] 시공사 내정보 및 활동 권역 관리 화면을 호출합니다.'), className: "font-label-sm text-label-sm text-primary hover:underline font-semibold flex items-center gap-1 px-3 py-1 rounded-lg border-2 border-red-500 cursor-pointer" },
-                                "\uAD8C\uC5ED \uC218\uC815 ",
-                                React.createElement("span", { className: "material-symbols-outlined text-[15px]" }, "arrow_forward")))))),
+                            partnerCerts.length === 0 ? (React.createElement("span", { className: "px-2 py-0.5 rounded-full bg-surface-container-lowest border border-slate-200 text-on-surface-variant font-label-sm text-label-sm" }, "\uB4F1\uB85D\uB41C \uC790\uACA9 \uBC0F \uC778\uC99D\uC774 \uC5C6\uC2B5\uB2C8\uB2E4.")) : (partnerCerts.map((certNm, idx) => (React.createElement("span", { key: idx, className: "px-2 py-0.5 rounded-full bg-surface-container-lowest border border-slate-200 text-on-surface-variant font-label-sm text-label-sm" }, certNm)))))))),
             React.createElement("section", { className: "bg-surface-container-lowest border-2 border-blue-500 rounded-xl p-space-lg shadow-sm flex flex-col gap-space-md", id: "section-quote-process" },
                 React.createElement("div", { className: "flex flex-col md:flex-row md:items-center justify-between gap-space-md pb-space-xs border-b border-surface-container-high/60" },
                     React.createElement("div", { className: "flex items-center gap-space-xs" },
@@ -5711,6 +5817,10 @@ function WebSrvcCom010000({ userInfo }) {
                             activeTab === 'waiting-bid' && (React.createElement("div", { className: "flex items-center gap-2" },
                                 React.createElement("button", { type: "button", onClick: () => showToast(`[WEB-SRVC-QOT-010000] 발주(${item.orderNo}) 상세조회 모달을 호출합니다.`), className: "bg-surface-container-lowest hover:bg-surface-container border border-slate-300 text-on-surface font-title-md text-title-md font-bold px-space-lg py-2.5 rounded-lg shadow-sm transition cursor-pointer" }, "\uC0C1\uC138\uC870\uD68C"),
                                 React.createElement("button", { type: "button", onClick: () => {
+                                        if (isBizRestricted) {
+                                            showToast('상단 메뉴에서 "내 정보 관리" 선택후 사업자등록 정보 입력하세요!.');
+                                            return;
+                                        }
                                         const bizNo = userInfo?.BIZ_REG_NO || userInfo?.bizRegNo;
                                         const bizStat = userInfo?.BIZ_STAT_CD || userInfo?.bizStatCd || 'ACTIVE';
                                         if (!bizNo || ['CLOSED', 'SUSPENDED', '폐업', '휴업'].includes(bizStat)) {
@@ -5823,7 +5933,7 @@ function WebSrvcMyp020100({ userInfo, onBack }) {
     const [docType, setDocType] = useState('ALL');
     const [serviceCat, setServiceCat] = useState('ALL');
     const [keyword, setKeyword] = useState('');
-    const [certs, setCerts] = useState(INITIAL_CERTS);
+    const [certs, setCerts] = useState([]);
     const [isOcrModalOpen, setIsOcrModalOpen] = useState(false);
     const [showEmptyBizModal, setShowEmptyBizModal] = useState(!bizNo || !bizName);
     const [certPage, setCertPage] = useState(1);
@@ -5831,6 +5941,44 @@ function WebSrvcMyp020100({ userInfo, onBack }) {
     const totalCertPages = Math.max(1, Math.ceil(certs.length / pageSize));
     const pagedCerts = certs.slice((certPage - 1) * pageSize, certPage * pageSize);
     const [toastMsg, setToastMsg] = useState('');
+    useEffect(() => {
+        const uNo = userInfo?.USER_NO || userInfo?.userNo || 'S20261100002';
+        fetch(`/api/srvc/myp/020101?userNo=${encodeURIComponent(uNo)}`)
+            .then((res) => res.json())
+            .then((json) => {
+            if (json?.success && json.data) {
+                if (json.data.COMP_NM)
+                    setBizName(json.data.COMP_NM);
+                if (json.data.CEO_NM)
+                    setCeoName(json.data.CEO_NM);
+                if (json.data.BIZ_REG_NO)
+                    setBizNo(json.data.BIZ_REG_NO);
+            }
+        })
+            .catch(() => { });
+        fetch(`/api/srvc/myp/020100?userNo=${encodeURIComponent(uNo)}`)
+            .then((res) => res.json())
+            .then((json) => {
+            if (json?.success && Array.isArray(json.certs)) {
+                setCerts(json.certs.map((c, idx) => ({
+                    id: c.CERT_SEQ || idx + 1,
+                    name: c.CERT_NM || '',
+                    org: c.ISSUER_ORG || '',
+                    cat: c.SERVICE_CAT || '공통',
+                    catCls: 'bg-blue-50 text-blue-700 border-blue-100',
+                    level: c.CERT_LEVEL || '1급',
+                    date: c.issueDt || '',
+                    certNo: c.CERT_NO || '',
+                    status: c.VERIFY_STAT_CD === 'APPROVED' ? '검수완료' : '심사대기',
+                    statusCls: c.VERIFY_STAT_CD === 'APPROVED' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-amber-50 text-amber-700 border-amber-200',
+                    dotCls: c.VERIFY_STAT_CD === 'APPROVED' ? 'bg-emerald-500' : 'bg-amber-500',
+                    icon: 'award_star',
+                    iconBg: 'bg-teal-50 text-teal-700 border-teal-200',
+                })));
+            }
+        })
+            .catch(() => { });
+    }, [userInfo]);
     const showToast = (msg) => {
         setToastMsg(msg);
         setTimeout(() => setToastMsg(''), 2500);
@@ -5891,12 +6039,10 @@ function WebSrvcMyp020100({ userInfo, onBack }) {
                             React.createElement("span", { className: "material-symbols-outlined text-[22px]" }, "verified_user")),
                         React.createElement("div", null,
                             React.createElement("div", { className: "flex items-center gap-2" },
-                                React.createElement("h2", { className: "text-lg font-bold text-slate-900" }, "2. \uD45C\uC900 \uC790\uACA9\u00B7\uC218\uB8CC \uD56D\uBAA9 \uAC80\uC0C9 \uBC0F \uB4F1\uB85D"),
-                                React.createElement("span", { className: "text-xs font-bold text-teal-700 bg-teal-50 px-2 py-0.5 rounded-full border border-teal-200" }, "\uCD5C\uB300 5\uAC74")),
+                                React.createElement("h2", { className: "text-lg font-bold text-slate-900" }, "2. \uD45C\uC900 \uC790\uACA9\u00B7\uC218\uB8CC \uD56D\uBAA9 \uAC80\uC0C9 \uBC0F \uB4F1\uB85D")),
                             React.createElement("p", { className: "text-xs text-slate-500" }, "\uBCF8\uC0AC \uC2EC\uC0AC \uC2B9\uC778 \uC2DC \uACE0\uAC1D \uB300\uC2DC\uBCF4\uB4DC \uBC0F \uC0C1\uC138 \uACAC\uC801 \uD504\uB85C\uD544\uC5D0 \uACF5\uC2DD \uC778\uC99D \uB9C8\uD06C \uBD80\uC5EC"))),
                     React.createElement("span", { className: "text-xs font-semibold text-slate-500 flex items-center gap-1" },
-                        React.createElement("span", { className: "material-symbols-outlined text-sm text-slate-400" }, "filter_list"),
-                        "\uC8FC\uB825 \uBD84\uC57C(\uC785\uC8FC\uCCAD\uC18C/\uAC00\uC804\uCF00\uC5B4) \uC6B0\uC120 \uC815\uB82C")),
+                        React.createElement("span", { className: "material-symbols-outlined text-sm text-slate-400" }, "filter_list"))),
                 React.createElement("div", { className: "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 bg-slate-50 p-4 rounded-xl border border-slate-200/80 text-sm" },
                     React.createElement("div", null,
                         React.createElement("label", { className: "block text-[11px] font-bold text-slate-500 mb-1" }, "\uBB38\uC11C \uAD6C\uBD84 (CERT_DOC_TYPE)"),
@@ -5928,7 +6074,7 @@ function WebSrvcMyp020100({ userInfo, onBack }) {
                             React.createElement("span", { className: "text-[11px] font-semibold text-teal-700 bg-teal-50 px-2 py-0.5 rounded-full border border-teal-200" },
                                 "(",
                                 certs.length,
-                                "/5\uAC74 \uB4F1\uB85D\uB428)")),
+                                "\uAC74 \uB4F1\uB85D\uB428)")),
                         React.createElement("span", { className: "text-xs text-slate-500 font-medium" },
                             "\uC794\uC5EC ",
                             React.createElement("strong", { className: "text-blue-600 font-bold" },
@@ -6005,11 +6151,11 @@ function WebSrvcMyp020100({ userInfo, onBack }) {
                                 }
                             }, className: "flex-1 sm:flex-none px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shadow-sm flex items-center justify-center gap-1.5 cursor-pointer" },
                             React.createElement("span", { className: "material-symbols-outlined text-base" }, "save"),
-                            "\uC0AC\uC5C5\uC790 \uBC0F \uC790\uACA9\u00B7\uC218\uB8CC \uC815\uBCF4 \uC800\uC7A5"))))),
+                            "\uB0B4 \uC815\uBCF4 \uC800\uC7A5"))))),
         toastMsg && (React.createElement("div", { className: "fixed bottom-6 right-6 z-50 bg-slate-900 text-white px-4 py-3 rounded-xl shadow-xl flex items-center gap-2 text-xs font-medium" },
             React.createElement("span", { className: "material-symbols-outlined text-emerald-400 text-base" }, "check_circle"),
             React.createElement("span", null, toastMsg))),
-        React.createElement(WebSrvcMyp020101, { isOpen: isOcrModalOpen, onClose: () => setIsOcrModalOpen(false), onApplyData: (data) => {
+        React.createElement(WebSrvcMyp020101, { isOpen: isOcrModalOpen, userInfo: userInfo, onClose: () => setIsOcrModalOpen(false), onApplyData: (data) => {
                 if (data?.bizName)
                     setBizName(data.bizName);
                 if (data?.ceoName)
@@ -6029,7 +6175,8 @@ function WebSrvcMyp020100({ userInfo, onBack }) {
  * 화면 ID: WEB-SRVC-MYP-020101
  * 화면명: 홈택스 PDF OCR 업로드 및 자동 인식 모달 (Modal)
  */
-function WebSrvcMyp020101({ isOpen, onClose, onApplyData }) {
+function WebSrvcMyp020101({ isOpen, onClose, onApplyData, userInfo }) {
+    const userNo = userInfo?.USER_NO || userInfo?.userNo || 'S20261000001';
     const fileInputRef = useRef(null);
     const [fileInfo, setFileInfo] = useState({
         name: '사업자등록증명_공간다원_202611.pdf',
@@ -6067,7 +6214,7 @@ function WebSrvcMyp020101({ isOpen, onClose, onApplyData }) {
         setIsParsing(true);
         try {
             const formData = new FormData();
-            formData.append('userNo', 'S20261100002');
+            formData.append('userNo', userNo);
             formData.append('file', file);
             const res = await fetch('/api/srvc/myp/020101', { method: 'POST', body: formData });
             const json = await res.json();
@@ -6178,9 +6325,12 @@ function WebSrvcMyp020101({ isOpen, onClose, onApplyData }) {
                                 React.createElement("div", { className: "flex items-center gap-2.5 min-w-0 flex-1" },
                                     React.createElement("div", { className: "flex items-center gap-1 bg-blue-50 border border-blue-200 text-blue-700 font-mono font-bold text-xs rounded-lg px-2 py-1 shrink-0" },
                                         React.createElement("span", null, "\uCF54\uB4DC:"),
-                                        React.createElement("input", { type: "text", value: ocrData.industryCode, onChange: (e) => setOcrData({ ...ocrData, industryCode: e.target.value }), placeholder: "6\uC790\uB9AC \uC785\uB825", className: "w-16 bg-transparent focus:outline-none text-blue-800 font-mono font-bold" })),
+                                        React.createElement("input", { type: "text", maxLength: 6, value: ocrData.industryCode, onChange: (e) => setOcrData({ ...ocrData, industryCode: e.target.value.replace(/[^0-9]/g, '').slice(0, 6) }), placeholder: "6\uC790\uB9AC \uC785\uB825", className: "w-16 bg-transparent focus:outline-none text-blue-800 font-mono font-bold" })),
                                     React.createElement("input", { type: "text", value: ocrData.industryName, onChange: (e) => setOcrData({ ...ocrData, industryName: e.target.value }), className: "font-bold text-slate-800 text-xs sm:text-sm flex-1 min-w-0 bg-transparent focus:outline-none" })),
-                                React.createElement("span", { className: "material-symbols-outlined text-emerald-600 text-[20px] shrink-0" }, "verified"))))),
+                                React.createElement("span", { className: "material-symbols-outlined text-emerald-600 text-[20px] shrink-0" }, "verified")),
+                            React.createElement("div", { className: "mt-1.5 text-[11px] text-red-600 font-bold leading-relaxed" },
+                                React.createElement("p", null, "\uC8FC\uC5C5\uC885 \uCF54\uB4DC \uD655\uC778: \uD648\uD0DD\uC2A4(hometax.go.kr) \uB85C\uADF8\uC778 \u2192 \uC6B0\uCE21 \uC0C1\uB2E8 [My\uD648\uD0DD\uC2A4] \u2192 [\uC0AC\uC5C5\uC790\uB4F1\uB85D\uC0AC\uD56D \uBC0F \uB2F4\uB2F9\uC790 \uC548\uB0B4]"),
+                                React.createElement("p", null, "\uBA54\uB274 \uD074\uB9AD \u2192 \uB4F1\uB85D\uB41C \uC8FC\uC5C5\uC885 \uCF54\uB4DC(6\uC790\uB9AC), \uBD80\uC5C5\uC885 \uCF54\uB4DC, \uC5C5\uD0DC, \uC885\uBAA9 \uD655\uC778\uD560 \uC218 \uC788\uC2B5\uB2C8\uB2E4."))))),
                 React.createElement("div", { className: "bg-amber-50/70 border border-amber-200/90 rounded-xl p-3.5 sm:p-4 text-xs flex items-start gap-3" },
                     React.createElement("span", { className: "material-symbols-outlined text-amber-600 text-[18px] shrink-0 mt-0.5" }, "warning"),
                     React.createElement("div", { className: "flex flex-col gap-1 text-amber-900 leading-relaxed" },
@@ -6194,12 +6344,31 @@ function WebSrvcMyp020101({ isOpen, onClose, onApplyData }) {
                     React.createElement("span", null, "SSL 256-bit \uACF5\uACF5 \uB370\uC774\uD130 \uC804\uC1A1 \uBCF4\uC548 \uC801\uC6A9")),
                 React.createElement("div", { className: "flex items-center gap-2 w-full sm:w-auto justify-end" },
                     React.createElement("button", { type: "button", onClick: onClose, className: "w-full sm:w-auto px-5 py-2.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-100 text-xs font-bold text-slate-700 cursor-pointer" }, "\uCDE8\uC18C \uBC0F \uB2EB\uAE30"),
-                    React.createElement("button", { type: "button", onClick: () => {
-                            onApplyData?.(ocrData);
-                            onClose?.();
+                    React.createElement("button", { type: "button", onClick: async () => {
+                            if (ocrData.industryCode && ocrData.industryCode.trim().length !== 6) {
+                                alert('주업종 코드는 입력 시 6자리를 반드시 입력해야 합니다.');
+                                return;
+                            }
+                            try {
+                                const res = await fetch('/api/srvc/myp/020101', {
+                                    method: 'PUT',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({ userNo, ...ocrData }),
+                                });
+                                const json = await res.json();
+                                if (!res.ok || !json?.success) {
+                                    alert(json?.message || '국세청 사업자등록정보 진위확인에 실패했습니다.');
+                                    return;
+                                }
+                                onApplyData?.(ocrData);
+                                onClose?.();
+                            }
+                            catch {
+                                alert('국세청 진위확인 서버 통신 중 오류가 발생했습니다.');
+                            }
                         }, className: "w-full sm:w-auto px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shadow-sm flex items-center justify-center gap-1.5 cursor-pointer" },
                         React.createElement("span", { className: "material-symbols-outlined text-[16px]" }, "task_alt"),
-                        "\uC778\uC2DD \uC815\uBCF4 \uD654\uBA74\uC5D0 \uC790\uB3D9 \uBC18\uC601\uD558\uAE30"))))));
+                        "\uB0B4 \uC815\uBCF4 \uB4F1\uB85D"))))));
 }
 function WebClntCom010000({ onNavigate }) {
     // 1. 필수 상태 관리 (요구사항 명세 100% 반영)
@@ -6322,6 +6491,7 @@ function WebClntCom010000({ onNavigate }) {
         }
     ];
     // [신규] 푸시 알림 센터 상태 및 제어 (벨 클릭 시 수신 목록 출력)
+    const [isBrandLogoModalOpen, setIsBrandLogoModalOpen] = useState(false);
     const [notiList, setNotiList] = useState([]);
     const [unreadNotiCount, setUnreadNotiCount] = useState(0);
     const [isNotiOpen, setIsNotiOpen] = useState(false);
@@ -6684,19 +6854,22 @@ function WebClntCom010000({ onNavigate }) {
                 React.createElement("div", { className: "flex items-center gap-4 shrink-0" },
                     React.createElement("a", { className: "flex items-center gap-2 group cursor-pointer", "data-path": "home", href: "#home", onClick: (e) => {
                             e.preventDefault();
-                            const role = userInfo?.USER_ROLE_CD || userInfo?.userRoleCd;
-                            if (userInfo && (role === 'S' || role === 'SERVICE')) {
-                                handleNavClick(e, 'WEB-SRVC-COM-010000');
-                            }
-                            else if (userInfo && (role === 'C' || role === 'CLIENT')) {
-                                handleNavClick(e, 'WEB-CLNT-COM-010200');
-                            }
-                            else {
-                                handleNavClick(e, 'home');
-                            }
+                            setIsBrandLogoModalOpen(true);
                         } },
                         React.createElement("img", { src: "/logo.png", alt: "\uC4F8\uACE0\uB2E6\uACE0 \uB85C\uACE0", className: "w-14 h-14 rounded-full object-cover shadow-sm ring-2 ring-primary/20" }))),
                 React.createElement("nav", { className: "hidden md:flex items-center gap-1 bg-surface-container-lowest p-1 rounded-full shadow-xs border border-outline-variant/30", "data-active-classes": "bg-secondary-container text-on-secondary-container font-label-md" },
+                    React.createElement("button", { type: "button", className: "px-3.5 py-1.5 rounded-full font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all cursor-pointer font-bold", onClick: (e) => {
+                            const role = userInfo?.USER_ROLE_CD || userInfo?.userRoleCd;
+                            if (!userInfo || userInfo.isGuest) {
+                                handleNavClick(e, 'home');
+                            }
+                            else if (role === 'S' || role === 'SERVICE') {
+                                handleNavClick(e, 'WEB-SRVC-COM-010000');
+                            }
+                            else {
+                                handleNavClick(e, 'WEB-CLNT-COM-010200');
+                            }
+                        } }, "\uD648"),
                     userInfo?.USER_ROLE_CD === 'S' ? (React.createElement(React.Fragment, null,
                         React.createElement("button", { type: "button", className: "px-3.5 py-1.5 rounded-full font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all cursor-pointer", onClick: () => {
                                 setActiveNavPath('WEB-SRVC-COM-010000');
@@ -6853,6 +7026,11 @@ function WebClntCom010000({ onNavigate }) {
                                 e.preventDefault();
                                 setIsRegisterModalOpen(true);
                             } }, "\uD68C\uC6D0\uAC00\uC785")))))),
+        isBrandLogoModalOpen && (React.createElement("div", { className: "fixed inset-0 z-[120] flex items-center justify-center bg-slate-950/70 backdrop-blur-sm p-4", onClick: () => setIsBrandLogoModalOpen(false) },
+            React.createElement("div", { role: "dialog", "aria-modal": "true", className: "bg-white rounded-3xl p-6 shadow-2xl flex flex-col items-center gap-4 max-w-xs w-full", onClick: (e) => e.stopPropagation() },
+                React.createElement("div", { className: "w-56 h-56 rounded-full overflow-hidden border border-slate-200 shadow-sm" },
+                    React.createElement("img", { src: "/storage/sseuldakgo/logo/Logo_\uC4F8\uACE0\uB531\uACE0.jpg", alt: "\uC4F8\uACE0\uB531\uACE0 \uB85C\uACE0", className: "w-full h-full object-cover scale-110" })),
+                React.createElement("button", { type: "button", onClick: () => setIsBrandLogoModalOpen(false), className: "w-full py-2.5 rounded-xl bg-primary hover:bg-primary-container text-on-primary font-title-md text-title-md font-bold shadow-sm transition cursor-pointer" }, "\uB2EB\uAE30")))),
         userInfo?.USER_ROLE_CD === 'S' && (activeNavPath === 'WEB-SRVC-COM-010000' || activeNavPath === 'home') ? (React.createElement(WebSrvcCom010000, { userInfo: userInfo, onNavigate: setActiveNavPath })) : userInfo?.USER_ROLE_CD === 'C' && activeNavPath === 'WEB-CLNT-COM-010200' ? (React.createElement(WebClntCom010200, { userInfo: userInfo, onOpenReqModal: handleOpenReqModal, onNavigate: setActiveNavPath })) : userInfo?.USER_ROLE_CD === 'S' && activeNavPath === 'WEB-SRVC-MYP-020100' ? (React.createElement(WebSrvcMyp020100, { userInfo: userInfo, onBack: () => setActiveNavPath('WEB-SRVC-COM-010000') })) : (React.createElement("main", { className: "w-full pt-[72px] bg-surface flex-1 overflow-y-auto overflow-x-hidden" },
             React.createElement("div", { className: "max-w-[1440px] mx-auto px-margin-mobile lg:px-margin flex flex-col gap-0" },
                 React.createElement("section", { className: "relative py-12 lg:py-20" },

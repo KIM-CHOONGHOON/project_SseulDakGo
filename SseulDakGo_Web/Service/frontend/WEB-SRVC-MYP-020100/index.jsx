@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 const INITIAL_CERTS = [
   { id: 1, name: '가전관리사 1급', org: '한국청소위생협회', cat: '계절가전 분해케어', catCls: 'bg-blue-50 text-blue-700 border-blue-100', level: '1급', date: '2023.05.14', certNo: '제2023-C-0842호', status: '검수완료', statusCls: 'bg-emerald-50 text-emerald-700 border-emerald-200', dotCls: 'bg-emerald-500', icon: 'award_star', iconBg: 'bg-teal-50 text-teal-700 border-teal-200' },
@@ -16,7 +16,7 @@ export default function WebSrvcMyp020100({ userInfo, onBack }) {
   const [docType, setDocType] = useState('ALL');
   const [serviceCat, setServiceCat] = useState('ALL');
   const [keyword, setKeyword] = useState('');
-  const [certs, setCerts] = useState(INITIAL_CERTS);
+  const [certs, setCerts] = useState([]);
   const [isOcrModalOpen, setIsOcrModalOpen] = useState(false);
   const [showEmptyBizModal, setShowEmptyBizModal] = useState(!bizNo || !bizName);
   const [certPage, setCertPage] = useState(1);
@@ -24,6 +24,44 @@ export default function WebSrvcMyp020100({ userInfo, onBack }) {
   const totalCertPages = Math.max(1, Math.ceil(certs.length / pageSize));
   const pagedCerts = certs.slice((certPage - 1) * pageSize, certPage * pageSize);
   const [toastMsg, setToastMsg] = useState('');
+
+  useEffect(() => {
+    const uNo = userInfo?.USER_NO || userInfo?.userNo || 'S20261100002';
+    fetch(`/api/srvc/myp/020101?userNo=${encodeURIComponent(uNo)}`)
+      .then((res) => res.json())
+      .then((json) => {
+        if (json?.success && json.data) {
+          if (json.data.COMP_NM) setBizName(json.data.COMP_NM);
+          if (json.data.CEO_NM) setCeoName(json.data.CEO_NM);
+          if (json.data.BIZ_REG_NO) setBizNo(json.data.BIZ_REG_NO);
+        }
+      })
+      .catch(() => {});
+    fetch(`/api/srvc/myp/020100?userNo=${encodeURIComponent(uNo)}`)
+      .then((res) => res.json())
+      .then((json) => {
+        if (json?.success && Array.isArray(json.certs)) {
+          setCerts(
+            json.certs.map((c, idx) => ({
+              id: c.CERT_SEQ || idx + 1,
+              name: c.CERT_NM || '',
+              org: c.ISSUER_ORG || '',
+              cat: c.SERVICE_CAT || '공통',
+              catCls: 'bg-blue-50 text-blue-700 border-blue-100',
+              level: c.CERT_LEVEL || '1급',
+              date: c.issueDt || '',
+              certNo: c.CERT_NO || '',
+              status: c.VERIFY_STAT_CD === 'APPROVED' ? '검수완료' : '심사대기',
+              statusCls: c.VERIFY_STAT_CD === 'APPROVED' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-amber-50 text-amber-700 border-amber-200',
+              dotCls: c.VERIFY_STAT_CD === 'APPROVED' ? 'bg-emerald-500' : 'bg-amber-500',
+              icon: 'award_star',
+              iconBg: 'bg-teal-50 text-teal-700 border-teal-200',
+            }))
+          );
+        }
+      })
+      .catch(() => {});
+  }, [userInfo]);
 
   const showToast = (msg) => {
     setToastMsg(msg);
@@ -111,14 +149,14 @@ export default function WebSrvcMyp020100({ userInfo, onBack }) {
               <div>
                 <div className="flex items-center gap-2">
                   <h2 className="text-lg font-bold text-slate-900">2. 표준 자격·수료 항목 검색 및 등록</h2>
-                  <span className="text-xs font-bold text-teal-700 bg-teal-50 px-2 py-0.5 rounded-full border border-teal-200">최대 5건</span>
+
                 </div>
                 <p className="text-xs text-slate-500">본사 심사 승인 시 고객 대시보드 및 상세 견적 프로필에 공식 인증 마크 부여</p>
               </div>
             </div>
             <span className="text-xs font-semibold text-slate-500 flex items-center gap-1">
               <span className="material-symbols-outlined text-sm text-slate-400">filter_list</span>
-              주력 분야(입주청소/가전케어) 우선 정렬
+
             </span>
           </div>
 
@@ -160,7 +198,7 @@ export default function WebSrvcMyp020100({ userInfo, onBack }) {
                 <span className="font-bold text-slate-900 text-sm flex items-center gap-1.5">
                   <span className="material-symbols-outlined text-teal-600 text-lg">verified</span>등록 자격·수료증
                 </span>
-                <span className="text-[11px] font-semibold text-teal-700 bg-teal-50 px-2 py-0.5 rounded-full border border-teal-200">({certs.length}/5건 등록됨)</span>
+                <span className="text-[11px] font-semibold text-teal-700 bg-teal-50 px-2 py-0.5 rounded-full border border-teal-200">({certs.length}건 등록됨)</span>
               </div>
               <span className="text-xs text-slate-500 font-medium">잔여 <strong className="text-blue-600 font-bold">{Math.max(0, 5 - certs.length)}건</strong> 추가 가능</span>
             </div>
@@ -247,7 +285,7 @@ export default function WebSrvcMyp020100({ userInfo, onBack }) {
                 className="flex-1 sm:flex-none px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shadow-sm flex items-center justify-center gap-1.5 cursor-pointer"
               >
                 <span className="material-symbols-outlined text-base">save</span>
-                사업자 및 자격·수료 정보 저장
+                내 정보 저장
               </button>
             </div>
           </div>
@@ -263,6 +301,7 @@ export default function WebSrvcMyp020100({ userInfo, onBack }) {
 
       <WebSrvcMyp020101
         isOpen={isOcrModalOpen}
+        userInfo={userInfo}
         onClose={() => setIsOcrModalOpen(false)}
         onApplyData={(data) => {
           if (data?.bizName) setBizName(data.bizName);

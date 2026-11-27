@@ -4,7 +4,8 @@ import React, { useState, useRef } from 'react';
  * 화면 ID: WEB-SRVC-MYP-020101
  * 화면명: 홈택스 PDF OCR 업로드 및 자동 인식 모달 (Modal)
  */
-export default function WebSrvcMyp020101({ isOpen, onClose, onApplyData }) {
+export default function WebSrvcMyp020101({ isOpen, onClose, onApplyData, userInfo }) {
+  const userNo = userInfo?.USER_NO || userInfo?.userNo || 'S20261000001';
   const fileInputRef = useRef(null);
   const [fileInfo, setFileInfo] = useState({
     name: '사업자등록증명_공간다원_202611.pdf',
@@ -43,7 +44,7 @@ export default function WebSrvcMyp020101({ isOpen, onClose, onApplyData }) {
     setIsParsing(true);
     try {
       const formData = new FormData();
-      formData.append('userNo', 'S20261100002');
+      formData.append('userNo', userNo);
       formData.append('file', file);
       const res = await fetch('/api/srvc/myp/020101', { method: 'POST', body: formData });
       const json = await res.json();
@@ -217,8 +218,9 @@ export default function WebSrvcMyp020101({ isOpen, onClose, onApplyData }) {
                       <span>코드:</span>
                       <input
                         type="text"
+                        maxLength={6}
                         value={ocrData.industryCode}
-                        onChange={(e) => setOcrData({ ...ocrData, industryCode: e.target.value })}
+                        onChange={(e) => setOcrData({ ...ocrData, industryCode: e.target.value.replace(/[^0-9]/g, '').slice(0, 6) })}
                         placeholder="6자리 입력"
                         className="w-16 bg-transparent focus:outline-none text-blue-800 font-mono font-bold"
                       />
@@ -231,6 +233,10 @@ export default function WebSrvcMyp020101({ isOpen, onClose, onApplyData }) {
                     />
                   </div>
                   <span className="material-symbols-outlined text-emerald-600 text-[20px] shrink-0">verified</span>
+                </div>
+                <div className="mt-1.5 text-[11px] text-red-600 font-bold leading-relaxed">
+                  <p>주업종 코드 확인: 홈택스(hometax.go.kr) 로그인 → 우측 상단 [My홈택스] → [사업자등록사항 및 담당자 안내]</p>
+                  <p>메뉴 클릭 → 등록된 주업종 코드(6자리), 부업종 코드, 업태, 종목 확인할 수 있습니다.</p>
                 </div>
               </div>
             </div>
@@ -261,14 +267,32 @@ export default function WebSrvcMyp020101({ isOpen, onClose, onApplyData }) {
             </button>
             <button
               type="button"
-              onClick={() => {
-                onApplyData?.(ocrData);
-                onClose?.();
+              onClick={async () => {
+                if (ocrData.industryCode && ocrData.industryCode.trim().length !== 6) {
+                  alert('주업종 코드는 입력 시 6자리를 반드시 입력해야 합니다.');
+                  return;
+                }
+                try {
+                  const res = await fetch('/api/srvc/myp/020101', {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ userNo, ...ocrData }),
+                  });
+                  const json = await res.json();
+                  if (!res.ok || !json?.success) {
+                    alert(json?.message || '국세청 사업자등록정보 진위확인에 실패했습니다.');
+                    return;
+                  }
+                  onApplyData?.(ocrData);
+                  onClose?.();
+                } catch {
+                  alert('국세청 진위확인 서버 통신 중 오류가 발생했습니다.');
+                }
               }}
               className="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shadow-sm flex items-center justify-center gap-1.5 cursor-pointer"
             >
               <span className="material-symbols-outlined text-[16px]">task_alt</span>
-              인식 정보 화면에 자동 반영하기
+              내 정보 등록
             </button>
           </div>
         </div>

@@ -6959,6 +6959,44 @@ function WebSrvcCom010100({ isOpen, userInfo, onClose, onSuccess }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [toastMsg, setToastMsg] = useState('');
 
+  useEffect(() => {
+    const uNo = userInfo?.USER_NO || userInfo?.userNo || 'S20261100002';
+    fetch(`/api/srvc/myp/020101?userNo=${encodeURIComponent(uNo)}`)
+      .then((res) => res.json())
+      .then((json) => {
+        if (json?.success && json.data) {
+          if (json.data.COMP_NM) setBizName(json.data.COMP_NM);
+          if (json.data.CEO_NM) setCeoName(json.data.CEO_NM);
+          if (json.data.BIZ_REG_NO) setBizNo(json.data.BIZ_REG_NO);
+        }
+      })
+      .catch(() => {});
+    fetch(`/api/srvc/myp/020100?userNo=${encodeURIComponent(uNo)}`)
+      .then((res) => res.json())
+      .then((json) => {
+        if (json?.success && Array.isArray(json.certs)) {
+          setCerts(
+            json.certs.map((c, idx) => ({
+              id: c.CERT_SEQ || idx + 1,
+              name: c.CERT_NM || '',
+              org: c.ISSUER_ORG || '',
+              cat: c.SERVICE_CAT || '공통',
+              catCls: 'bg-blue-50 text-blue-700 border-blue-100',
+              level: c.CERT_LEVEL || '1급',
+              date: c.issueDt || '',
+              certNo: c.CERT_NO || '',
+              status: c.VERIFY_STAT_CD === 'APPROVED' ? '검수완료' : '심사대기',
+              statusCls: c.VERIFY_STAT_CD === 'APPROVED' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-amber-50 text-amber-700 border-amber-200',
+              dotCls: c.VERIFY_STAT_CD === 'APPROVED' ? 'bg-emerald-500' : 'bg-amber-500',
+              icon: 'award_star',
+              iconBg: 'bg-teal-50 text-teal-700 border-teal-200',
+            }))
+          );
+        }
+      })
+      .catch(() => {});
+  }, [userInfo]);
+
   const showToast = (msg) => {
     setToastMsg(msg);
     setTimeout(() => setToastMsg(''), 3200);
@@ -7388,8 +7426,50 @@ function WebSrvcCom010000({ userInfo }) {
   const [actTotalPages, setActTotalPages] = useState(1);
 
   const [toastMsg, setToastMsg] = useState('');
+
+  useEffect(() => {
+    const uNo = userInfo?.USER_NO || userInfo?.userNo || 'S20261100002';
+    fetch(`/api/srvc/myp/020101?userNo=${encodeURIComponent(uNo)}`)
+      .then((res) => res.json())
+      .then((json) => {
+        if (json?.success && json.data) {
+          if (json.data.COMP_NM) setBizName(json.data.COMP_NM);
+          if (json.data.CEO_NM) setCeoName(json.data.CEO_NM);
+          if (json.data.BIZ_REG_NO) setBizNo(json.data.BIZ_REG_NO);
+        }
+      })
+      .catch(() => {});
+    fetch(`/api/srvc/myp/020100?userNo=${encodeURIComponent(uNo)}`)
+      .then((res) => res.json())
+      .then((json) => {
+        if (json?.success && Array.isArray(json.certs)) {
+          setCerts(
+            json.certs.map((c, idx) => ({
+              id: c.CERT_SEQ || idx + 1,
+              name: c.CERT_NM || '',
+              org: c.ISSUER_ORG || '',
+              cat: c.SERVICE_CAT || '공통',
+              catCls: 'bg-blue-50 text-blue-700 border-blue-100',
+              level: c.CERT_LEVEL || '1급',
+              date: c.issueDt || '',
+              certNo: c.CERT_NO || '',
+              status: c.VERIFY_STAT_CD === 'APPROVED' ? '검수완료' : '심사대기',
+              statusCls: c.VERIFY_STAT_CD === 'APPROVED' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-amber-50 text-amber-700 border-amber-200',
+              dotCls: c.VERIFY_STAT_CD === 'APPROVED' ? 'bg-emerald-500' : 'bg-amber-500',
+              icon: 'award_star',
+              iconBg: 'bg-teal-50 text-teal-700 border-teal-200',
+            }))
+          );
+        }
+      })
+      .catch(() => {});
+  }, [userInfo]);
   const [isLogoModalOpen, setIsLogoModalOpen] = useState(false);
   const [partnerLogoUrl, setPartnerLogoUrl] = useState(userInfo?.PROFILE_IMG_URL || null);
+  const [partnerCerts, setPartnerCerts] = useState([]);
+  const [partnerSpecialties, setPartnerSpecialties] = useState([]);
+  const [isBizRestricted, setIsBizRestricted] = useState(false);
+  const [showBizNotice, setShowBizNotice] = useState(false);
 
   const showToast = (msg) => {
     setToastMsg(msg);
@@ -7412,6 +7492,14 @@ function WebSrvcCom010000({ userInfo }) {
         const res = await fetch(`/api/srvc/com/010000?${params.toString()}`);
         const data = await res.json();
         if (data?.success) {
+          if (data.isBizRestricted) {
+            setIsBizRestricted(true);
+            setShowBizNotice(true);
+          } else {
+            setIsBizRestricted(false);
+          }
+          if (Array.isArray(data.partnerSpecialties)) setPartnerSpecialties(data.partnerSpecialties);
+          if (Array.isArray(data.partnerCerts)) setPartnerCerts(data.partnerCerts);
           setTabCounts(data.tabCounts || { waitingBid: 0, waitingPayment: 0, waitingCleaning: 0 });
           setTabItems(data.tabData?.items || []);
           setTabTotalPages(data.tabData?.totalPages || 1);
@@ -7444,6 +7532,30 @@ function WebSrvcCom010000({ userInfo }) {
       .then((d) => {
         if (d?.success && d.data?.currentLogoUrl) {
           setPartnerLogoUrl(d.data.currentLogoUrl);
+        }
+      })
+      .catch(() => {});
+    fetch(`/api/srvc/myp/020100?userNo=${encodeURIComponent(uNo)}`)
+      .then((res) => res.json())
+      .then((json) => {
+        if (json?.success && Array.isArray(json.certs)) {
+          setCerts(
+            json.certs.map((c, idx) => ({
+              id: c.CERT_SEQ || idx + 1,
+              name: c.CERT_NM || '',
+              org: c.ISSUER_ORG || '',
+              cat: c.SERVICE_CAT || '공통',
+              catCls: 'bg-blue-50 text-blue-700 border-blue-100',
+              level: c.CERT_LEVEL || '1급',
+              date: c.issueDt || '',
+              certNo: c.CERT_NO || '',
+              status: c.VERIFY_STAT_CD === 'APPROVED' ? '검수완료' : '심사대기',
+              statusCls: c.VERIFY_STAT_CD === 'APPROVED' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-amber-50 text-amber-700 border-amber-200',
+              dotCls: c.VERIFY_STAT_CD === 'APPROVED' ? 'bg-emerald-500' : 'bg-amber-500',
+              icon: 'award_star',
+              iconBg: 'bg-teal-50 text-teal-700 border-teal-200',
+            }))
+          );
         }
       })
       .catch(() => {});
@@ -7514,6 +7626,21 @@ function WebSrvcCom010000({ userInfo }) {
         </div>
       )}
 
+      {showBizNotice && (
+        <div
+          onClick={() => setShowBizNotice(false)}
+          className="max-w-[1440px] w-full mx-auto px-margin-mobile md:px-margin pt-4 cursor-pointer"
+        >
+          <div className="bg-red-50 border-2 border-red-500 text-red-700 px-5 py-3.5 rounded-xl shadow-sm flex items-center justify-between gap-3">
+            <div className="flex items-center gap-2 font-bold text-sm">
+              <span className="material-symbols-outlined text-red-600">warning</span>
+              <span>상단 메뉴에서 "내 정보 관리" 선택후 사업자등록 정보 입력하세요!.</span>
+            </div>
+            <span className="text-xs text-red-500 font-semibold shrink-0">(클릭 시 닫힘)</span>
+          </div>
+        </div>
+      )}
+
       <div className="w-full max-w-[1440px] mx-auto px-margin-mobile md:px-margin py-space-xl flex flex-col gap-space-xl">
         {/* Section 2: Partner Welcome */}
         <section className="bg-surface-container-lowest border-2 border-blue-500 rounded-xl p-space-lg shadow-sm flex flex-col lg:flex-row items-start lg:items-center justify-between gap-space-lg relative overflow-hidden">
@@ -7557,32 +7684,25 @@ function WebSrvcCom010000({ userInfo }) {
                 <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-surface-container-high text-on-surface-variant font-label-sm text-label-sm font-semibold">
                   <span className="material-symbols-outlined text-[14px] text-primary">cleaning_services</span>청소 전문 분야
                 </span>
-                <span className="px-2 py-0.5 rounded-full bg-surface-container-low border border-slate-200 text-on-surface font-label-sm text-label-sm font-medium">정기청소 (상가·계단·사무실)</span>
-                <span className="px-2 py-0.5 rounded-full bg-surface-container-low border border-slate-200 text-on-surface font-label-sm text-label-sm font-medium">입주·이사 청소</span>
-                <span className="px-2 py-0.5 rounded-full bg-surface-container-low border border-slate-200 text-on-surface font-label-sm text-label-sm font-medium">계절가전 분해케어 (에어컨·세탁기)</span>
+                {partnerSpecialties.length === 0 ? (
+                  <span className="px-2 py-0.5 rounded-full bg-surface-container-low border border-slate-200 text-on-surface-variant font-label-sm text-label-sm">등록된 청소 전문 분야가 없습니다.</span>
+                ) : (
+                  partnerSpecialties.map((sp, idx) => (
+                    <span key={idx} className="px-2 py-0.5 rounded-full bg-surface-container-low border border-slate-200 text-on-surface font-label-sm text-label-sm font-medium">{sp}</span>
+                  ))
+                )}
               </div>
               <div className="flex flex-wrap items-center gap-1.5">
                 <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-secondary-fixed/30 text-on-secondary-fixed font-label-sm text-label-sm font-semibold">
                   <span className="material-symbols-outlined text-[14px] text-secondary">verified_user</span>보유 자격 및 인증
                 </span>
-                <span className="px-2 py-0.5 rounded-full bg-surface-container-lowest border border-slate-200 text-on-surface-variant font-label-sm text-label-sm">위생관리용역업 등록</span>
-                <span className="px-2 py-0.5 rounded-full bg-surface-container-lowest border border-slate-200 text-on-surface-variant font-label-sm text-label-sm">방역소독전문가 1급</span>
-                <span className="px-2 py-0.5 rounded-full bg-surface-container-lowest border border-slate-200 text-on-surface-variant font-label-sm text-label-sm">가전관리사 수료(한국청소위생협회)</span>
-                <span className="px-2 py-0.5 rounded-full bg-secondary-fixed/20 text-secondary font-label-sm text-label-sm font-semibold">삼성·LG 가전케어 8년 경력</span>
-              </div>
-              <div className="flex flex-wrap items-center gap-space-sm text-on-surface-variant">
-                <div className="flex items-center gap-1.5 bg-surface-container-low px-space-sm py-1 rounded-full font-label-md text-label-md text-tertiary">
-                  <span className="material-symbols-outlined text-[17px] text-primary">location_on</span>
-                  <span>활동 권역: 경기 고양시 덕양구 · 일산동구 · 서울 서대문구</span>
-                  <span className="text-secondary font-semibold ml-1">(3/10개 구역 설정)</span>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => showToast('[WEB-SRVC-MYP-010100] 시공사 내정보 및 활동 권역 관리 화면을 호출합니다.')}
-                  className="font-label-sm text-label-sm text-primary hover:underline font-semibold flex items-center gap-1 px-3 py-1 rounded-lg border-2 border-red-500 cursor-pointer"
-                >
-                  권역 수정 <span className="material-symbols-outlined text-[15px]">arrow_forward</span>
-                </button>
+                {partnerCerts.length === 0 ? (
+                  <span className="px-2 py-0.5 rounded-full bg-surface-container-lowest border border-slate-200 text-on-surface-variant font-label-sm text-label-sm">등록된 자격 및 인증이 없습니다.</span>
+                ) : (
+                  partnerCerts.map((certNm, idx) => (
+                    <span key={idx} className="px-2 py-0.5 rounded-full bg-surface-container-lowest border border-slate-200 text-on-surface-variant font-label-sm text-label-sm">{certNm}</span>
+                  ))
+                )}
               </div>
             </div>
           </div>
@@ -7700,6 +7820,10 @@ function WebSrvcCom010000({ userInfo }) {
                           <button
                             type="button"
                             onClick={() => {
+                              if (isBizRestricted) {
+                                showToast('상단 메뉴에서 "내 정보 관리" 선택후 사업자등록 정보 입력하세요!.');
+                                return;
+                              }
                               const bizNo = userInfo?.BIZ_REG_NO || userInfo?.bizRegNo;
                               const bizStat = userInfo?.BIZ_STAT_CD || userInfo?.bizStatCd || 'ACTIVE';
                               if (!bizNo || ['CLOSED', 'SUSPENDED', '폐업', '휴업'].includes(bizStat)) {
@@ -7943,7 +8067,7 @@ function WebSrvcMyp020100({ userInfo, onBack }) {
   const [docType, setDocType] = useState('ALL');
   const [serviceCat, setServiceCat] = useState('ALL');
   const [keyword, setKeyword] = useState('');
-  const [certs, setCerts] = useState(INITIAL_CERTS);
+  const [certs, setCerts] = useState([]);
   const [isOcrModalOpen, setIsOcrModalOpen] = useState(false);
   const [showEmptyBizModal, setShowEmptyBizModal] = useState(!bizNo || !bizName);
   const [certPage, setCertPage] = useState(1);
@@ -7951,6 +8075,44 @@ function WebSrvcMyp020100({ userInfo, onBack }) {
   const totalCertPages = Math.max(1, Math.ceil(certs.length / pageSize));
   const pagedCerts = certs.slice((certPage - 1) * pageSize, certPage * pageSize);
   const [toastMsg, setToastMsg] = useState('');
+
+  useEffect(() => {
+    const uNo = userInfo?.USER_NO || userInfo?.userNo || 'S20261100002';
+    fetch(`/api/srvc/myp/020101?userNo=${encodeURIComponent(uNo)}`)
+      .then((res) => res.json())
+      .then((json) => {
+        if (json?.success && json.data) {
+          if (json.data.COMP_NM) setBizName(json.data.COMP_NM);
+          if (json.data.CEO_NM) setCeoName(json.data.CEO_NM);
+          if (json.data.BIZ_REG_NO) setBizNo(json.data.BIZ_REG_NO);
+        }
+      })
+      .catch(() => {});
+    fetch(`/api/srvc/myp/020100?userNo=${encodeURIComponent(uNo)}`)
+      .then((res) => res.json())
+      .then((json) => {
+        if (json?.success && Array.isArray(json.certs)) {
+          setCerts(
+            json.certs.map((c, idx) => ({
+              id: c.CERT_SEQ || idx + 1,
+              name: c.CERT_NM || '',
+              org: c.ISSUER_ORG || '',
+              cat: c.SERVICE_CAT || '공통',
+              catCls: 'bg-blue-50 text-blue-700 border-blue-100',
+              level: c.CERT_LEVEL || '1급',
+              date: c.issueDt || '',
+              certNo: c.CERT_NO || '',
+              status: c.VERIFY_STAT_CD === 'APPROVED' ? '검수완료' : '심사대기',
+              statusCls: c.VERIFY_STAT_CD === 'APPROVED' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-amber-50 text-amber-700 border-amber-200',
+              dotCls: c.VERIFY_STAT_CD === 'APPROVED' ? 'bg-emerald-500' : 'bg-amber-500',
+              icon: 'award_star',
+              iconBg: 'bg-teal-50 text-teal-700 border-teal-200',
+            }))
+          );
+        }
+      })
+      .catch(() => {});
+  }, [userInfo]);
 
   const showToast = (msg) => {
     setToastMsg(msg);
@@ -8038,14 +8200,14 @@ function WebSrvcMyp020100({ userInfo, onBack }) {
               <div>
                 <div className="flex items-center gap-2">
                   <h2 className="text-lg font-bold text-slate-900">2. 표준 자격·수료 항목 검색 및 등록</h2>
-                  <span className="text-xs font-bold text-teal-700 bg-teal-50 px-2 py-0.5 rounded-full border border-teal-200">최대 5건</span>
+
                 </div>
                 <p className="text-xs text-slate-500">본사 심사 승인 시 고객 대시보드 및 상세 견적 프로필에 공식 인증 마크 부여</p>
               </div>
             </div>
             <span className="text-xs font-semibold text-slate-500 flex items-center gap-1">
               <span className="material-symbols-outlined text-sm text-slate-400">filter_list</span>
-              주력 분야(입주청소/가전케어) 우선 정렬
+
             </span>
           </div>
 
@@ -8087,7 +8249,7 @@ function WebSrvcMyp020100({ userInfo, onBack }) {
                 <span className="font-bold text-slate-900 text-sm flex items-center gap-1.5">
                   <span className="material-symbols-outlined text-teal-600 text-lg">verified</span>등록 자격·수료증
                 </span>
-                <span className="text-[11px] font-semibold text-teal-700 bg-teal-50 px-2 py-0.5 rounded-full border border-teal-200">({certs.length}/5건 등록됨)</span>
+                <span className="text-[11px] font-semibold text-teal-700 bg-teal-50 px-2 py-0.5 rounded-full border border-teal-200">({certs.length}건 등록됨)</span>
               </div>
               <span className="text-xs text-slate-500 font-medium">잔여 <strong className="text-blue-600 font-bold">{Math.max(0, 5 - certs.length)}건</strong> 추가 가능</span>
             </div>
@@ -8174,7 +8336,7 @@ function WebSrvcMyp020100({ userInfo, onBack }) {
                 className="flex-1 sm:flex-none px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shadow-sm flex items-center justify-center gap-1.5 cursor-pointer"
               >
                 <span className="material-symbols-outlined text-base">save</span>
-                사업자 및 자격·수료 정보 저장
+                내 정보 저장
               </button>
             </div>
           </div>
@@ -8190,6 +8352,7 @@ function WebSrvcMyp020100({ userInfo, onBack }) {
 
       <WebSrvcMyp020101
         isOpen={isOcrModalOpen}
+        userInfo={userInfo}
         onClose={() => setIsOcrModalOpen(false)}
         onApplyData={(data) => {
           if (data?.bizName) setBizName(data.bizName);
@@ -8227,7 +8390,8 @@ function WebSrvcMyp020100({ userInfo, onBack }) {
  * 화면 ID: WEB-SRVC-MYP-020101
  * 화면명: 홈택스 PDF OCR 업로드 및 자동 인식 모달 (Modal)
  */
-function WebSrvcMyp020101({ isOpen, onClose, onApplyData }) {
+function WebSrvcMyp020101({ isOpen, onClose, onApplyData, userInfo }) {
+  const userNo = userInfo?.USER_NO || userInfo?.userNo || 'S20261000001';
   const fileInputRef = useRef(null);
   const [fileInfo, setFileInfo] = useState({
     name: '사업자등록증명_공간다원_202611.pdf',
@@ -8266,7 +8430,7 @@ function WebSrvcMyp020101({ isOpen, onClose, onApplyData }) {
     setIsParsing(true);
     try {
       const formData = new FormData();
-      formData.append('userNo', 'S20261100002');
+      formData.append('userNo', userNo);
       formData.append('file', file);
       const res = await fetch('/api/srvc/myp/020101', { method: 'POST', body: formData });
       const json = await res.json();
@@ -8440,8 +8604,9 @@ function WebSrvcMyp020101({ isOpen, onClose, onApplyData }) {
                       <span>코드:</span>
                       <input
                         type="text"
+                        maxLength={6}
                         value={ocrData.industryCode}
-                        onChange={(e) => setOcrData({ ...ocrData, industryCode: e.target.value })}
+                        onChange={(e) => setOcrData({ ...ocrData, industryCode: e.target.value.replace(/[^0-9]/g, '').slice(0, 6) })}
                         placeholder="6자리 입력"
                         className="w-16 bg-transparent focus:outline-none text-blue-800 font-mono font-bold"
                       />
@@ -8454,6 +8619,10 @@ function WebSrvcMyp020101({ isOpen, onClose, onApplyData }) {
                     />
                   </div>
                   <span className="material-symbols-outlined text-emerald-600 text-[20px] shrink-0">verified</span>
+                </div>
+                <div className="mt-1.5 text-[11px] text-red-600 font-bold leading-relaxed">
+                  <p>주업종 코드 확인: 홈택스(hometax.go.kr) 로그인 → 우측 상단 [My홈택스] → [사업자등록사항 및 담당자 안내]</p>
+                  <p>메뉴 클릭 → 등록된 주업종 코드(6자리), 부업종 코드, 업태, 종목 확인할 수 있습니다.</p>
                 </div>
               </div>
             </div>
@@ -8484,14 +8653,32 @@ function WebSrvcMyp020101({ isOpen, onClose, onApplyData }) {
             </button>
             <button
               type="button"
-              onClick={() => {
-                onApplyData?.(ocrData);
-                onClose?.();
+              onClick={async () => {
+                if (ocrData.industryCode && ocrData.industryCode.trim().length !== 6) {
+                  alert('주업종 코드는 입력 시 6자리를 반드시 입력해야 합니다.');
+                  return;
+                }
+                try {
+                  const res = await fetch('/api/srvc/myp/020101', {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ userNo, ...ocrData }),
+                  });
+                  const json = await res.json();
+                  if (!res.ok || !json?.success) {
+                    alert(json?.message || '국세청 사업자등록정보 진위확인에 실패했습니다.');
+                    return;
+                  }
+                  onApplyData?.(ocrData);
+                  onClose?.();
+                } catch {
+                  alert('국세청 진위확인 서버 통신 중 오류가 발생했습니다.');
+                }
               }}
               className="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shadow-sm flex items-center justify-center gap-1.5 cursor-pointer"
             >
               <span className="material-symbols-outlined text-[16px]">task_alt</span>
-              인식 정보 화면에 자동 반영하기
+              내 정보 등록
             </button>
           </div>
         </div>
@@ -8620,6 +8807,7 @@ export default function WebClntCom010000({ onNavigate }) {
   ];
 
   // [신규] 푸시 알림 센터 상태 및 제어 (벨 클릭 시 수신 목록 출력)
+  const [isBrandLogoModalOpen, setIsBrandLogoModalOpen] = useState(false);
   const [notiList, setNotiList] = useState([]);
   const [unreadNotiCount, setUnreadNotiCount] = useState(0);
   const [isNotiOpen, setIsNotiOpen] = useState(false);
@@ -9069,14 +9257,7 @@ export default function WebClntCom010000({ onNavigate }) {
               href="#home"
               onClick={(e) => {
                 e.preventDefault();
-                const role = userInfo?.USER_ROLE_CD || userInfo?.userRoleCd;
-                if (userInfo && (role === 'S' || role === 'SERVICE')) {
-                  handleNavClick(e, 'WEB-SRVC-COM-010000');
-                } else if (userInfo && (role === 'C' || role === 'CLIENT')) {
-                  handleNavClick(e, 'WEB-CLNT-COM-010200');
-                } else {
-                  handleNavClick(e, 'home');
-                }
+                setIsBrandLogoModalOpen(true);
               }}
             >
               <img
@@ -9092,6 +9273,22 @@ export default function WebClntCom010000({ onNavigate }) {
             className="hidden md:flex items-center gap-1 bg-surface-container-lowest p-1 rounded-full shadow-xs border border-outline-variant/30"
             data-active-classes="bg-secondary-container text-on-secondary-container font-label-md"
           >
+            <button
+              type="button"
+              className="px-3.5 py-1.5 rounded-full font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all cursor-pointer font-bold"
+              onClick={(e) => {
+                const role = userInfo?.USER_ROLE_CD || userInfo?.userRoleCd;
+                if (!userInfo || userInfo.isGuest) {
+                  handleNavClick(e, 'home');
+                } else if (role === 'S' || role === 'SERVICE') {
+                  handleNavClick(e, 'WEB-SRVC-COM-010000');
+                } else {
+                  handleNavClick(e, 'WEB-CLNT-COM-010200');
+                }
+              }}
+            >
+              홈
+            </button>
             {userInfo?.USER_ROLE_CD === 'S' ? (
               /* [시공사 GNB: 홈, 통합 시공·청약 공정 관리, 내 활동 내역, 내 정보, 고객센터] */
               <>
@@ -9502,6 +9699,34 @@ export default function WebClntCom010000({ onNavigate }) {
           </div>
         </div>
       </header>
+      {isBrandLogoModalOpen && (
+        <div
+          className="fixed inset-0 z-[120] flex items-center justify-center bg-slate-950/70 backdrop-blur-sm p-4"
+          onClick={() => setIsBrandLogoModalOpen(false)}
+        >
+          <div
+            role="dialog"
+            aria-modal="true"
+            className="bg-white rounded-3xl p-6 shadow-2xl flex flex-col items-center gap-4 max-w-xs w-full"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="w-56 h-56 rounded-full overflow-hidden border border-slate-200 shadow-sm">
+              <img
+                src="/storage/sseuldakgo/logo/Logo_쓸고딱고.jpg"
+                alt="쓸고딱고 로고"
+                className="w-full h-full object-cover scale-110"
+              />
+            </div>
+            <button
+              type="button"
+              onClick={() => setIsBrandLogoModalOpen(false)}
+              className="w-full py-2.5 rounded-xl bg-primary hover:bg-primary-container text-on-primary font-title-md text-title-md font-bold shadow-sm transition cursor-pointer"
+            >
+              닫기
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* ====================================================================
           MAIN CONTENT (고객 C: WEB-CLNT-COM-010000 / 시공사 S: WEB-SRVC-COM-010000)
