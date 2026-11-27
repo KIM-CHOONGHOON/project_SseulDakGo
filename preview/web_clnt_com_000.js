@@ -2863,7 +2863,7 @@ function WebClntAth010100({ isOpen = false, onClose, onSuccessLogin, onOpenRegis
             setErrorMsg('이메일 주소를 입력해 주세요.');
             return;
         }
-        if (!pwd.trim()) {
+        if (!pwd.trim() && !e?.isSocial && !localStorage.getItem('SSEULDAKGO_SOCIAL_LOGIN_BRIDGE')) {
             setErrorMsg('비밀번호를 입력해 주세요.');
             return;
         }
@@ -5323,13 +5323,10 @@ function WebSrvcCom010100({ isOpen, userInfo, onClose, onSuccess }) {
             });
             const data = await res.json();
             if (data?.success) {
-                showToast('대표 로고 이미지가 성공적으로 변경되었습니다.');
                 if (onSuccess)
                     onSuccess(data.data?.logoImgUrl || previewUrl);
-                setTimeout(() => {
-                    if (onClose)
-                        onClose();
-                }, 800);
+                if (onClose)
+                    onClose();
             }
             else {
                 showToast(data?.message || '로고 저장 중 오류가 발생했습니다.');
@@ -6321,15 +6318,20 @@ function WebClntCom010000({ onNavigate }) {
         }
     ];
     // [신규] 푸시 알림 센터 상태 및 제어 (벨 클릭 시 수신 목록 출력)
-    const [notiList, setNotiList] = useState(INITIAL_NOTI_LIST);
-    const [unreadNotiCount, setUnreadNotiCount] = useState(3);
+    const [notiList, setNotiList] = useState([]);
+    const [unreadNotiCount, setUnreadNotiCount] = useState(0);
     const [isNotiOpen, setIsNotiOpen] = useState(false);
     const [activeNotiModal, setActiveNotiModal] = useState(null); // 알림 상세 모달
     const [bidSubmitSuccessMsg, setBidSubmitSuccessMsg] = useState(''); // 청약 완료 메시지
-    // 알림 목록 및 미확인 건수 조회
+    // 알림 목록 및 미확인 건수 조회 (로그인 회원 전용)
     const fetchNotifications = useCallback(async (targetUserNo = userInfo.USER_NO) => {
         try {
-            const uNo = (!targetUserNo || targetUserNo === 'GUEST') ? 'S20261100001' : targetUserNo;
+            const uNo = targetUserNo || userInfo.USER_NO;
+            if (!uNo || uNo === 'GUEST' || userInfo?.isGuest) {
+                setNotiList([]);
+                setUnreadNotiCount(0);
+                return;
+            }
             const res = await fetch(`/api/common/notifications?userNo=${encodeURIComponent(uNo)}`);
             const json = await res.json();
             if (json && json.success) {
@@ -6708,84 +6710,62 @@ function WebClntCom010000({ onNavigate }) {
                                         el.scrollIntoView({ behavior: 'smooth' });
                                 }, 100);
                             } }, "\uB0B4 \uD65C\uB3D9 \uB0B4\uC5ED"))) : (React.createElement(React.Fragment, null,
-                        React.createElement("button", { type: "button", className: "px-3.5 py-1.5 rounded-full font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all cursor-pointer", onClick: () => document.getElementById('section-core-services')?.scrollIntoView({ behavior: 'smooth' }) }, "3\uB300 \uCCAD\uC18C \uC6A9\uC5ED \uB300\uBD84\uB958"),
-                        React.createElement("button", { type: "button", className: "px-3.5 py-1.5 rounded-full font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all cursor-pointer", onClick: () => document.getElementById('section-how-it-works')?.scrollIntoView({ behavior: 'smooth' }) }, "\uC774\uC6A9 \uC808\uCC28 4\uB2E8\uACC4 \uC6CC\uD06C\uD50C\uB85C\uC6B0"),
-                        React.createElement("button", { type: "button", className: "px-3.5 py-1.5 rounded-full font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all cursor-pointer", onClick: () => document.getElementById('section-live-matching')?.scrollIntoView({ behavior: 'smooth' }) }, "\uC2E4\uC2DC\uAC04 \uBC1C\uC8FC\u00B7\uB9E4\uCE6D \uD604\uD669"),
-                        React.createElement("button", { type: "button", className: "px-3.5 py-1.5 rounded-full font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all cursor-pointer", onClick: () => document.getElementById('section-partner-recruit')?.scrollIntoView({ behavior: 'smooth' }) }, "\uC4F8\uACE0\uB2E6\uACE0 \uC804\uBB38 \uC2DC\uACF5\uC0AC \uD30C\uD2B8\uB108 \uBAA8\uC9D1"))),
-                    React.createElement("div", { className: "relative" },
-                        React.createElement("button", { type: "button", className: activeNavPath === 'my-account' || activeNavPath === 'WEB-CLNT-MYP-010100' || isMyMenuOpen
-                                ? 'px-3.5 py-1.5 rounded-full transition-all bg-secondary-container text-on-secondary-container font-label-md flex items-center gap-1 cursor-pointer font-bold'
-                                : 'px-3.5 py-1.5 rounded-full font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all flex items-center gap-1 cursor-pointer', onClick: (e) => {
-                                e.stopPropagation();
-                                if (userInfo && !userInfo.isGuest) {
-                                    if (userInfo.USER_ROLE_CD === 'S') {
-                                        setActiveNavPath('WEB-SRVC-MYP-020100');
-                                        if (typeof onNavigate === 'function')
-                                            onNavigate('WEB-SRVC-MYP-020100');
-                                    }
-                                    else {
-                                        setIsMyMenuOpen(!isMyMenuOpen);
-                                    }
-                                }
-                                else {
-                                    alert('내 정보 관리를 위해 먼저 로그인해 주세요.');
+                        React.createElement("button", { type: "button", className: "px-3.5 py-1.5 rounded-full font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all cursor-pointer", onClick: () => document.getElementById('section-core-services')?.scrollIntoView({ behavior: 'smooth' }) }, "\uCCAD\uC18C \uC6A9\uC5ED \uB300\uBD84\uB958"),
+                        React.createElement("button", { type: "button", className: "px-3.5 py-1.5 rounded-full font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all cursor-pointer", onClick: () => document.getElementById('section-how-it-works')?.scrollIntoView({ behavior: 'smooth' }) }, "\uC774\uC6A9 \uC808\uCC28 \uC6CC\uD06C\uD50C\uB85C\uC6B0"),
+                        React.createElement("button", { type: "button", className: "px-3.5 py-1.5 rounded-full font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all cursor-pointer", onClick: () => document.getElementById('section-live-matching')?.scrollIntoView({ behavior: 'smooth' }) }, "\uC2E4\uC2DC\uAC04 \uBC1C\uC8FC \uD604\uD669"),
+                        React.createElement("button", { type: "button", className: "px-3.5 py-1.5 rounded-full font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all cursor-pointer", onClick: () => document.getElementById('section-partner-recruit')?.scrollIntoView({ behavior: 'smooth' }) }, "\uD30C\uD2B8\uB108 (\uC2DC\uACF5\uC790) \uBAA8\uC9D1"))),
+                    React.createElement("div", { className: "relative" }, isMyMenuOpen && userInfo?.USER_ROLE_CD !== 'S' && (React.createElement("div", { className: "absolute right-0 top-full mt-1 w-56 bg-white rounded-2xl shadow-xl border border-slate-200/80 py-2 z-[200] animate-in fade-in slide-in-from-top-1 duration-150" },
+                        React.createElement("div", { className: "px-3.5 py-2 border-b border-slate-100 flex items-center justify-between text-xs" },
+                            React.createElement("span", { className: "font-bold text-slate-800" }, userInfo?.USER_ROLE_CD === 'S' ? '시공사 회원' : (userInfo?.isGuest ? '비회원' : '고객 회원')),
+                            React.createElement("span", { className: "text-[10px] px-1.5 py-0.2 rounded font-mono font-bold bg-slate-100 text-slate-600" }, userInfo?.isGuest ? 'GUEST' : (userInfo?.USER_ROLE_CD === 'S' ? 'PARTNER' : 'CLIENT'))),
+                        userInfo?.isGuest ? (React.createElement("div", { className: "p-3 text-center space-y-2" },
+                            React.createElement("p", { className: "text-xs text-slate-500" }, "\uB85C\uADF8\uC778 \uD6C4 \uB0B4 \uC815\uBCF4\uB97C \uC774\uC6A9\uD558\uC2E4 \uC218 \uC788\uC2B5\uB2C8\uB2E4."),
+                            React.createElement("button", { type: "button", onClick: () => {
+                                    setIsMyMenuOpen(false);
                                     setIsLoginModalOpen(true);
-                                }
-                            } },
-                            React.createElement("span", null, "\uB0B4 \uC815\uBCF4 \uAD00\uB9AC"),
-                            React.createElement("span", { className: "material-symbols-outlined text-[16px] transition-transform duration-200" }, isMyMenuOpen ? 'arrow_drop_up' : 'arrow_drop_down')),
-                        isMyMenuOpen && userInfo?.USER_ROLE_CD !== 'S' && (React.createElement("div", { className: "absolute right-0 top-full mt-1 w-56 bg-white rounded-2xl shadow-xl border border-slate-200/80 py-2 z-[200] animate-in fade-in slide-in-from-top-1 duration-150" },
-                            React.createElement("div", { className: "px-3.5 py-2 border-b border-slate-100 flex items-center justify-between text-xs" },
-                                React.createElement("span", { className: "font-bold text-slate-800" }, userInfo?.USER_ROLE_CD === 'S' ? '시공사 회원' : (userInfo?.isGuest ? '비회원' : '고객 회원')),
-                                React.createElement("span", { className: "text-[10px] px-1.5 py-0.2 rounded font-mono font-bold bg-slate-100 text-slate-600" }, userInfo?.isGuest ? 'GUEST' : (userInfo?.USER_ROLE_CD === 'S' ? 'PARTNER' : 'CLIENT'))),
-                            userInfo?.isGuest ? (React.createElement("div", { className: "p-3 text-center space-y-2" },
-                                React.createElement("p", { className: "text-xs text-slate-500" }, "\uB85C\uADF8\uC778 \uD6C4 \uB0B4 \uC815\uBCF4\uB97C \uC774\uC6A9\uD558\uC2E4 \uC218 \uC788\uC2B5\uB2C8\uB2E4."),
-                                React.createElement("button", { type: "button", onClick: () => {
-                                        setIsMyMenuOpen(false);
-                                        setIsLoginModalOpen(true);
-                                    }, className: "w-full py-1.5 bg-primary text-white text-xs font-bold rounded-lg shadow-sm" }, "\uB85C\uADF8\uC778\uD558\uAE30"))) : userInfo?.USER_ROLE_CD === 'S' ? (React.createElement("div", { className: "py-1 text-xs" },
-                                React.createElement("button", { type: "button", onClick: () => {
-                                        setIsMyMenuOpen(false);
-                                        setSubModalType('BIZ_REG');
-                                    }, className: "w-full px-4 py-2.5 text-left text-slate-700 hover:bg-slate-50 hover:text-primary flex items-center gap-2.5 transition-colors cursor-pointer font-medium" },
-                                    React.createElement("span", { className: "material-symbols-outlined text-[18px] text-amber-600" }, "badge"),
-                                    React.createElement("span", null, "\uC0AC\uC5C5\uC790\uB4F1\uB85D\uC99D \uB4F1\uB85D")),
-                                React.createElement("button", { type: "button", onClick: () => {
-                                        setIsMyMenuOpen(false);
-                                        setSubModalType('CHANGE_PHONE');
-                                    }, className: "w-full px-4 py-2.5 text-left text-slate-700 hover:bg-slate-50 hover:text-primary flex items-center gap-2.5 transition-colors cursor-pointer font-medium" },
-                                    React.createElement("span", { className: "material-symbols-outlined text-[18px] text-slate-500" }, "phonelink_setup"),
-                                    React.createElement("span", null, "\uC804\uD654\uBC88\uD638 \uBCC0\uACBD")),
-                                React.createElement("button", { type: "button", onClick: () => {
-                                        setIsMyMenuOpen(false);
-                                        setSubModalType('CHANGE_PWD');
-                                    }, className: "w-full px-4 py-2.5 text-left text-slate-700 hover:bg-slate-50 hover:text-primary flex items-center gap-2.5 transition-colors cursor-pointer font-medium" },
-                                    React.createElement("span", { className: "material-symbols-outlined text-[18px] text-slate-500" }, "lock_reset"),
-                                    React.createElement("span", null, "\uBE44\uBC00\uBC88\uD638 \uBCC0\uACBD")),
-                                React.createElement("button", { type: "button", onClick: () => {
-                                        setIsMyMenuOpen(false);
-                                        setActiveNavPath('WEB-CLNT-MYP-010100');
-                                    }, className: "w-full px-4 py-2.5 text-left text-primary hover:bg-primary-fixed/30 flex items-center gap-2.5 transition-colors border-t border-slate-100 cursor-pointer font-bold bg-primary-fixed/10" },
-                                    React.createElement("span", { className: "material-symbols-outlined text-[18px] text-primary" }, "person"),
-                                    React.createElement("span", null, "\uB0B4\uC815\uBCF4 \uAD00\uB9AC (\uD504\uB85C\uD544 \uBC0F \uD1B5\uACC4)")))) : (React.createElement("div", { className: "py-1 text-xs" },
-                                React.createElement("button", { type: "button", onClick: () => {
-                                        setIsMyMenuOpen(false);
-                                        setSubModalType('CHANGE_PHONE');
-                                    }, className: "w-full px-4 py-2.5 text-left text-slate-700 hover:bg-slate-50 hover:text-primary flex items-center gap-2.5 transition-colors cursor-pointer font-medium" },
-                                    React.createElement("span", { className: "material-symbols-outlined text-[18px] text-slate-500" }, "phonelink_setup"),
-                                    React.createElement("span", null, "\uC804\uD654\uBC88\uD638 \uBCC0\uACBD")),
-                                React.createElement("button", { type: "button", onClick: () => {
-                                        setIsMyMenuOpen(false);
-                                        setSubModalType('CHANGE_PWD');
-                                    }, className: "w-full px-4 py-2.5 text-left text-slate-700 hover:bg-slate-50 hover:text-primary flex items-center gap-2.5 transition-colors cursor-pointer font-medium" },
-                                    React.createElement("span", { className: "material-symbols-outlined text-[18px] text-slate-500" }, "lock_reset"),
-                                    React.createElement("span", null, "\uBE44\uBC00\uBC88\uD638 \uBCC0\uACBD")),
-                                React.createElement("button", { type: "button", onClick: () => {
-                                        setIsMyMenuOpen(false);
-                                        setActiveNavPath('WEB-CLNT-MYP-010100');
-                                    }, className: "w-full px-4 py-2.5 text-left text-primary hover:bg-primary-fixed/30 flex items-center gap-2.5 transition-colors border-t border-slate-100 cursor-pointer font-bold bg-primary-fixed/10" },
-                                    React.createElement("span", { className: "material-symbols-outlined text-[18px] text-primary" }, "person"),
-                                    React.createElement("span", null, "\uB0B4\uC815\uBCF4 \uAD00\uB9AC (\uD504\uB85C\uD544 \uBC0F \uD1B5\uACC4)"))))))),
+                                }, className: "w-full py-1.5 bg-primary text-white text-xs font-bold rounded-lg shadow-sm" }, "\uB85C\uADF8\uC778\uD558\uAE30"))) : userInfo?.USER_ROLE_CD === 'S' ? (React.createElement("div", { className: "py-1 text-xs" },
+                            React.createElement("button", { type: "button", onClick: () => {
+                                    setIsMyMenuOpen(false);
+                                    setSubModalType('BIZ_REG');
+                                }, className: "w-full px-4 py-2.5 text-left text-slate-700 hover:bg-slate-50 hover:text-primary flex items-center gap-2.5 transition-colors cursor-pointer font-medium" },
+                                React.createElement("span", { className: "material-symbols-outlined text-[18px] text-amber-600" }, "badge"),
+                                React.createElement("span", null, "\uC0AC\uC5C5\uC790\uB4F1\uB85D\uC99D \uB4F1\uB85D")),
+                            React.createElement("button", { type: "button", onClick: () => {
+                                    setIsMyMenuOpen(false);
+                                    setSubModalType('CHANGE_PHONE');
+                                }, className: "w-full px-4 py-2.5 text-left text-slate-700 hover:bg-slate-50 hover:text-primary flex items-center gap-2.5 transition-colors cursor-pointer font-medium" },
+                                React.createElement("span", { className: "material-symbols-outlined text-[18px] text-slate-500" }, "phonelink_setup"),
+                                React.createElement("span", null, "\uC804\uD654\uBC88\uD638 \uBCC0\uACBD")),
+                            React.createElement("button", { type: "button", onClick: () => {
+                                    setIsMyMenuOpen(false);
+                                    setSubModalType('CHANGE_PWD');
+                                }, className: "w-full px-4 py-2.5 text-left text-slate-700 hover:bg-slate-50 hover:text-primary flex items-center gap-2.5 transition-colors cursor-pointer font-medium" },
+                                React.createElement("span", { className: "material-symbols-outlined text-[18px] text-slate-500" }, "lock_reset"),
+                                React.createElement("span", null, "\uBE44\uBC00\uBC88\uD638 \uBCC0\uACBD")),
+                            React.createElement("button", { type: "button", onClick: () => {
+                                    setIsMyMenuOpen(false);
+                                    setActiveNavPath('WEB-CLNT-MYP-010100');
+                                }, className: "w-full px-4 py-2.5 text-left text-primary hover:bg-primary-fixed/30 flex items-center gap-2.5 transition-colors border-t border-slate-100 cursor-pointer font-bold bg-primary-fixed/10" },
+                                React.createElement("span", { className: "material-symbols-outlined text-[18px] text-primary" }, "person"),
+                                React.createElement("span", null, "\uB0B4\uC815\uBCF4 \uAD00\uB9AC (\uD504\uB85C\uD544 \uBC0F \uD1B5\uACC4)")))) : (React.createElement("div", { className: "py-1 text-xs" },
+                            React.createElement("button", { type: "button", onClick: () => {
+                                    setIsMyMenuOpen(false);
+                                    setSubModalType('CHANGE_PHONE');
+                                }, className: "w-full px-4 py-2.5 text-left text-slate-700 hover:bg-slate-50 hover:text-primary flex items-center gap-2.5 transition-colors cursor-pointer font-medium" },
+                                React.createElement("span", { className: "material-symbols-outlined text-[18px] text-slate-500" }, "phonelink_setup"),
+                                React.createElement("span", null, "\uC804\uD654\uBC88\uD638 \uBCC0\uACBD")),
+                            React.createElement("button", { type: "button", onClick: () => {
+                                    setIsMyMenuOpen(false);
+                                    setSubModalType('CHANGE_PWD');
+                                }, className: "w-full px-4 py-2.5 text-left text-slate-700 hover:bg-slate-50 hover:text-primary flex items-center gap-2.5 transition-colors cursor-pointer font-medium" },
+                                React.createElement("span", { className: "material-symbols-outlined text-[18px] text-slate-500" }, "lock_reset"),
+                                React.createElement("span", null, "\uBE44\uBC00\uBC88\uD638 \uBCC0\uACBD")),
+                            React.createElement("button", { type: "button", onClick: () => {
+                                    setIsMyMenuOpen(false);
+                                    setActiveNavPath('WEB-CLNT-MYP-010100');
+                                }, className: "w-full px-4 py-2.5 text-left text-primary hover:bg-primary-fixed/30 flex items-center gap-2.5 transition-colors border-t border-slate-100 cursor-pointer font-bold bg-primary-fixed/10" },
+                                React.createElement("span", { className: "material-symbols-outlined text-[18px] text-primary" }, "person"),
+                                React.createElement("span", null, "\uB0B4\uC815\uBCF4 \uAD00\uB9AC (\uD504\uB85C\uD544 \uBC0F \uD1B5\uACC4)"))))))),
                     React.createElement("button", { type: "button", className: "px-3.5 py-1.5 rounded-full font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all cursor-pointer", onClick: () => {
                             alert('쓸고닦고 고객만족센터: 1588-7824 (평일 09:00~18:00 운영, 카카오톡 상담 채널 @쓸고닦고)');
                         } }, "\uACE0\uAC1D\uC13C\uD130")),

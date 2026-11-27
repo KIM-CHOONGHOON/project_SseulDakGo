@@ -189,7 +189,7 @@ export async function processWebClntAth010200100(payload = {}) {
     };
   }
 
-  if (!userPwd || !userPwd.trim()) {
+  if (!socialProvider && (!userPwd || !userPwd.trim())) {
     return {
       status: 400,
       data: {

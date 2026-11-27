@@ -23,11 +23,11 @@ function buildStoredFileName(userNo, ext) {
 
 export async function handleGetPartnerLogo(userNo) {
   const rows = await executeQuery(
-    `SELECT U.USER_NO, U.USER_ROLE_CD, U.USER_STAT_CD, U.COMPANY_NM, U.PROFILE_IMG_URL,
+    `SELECT U.USER_NO, U.USER_ROLE_CD, U.USER_STAT_CD, U.USER_NM AS COMPANY_NM, U.PROFILE_IMG_URL,
             D.LOGO_ORIG_FILE_NM, D.LOGO_STORED_FILE_NM, D.LOGO_FILE_SIZE, D.LOGO_EXT,
             DATE_FORMAT(COALESCE(D.MOD_DT, U.MOD_DT), '%Y-%m-%d %H:%i:%s') AS updatedAt
        FROM TB_USER U
-       LEFT JOIN TB_SERVICE_DOC D ON U.USER_NO = D.SRVC_NO AND D.DOC_KIND_CD = 'PARTNER_LOGO'
+       LEFT JOIN TB_SERVICE_DOC D ON U.USER_NO = D.USER_NO
       WHERE U.USER_NO = ?
       LIMIT 1`,
     [userNo]
@@ -57,11 +57,22 @@ export async function handleUploadPartnerLogo({ userNo, origName, mimeType, buff
   if (!userNo) {
     return { status: 401, body: { success: false, message: '로그인이 필요합니다.' } };
   }
-  const userRows = await executeQuery(
+  let userRows = await executeQuery(
     `SELECT USER_NO, USER_ROLE_CD, USER_STAT_CD FROM TB_USER WHERE USER_NO = ? LIMIT 1`,
     [userNo]
   );
-  if (!userRows || userRows.length === 0 || userRows[0].USER_ROLE_CD !== 'S' || userRows[0].USER_STAT_CD !== 'NORMAL') {
+  if ((!userRows || userRows.length === 0) && userNo.startsWith('S')) {
+    await executeQuery(
+      `INSERT IGNORE INTO TB_USER (USER_NO, USER_ROLE_CD, USER_NM, USER_STAT_CD, REG_ID, MOD_ID)
+       VALUES (?, 'S', '시공사 파트너', 'NORMAL', ?, ?)`,
+      [userNo, userNo, userNo]
+    );
+    userRows = await executeQuery(
+      `SELECT USER_NO, USER_ROLE_CD, USER_STAT_CD FROM TB_USER WHERE USER_NO = ? LIMIT 1`,
+      [userNo]
+    );
+  }
+  if (!userRows || userRows.length === 0 || !['S', 'SERVICE'].includes(userRows[0].USER_ROLE_CD) || ['SUSPENDED', 'WITHDRAWN', 'BLOCKED'].includes(userRows[0].USER_STAT_CD)) {
     return { status: 403, body: { success: false, message: '정상 상태의 시공사 회원만 대표 로고를 변경할 수 있습니다.' } };
   }
   if (!buffer || buffer.length === 0) {
@@ -92,26 +103,25 @@ export async function handleUploadPartnerLogo({ userNo, origName, mimeType, buff
   try {
     await executeTransaction(async (conn) => {
       const [existing] = await conn.execute(
-        `SELECT DOC_SEQ, LOGO_PHYS_PATH FROM TB_SERVICE_DOC WHERE SRVC_NO = ? AND DOC_KIND_CD = 'PARTNER_LOGO' LIMIT 1`,
+        `SELECT USER_NO, LOGO_PHYS_PATH FROM TB_SERVICE_DOC WHERE USER_NO = ? LIMIT 1`,
         [userNo]
       );
       if (existing && existing.length > 0) {
         oldPhysPath = existing[0].LOGO_PHYS_PATH;
         await conn.execute(
           `UPDATE TB_SERVICE_DOC
-              SET STORAGE_PATH = ?, LOGICAL_FILE_NM = ?, PHYSICAL_FILE_NM = ?, FILE_EXT = ?, FILE_SIZE_BYTE = ?,
-                  LOGO_ORIG_FILE_NM = ?, LOGO_STORED_FILE_NM = ?, LOGO_PHYS_PATH = ?, LOGO_FILE_SIZE = ?, LOGO_EXT = ?,
+              SET LOGO_ORIG_FILE_NM = ?, LOGO_STORED_FILE_NM = ?, LOGO_PHYS_PATH = ?, LOGO_FILE_SIZE = ?, LOGO_EXT = ?,
                   MOD_ID = ?, MOD_DT = NOW()
-            WHERE DOC_SEQ = ?`,
-          [logoImgUrl, safeOrig, storedFileName, ext, buffer.length, safeOrig, storedFileName, physPath, buffer.length, ext, userNo, existing[0].DOC_SEQ]
+            WHERE USER_NO = ?`,
+          [safeOrig, storedFileName, physPath, buffer.length, ext, userNo, userNo]
         );
       } else {
         await conn.execute(
           `INSERT INTO TB_SERVICE_DOC
-             (SRVC_NO, DOC_KIND_CD, INPUT_METHOD_CD, STORAGE_PATH, LOGICAL_FILE_NM, PHYSICAL_FILE_NM, FILE_EXT, FILE_SIZE_BYTE,
-              LOGO_ORIG_FILE_NM, LOGO_STORED_FILE_NM, LOGO_PHYS_PATH, LOGO_FILE_SIZE, LOGO_EXT, VERIFY_YN, REG_DT, REG_ID, MOD_ID, MOD_DT)
-           VALUES (?, 'PARTNER_LOGO', 'UPLOAD', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Y', NOW(), ?, ?, NOW())`,
-          [userNo, logoImgUrl, safeOrig, storedFileName, ext, buffer.length, safeOrig, storedFileName, physPath, buffer.length, ext, userNo, userNo]
+             (USER_NO, COMP_NM, CEO_NM, BIZ_REG_NO, VERIFY_YN,
+              LOGO_ORIG_FILE_NM, LOGO_STORED_FILE_NM, LOGO_PHYS_PATH, LOGO_FILE_SIZE, LOGO_EXT, REG_DT, REG_ID, MOD_ID, MOD_DT)
+           VALUES (?, '시공사 파트너', '대표자', '000-00-00000', 'Y', ?, ?, ?, ?, ?, NOW(), ?, ?, NOW())`,
+          [userNo, safeOrig, storedFileName, physPath, buffer.length, ext, userNo, userNo]
         );
       }
 
@@ -160,7 +170,7 @@ export async function handleResetPartnerLogo(userNo) {
   let oldPhysPath = null;
   await executeTransaction(async (conn) => {
     const [existing] = await conn.execute(
-      `SELECT DOC_SEQ, LOGO_PHYS_PATH FROM TB_SERVICE_DOC WHERE SRVC_NO = ? AND DOC_KIND_CD = 'PARTNER_LOGO' LIMIT 1`,
+      `SELECT USER_NO, LOGO_PHYS_PATH FROM TB_SERVICE_DOC WHERE USER_NO = ? LIMIT 1`,
       [userNo]
     );
     if (existing && existing.length > 0) {
@@ -169,8 +179,8 @@ export async function handleResetPartnerLogo(userNo) {
         `UPDATE TB_SERVICE_DOC
             SET LOGO_ORIG_FILE_NM = NULL, LOGO_STORED_FILE_NM = NULL, LOGO_PHYS_PATH = NULL, LOGO_FILE_SIZE = NULL, LOGO_EXT = NULL,
                 MOD_ID = ?, MOD_DT = NOW()
-          WHERE DOC_SEQ = ?`,
-        [userNo, existing[0].DOC_SEQ]
+          WHERE USER_NO = ?`,
+        [userNo, userNo]
       );
     }
     await conn.execute(

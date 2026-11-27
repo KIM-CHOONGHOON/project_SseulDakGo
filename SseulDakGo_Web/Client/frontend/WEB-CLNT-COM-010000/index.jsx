@@ -2846,7 +2846,7 @@ export function WebClntAth010100({
       setErrorMsg('이메일 주소를 입력해 주세요.');
       return;
     }
-    if (!pwd.trim()) {
+    if (!pwd.trim() && !e?.isSocial && !localStorage.getItem('SSEULDAKGO_SOCIAL_LOGIN_BRIDGE')) {
       setErrorMsg('비밀번호를 입력해 주세요.');
       return;
     }
@@ -7050,11 +7050,8 @@ function WebSrvcCom010100({ isOpen, userInfo, onClose, onSuccess }) {
       });
       const data = await res.json();
       if (data?.success) {
-        showToast('대표 로고 이미지가 성공적으로 변경되었습니다.');
         if (onSuccess) onSuccess(data.data?.logoImgUrl || previewUrl);
-        setTimeout(() => {
-          if (onClose) onClose();
-        }, 800);
+        if (onClose) onClose();
       } else {
         showToast(data?.message || '로고 저장 중 오류가 발생했습니다.');
       }
@@ -8618,16 +8615,21 @@ export default function WebClntCom010000({ onNavigate }) {
   ];
 
   // [신규] 푸시 알림 센터 상태 및 제어 (벨 클릭 시 수신 목록 출력)
-  const [notiList, setNotiList] = useState(INITIAL_NOTI_LIST);
-  const [unreadNotiCount, setUnreadNotiCount] = useState(3);
+  const [notiList, setNotiList] = useState([]);
+  const [unreadNotiCount, setUnreadNotiCount] = useState(0);
   const [isNotiOpen, setIsNotiOpen] = useState(false);
   const [activeNotiModal, setActiveNotiModal] = useState(null); // 알림 상세 모달
   const [bidSubmitSuccessMsg, setBidSubmitSuccessMsg] = useState(''); // 청약 완료 메시지
 
-  // 알림 목록 및 미확인 건수 조회
+  // 알림 목록 및 미확인 건수 조회 (로그인 회원 전용)
   const fetchNotifications = useCallback(async (targetUserNo = userInfo.USER_NO) => {
     try {
-      const uNo = (!targetUserNo || targetUserNo === 'GUEST') ? 'S20261100001' : targetUserNo;
+      const uNo = targetUserNo || userInfo.USER_NO;
+      if (!uNo || uNo === 'GUEST' || userInfo?.isGuest) {
+        setNotiList([]);
+        setUnreadNotiCount(0);
+        return;
+      }
       const res = await fetch(`/api/common/notifications?userNo=${encodeURIComponent(uNo)}`);
       const json = await res.json();
       if (json && json.success) {
@@ -9123,61 +9125,34 @@ export default function WebClntCom010000({ onNavigate }) {
                   className="px-3.5 py-1.5 rounded-full font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all cursor-pointer"
                   onClick={() => document.getElementById('section-core-services')?.scrollIntoView({ behavior: 'smooth' })}
                 >
-                  3대 청소 용역 대분류
+                  청소 용역 대분류
                 </button>
                 <button
                   type="button"
                   className="px-3.5 py-1.5 rounded-full font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all cursor-pointer"
                   onClick={() => document.getElementById('section-how-it-works')?.scrollIntoView({ behavior: 'smooth' })}
                 >
-                  이용 절차 4단계 워크플로우
+                  이용 절차 워크플로우
                 </button>
                 <button
                   type="button"
                   className="px-3.5 py-1.5 rounded-full font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all cursor-pointer"
                   onClick={() => document.getElementById('section-live-matching')?.scrollIntoView({ behavior: 'smooth' })}
                 >
-                  실시간 발주·매칭 현황
+                  실시간 발주 현황
                 </button>
                 <button
                   type="button"
                   className="px-3.5 py-1.5 rounded-full font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all cursor-pointer"
                   onClick={() => document.getElementById('section-partner-recruit')?.scrollIntoView({ behavior: 'smooth' })}
                 >
-                  쓸고닦고 전문 시공사 파트너 모집
+                  파트너 (시공자) 모집
                 </button>
               </>
             )}
 
-            {/* 내 정보 관리 (시공사 S: WEB-CLNT-COM-010300 모달 / 고객 C: 드롭다운) */}
+            {/* 내 정보 관리 버튼 제거됨 */}
             <div className="relative">
-              <button
-                type="button"
-                className={
-                  activeNavPath === 'my-account' || activeNavPath === 'WEB-CLNT-MYP-010100' || isMyMenuOpen
-                    ? 'px-3.5 py-1.5 rounded-full transition-all bg-secondary-container text-on-secondary-container font-label-md flex items-center gap-1 cursor-pointer font-bold'
-                    : 'px-3.5 py-1.5 rounded-full font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all flex items-center gap-1 cursor-pointer'
-                }
-                onClick={(e) => {
-                  e.stopPropagation();
-                  if (userInfo && !userInfo.isGuest) {
-                    if (userInfo.USER_ROLE_CD === 'S') {
-                      setActiveNavPath('WEB-SRVC-MYP-020100');
-                      if (typeof onNavigate === 'function') onNavigate('WEB-SRVC-MYP-020100');
-                    } else {
-                      setIsMyMenuOpen(!isMyMenuOpen);
-                    }
-                  } else {
-                    alert('내 정보 관리를 위해 먼저 로그인해 주세요.');
-                    setIsLoginModalOpen(true);
-                  }
-                }}
-              >
-                <span>내 정보 관리</span>
-                <span className="material-symbols-outlined text-[16px] transition-transform duration-200">
-                  {isMyMenuOpen ? 'arrow_drop_up' : 'arrow_drop_down'}
-                </span>
-              </button>
 
               {/* 하위 드롭다운 레이어 (고객 C 전용) */}
               {isMyMenuOpen && userInfo?.USER_ROLE_CD !== 'S' && (

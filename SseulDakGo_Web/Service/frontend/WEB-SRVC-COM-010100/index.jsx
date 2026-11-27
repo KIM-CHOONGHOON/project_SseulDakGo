@@ -108,11 +108,8 @@ export default function WebSrvcCom010100({ isOpen, userInfo, onClose, onSuccess 
       });
       const data = await res.json();
       if (data?.success) {
-        showToast('대표 로고 이미지가 성공적으로 변경되었습니다.');
         if (onSuccess) onSuccess(data.data?.logoImgUrl || previewUrl);
-        setTimeout(() => {
-          if (onClose) onClose();
-        }, 800);
+        if (onClose) onClose();
       } else {
         showToast(data?.message || '로고 저장 중 오류가 발생했습니다.');
       }
