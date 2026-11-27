@@ -77,7 +77,8 @@ export const SQL_SELECT_REGULAR_DETAIL_CODES = `
 `;
 
 /**
- * 3. 지역 실시간 청소 요청 피드 최근 5건 조회 쿼리 (TB_ORDER_MSTR + TB_ORDER_DTL)
+ * 3. 지역 실시간 청소 요청 피드 조회 쿼리 (TB_ORDER_MSTR + TB_ORDER_DTL)
+ *    - 시스템일자 기준 당일 1개월 이전부터 당일까지, 최근 등록일 순, 청소요청/청소청약 상태
  */
 export const SQL_SELECT_REALTIME_ORDER_FEED = `
   SELECT 
@@ -89,11 +90,12 @@ export const SQL_SELECT_REALTIME_ORDER_FEED = `
     M.REG_DT
   FROM TB_ORDER_MSTR M
   INNER JOIN TB_ORDER_DTL D ON M.ORDER_NO = D.ORDER_NO
-  WHERE M.ORDER_STATUS = 'BID_OPEN'
-    AND M.BID_EXPIRE_DT > NOW()
+  WHERE M.ORDER_STATUS IN ('BID_OPEN', 'BID_APPLIED', 'PAY_WAIT_1', 'PAY_WAIT_2', 'PAYMENT_WAITING', 'CONTRACTED')
+    AND M.REG_DT >= DATE_SUB(CURDATE(), INTERVAL 1 MONTH)
+    AND M.REG_DT <= NOW()
     AND M.SIDO_CD = ? AND M.SIGUNGU_CD = ?
   ORDER BY M.REG_DT DESC
-  LIMIT 5;
+  LIMIT 200;
 `;
 
 // ============================================================================
@@ -467,7 +469,7 @@ export async function processWebClntCom010000(body = {}) {
       PROPOSED_PRICE: Number(row.PROPOSED_PRICE),
       PRICE_PREFIX: row.CLEAN_LARGE_CD === 'REGULAR' ? '월 ' : '',
       ORDER_STATUS: row.ORDER_STATUS,
-      ORDER_STATUS_LABEL: 'BID_OPEN (청약접수중)',
+      ORDER_STATUS_LABEL: row.ORDER_STATUS === 'BID_OPEN' ? '청소요청' : '청소청약',
       STATUS_BADGE_TYPE: 'SECONDARY_PING',
       REG_DT:
         row.REG_DT instanceof Date

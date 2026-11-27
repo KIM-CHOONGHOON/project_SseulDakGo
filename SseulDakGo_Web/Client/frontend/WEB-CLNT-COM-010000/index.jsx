@@ -7408,6 +7408,434 @@ function PaginationBar({ page, totalPages, onPageChange }) {
  * 화면 ID: WEB-SRVC-COM-010000
  * 화면명: 시공사 파트너 메인 대시보드
  */
+/**
+ * 화면 ID: WEB-SRVC-COM-010100
+ * 화면명: 파트너 대표 로고 이미지 변경 (Modal)
+ */
+function WebSrvcCom010100({ isOpen, userInfo, onClose, onSuccess }) {
+  const userNo = userInfo?.USER_NO || userInfo?.userNo || 'S20261100001';
+  const companyNm = userInfo?.COMPANY_NM || userInfo?.USER_NM || '(주)클린파트너스';
+
+  const fileInputRef = useRef(null);
+  const [currentLogoUrl, setCurrentLogoUrl] = useState(null);
+  const [previewUrl, setPreviewUrl] = useState(null);
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [stagedMeta, setStagedMeta] = useState({ name: '선택된 파일 없음', sizeText: 'JPG, PNG, WEBP (최대 5MB)' });
+  const [isDragging, setIsDragging] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [toastMsg, setToastMsg] = useState('');
+
+  const showToast = (msg) => {
+    setToastMsg(msg);
+    setTimeout(() => setToastMsg(''), 3200);
+  };
+
+  useEffect(() => {
+    if (!isOpen) return;
+    let active = true;
+    fetch(`/api/srvc/com/010100?userNo=${encodeURIComponent(userNo)}`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (!active || !data?.success) return;
+        setCurrentLogoUrl(data.data?.currentLogoUrl || null);
+      })
+      .catch(() => {});
+
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape' && onClose) onClose();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      active = false;
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isOpen, userNo, onClose]);
+
+  if (!isOpen) return null;
+
+  const processFile = (file) => {
+    if (!file) return;
+    const validTypes = ['image/png', 'image/jpeg', 'image/webp'];
+    if (!validTypes.includes(file.type)) {
+      showToast('지원되지 않는 파일 형식입니다. (PNG, JPG, WEBP만 가능)');
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      if (fileInputRef.current) fileInputRef.current.value = '';
+      showToast('파일 크기는 5MB 이하만 업로드 됩니다');
+      return;
+    }
+    const objectUrl = URL.createObjectURL(file);
+    setSelectedFile(file);
+    setPreviewUrl(objectUrl);
+    setStagedMeta({
+      name: file.name,
+      sizeText: `(${Math.round(file.size / 1024)} KB)`,
+    });
+    showToast(`새 로고 파일 [${file.name}]이(가) 정상적으로 로드되었습니다.`);
+  };
+
+  const handleResetDefault = async () => {
+    setIsSubmitting(true);
+    try {
+      const res = await fetch(`/api/srvc/com/010100?userNo=${encodeURIComponent(userNo)}`, {
+        method: 'DELETE',
+      });
+      const data = await res.json();
+      if (data?.success) {
+        setSelectedFile(null);
+        setPreviewUrl(null);
+        setCurrentLogoUrl(null);
+        setStagedMeta({ name: '공식 파트너 기본 뱃지 (시스템 표준)', sizeText: '(Default Vector)' });
+        showToast('기본 공간다원 인증 파트너 뱃지로 초기화되었습니다.');
+        if (onSuccess) onSuccess(null);
+      } else {
+        showToast(data?.message || '초기화 처리 중 오류가 발생했습니다.');
+      }
+    } catch {
+      showToast('서버 통신 중 오류가 발생했습니다.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleSubmitLogo = async () => {
+    if (!selectedFile) {
+      showToast('변경할 대표 로고 이미지 파일을 먼저 선택해주세요.');
+      return;
+    }
+    setIsSubmitting(true);
+    try {
+      const formData = new FormData();
+      formData.append('userNo', userNo);
+      formData.append('logoFile', selectedFile);
+
+      const res = await fetch('/api/srvc/com/010100', {
+        method: 'POST',
+        body: formData,
+      });
+      const data = await res.json();
+      if (data?.success) {
+        if (onSuccess) onSuccess(data.data?.logoImgUrl || previewUrl);
+        if (onClose) onClose();
+      } else {
+        showToast(data?.message || '로고 저장 중 오류가 발생했습니다.');
+      }
+    } catch {
+      showToast('서버 통신 중 오류가 발생했습니다.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 overflow-y-auto bg-slate-950/70 backdrop-blur-md">
+      {toastMsg && (
+        <div className="fixed bottom-6 right-6 z-60 bg-white/95 border border-emerald-300 shadow-xl rounded-2xl px-4 py-3 flex items-center gap-2 text-xs font-bold text-slate-800">
+          <span className="material-symbols-outlined text-emerald-600 text-base">check_circle</span>
+          <span>{toastMsg}</span>
+        </div>
+      )}
+
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="modal-title"
+        className="relative w-full max-w-xl bg-white rounded-3xl border border-slate-200/90 shadow-2xl flex flex-col max-h-[92vh] overflow-hidden"
+      >
+        <header className="px-6 sm:px-7 py-5 border-b border-slate-100 bg-white flex items-start justify-between gap-4 shrink-0">
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="inline-flex items-center px-2.5 py-0.5 rounded-md text-[11px] font-extrabold font-mono bg-sky-50 text-sky-700 border border-sky-200">
+                WEB-SRVC-COM-010100
+              </span>
+              <span className="text-slate-300 text-xs font-bold">·</span>
+              <span className="inline-flex items-center gap-1 text-xs font-semibold text-slate-500">
+                <span className="material-symbols-outlined text-[15px] text-teal-600">verified</span>
+                시공사 프로필 브랜딩 관리
+              </span>
+            </div>
+            <h1 id="modal-title" className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight mt-1.5">
+              파트너 대표 로고 이미지 변경
+            </h1>
+            <p className="text-xs sm:text-sm text-slate-500 mt-1 leading-relaxed">
+              고객이 청약 시공사를 선택할 때 프로필 카드와 상세 견적서에 노출되는 우리 업체만의 대표 로고 이미지를 등록·변경합니다.
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="shrink-0 p-2 -mr-1.5 -mt-1 rounded-full text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
+            aria-label="닫기"
+          >
+            <span className="material-symbols-outlined text-xl">close</span>
+          </button>
+        </header>
+
+        <div className="overflow-y-auto p-6 sm:p-7 flex flex-col gap-6">
+          <section>
+            <div className="flex items-center justify-between mb-2.5">
+              <h2 className="text-xs font-extrabold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
+                <span className="material-symbols-outlined text-[17px] text-sky-600">compare</span>
+                현재 로고 vs 변경 미리보기
+              </h2>
+              <span className="text-[11px] text-slate-400 font-medium">플랫폼 공통 규격: 1:1 원형 렌더링</span>
+            </div>
+
+            <div className="bg-gradient-to-b from-slate-50/90 to-slate-100/70 border border-slate-200/90 rounded-2xl p-5 sm:p-6 flex items-center justify-around gap-4 shadow-inner">
+              <div className="flex flex-col items-center text-center gap-2 flex-1">
+                <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-white border-2 border-slate-200 shadow-sm flex items-center justify-center overflow-hidden">
+                  {currentLogoUrl ? (
+                    <img src={currentLogoUrl} alt="현재 대표 로고" className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="w-full h-full bg-slate-50 flex flex-col items-center justify-center p-2 text-slate-600">
+                      <span className="material-symbols-outlined text-3xl text-slate-400">apartment</span>
+                      <span className="text-[10px] font-extrabold text-slate-500 mt-0.5 truncate max-w-[72px]">{companyNm}</span>
+                    </div>
+                  )}
+                </div>
+                <span className="text-xs font-bold text-slate-600">현재 대표 로고</span>
+              </div>
+
+              <div className="w-8 h-8 rounded-full bg-white border border-slate-200 flex items-center justify-center shadow-xs shrink-0">
+                <span className="material-symbols-outlined text-sky-600 text-lg">arrow_forward</span>
+              </div>
+
+              <div className="flex flex-col items-center text-center gap-2 flex-1">
+                <div className="relative">
+                  <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-white border-2 border-teal-500 ring-4 ring-teal-500/15 shadow-md flex items-center justify-center overflow-hidden">
+                    {previewUrl ? (
+                      <img src={previewUrl} alt="새 로고 미리보기" className="w-full h-full object-cover" />
+                    ) : (
+                      <div className="w-full h-full bg-gradient-to-tr from-sky-600 via-teal-500 to-emerald-400 flex flex-col items-center justify-center p-2 text-white">
+                        <span className="material-symbols-outlined text-3xl">cleaning_services</span>
+                        <span className="text-[10px] font-black uppercase">CLEAN PRO</span>
+                      </div>
+                    )}
+                  </div>
+                  <span className="absolute -top-1 -right-1 px-2 py-0.5 rounded-full bg-teal-600 text-white text-[10px] font-extrabold border border-white">
+                    NEW
+                  </span>
+                </div>
+                <span className="text-xs font-bold text-teal-700">변경 적용 미리보기</span>
+              </div>
+            </div>
+          </section>
+
+          <section>
+            <div className="flex items-center justify-between mb-2">
+              <h2 className="text-xs font-extrabold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
+                <span className="material-symbols-outlined text-[17px] text-sky-600">cloud_upload</span>
+                새 대표 로고 이미지 파일 등록
+              </h2>
+              <span className="text-[11px] text-sky-700 font-bold bg-sky-50 px-2 py-0.5 rounded-full border border-sky-200">
+                권장 400 × 400px 이상
+              </span>
+            </div>
+
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/png, image/jpeg, image/webp"
+              className="hidden"
+              onChange={(e) => {
+                const f = e.target.files?.[0];
+                e.target.value = '';
+                processFile(f);
+              }}
+            />
+
+            <div
+              onClick={() => fileInputRef.current?.click()}
+              onDragOver={(e) => {
+                e.preventDefault();
+                setIsDragging(true);
+              }}
+              onDragLeave={(e) => {
+                e.preventDefault();
+                setIsDragging(false);
+              }}
+              onDrop={(e) => {
+                e.preventDefault();
+                setIsDragging(false);
+                processFile(e.dataTransfer.files?.[0]);
+              }}
+              className={`border-2 border-dashed rounded-2xl p-6 text-center transition-all flex flex-col items-center justify-center gap-3 cursor-pointer ${
+                isDragging ? 'border-sky-500 bg-sky-100/40 scale-[1.01]' : 'border-sky-300 hover:border-sky-500 bg-sky-50/25'
+              }`}
+            >
+              <div className="w-12 h-12 rounded-2xl bg-sky-100 text-sky-600 flex items-center justify-center">
+                <span className="material-symbols-outlined text-3xl">add_photo_alternate</span>
+              </div>
+              <div>
+                <p className="text-sm font-bold text-slate-800">변경할 파트너 대표 로고 이미지를 드래그하거나 클릭하여 선택하세요</p>
+                <p className="text-xs text-slate-500 mt-1">
+                  권장 비율: 1:1 정사각형 · 지원 형식: <span className="font-mono">JPG, PNG, WEBP</span> (최대 5MB)
+                </p>
+              </div>
+              <div className="flex items-center gap-2 mt-1 flex-wrap justify-center" onClick={(e) => e.stopPropagation()}>
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  className="px-4 py-2 rounded-xl bg-white hover:bg-slate-50 border border-slate-300 text-xs font-bold text-slate-700 flex items-center gap-1.5 cursor-pointer"
+                >
+                  <span className="material-symbols-outlined text-sm text-sky-600">folder_open</span>
+                  <span>이미지 파일 선택하기</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={handleResetDefault}
+                  disabled={isSubmitting}
+                  className="px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-500 hover:text-rose-600 hover:bg-rose-50 flex items-center gap-1 cursor-pointer"
+                >
+                  <span className="material-symbols-outlined text-sm">restart_alt</span>
+                  <span>기본 파트너 뱃지로 초기화</span>
+                </button>
+              </div>
+            </div>
+
+            <div className="mt-2.5 bg-slate-50 border border-slate-200/80 rounded-xl px-3.5 py-2 flex items-center justify-between text-xs">
+              <span className="text-slate-600 truncate">
+                선택된 파일: <strong className="font-mono text-slate-900">{stagedMeta.name}</strong>{' '}
+                <span className="text-slate-400 font-mono text-[11px]">{stagedMeta.sizeText}</span>
+              </span>
+              <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                규격 적합
+              </span>
+            </div>
+          </section>
+
+          <section>
+            <div className="flex items-center justify-between mb-2">
+              <h2 className="text-xs font-extrabold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
+                <span className="material-symbols-outlined text-[17px] text-teal-600">visibility</span>
+                고객 청약 선택 화면 노출 미리보기
+              </h2>
+              <span className="text-[11px] font-mono text-slate-400">WEB-CLNT-ORD-010100 연동</span>
+            </div>
+            <div className="bg-white border border-slate-200 rounded-2xl p-4 flex items-center justify-between gap-3">
+              <div className="flex items-center gap-3.5">
+                <div className="w-12 h-12 rounded-full border-2 border-teal-500 bg-gradient-to-tr from-sky-600 to-teal-400 flex items-center justify-center text-white overflow-hidden shrink-0">
+                  {previewUrl || currentLogoUrl ? (
+                    <img src={previewUrl || currentLogoUrl} alt="고객 노출 미리보기" className="w-full h-full object-cover" />
+                  ) : (
+                    <span className="material-symbols-outlined text-2xl">cleaning_services</span>
+                  )}
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-extrabold text-slate-900">{companyNm}</span>
+                    <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                      사업자 인증완료
+                    </span>
+                  </div>
+                  <div className="text-xs text-slate-500 mt-0.5">★ 4.9 · 단독 청약 체결 128건 · 입주청소 1급</div>
+                </div>
+              </div>
+              <span className="text-[11px] font-medium text-slate-500 bg-slate-50 border border-slate-200 px-2.5 py-1 rounded-lg">
+                고객 발주서 뷰
+              </span>
+            </div>
+          </section>
+        </div>
+
+        <footer className="px-6 sm:px-7 py-4 bg-slate-50 border-t border-slate-200/90 flex items-center justify-between gap-3 shrink-0">
+          <div className="flex items-center gap-2 text-slate-400 text-[11px] font-mono">
+            <span className="w-2 h-2 rounded-full bg-emerald-500" />
+            <span className="font-bold text-slate-600">POST</span>
+            <span>/api/srvc/com/010100</span>
+          </div>
+          <div className="flex items-center gap-2.5">
+            <button
+              type="button"
+              onClick={onClose}
+              className="px-4 py-2.5 rounded-xl border border-slate-300/80 bg-white hover:bg-slate-100 text-xs font-bold text-slate-700 cursor-pointer"
+            >
+              취소
+            </button>
+            <button
+              type="button"
+              disabled={isSubmitting}
+              onClick={handleSubmitLogo}
+              className="px-5 py-2.5 rounded-xl bg-[#0284C7] hover:bg-[#0369A1] text-white text-xs font-extrabold shadow-sm flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+            >
+              <span className="material-symbols-outlined text-[17px]">check_circle</span>
+              <span>{isSubmitting ? '저장 중...' : '대표 로고 이미지 저장하기'}</span>
+            </button>
+          </div>
+        </footer>
+      </div>
+    </div>
+  );
+}
+
+
+
+function getCurrentMonthRange() {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = now.getMonth() + 1;
+  const lastDay = new Date(year, month, 0).getDate();
+  const mm = String(month).padStart(2, '0');
+  const dd = String(lastDay).padStart(2, '0');
+  return {
+    from: `${year}.${mm}.01`,
+    to: `${year}.${mm}.${dd}`,
+  };
+}
+
+function PaginationBar({ page, totalPages, onPageChange }) {
+  const safeTotal = Math.max(1, totalPages || 1);
+  const safePage = Math.min(Math.max(1, page || 1), safeTotal);
+  const startPage = Math.floor((safePage - 1) / 5) * 5 + 1;
+  const endPage = Math.min(safeTotal, startPage + 4);
+  const pages = [];
+  for (let p = startPage; p <= endPage; p += 1) {
+    pages.push(p);
+  }
+
+  const btnBase =
+    'px-2.5 py-1.5 rounded-lg border border-slate-300 bg-surface-container-lowest text-label-sm font-semibold text-on-surface-variant hover:bg-surface-container-low disabled:opacity-40 disabled:cursor-not-allowed transition cursor-pointer';
+
+  return (
+    <div className="flex flex-wrap items-center justify-end gap-1.5 pt-4 mt-auto border-t border-slate-200">
+      <button type="button" onClick={() => onPageChange(1)} disabled={safePage <= 1} className={btnBase}>
+        맨처음
+      </button>
+      <button type="button" onClick={() => onPageChange(safePage - 1)} disabled={safePage <= 1} className={btnBase}>
+        이전페이지
+      </button>
+      {pages.map((p) => (
+        <button
+          key={p}
+          type="button"
+          onClick={() => onPageChange(p)}
+          className={`min-w-[32px] px-2.5 py-1.5 rounded-lg border text-label-sm font-bold transition cursor-pointer ${
+            p === safePage
+              ? 'bg-primary text-on-primary border-primary shadow-sm'
+              : 'bg-surface-container-lowest text-on-surface border-slate-300 hover:bg-surface-container-low'
+          }`}
+        >
+          {p}
+        </button>
+      ))}
+      <button type="button" onClick={() => onPageChange(safePage + 1)} disabled={safePage >= safeTotal} className={btnBase}>
+        다음페이지
+      </button>
+      <button type="button" onClick={() => onPageChange(safeTotal)} disabled={safePage >= safeTotal} className={btnBase}>
+        마지막페이지
+      </button>
+      <span className="ml-2 font-label-sm text-label-sm text-on-surface-variant font-medium">
+        전체 {safeTotal}페이지
+      </span>
+    </div>
+  );
+}
+
+/**
+ * 화면 ID: WEB-SRVC-COM-010000
+ * 화면명: 시공사 파트너 메인 대시보드
+ */
 function WebSrvcCom010000({ userInfo }) {
   const partnerName = userInfo?.USER_NM || '클린마스터 김태호';
   const defaultRange = getCurrentMonthRange();
@@ -7426,48 +7854,11 @@ function WebSrvcCom010000({ userInfo }) {
   const [actTotalPages, setActTotalPages] = useState(1);
 
   const [toastMsg, setToastMsg] = useState('');
-
-  useEffect(() => {
-    const uNo = userInfo?.USER_NO || userInfo?.userNo || 'S20261100002';
-    fetch(`/api/srvc/myp/020101?userNo=${encodeURIComponent(uNo)}`)
-      .then((res) => res.json())
-      .then((json) => {
-        if (json?.success && json.data) {
-          if (json.data.COMP_NM) setBizName(json.data.COMP_NM);
-          if (json.data.CEO_NM) setCeoName(json.data.CEO_NM);
-          if (json.data.BIZ_REG_NO) setBizNo(json.data.BIZ_REG_NO);
-        }
-      })
-      .catch(() => {});
-    fetch(`/api/srvc/myp/020100?userNo=${encodeURIComponent(uNo)}`)
-      .then((res) => res.json())
-      .then((json) => {
-        if (json?.success && Array.isArray(json.certs)) {
-          setCerts(
-            json.certs.map((c, idx) => ({
-              id: c.CERT_SEQ || idx + 1,
-              name: c.CERT_NM || '',
-              org: c.ISSUER_ORG || '',
-              cat: c.SERVICE_CAT || '공통',
-              catCls: 'bg-blue-50 text-blue-700 border-blue-100',
-              level: c.CERT_LEVEL || '1급',
-              date: c.issueDt || '',
-              certNo: c.CERT_NO || '',
-              status: c.VERIFY_STAT_CD === 'APPROVED' ? '검수완료' : '심사대기',
-              statusCls: c.VERIFY_STAT_CD === 'APPROVED' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-amber-50 text-amber-700 border-amber-200',
-              dotCls: c.VERIFY_STAT_CD === 'APPROVED' ? 'bg-emerald-500' : 'bg-amber-500',
-              icon: 'award_star',
-              iconBg: 'bg-teal-50 text-teal-700 border-teal-200',
-            }))
-          );
-        }
-      })
-      .catch(() => {});
-  }, [userInfo]);
   const [isLogoModalOpen, setIsLogoModalOpen] = useState(false);
   const [partnerLogoUrl, setPartnerLogoUrl] = useState(userInfo?.PROFILE_IMG_URL || null);
   const [partnerCerts, setPartnerCerts] = useState([]);
   const [partnerSpecialties, setPartnerSpecialties] = useState([]);
+  const [partnerCompNm, setPartnerCompNm] = useState('');
   const [isBizRestricted, setIsBizRestricted] = useState(false);
   const [showBizNotice, setShowBizNotice] = useState(false);
 
@@ -7492,6 +7883,7 @@ function WebSrvcCom010000({ userInfo }) {
         const res = await fetch(`/api/srvc/com/010000?${params.toString()}`);
         const data = await res.json();
         if (data?.success) {
+          if (data.partnerCompNm) setPartnerCompNm(data.partnerCompNm);
           if (data.isBizRestricted) {
             setIsBizRestricted(true);
             setShowBizNotice(true);
@@ -7532,30 +7924,6 @@ function WebSrvcCom010000({ userInfo }) {
       .then((d) => {
         if (d?.success && d.data?.currentLogoUrl) {
           setPartnerLogoUrl(d.data.currentLogoUrl);
-        }
-      })
-      .catch(() => {});
-    fetch(`/api/srvc/myp/020100?userNo=${encodeURIComponent(uNo)}`)
-      .then((res) => res.json())
-      .then((json) => {
-        if (json?.success && Array.isArray(json.certs)) {
-          setCerts(
-            json.certs.map((c, idx) => ({
-              id: c.CERT_SEQ || idx + 1,
-              name: c.CERT_NM || '',
-              org: c.ISSUER_ORG || '',
-              cat: c.SERVICE_CAT || '공통',
-              catCls: 'bg-blue-50 text-blue-700 border-blue-100',
-              level: c.CERT_LEVEL || '1급',
-              date: c.issueDt || '',
-              certNo: c.CERT_NO || '',
-              status: c.VERIFY_STAT_CD === 'APPROVED' ? '검수완료' : '심사대기',
-              statusCls: c.VERIFY_STAT_CD === 'APPROVED' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-amber-50 text-amber-700 border-amber-200',
-              dotCls: c.VERIFY_STAT_CD === 'APPROVED' ? 'bg-emerald-500' : 'bg-amber-500',
-              icon: 'award_star',
-              iconBg: 'bg-teal-50 text-teal-700 border-teal-200',
-            }))
-          );
         }
       })
       .catch(() => {});
@@ -7673,15 +8041,16 @@ function WebSrvcCom010000({ userInfo }) {
                   <span className="w-1.5 h-1.5 rounded-full bg-secondary" />
                   <span className="font-label-sm text-label-sm text-on-surface-variant font-medium">실시간 운영 모드</span>
                 </div>
-                <h1 className="font-headline-lg text-headline-lg text-on-surface font-extrabold tracking-tight">
-                  {partnerName} 파트너님, 환영합니다
+                <h1 className="font-headline-lg text-headline-lg text-on-surface font-extrabold tracking-tight leading-tight">
+                  <span className="block">{partnerCompNm || partnerName} 파트너님,</span>
+                  <span className="block">환영합니다</span>
                 </h1>
               </div>
             </div>
 
-            <div className="flex flex-col gap-2.5 flex-1 lg:max-w-xl">
-              <div className="flex flex-wrap items-center gap-1.5">
-                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-surface-container-high text-on-surface-variant font-label-sm text-label-sm font-semibold">
+            <div className="flex flex-col gap-2.5 flex-1 lg:max-w-xl -mt-2">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="inline-flex items-center justify-center gap-1 w-36 px-2 py-0.5 rounded-md bg-surface-container-high text-on-surface-variant font-label-sm text-label-sm font-semibold shrink-0">
                   <span className="material-symbols-outlined text-[14px] text-primary">cleaning_services</span>청소 전문 분야
                 </span>
                 {partnerSpecialties.length === 0 ? (
@@ -7692,16 +8061,30 @@ function WebSrvcCom010000({ userInfo }) {
                   ))
                 )}
               </div>
-              <div className="flex flex-wrap items-center gap-1.5">
-                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-secondary-fixed/30 text-on-secondary-fixed font-label-sm text-label-sm font-semibold">
-                  <span className="material-symbols-outlined text-[14px] text-secondary">verified_user</span>보유 자격 및 인증
+              <div className="flex items-start gap-2">
+                <span className="inline-flex items-center justify-center gap-1 w-36 px-2 py-0.5 rounded-md bg-secondary-fixed/30 text-on-secondary-fixed font-label-sm text-label-sm font-semibold shrink-0">
+                  <span className="material-symbols-outlined text-[14px] text-secondary">verified_user</span>보유 자격 및 수료
                 </span>
                 {partnerCerts.length === 0 ? (
-                  <span className="px-2 py-0.5 rounded-full bg-surface-container-lowest border border-slate-200 text-on-surface-variant font-label-sm text-label-sm">등록된 자격 및 인증이 없습니다.</span>
+                  <span className="px-2 py-0.5 rounded-full bg-surface-container-lowest border border-slate-200 text-on-surface-variant font-label-sm text-label-sm">등록된 자격 및 수료가 없습니다.</span>
                 ) : (
-                  partnerCerts.map((certNm, idx) => (
-                    <span key={idx} className="px-2 py-0.5 rounded-full bg-surface-container-lowest border border-slate-200 text-on-surface-variant font-label-sm text-label-sm">{certNm}</span>
-                  ))
+                  <div className="grid grid-cols-3 gap-1.5 flex-1">
+                    {partnerCerts.slice(0, 12).map((certNm, idx) => {
+                      const colors = [
+                        'bg-blue-50 text-blue-700 border-blue-200',
+                        'bg-emerald-50 text-emerald-700 border-emerald-200',
+                        'bg-amber-50 text-amber-700 border-amber-200',
+                        'bg-purple-50 text-purple-700 border-purple-200',
+                        'bg-rose-50 text-rose-700 border-rose-200',
+                        'bg-teal-50 text-teal-700 border-teal-200',
+                      ];
+                      return (
+                        <span key={idx} className={`px-2.5 py-1 rounded-lg border font-label-sm text-label-sm font-medium text-center truncate ${colors[idx % colors.length]}`}>
+                          {certNm}
+                        </span>
+                      );
+                    })}
+                  </div>
                 )}
               </div>
             </div>
@@ -8055,11 +8438,16 @@ function WebSrvcCom010000({ userInfo }) {
 }
 
 
+
 const INITIAL_CERTS = [
   { id: 1, name: '가전관리사 1급', org: '한국청소위생협회', cat: '계절가전 분해케어', catCls: 'bg-blue-50 text-blue-700 border-blue-100', level: '1급', date: '2023.05.14', certNo: '제2023-C-0842호', status: '검수완료', statusCls: 'bg-emerald-50 text-emerald-700 border-emerald-200', dotCls: 'bg-emerald-500', icon: 'award_star', iconBg: 'bg-teal-50 text-teal-700 border-teal-200' },
   { id: 2, name: '방역소독전문가 1급', org: '사단법인 한국방역협회', cat: '입주·이사 청소', catCls: 'bg-teal-50 text-teal-700 border-teal-100', level: '전문가', date: '2022.11.20', certNo: '제2022-DS-1093호', status: '심사대기', statusCls: 'bg-amber-50 text-amber-700 border-amber-200', dotCls: 'bg-amber-500', icon: 'license', iconBg: 'bg-blue-50 text-blue-700 border-blue-200' },
 ];
 
+/**
+ * 화면 ID: WEB-SRVC-MYP-020100
+ * 화면명: 사업자등록 및 자격증·수료증 통합 관리
+ */
 function WebSrvcMyp020100({ userInfo, onBack }) {
   const [bizName, setBizName] = useState(userInfo?.USER_NM || '(주)클린파트너스');
   const [ceoName, setCeoName] = useState('김태호');
@@ -8386,6 +8774,7 @@ function WebSrvcMyp020100({ userInfo, onBack }) {
 }
 
 
+
 /**
  * 화면 ID: WEB-SRVC-MYP-020101
  * 화면명: 홈택스 PDF OCR 업로드 및 자동 인식 모달 (Modal)
@@ -8482,7 +8871,7 @@ function WebSrvcMyp020101({ isOpen, onClose, onApplyData, userInfo }) {
               </span>
             </div>
             <h2 className="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight">
-              사업자 등록증 업로드 및 자동 인식
+              홈택스 PDF OCR 업로드 및 자동 인식
             </h2>
             <p className="text-xs sm:text-sm text-slate-500 mt-1 leading-relaxed">
               국세청 홈택스에서 발급받은 사업자등록증(명) 원본 PDF를 업로드하면 업종코드와 사업자 정보가 자동 추출됩니다.
@@ -8691,9 +9080,12 @@ function WebSrvcMyp020101({ isOpen, onClose, onApplyData, userInfo }) {
 export default function WebClntCom010000({ onNavigate }) {
   // 1. 필수 상태 관리 (요구사항 명세 100% 반영)
   const [feedList, setFeedList] = useState(INITIAL_FEED_LIST);
+  const [liveFeedFilter, setLiveFeedFilter] = useState('ALL');
+  const [liveFeedPage, setLiveFeedPage] = useState(1);
   const [regionInfo, setRegionInfo] = useState(INITIAL_REGION_INFO);
   const [isReqModalOpen, setIsReqModalOpen] = useState(false);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const [isPartnerRecruitModalOpen, setIsPartnerRecruitModalOpen] = useState(false);
   const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
   const [socialPrefill, setSocialPrefill] = useState(null);
   const [isWelcomeModalOpen, setIsWelcomeModalOpen] = useState(false);
@@ -8808,6 +9200,7 @@ export default function WebClntCom010000({ onNavigate }) {
 
   // [신규] 푸시 알림 센터 상태 및 제어 (벨 클릭 시 수신 목록 출력)
   const [isBrandLogoModalOpen, setIsBrandLogoModalOpen] = useState(false);
+  const [isAboutModalOpen, setIsAboutModalOpen] = useState(false);
   const [notiList, setNotiList] = useState([]);
   const [unreadNotiCount, setUnreadNotiCount] = useState(0);
   const [isNotiOpen, setIsNotiOpen] = useState(false);
@@ -9334,7 +9727,7 @@ export default function WebClntCom010000({ onNavigate }) {
                 </button>
               </>
             ) : (
-              /* [이용자 GNB: 3대 청소 용역 대분류, 이용 절차 4단계 워크플로우, 실시간 발주·매칭 현황, 쓸고닦고 전문 시공사 파트너 모집] */
+              /* [이용자 GNB: 3대 청소 용역 대분류, 이용 절차 4단계 워크플로우, 실시간 발주 현황, 쓸고닦고 전문 시공사 파트너 모집] */
               <>
                 <button
                   type="button"
@@ -9360,9 +9753,9 @@ export default function WebClntCom010000({ onNavigate }) {
                 <button
                   type="button"
                   className="px-3.5 py-1.5 rounded-full font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all cursor-pointer"
-                  onClick={() => document.getElementById('section-partner-recruit')?.scrollIntoView({ behavior: 'smooth' })}
+                  onClick={() => setIsAboutModalOpen(true)}
                 >
-                  파트너 (시공자) 모집
+                  쓸고 딱고 란 ?
                 </button>
               </>
             )}
@@ -9630,7 +10023,7 @@ export default function WebClntCom010000({ onNavigate }) {
                       person
                     </span>
                   </div>
-                  <div className="hidden lg:flex flex-col text-left leading-tight">
+                  <div className="flex flex-col leading-tight">
                     <div className="flex items-center gap-1">
                       <span
                         className="font-label-md text-label-md text-on-surface"
@@ -9707,26 +10100,106 @@ export default function WebClntCom010000({ onNavigate }) {
           <div
             role="dialog"
             aria-modal="true"
-            className="bg-white rounded-3xl p-6 shadow-2xl flex flex-col items-center gap-4 max-w-xs w-full"
+            className="bg-white rounded-3xl p-4 shadow-2xl flex flex-col items-center gap-3 w-fit max-w-[92vw]"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="w-56 h-56 rounded-full overflow-hidden border border-slate-200 shadow-sm">
-              <img
-                src="/storage/sseuldakgo/logo/Logo_쓸고딱고.jpg"
-                alt="쓸고딱고 로고"
-                className="w-full h-full object-cover scale-110"
-              />
-            </div>
+            <img
+              src="/storage/sseuldakgo/page_main/20261126_v0.01/sseuldakgo_explanation_001.png"
+              alt="쓸고딱고 안내"
+              className="w-auto max-w-[88vw] max-h-[80vh] rounded-2xl object-contain"
+            />
             <button
               type="button"
               onClick={() => setIsBrandLogoModalOpen(false)}
-              className="w-full py-2.5 rounded-xl bg-primary hover:bg-primary-container text-on-primary font-title-md text-title-md font-bold shadow-sm transition cursor-pointer"
+              className="px-8 py-2.5 rounded-xl bg-primary hover:bg-primary-container text-on-primary font-title-md text-title-md font-bold shadow-sm transition cursor-pointer"
             >
               닫기
             </button>
           </div>
         </div>
       )}
+      {isAboutModalOpen && (
+        <div
+          className="fixed inset-0 z-[120] flex items-center justify-center bg-slate-950/70 backdrop-blur-sm p-4"
+          onClick={() => setIsAboutModalOpen(false)}
+        >
+          <div
+            role="dialog"
+            aria-modal="true"
+            className="bg-white rounded-3xl p-4 shadow-2xl flex flex-col items-center gap-3 w-fit max-w-[92vw]"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <img
+              src="/storage/sseuldakgo/page_main/20261126_v0.01/sseuldakgo_explanation_002.png"
+              alt="쓸고 딱고 란 ?"
+              className="w-auto max-w-[88vw] max-h-[80vh] rounded-2xl object-contain"
+            />
+            <button
+              type="button"
+              onClick={() => setIsAboutModalOpen(false)}
+              className="px-8 py-2.5 rounded-xl bg-primary hover:bg-primary-container text-on-primary font-title-md text-title-md font-bold shadow-sm transition cursor-pointer"
+            >
+              닫기
+            </button>
+          </div>
+        </div>
+      )}
+      <div className="fixed right-6 top-28 z-40 hidden lg:flex flex-col gap-2.5">
+        <button
+          type="button"
+          onClick={() => handleOpenReqModal()}
+          className="w-60 h-12 rounded-2xl bg-[#00695c] hover:bg-[#004d40] text-white font-bold text-sm shadow-lg flex items-center justify-center gap-2 transition cursor-pointer"
+        >
+          <span className="material-symbols-outlined text-[18px]">edit_note</span>
+          <span>우리집 청소 요청 등록하기</span>
+        </button>
+        <button
+          type="button"
+          onClick={() => setIsPartnerRecruitModalOpen(true)}
+          className="w-60 h-12 rounded-2xl bg-[#003d9b] hover:bg-[#002f7a] text-white font-bold text-[12px] shadow-lg flex items-center justify-center gap-1.5 px-3 transition cursor-pointer"
+        >
+          <span className="material-symbols-outlined text-[18px] shrink-0">article</span>
+          <span className="truncate">쓸고딱고 전문 시공 파트너 모집</span>
+        </button>
+      </div>
+      {isPartnerRecruitModalOpen && (
+        <div
+          className="fixed inset-0 z-[120] flex items-center justify-center bg-slate-950/70 backdrop-blur-sm p-4"
+          onClick={() => setIsPartnerRecruitModalOpen(false)}
+        >
+          <div
+            role="dialog"
+            aria-modal="true"
+            className="bg-white rounded-3xl p-4 sm:p-6 shadow-2xl flex flex-col items-center gap-4 max-w-4xl w-full max-h-[90vh] overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="relative w-full">
+              <img
+                src="/storage/sseuldakgo/page_main/20261126_v0.01/sseuldakgo_explanation_003.png"
+                alt="쓸고딱고 전문 시공 파트너 모집 안내"
+                className="w-full h-auto rounded-2xl object-contain"
+              />
+              <button
+                type="button"
+                aria-label="쓸고딱고 전문 시공사 회원가입"
+                onClick={() => {
+                  setIsPartnerRecruitModalOpen(false);
+                  setIsRegisterModalOpen(true);
+                }}
+                className="absolute left-1/2 -translate-x-1/2 bottom-[7%] w-[34%] h-[10%] rounded-full cursor-pointer hover:bg-white/10 transition"
+              />
+            </div>
+            <button
+              type="button"
+              onClick={() => setIsPartnerRecruitModalOpen(false)}
+              className="px-8 py-2.5 rounded-xl bg-primary hover:bg-primary-container text-on-primary font-title-md text-title-md font-bold shadow-sm transition cursor-pointer"
+            >
+              닫기
+            </button>
+          </div>
+        </div>
+      )}
+
 
       {/* ====================================================================
           MAIN CONTENT (고객 C: WEB-CLNT-COM-010000 / 시공사 S: WEB-SRVC-COM-010000)
@@ -9745,28 +10218,11 @@ export default function WebClntCom010000({ onNavigate }) {
             <div className="absolute -top-10 -left-10 w-96 h-96 rounded-full bg-primary/5 blur-3xl pointer-events-none" />
             <div className="absolute bottom-0 right-0 w-96 h-96 rounded-full bg-secondary/10 blur-3xl pointer-events-none" />
             <div className="relative grid grid-cols-1 lg:grid-cols-12 gap-space-xl items-center">
-              <div className="lg:col-span-7 flex flex-col gap-space-lg min-w-0">
-                <div className="inline-flex items-center gap-space-xs self-start px-space-md py-space-2xs rounded-full bg-secondary-container text-on-secondary-container font-label-sm text-label-sm font-semibold">
-                  <span className="material-symbols-outlined text-[16px]">verified</span>
-                  <span>고객 직접 확정 지정가 · 단독 매칭</span>
-                </div>
-                <h1 className="font-display-hero text-display-hero text-on-surface tracking-tight leading-tight">
-                  내가 정한 요금 그대로!<br />정기청소.입주이사청소.계절가전 분해케어를 요청해보세요
-                </h1>
-                <p className="font-body-lg text-body-lg text-on-surface-variant max-w-2xl">
-                  정기청소부터 계절가전 분해케어, 입주·이사 청소까지 고객님이 직접 지불할 용역 요금을 결정해 입력하면, 검증된 전문 시공사가 가격 흥정 없이 단독 매칭됩니다.
-                </p>
+              <div className="lg:col-span-12 flex flex-col gap-space-lg min-w-0">
+                
+                <img src='/storage/sseuldakgo/page_main/20261126_v0.01/sseuldakgo_Banner_001.png' alt='쓸고닦고 메인 배너' className='w-full h-auto rounded-2xl object-contain shadow-sm' />
               </div>
-              <div className="lg:col-span-5 min-w-0 flex items-center justify-center lg:justify-end h-full">
-                <button
-                  type="button"
-                  onClick={() => handleOpenReqModal()}
-                  className="inline-flex items-center justify-center gap-3 px-8 py-5 rounded-2xl bg-[#005f56] hover:bg-[#004d46] text-white shadow-lg transition-colors font-bold text-lg cursor-pointer"
-                >
-                  <span className="material-symbols-outlined text-[28px]">post_add</span>
-                  <span>우리집 청소 요청 등록하기</span>
-                </button>
-              </div>
+              
             </div>
           </section>
 
@@ -9885,80 +10341,70 @@ export default function WebClntCom010000({ onNavigate }) {
             </div>
           </section>
 
-          {/* Section 6: 실시간 발주·매칭 현황 */}
+          {/* Section 6: 실시간 발주 현황 */}
           <section id="section-live-matching" className="scroll-mt-20 py-8 flex flex-col gap-space-md border-t border-outline-variant/50">
             <div className="flex flex-col gap-space-2xs">
               <span className="font-label-sm text-label-sm text-secondary uppercase tracking-wider font-bold">03 / LIVE MATCHING STATUS</span>
-              <h2 className="font-headline-xl text-headline-xl text-on-surface">실시간 발주·매칭 현황</h2>
+              <h2 className="font-headline-xl text-headline-xl text-on-surface">실시간 발주 현황</h2>
             </div>
             <div className="bg-surface-container-lowest rounded-2xl shadow-sm p-space-md flex flex-col gap-space-sm border border-outline-variant/60 w-full">
-              <div className="flex items-center justify-between">
+              <div className="flex flex-wrap items-center justify-between gap-space-xs">
                 <div className="flex items-center gap-space-xs">
                   <span className="w-2.5 h-2.5 rounded-full bg-secondary animate-pulse" />
-                  <h3 className="font-headline-sm text-headline-sm text-on-surface font-bold">실시간 매칭 현황</h3>
+                  <h3 className="font-headline-sm text-headline-sm text-on-surface font-bold">실시간 발주·매칭 현황</h3>
                 </div>
-                <span className="font-label-sm text-label-sm text-on-surface-variant">LIVE UPDATE</span>
+                <div className="flex items-center gap-space-xs">
+                  <label className="font-label-sm text-label-sm text-on-surface-variant whitespace-nowrap">정렬순서 :</label>
+                  <select
+                    value={liveFeedFilter}
+                    onChange={(e) => { setLiveFeedFilter(e.target.value); setLiveFeedPage(1); }}
+                    className="px-2.5 py-1 rounded-lg border border-outline-variant bg-surface-container-lowest font-label-sm text-label-sm text-on-surface focus:outline-none focus:ring-1 focus:ring-primary cursor-pointer"
+                  >
+                    <option value="ALL">전체</option>
+                    <option value="BID_OPEN">청소요청</option>
+                    <option value="BID_APPLIED">청소청약</option>
+                  </select>
+                </div>
               </div>
-              <div className="flex flex-col gap-space-xs">
-                {(feedList && feedList.length > 0 ? feedList.slice(0, 5) : [
-                  { ORDER_NO: 'LIVE-1', ADDR_TEXT: '경기 고양시 덕양구 | 32평 입주·이사 청소', PROPOSED_PRICE: 380000, ORDER_STATUS: '계약 확정' },
-                  { ORDER_NO: 'LIVE-2', ADDR_TEXT: '서울 서대문구 | 시스템에어컨 2대 분해케어', PROPOSED_PRICE: 180000, ORDER_STATUS: '청약 대기중' },
-                  { ORDER_NO: 'LIVE-3', ADDR_TEXT: '경기 고양시 일산동구 | 빌라 계단 정기청소 3개월', PROPOSED_PRICE: 270000, ORDER_STATUS: '시공 완료' },
-                ]).map((ord, idx) => (
-                  <div key={ord.ORDER_NO || idx} className="p-space-xs rounded-xl bg-surface-container-low flex flex-col sm:flex-row sm:items-center justify-between gap-space-xs border border-outline-variant/40">
-                    <div className="flex flex-col gap-space-2xs min-w-0">
-                      <span className="font-label-md text-label-md text-on-surface truncate font-semibold">{ord.ADDR_TEXT}</span>
-                      <span className="font-body-sm text-body-sm text-primary font-bold">고객 지정가 {Number(ord.PROPOSED_PRICE || 0).toLocaleString()}원</span>
+              {(() => {
+                const filteredFeed = (feedList || []).filter((ord) => {
+                  if (liveFeedFilter === 'BID_OPEN') return ord.ORDER_STATUS === 'BID_OPEN' || ord.ORDER_STATUS === '청소요청';
+                  if (liveFeedFilter === 'BID_APPLIED') return ord.ORDER_STATUS !== 'BID_OPEN' && ord.ORDER_STATUS !== '청소요청';
+                  return true;
+                });
+                const totalPages = Math.max(1, Math.ceil(filteredFeed.length / 10));
+                const safePage = Math.min(liveFeedPage, totalPages);
+                const pagedFeed = filteredFeed.slice((safePage - 1) * 10, safePage * 10);
+                return (
+                  <>
+                    <div className="flex flex-col gap-space-xs min-h-[680px]">
+                      {pagedFeed.length > 0 ? pagedFeed.map((ord, idx) => (
+                        <div key={ord.ORDER_NO || idx} className="p-space-xs rounded-xl bg-surface-container-low flex flex-col sm:flex-row sm:items-center justify-between gap-space-xs border border-outline-variant/40">
+                          <div className="flex flex-col gap-space-2xs min-w-0">
+                            <span className="font-label-md text-label-md text-on-surface truncate font-semibold">{ord.ADDR_TEXT}</span>
+                            <span className="font-body-sm text-body-sm text-primary font-bold">고객 지정가 {Number(ord.PROPOSED_PRICE || 0).toLocaleString()}원</span>
+                          </div>
+                          <span className="self-start sm:self-center px-space-sm py-space-2xs rounded-full bg-primary-fixed text-on-primary-fixed font-label-sm text-label-sm whitespace-nowrap font-semibold">
+                            {ord.ORDER_STATUS === 'BID_OPEN' ? '청소요청' : (ord.ORDER_STATUS_LABEL || ord.ORDER_STATUS || '청소청약')}
+                          </span>
+                        </div>
+                      )) : (
+                        <div className="flex-1 flex items-center justify-center font-body-sm text-body-sm text-on-surface-variant">
+                          조회된 실시간 발주·매칭 현황이 없습니다.
+                        </div>
+                      )}
                     </div>
-                    <span className="self-start sm:self-center px-space-sm py-space-2xs rounded-full bg-primary-fixed text-on-primary-fixed font-label-sm text-label-sm whitespace-nowrap font-semibold">
-                      {ord.ORDER_STATUS || '청약 대기중'}
-                    </span>
-                  </div>
-                ))}
-              </div>
+                    <div className="flex justify-end pt-space-xs">
+                      <PaginationBar page={safePage} totalPages={totalPages} onPageChange={(p) => setLiveFeedPage(p)} />
+                    </div>
+                  </>
+                );
+              })()}
             </div>
           </section>
 
           {/* Section 7: Partner Recruitment & App Download */}
-          <section id="section-partner-recruit" className="scroll-mt-20 py-16 lg:py-20 border-t border-outline-variant/50">
-            <div className="flex flex-col gap-space-2xs mb-space-md">
-              <span className="font-label-sm text-label-sm text-secondary uppercase tracking-wider font-bold">03 / 쓸고닦고 전문 시공사 파트너 모집</span>
-            </div>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-space-lg">
-              <div className="bg-primary text-on-primary rounded-2xl p-space-xl lg:p-10 shadow-md flex flex-col justify-between gap-space-lg">
-                <div className="flex flex-col gap-space-xs">
-                  <span className="font-label-sm text-label-sm text-sky-200 uppercase tracking-wider font-bold">PARTNER RECRUITMENT</span>
-                  <h3 className="font-headline-lg text-headline-lg text-on-primary font-bold">쓸고닦고 전문 시공사 파트너 모집</h3>
-                  <p className="font-body-md text-body-md text-sky-100">
-                    검증된 청소·가전분해 전문가라면 불필요한 광고비와 수수료 부담 없이 고객 확정가 발주 건을 단독 매칭받으세요.
-                  </p>
-                </div>
-                <button type="button" onClick={() => setIsLoginModalOpen(true)} className="self-start px-space-lg py-space-sm rounded-xl bg-surface-container-lowest text-primary hover:bg-sky-50 font-label-md text-label-md inline-flex items-center gap-space-xs transition-colors font-bold shadow-sm cursor-pointer">
-                  <span>사업자·자격증 인증 후 직불 매칭 시작하기</span>
-                  <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
-                </button>
-              </div>
-              <div className="bg-surface-container-lowest rounded-2xl p-space-xl lg:p-10 shadow-md flex flex-col justify-between gap-space-lg border border-outline-variant/60">
-                <div className="flex flex-col gap-space-xs">
-                  <span className="font-label-sm text-label-sm text-secondary uppercase tracking-wider font-bold">MOBILE APP</span>
-                  <h3 className="font-headline-lg text-headline-lg text-on-surface font-bold">모바일 앱으로 더 간편하게 발주·검수하세요</h3>
-                  <p className="font-body-md text-body-md text-on-surface-variant">
-                    실시간 청약 알림부터 시공 전·후 사진 검수, 0507 안심번호 연결까지 스마트폰으로 한 번에 관리할 수 있습니다.
-                  </p>
-                </div>
-                <div className="flex flex-wrap items-center gap-space-md">
-                  <a className="px-space-lg py-space-sm rounded-xl bg-slate-900 text-white hover:bg-slate-800 font-label-md text-label-md inline-flex items-center gap-space-xs transition-colors font-semibold" href="#google-play">
-                    <span className="material-symbols-outlined text-[20px]">shop</span>
-                    <span>Google Play</span>
-                  </a>
-                  <a className="px-space-lg py-space-sm rounded-xl bg-surface-container-low text-on-surface hover:bg-surface-container font-label-md text-label-md inline-flex items-center gap-space-xs transition-colors border border-outline-variant/60 font-semibold" href="#app-store">
-                    <span className="material-symbols-outlined text-[20px]">phone_iphone</span>
-                    <span>App Store</span>
-                  </a>
-                </div>
-              </div>
-            </div>
-          </section>
+          
         </div>
       </main>
       )}
@@ -12068,37 +12514,65 @@ export function WebClntJob010100({
             </div>
           </section>
 
-          {/* Section 6: 실시간 발주·매칭 현황 */}
+          {/* Section 6: 실시간 발주 현황 */}
           <section id="section-live-matching" className="scroll-mt-20 py-8 flex flex-col gap-space-md border-t border-outline-variant/50">
             <div className="flex flex-col gap-space-2xs">
               <span className="font-label-sm text-label-sm text-secondary uppercase tracking-wider font-bold">03 / LIVE MATCHING STATUS</span>
-              <h2 className="font-headline-xl text-headline-xl text-on-surface">실시간 발주·매칭 현황</h2>
+              <h2 className="font-headline-xl text-headline-xl text-on-surface">실시간 발주 현황</h2>
             </div>
             <div className="bg-surface-container-lowest rounded-2xl shadow-sm p-space-md flex flex-col gap-space-sm border border-outline-variant/60 w-full">
-              <div className="flex items-center justify-between">
+              <div className="flex flex-wrap items-center justify-between gap-space-xs">
                 <div className="flex items-center gap-space-xs">
                   <span className="w-2.5 h-2.5 rounded-full bg-secondary animate-pulse" />
-                  <h3 className="font-headline-sm text-headline-sm text-on-surface font-bold">실시간 매칭 현황</h3>
+                  <h3 className="font-headline-sm text-headline-sm text-on-surface font-bold">실시간 발주·매칭 현황</h3>
                 </div>
-                <span className="font-label-sm text-label-sm text-on-surface-variant">LIVE UPDATE</span>
+                <div className="flex items-center gap-space-xs">
+                  <label className="font-label-sm text-label-sm text-on-surface-variant whitespace-nowrap">정렬순서 :</label>
+                  <select
+                    value={liveFeedFilter}
+                    onChange={(e) => { setLiveFeedFilter(e.target.value); setLiveFeedPage(1); }}
+                    className="px-2.5 py-1 rounded-lg border border-outline-variant bg-surface-container-lowest font-label-sm text-label-sm text-on-surface focus:outline-none focus:ring-1 focus:ring-primary cursor-pointer"
+                  >
+                    <option value="ALL">전체</option>
+                    <option value="BID_OPEN">청소요청</option>
+                    <option value="BID_APPLIED">청소청약</option>
+                  </select>
+                </div>
               </div>
-              <div className="flex flex-col gap-space-xs">
-                {(feedList && feedList.length > 0 ? feedList.slice(0, 5) : [
-                  { ORDER_NO: 'LIVE-1', ADDR_TEXT: '경기 고양시 덕양구 | 32평 입주·이사 청소', PROPOSED_PRICE: 380000, ORDER_STATUS: '계약 확정' },
-                  { ORDER_NO: 'LIVE-2', ADDR_TEXT: '서울 서대문구 | 시스템에어컨 2대 분해케어', PROPOSED_PRICE: 180000, ORDER_STATUS: '청약 대기중' },
-                  { ORDER_NO: 'LIVE-3', ADDR_TEXT: '경기 고양시 일산동구 | 빌라 계단 정기청소 3개월', PROPOSED_PRICE: 270000, ORDER_STATUS: '시공 완료' },
-                ]).map((ord, idx) => (
-                  <div key={ord.ORDER_NO || idx} className="p-space-xs rounded-xl bg-surface-container-low flex flex-col sm:flex-row sm:items-center justify-between gap-space-xs border border-outline-variant/40">
-                    <div className="flex flex-col gap-space-2xs min-w-0">
-                      <span className="font-label-md text-label-md text-on-surface truncate font-semibold">{ord.ADDR_TEXT}</span>
-                      <span className="font-body-sm text-body-sm text-primary font-bold">고객 지정가 {Number(ord.PROPOSED_PRICE || 0).toLocaleString()}원</span>
+              {(() => {
+                const filteredFeed = (feedList || []).filter((ord) => {
+                  if (liveFeedFilter === 'BID_OPEN') return ord.ORDER_STATUS === 'BID_OPEN' || ord.ORDER_STATUS === '청소요청';
+                  if (liveFeedFilter === 'BID_APPLIED') return ord.ORDER_STATUS !== 'BID_OPEN' && ord.ORDER_STATUS !== '청소요청';
+                  return true;
+                });
+                const totalPages = Math.max(1, Math.ceil(filteredFeed.length / 10));
+                const safePage = Math.min(liveFeedPage, totalPages);
+                const pagedFeed = filteredFeed.slice((safePage - 1) * 10, safePage * 10);
+                return (
+                  <>
+                    <div className="flex flex-col gap-space-xs min-h-[680px]">
+                      {pagedFeed.length > 0 ? pagedFeed.map((ord, idx) => (
+                        <div key={ord.ORDER_NO || idx} className="p-space-xs rounded-xl bg-surface-container-low flex flex-col sm:flex-row sm:items-center justify-between gap-space-xs border border-outline-variant/40">
+                          <div className="flex flex-col gap-space-2xs min-w-0">
+                            <span className="font-label-md text-label-md text-on-surface truncate font-semibold">{ord.ADDR_TEXT}</span>
+                            <span className="font-body-sm text-body-sm text-primary font-bold">고객 지정가 {Number(ord.PROPOSED_PRICE || 0).toLocaleString()}원</span>
+                          </div>
+                          <span className="self-start sm:self-center px-space-sm py-space-2xs rounded-full bg-primary-fixed text-on-primary-fixed font-label-sm text-label-sm whitespace-nowrap font-semibold">
+                            {ord.ORDER_STATUS === 'BID_OPEN' ? '청소요청' : (ord.ORDER_STATUS_LABEL || ord.ORDER_STATUS || '청소청약')}
+                          </span>
+                        </div>
+                      )) : (
+                        <div className="flex-1 flex items-center justify-center font-body-sm text-body-sm text-on-surface-variant">
+                          조회된 실시간 발주·매칭 현황이 없습니다.
+                        </div>
+                      )}
                     </div>
-                    <span className="self-start sm:self-center px-space-sm py-space-2xs rounded-full bg-primary-fixed text-on-primary-fixed font-label-sm text-label-sm whitespace-nowrap font-semibold">
-                      {ord.ORDER_STATUS || '청약 대기중'}
-                    </span>
-                  </div>
-                ))}
-              </div>
+                    <div className="flex justify-end pt-space-xs">
+                      <PaginationBar page={safePage} totalPages={totalPages} onPageChange={(p) => setLiveFeedPage(p)} />
+                    </div>
+                  </>
+                );
+              })()}
             </div>
           </section>
 

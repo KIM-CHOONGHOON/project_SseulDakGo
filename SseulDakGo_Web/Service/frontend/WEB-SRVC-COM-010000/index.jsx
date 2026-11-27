@@ -88,6 +88,7 @@ export default function WebSrvcCom010000({ userInfo }) {
   const [partnerLogoUrl, setPartnerLogoUrl] = useState(userInfo?.PROFILE_IMG_URL || null);
   const [partnerCerts, setPartnerCerts] = useState([]);
   const [partnerSpecialties, setPartnerSpecialties] = useState([]);
+  const [partnerCompNm, setPartnerCompNm] = useState('');
   const [isBizRestricted, setIsBizRestricted] = useState(false);
   const [showBizNotice, setShowBizNotice] = useState(false);
 
@@ -112,6 +113,7 @@ export default function WebSrvcCom010000({ userInfo }) {
         const res = await fetch(`/api/srvc/com/010000?${params.toString()}`);
         const data = await res.json();
         if (data?.success) {
+          if (data.partnerCompNm) setPartnerCompNm(data.partnerCompNm);
           if (data.isBizRestricted) {
             setIsBizRestricted(true);
             setShowBizNotice(true);
@@ -269,15 +271,16 @@ export default function WebSrvcCom010000({ userInfo }) {
                   <span className="w-1.5 h-1.5 rounded-full bg-secondary" />
                   <span className="font-label-sm text-label-sm text-on-surface-variant font-medium">실시간 운영 모드</span>
                 </div>
-                <h1 className="font-headline-lg text-headline-lg text-on-surface font-extrabold tracking-tight">
-                  {partnerName} 파트너님, 환영합니다
+                <h1 className="font-headline-lg text-headline-lg text-on-surface font-extrabold tracking-tight leading-tight">
+                  <span className="block">{partnerCompNm || partnerName} 파트너님,</span>
+                  <span className="block">환영합니다</span>
                 </h1>
               </div>
             </div>
 
-            <div className="flex flex-col gap-2.5 flex-1 lg:max-w-xl">
-              <div className="flex flex-wrap items-center gap-1.5">
-                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-surface-container-high text-on-surface-variant font-label-sm text-label-sm font-semibold">
+            <div className="flex flex-col gap-2.5 flex-1 lg:max-w-xl -mt-2">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="inline-flex items-center justify-center gap-1 w-36 px-2 py-0.5 rounded-md bg-surface-container-high text-on-surface-variant font-label-sm text-label-sm font-semibold shrink-0">
                   <span className="material-symbols-outlined text-[14px] text-primary">cleaning_services</span>청소 전문 분야
                 </span>
                 {partnerSpecialties.length === 0 ? (
@@ -288,16 +291,30 @@ export default function WebSrvcCom010000({ userInfo }) {
                   ))
                 )}
               </div>
-              <div className="flex flex-wrap items-center gap-1.5">
-                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-secondary-fixed/30 text-on-secondary-fixed font-label-sm text-label-sm font-semibold">
-                  <span className="material-symbols-outlined text-[14px] text-secondary">verified_user</span>보유 자격 및 인증
+              <div className="flex items-start gap-2">
+                <span className="inline-flex items-center justify-center gap-1 w-36 px-2 py-0.5 rounded-md bg-secondary-fixed/30 text-on-secondary-fixed font-label-sm text-label-sm font-semibold shrink-0">
+                  <span className="material-symbols-outlined text-[14px] text-secondary">verified_user</span>보유 자격 및 수료
                 </span>
                 {partnerCerts.length === 0 ? (
-                  <span className="px-2 py-0.5 rounded-full bg-surface-container-lowest border border-slate-200 text-on-surface-variant font-label-sm text-label-sm">등록된 자격 및 인증이 없습니다.</span>
+                  <span className="px-2 py-0.5 rounded-full bg-surface-container-lowest border border-slate-200 text-on-surface-variant font-label-sm text-label-sm">등록된 자격 및 수료가 없습니다.</span>
                 ) : (
-                  partnerCerts.map((certNm, idx) => (
-                    <span key={idx} className="px-2 py-0.5 rounded-full bg-surface-container-lowest border border-slate-200 text-on-surface-variant font-label-sm text-label-sm">{certNm}</span>
-                  ))
+                  <div className="grid grid-cols-3 gap-1.5 flex-1">
+                    {partnerCerts.slice(0, 12).map((certNm, idx) => {
+                      const colors = [
+                        'bg-blue-50 text-blue-700 border-blue-200',
+                        'bg-emerald-50 text-emerald-700 border-emerald-200',
+                        'bg-amber-50 text-amber-700 border-amber-200',
+                        'bg-purple-50 text-purple-700 border-purple-200',
+                        'bg-rose-50 text-rose-700 border-rose-200',
+                        'bg-teal-50 text-teal-700 border-teal-200',
+                      ];
+                      return (
+                        <span key={idx} className={`px-2.5 py-1 rounded-lg border font-label-sm text-label-sm font-medium text-center truncate ${colors[idx % colors.length]}`}>
+                          {certNm}
+                        </span>
+                      );
+                    })}
+                  </div>
                 )}
               </div>
             </div>

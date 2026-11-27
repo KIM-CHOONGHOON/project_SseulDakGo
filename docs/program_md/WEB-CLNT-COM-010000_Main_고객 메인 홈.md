@@ -8,6 +8,7 @@
   - 시공사 GNB: `통합 시공·청약 공정 관리` | `내 활동 내역` | `내 정보 관리` | `고객센터`
   - 좌상단 로고 클릭 시 로그인 역할에 따라 시공사(`WEB-SRVC-COM-010000`) / 이용자(`WEB-CLNT-COM-010200`) 홈으로 복귀.
 - **알림 배지 노출 제어**: 비로그인(`GUEST`) 상태에서는 종 아이콘 옆 미확인 건수 배지를 출력하지 않고, 로그인(`C`/`S`) 시에만 해당 회원 건수를 조회해 출력.
+- **우측 스크롤 고정 플로팅 버튼 (`fixed right-6 top-28`)**: `우리집 청소 요청 등록하기` 및 동일 크기의 `쓸고딱고 전문 시공 파트너 모집`(아티클 아이콘 포함, 클릭 시 `sseuldakgo_explanation_003.png` 모달 출력) 추가.
 
 
 | 항목 | 내용 |
@@ -188,3 +189,9 @@
 - 로그아웃(비회원 GUEST) 상태에서는 상단 종 아이콘 우측의 미확인 푸시메시지 건수 배지를 출력하지 않도록 조건을 보완했습니다.
 
 - [2026-11-26 업데이트] WEB-CLNT-COM-010000/index.jsx 본문을 신규 HTML 레이아웃(Hero + 우리집 청소 요청 등록하기, 3대 청소 용역 대분류, 이용 절차 4단계, 실시간 발주·매칭 현황, 파트너 모집 & 모바일 앱 배너)으로 개편하고 기존 Header/Footer를 유지했습니다.
+
+- **2026-11-28 (실시간 발주·매칭 현황 페이징 및 정렬순서 필터 적용)**
+  - `SseulDakGo_Web/Client/backend/api_WEB_CLNT_COM_010000/route.js`: `SQL_SELECT_REALTIME_ORDER_FEED`를 시스템일자 기준 당일 1개월 이전~당일(`REG_DT >= DATE_SUB(CURDATE(), INTERVAL 1 MONTH)`), `REG_DT DESC` 정렬, 청소요청(`BID_OPEN`) 및 청소청약(`BID_APPLIED`, `PAY_WAIT_1`, `PAY_WAIT_2`, `PAYMENT_WAITING`, `CONTRACTED`) 상태 조회(최대 200건)로 수정.
+  - `SseulDakGo_Web/Client/frontend/WEB-CLNT-COM-010000/index.jsx`: `"실시간 발주·매칭 현황"` 제목 우측에 `"정렬순서 : "` 드롭다운(`전체`, `청소요청`, `청소청약`) 추가, 목록 최대 10줄 출력 및 10줄 초과 시 우측 하단에 `PaginationBar` 출력.
+- **2026-11-28 (실시간 발주·매칭 현황 10줄 고정 높이 및 PaginationBar 상시 표시)**
+  - `SseulDakGo_Web/Client/frontend/WEB-CLNT-COM-010000/index.jsx`: 목록 컨테이너에 `min-h-[680px]`를 적용해 10개 미만일 때도 세로 크기를 고정하고, `PaginationBar`를 목록 우측 하단에 상시 표시(1페이지 포함)하도록 수정.

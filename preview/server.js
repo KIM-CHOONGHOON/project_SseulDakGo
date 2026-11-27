@@ -1606,7 +1606,11 @@ app.get('/api/srvc/com/010000', async (req, res) => {
     if (userNo) {
       try {
         partnerCerts = await executeQuery(
-          `SELECT CERT_NM, SERVICE_CAT FROM TB_SERVICE_CERT WHERE USER_NO = ? ORDER BY REG_DT DESC LIMIT 5`,
+          `SELECT CERT_NM, SERVICE_CAT
+             FROM TB_SERVICE_CERT
+            WHERE USER_NO = ?
+            ORDER BY CASE WHEN CERT_DOC_TYPE = 'LICENSE' THEN 1 WHEN CERT_DOC_TYPE = 'COMPLETION' THEN 2 ELSE 3 END, REG_DT DESC
+            LIMIT 12`,
           [userNo]
         );
       } catch (_) {}
@@ -1617,14 +1621,16 @@ app.get('/api/srvc/com/010000', async (req, res) => {
     );
 
     let isBizRestricted = false;
+    let partnerCompNm = null;
     if (userNo) {
       try {
         const docRows = await executeQuery(
-          `SELECT BIZ_REG_NO, CEO_NM, VERIFY_YN FROM TB_SERVICE_DOC WHERE USER_NO = ? LIMIT 1`,
+          `SELECT COMP_NM, BIZ_REG_NO, CEO_NM, VERIFY_YN FROM TB_SERVICE_DOC WHERE USER_NO = ? LIMIT 1`,
           [userNo]
         );
         if (docRows && docRows.length > 0) {
           const doc = docRows[0];
+          partnerCompNm = doc.COMP_NM || null;
           const noBizNo = !doc.BIZ_REG_NO || doc.BIZ_REG_NO === '000-00-00000';
           const noCeo = !doc.CEO_NM || doc.CEO_NM === '대표자';
           const badVerify = doc.VERIFY_YN === 'N';
@@ -1638,6 +1644,7 @@ app.get('/api/srvc/com/010000', async (req, res) => {
     return res.status(200).json({
       success: true,
       isBizRestricted,
+      partnerCompNm,
       partnerSpecialties,
       partnerCerts: (partnerCerts || []).map((c) => c.CERT_NM).filter(Boolean),
       tabCounts,
