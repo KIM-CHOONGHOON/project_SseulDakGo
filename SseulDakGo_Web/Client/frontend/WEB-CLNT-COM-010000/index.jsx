@@ -8456,6 +8456,7 @@ function WebSrvcMyp020100({ userInfo, onBack }) {
   const [serviceCat, setServiceCat] = useState('ALL');
   const [keyword, setKeyword] = useState('');
   const [certs, setCerts] = useState([]);
+  const [cleanServiceTypes, setCleanServiceTypes] = useState([]);
   const [isOcrModalOpen, setIsOcrModalOpen] = useState(false);
   const [showEmptyBizModal, setShowEmptyBizModal] = useState(!bizNo || !bizName);
   const [certPage, setCertPage] = useState(1);
@@ -8533,7 +8534,7 @@ function WebSrvcMyp020100({ userInfo, onBack }) {
         </header>
 
         {/* 1. 사업자등록 및 국세청 진위확인 */}
-        <section className="bg-white rounded-2xl p-6 sm:p-7 border border-slate-200/90 shadow-sm flex flex-col gap-5">
+        <section className="bg-white rounded-2xl p-6 sm:p-7 border-2 border-blue-500 shadow-sm flex flex-col gap-5">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-100 gap-3">
             <div className="flex items-center gap-2.5">
               <div className="w-9 h-9 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600 border border-blue-100">
@@ -8578,8 +8579,43 @@ function WebSrvcMyp020100({ userInfo, onBack }) {
           </div>
         </section>
 
-        {/* 2. 표준 자격·수료 항목 검색 및 등록 */}
-        <section className="bg-white rounded-2xl p-6 sm:p-7 border border-slate-200/90 shadow-sm flex flex-col gap-5">
+        {/* 2. 청소 용역 구분 */}
+        <section className="bg-white rounded-2xl p-6 sm:p-7 border-2 border-blue-500 shadow-sm flex flex-col gap-5">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-100 gap-2">
+            <div className="flex items-center gap-2.5">
+              <div className="w-9 h-9 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600 border border-blue-100">
+                <span className="material-symbols-outlined text-[22px]">cleaning_services</span>
+              </div>
+              <div>
+                <h2 className="text-lg font-bold text-slate-900">2. 청소 용역 구분</h2>
+                <p className="text-xs text-slate-500">시공 가능한 청소 용역 분야를 선택하세요 (복수 선택 가능)</p>
+              </div>
+            </div>
+          </div>
+          <div className="flex flex-wrap items-center gap-6">
+            {['정기청소', '입주청소', '계절가전 청소'].map((item) => {
+              const checked = cleanServiceTypes.includes(item);
+              return (
+                <label key={item} className="inline-flex items-center gap-2.5 cursor-pointer select-none">
+                  <input
+                    type="checkbox"
+                    checked={checked}
+                    onChange={() =>
+                      setCleanServiceTypes((prev) =>
+                        prev.includes(item) ? prev.filter((v) => v !== item) : [...prev, item]
+                      )
+                    }
+                    className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
+                  />
+                  <span className="text-sm font-semibold text-slate-800">{item}</span>
+                </label>
+              );
+            })}
+          </div>
+        </section>
+
+        {/* 3. 표준 자격·수료 항목 검색 및 등록 */}
+        <section className="bg-white rounded-2xl p-6 sm:p-7 border-2 border-blue-500 shadow-sm flex flex-col gap-5">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-100 gap-2">
             <div className="flex items-center gap-2.5">
               <div className="w-9 h-9 rounded-xl bg-teal-50 flex items-center justify-center text-teal-700 border border-teal-100">
@@ -8587,7 +8623,7 @@ function WebSrvcMyp020100({ userInfo, onBack }) {
               </div>
               <div>
                 <div className="flex items-center gap-2">
-                  <h2 className="text-lg font-bold text-slate-900">2. 표준 자격·수료 항목 검색 및 등록</h2>
+                  <h2 className="text-lg font-bold text-slate-900">3. 표준 자격·수료 항목 검색 및 등록</h2>
 
                 </div>
                 <p className="text-xs text-slate-500">본사 심사 승인 시 고객 대시보드 및 상세 견적 프로필에 공식 인증 마크 부여</p>
@@ -8712,6 +8748,7 @@ function WebSrvcMyp020100({ userInfo, onBack }) {
                         bizName,
                         ceoName,
                         bizNo,
+                        cleanServiceTypes,
                         certs,
                       }),
                     });
@@ -8741,6 +8778,7 @@ function WebSrvcMyp020100({ userInfo, onBack }) {
       <WebSrvcMyp020101
         isOpen={isOcrModalOpen}
         userInfo={userInfo}
+        initialBizData={{ bizName, ceoName, bizNo }}
         onClose={() => setIsOcrModalOpen(false)}
         onApplyData={(data) => {
           if (data?.bizName) setBizName(data.bizName);
@@ -8779,7 +8817,7 @@ function WebSrvcMyp020100({ userInfo, onBack }) {
  * 화면 ID: WEB-SRVC-MYP-020101
  * 화면명: 홈택스 PDF OCR 업로드 및 자동 인식 모달 (Modal)
  */
-function WebSrvcMyp020101({ isOpen, onClose, onApplyData, userInfo }) {
+function WebSrvcMyp020101({ isOpen, onClose, onApplyData, userInfo, initialBizData }) {
   const userNo = userInfo?.USER_NO || userInfo?.userNo || 'S20261000001';
   const fileInputRef = useRef(null);
   const [fileInfo, setFileInfo] = useState({
@@ -8797,6 +8835,17 @@ function WebSrvcMyp020101({ isOpen, onClose, onApplyData, userInfo }) {
   });
 
   const [isParsing, setIsParsing] = useState(false);
+
+  useEffect(() => {
+    if (isOpen && initialBizData) {
+      setOcrData((prev) => ({
+        ...prev,
+        bizName: initialBizData.bizName || prev.bizName,
+        ceoName: initialBizData.ceoName || prev.ceoName,
+        bizNo: initialBizData.bizNo || prev.bizNo,
+      }));
+    }
+  }, [isOpen, initialBizData?.bizName, initialBizData?.ceoName, initialBizData?.bizNo]);
 
   if (!isOpen) return null;
 
@@ -9076,6 +9125,314 @@ function WebSrvcMyp020101({ isOpen, onClose, onApplyData, userInfo }) {
   );
 }
 
+
+function WebClntCom010200({ userInfo, onOpenReqModal, onNavigate, onLogout }) {
+  const [dateFrom, setDateFrom] = useState('2025.11.20');
+  const [dateTo, setDateTo] = useState('2026.11.20');
+  const [orderStatus, setOrderStatus] = useState('REQ_APPLY');
+  const [page, setPage] = useState(1);
+  const [dashboardData, setDashboardData] = useState(null);
+  const [toastMsg, setToastMsg] = useState('');
+
+  const showToast = useCallback((msg) => {
+    setToastMsg(msg);
+    setTimeout(() => setToastMsg(''), 3500);
+  }, []);
+
+  const fetchDashboard = useCallback(async (targetPage = page, targetFrom = dateFrom, targetTo = dateTo, targetStatus = orderStatus) => {
+    try {
+      const uNo = userInfo?.USER_NO || 'C20261100001';
+      const qs = new URLSearchParams({
+        userNo: uNo,
+        dateFrom: targetFrom,
+        dateTo: targetTo,
+        orderStatus: targetStatus,
+        page: String(targetPage),
+        pageSize: '10',
+      });
+      const res = await fetch(`/api/clnt/com/010200?${qs.toString()}`);
+      const json = await res.json();
+      if (!res.ok || !json?.success) {
+        showToast(json?.message || '조회 중 오류가 발생했습니다.');
+        return;
+      }
+      setDashboardData(json.data);
+    } catch {
+      showToast('대시보드 데이터를 불러오는 중 오류가 발생했습니다.');
+    }
+  }, [userInfo?.USER_NO, page, dateFrom, dateTo, orderStatus, showToast]);
+
+  useEffect(() => {
+    fetchDashboard(1, dateFrom, dateTo, orderStatus);
+  }, [userInfo?.USER_NO]);
+
+  const profile = dashboardData?.clientProfile || {
+    userNo: userInfo?.USER_NO || 'C20261100001',
+    userNm: userInfo?.USER_NM || '김충훈',
+    roleLabel: '일반 회원 (C)',
+    badgeLabel: '안심회원',
+    unreadNotiCnt: 2,
+  };
+  const statusOptions = dashboardData?.filterMeta?.statusOptions || [
+    { code: 'ALL', label: '전체 (ALL)' },
+    { code: 'REQ_APPLY', label: '청소 청약 (REQ_APPLY)' },
+    { code: 'APPLY_CMPL', label: '단독 청약 접수 완료 (APPLY_CMPL)' },
+    { code: 'PAY_WAIT', label: '1차 이용료 결제대기 (PAY_WAIT)' },
+    { code: 'JOB_ING', label: '시공 확정/진행중 (JOB_ING)' },
+    { code: 'JOB_INSPECT', label: '시공 사진 검수/승인대기 (JOB_INSPECT)' },
+    { code: 'JOB_CMPL', label: '시공 완료 (JOB_CMPL)' },
+    { code: 'ORDER_CANCEL', label: '발주 취소 (ORDER_CANCEL)' },
+  ];
+  const pagination = dashboardData?.pagination || {
+    currentPage: page,
+    pageSize: 10,
+    totalItems: 0,
+    totalPages: 1,
+    startItem: 0,
+    endItem: 0,
+  };
+  const orders = dashboardData?.orders || [];
+
+  const setPeriodRange = (days) => {
+    const toD = new Date();
+    const fromD = new Date(toD.getTime() - days * 24 * 60 * 60 * 1000);
+    const fmt = (d) => `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`;
+    setDateFrom(fmt(fromD));
+    setDateTo(fmt(toD));
+    showToast(`조회기간이 최근 ${days === 30 ? '1개월' : days === 90 ? '3개월' : days === 180 ? '6개월' : '1년'}으로 설정되었습니다.`);
+  };
+
+  const handleResetFilter = () => {
+    const toD = new Date();
+    const fromD = new Date(toD.getTime() - 365 * 24 * 60 * 60 * 1000);
+    const fmt = (d) => `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`;
+    const f = fmt(fromD);
+    const t = fmt(toD);
+    setDateFrom(f);
+    setDateTo(t);
+    setOrderStatus('REQ_APPLY');
+    setPage(1);
+    fetchDashboard(1, f, t, 'REQ_APPLY');
+  };
+
+  const handleApplyFilter = () => {
+    setPage(1);
+    fetchDashboard(1, dateFrom, dateTo, orderStatus);
+  };
+
+  const handlePageChange = (newPage) => {
+    if (newPage < 1 || newPage > pagination.totalPages) return;
+    setPage(newPage);
+    fetchDashboard(newPage, dateFrom, dateTo, orderStatus);
+  };
+
+  return (
+    <div className="flex flex-col min-h-screen bg-slate-50 text-slate-900">
+      <header className="h-[70px] flex-shrink-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-200 px-6 flex items-center justify-between sticky top-0">
+        <div className="flex items-center gap-8">
+          <button type="button" onClick={() => onNavigate?.('home')} className="flex items-center gap-3 group cursor-pointer">
+            <img alt="쓸고닦고 공식 로고" className="h-10 w-auto object-contain rounded" src="/storage/sseuldakgo/logo/Logo_쓸고딱고.jpg" />
+          </button>
+          <nav className="hidden md:flex items-center gap-1">
+            <button type="button" onClick={() => onOpenReqModal?.('REGULAR')} className="px-4 py-2 rounded-xl text-sm font-semibold text-slate-600 hover:text-sky-600 hover:bg-slate-100 transition-all flex items-center gap-1.5 cursor-pointer">
+              <span className="material-symbols-outlined text-[18px]">post_add</span>
+              청소 용역 발주
+              <span className="text-[10px] bg-sky-100 text-sky-700 font-bold px-1.5 py-0.5 rounded">지정가</span>
+            </button>
+            <button type="button" onClick={() => showToast('내 청소 발주 관리 (WEB-CLNT-ORD-010000)')} className="px-4 py-2 rounded-xl text-sm font-semibold text-slate-600 hover:text-sky-600 hover:bg-slate-100 transition-all flex items-center gap-1.5 cursor-pointer">
+              <span className="material-symbols-outlined text-[18px]">assignment</span>
+              청소 발주
+              <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
+            </button>
+            <button type="button" onClick={() => showToast('시공 검수 (WEB-CLNT-JOB-010000)')} className="px-4 py-2 rounded-xl text-sm font-semibold text-slate-600 hover:text-sky-600 hover:bg-slate-100 transition-all flex items-center gap-1.5 cursor-pointer">
+              <span className="material-symbols-outlined text-[18px]">fact_check</span>
+              시공 검수
+            </button>
+            <button type="button" onClick={() => onNavigate?.('WEB-CLNT-MYP-010100')} className="px-4 py-2 rounded-xl text-sm font-semibold text-slate-600 hover:text-sky-600 hover:bg-slate-100 transition-all flex items-center gap-1.5 cursor-pointer">
+              <span className="material-symbols-outlined text-[18px]">person</span>
+              내 정보
+            </button>
+          </nav>
+        </div>
+        <div className="flex items-center gap-3">
+          <button type="button" onClick={() => showToast(`알림 센터: 읽지 않은 ${profile.unreadNotiCnt}건`)} className="relative p-2 text-slate-500 hover:text-sky-600 hover:bg-slate-100 rounded-xl transition-all cursor-pointer">
+            <span className="material-symbols-outlined text-[24px]">notifications</span>
+            {profile.unreadNotiCnt > 0 && (
+              <span className="absolute top-1.5 right-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-rose-500 text-[10px] font-bold text-white shadow-sm ring-2 ring-white">
+                {profile.unreadNotiCnt}
+              </span>
+            )}
+          </button>
+          <div className="flex items-center gap-3 bg-slate-50 border border-slate-200/80 rounded-2xl p-1.5 pr-3">
+            <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-sky-600 to-teal-400 text-white flex items-center justify-center font-bold text-sm shadow-inner">
+              {(profile.userNm || '김').slice(0, 1)}
+            </div>
+            <div className="flex flex-col text-left">
+              <div className="flex items-center gap-1.5">
+                <span className="text-xs font-bold text-slate-800">{profile.userNm} 고객님</span>
+                <span className="text-[10px] bg-teal-100 text-teal-800 font-semibold px-1.5 py-0.2 rounded">{profile.badgeLabel}</span>
+              </div>
+              <span className="text-[10px] text-slate-400">{profile.roleLabel}</span>
+            </div>
+            <button type="button" onClick={() => onLogout?.()} className="text-xs font-medium text-slate-400 hover:text-rose-600 px-2 py-1.5 rounded-lg hover:bg-rose-50 transition-all cursor-pointer">
+              로그아웃
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <main className="flex-1 overflow-y-auto">
+        <div className="max-w-[1440px] mx-auto px-6 flex flex-col py-5 gap-4">
+          <section className="bg-white rounded-2xl p-6 border border-slate-200/90 shadow-sm relative overflow-hidden flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
+            <div className="relative z-10 flex-1">
+              <div className="flex items-center gap-2 mb-2">
+                <span className="px-2.5 py-1 rounded-md text-[11px] font-extrabold bg-sky-50 text-sky-700 border border-sky-200 tracking-wider">
+                  WEB-CLNT-COM-010200 · CLIENT DASHBOARD
+                </span>
+                <span className="flex items-center gap-1 text-[11px] font-medium text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200/60">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping" />
+                  실시간 청약 매칭 활성화
+                </span>
+              </div>
+              <h1 className="text-2xl sm:text-[28px] font-extrabold text-slate-900 tracking-tight leading-tight">
+                {profile.userNm} 고객님, 환영합니다!
+              </h1>
+              <p className="mt-2 text-sm sm:text-base text-slate-600 leading-relaxed max-w-3xl">
+                고객님이 <span className="font-bold text-sky-700 underline decoration-sky-300 underline-offset-4">직접 정한 요금 그대로!</span> 흥정·역경매 없는 1:1 단독 선착순 매칭으로 정기청소·입주이사청소·계절가전 분해케어를 간편하게 발주하고 실시간 진행 현황을 확인하세요.
+              </p>
+            </div>
+            <div className="relative z-10 flex-shrink-0 flex items-center gap-3 w-full lg:w-auto">
+              <button type="button" onClick={() => onOpenReqModal?.('REGULAR')} className="w-full lg:w-auto px-7 py-4 rounded-xl font-bold text-base text-white bg-[#0284C7] hover:bg-[#0369A1] transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer">
+                <span className="material-symbols-outlined text-[22px]">post_add</span>
+                <span>확정 지정가로 청소 발주하기</span>
+                <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
+              </button>
+            </div>
+          </section>
+
+          <section className="bg-white rounded-2xl p-6 border border-slate-200/90 shadow-sm flex flex-col gap-5">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-slate-100 gap-2">
+              <div className="flex items-center gap-2">
+                <span className="p-1.5 bg-sky-100 text-sky-700 rounded-lg">
+                  <span className="material-symbols-outlined text-[20px]">sync_alt</span>
+                </span>
+                <h2 className="text-lg font-bold text-slate-900 tracking-tight">내 진행 중인 청소 발주 현황</h2>
+                <span className="text-xs font-bold bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full">
+                  총 {pagination.totalItems}건 (페이지 {pagination.currentPage}/{pagination.totalPages})
+                </span>
+              </div>
+            </div>
+
+            <div className="bg-slate-50/80 p-4 rounded-xl border border-slate-200/80 flex flex-col gap-3.5">
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-3.5 items-end">
+                <div className="lg:col-span-7 flex flex-col gap-1.5">
+                  <div className="flex items-center justify-between">
+                    <label className="text-xs font-bold text-slate-700 flex items-center gap-1">
+                      <span className="material-symbols-outlined text-[16px] text-slate-500">calendar_today</span>
+                      조회기간
+                    </label>
+                    <span className="text-[11px] text-slate-400">최대 1년(365일) 범위 내에서만 조회가 가능합니다</span>
+                  </div>
+                  <div className="flex flex-wrap sm:flex-nowrap items-center gap-2">
+                    <div className="flex items-center gap-1.5 flex-1 min-w-[240px]">
+                      <input type="text" value={dateFrom} onChange={(e) => setDateFrom(e.target.value)} className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs font-medium text-slate-800 focus:outline-none focus:border-sky-500 font-mono text-center" />
+                      <span className="text-slate-400 text-xs font-bold">~</span>
+                      <input type="text" value={dateTo} onChange={(e) => setDateTo(e.target.value)} className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs font-medium text-slate-800 focus:outline-none focus:border-sky-500 font-mono text-center" />
+                    </div>
+                    <div className="inline-flex items-center gap-1 flex-shrink-0">
+                      <button type="button" onClick={() => setPeriodRange(30)} className="px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-white border border-slate-200 text-slate-600 hover:bg-slate-100 cursor-pointer">최근 1개월</button>
+                      <button type="button" onClick={() => setPeriodRange(90)} className="px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-white border border-slate-200 text-slate-600 hover:bg-slate-100 cursor-pointer">3개월</button>
+                      <button type="button" onClick={() => setPeriodRange(180)} className="px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-white border border-slate-200 text-slate-600 hover:bg-slate-100 cursor-pointer">6개월</button>
+                      <button type="button" onClick={() => setPeriodRange(365)} className="px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-sky-50 border border-sky-300 text-sky-700 cursor-pointer">1년</button>
+                    </div>
+                  </div>
+                </div>
+                <div className="lg:col-span-3 flex flex-col gap-1.5">
+                  <label className="text-xs font-bold text-slate-700 flex items-center gap-1">
+                    <span className="material-symbols-outlined text-[16px] text-slate-500">filter_list</span>
+                    진행상태
+                  </label>
+                  <select id="filter-order-status" value={orderStatus} onChange={(e) => setOrderStatus(e.target.value)} className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs font-semibold text-slate-800 cursor-pointer">
+                    {statusOptions.map((opt) => (
+                      <option key={opt.code} value={opt.code}>{opt.label}</option>
+                    ))}
+                  </select>
+                </div>
+                <div className="lg:col-span-2 flex items-center gap-2">
+                  <button type="button" onClick={handleResetFilter} className="flex-1 px-3 py-2 rounded-lg text-xs font-semibold bg-white border border-slate-200 text-slate-600 hover:bg-slate-100 cursor-pointer">초기화</button>
+                  <button type="button" onClick={handleApplyFilter} className="flex-1 px-3.5 py-2 rounded-lg text-xs font-bold bg-[#0284C7] hover:bg-[#0369A1] text-white cursor-pointer">조회</button>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-3.5">
+              {orders.map((ord) => (
+                <div key={ord.orderNo} className="p-5 rounded-xl border border-sky-200 bg-sky-50/40 hover:bg-sky-50/80 transition-all flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
+                  <div className="flex-1 flex flex-col gap-2">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="px-2.5 py-1 rounded-md text-xs font-bold bg-sky-600 text-white">{ord.cleanCatNm}</span>
+                      <span className="text-xs font-bold text-sky-800 bg-sky-100 px-2 py-0.5 rounded border border-sky-300">{ord.orderStatNm}</span>
+                      <span className="text-xs text-slate-400 font-mono">발주번호: {ord.orderNo}</span>
+                    </div>
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-sm font-medium text-slate-800">
+                      <span className="flex items-center gap-1"><span className="material-symbols-outlined text-[18px] text-slate-400">location_on</span>{ord.locationSummary}</span>
+                      {ord.scheduleSummary && (
+                        <>
+                          <span className="hidden sm:inline text-slate-300">|</span>
+                          <span className="flex items-center gap-1 text-slate-600"><span className="material-symbols-outlined text-[18px] text-slate-400">calendar_month</span>{ord.scheduleSummary}</span>
+                        </>
+                      )}
+                    </div>
+                    <div className="text-xs font-semibold text-slate-700 flex items-center gap-2">
+                      <span className="text-slate-500">고객 확정 지정가:</span>
+                      <span className="text-base font-extrabold text-[#0284C7]">{Number(ord.fixedServiceAmt || 0).toLocaleString()}원</span>
+                    </div>
+                  </div>
+                  <div className="w-full lg:w-auto flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+                    <button type="button" onClick={() => showToast(`[${ord.orderNo}] ${ord.ctaAction?.label || '상세 조회'}`)} className="px-5 py-2.5 rounded-xl font-bold text-xs sm:text-sm bg-[#0284C7] hover:bg-[#0369A1] text-white shadow-sm cursor-pointer">
+                      {ord.ctaAction?.label || '발주 상세 조회'}
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-3 mt-1 border-t border-slate-200/80 select-none">
+              <div className="text-xs text-slate-500 flex items-center gap-1.5 font-medium">
+                <span>전체 <strong className="text-slate-800 font-bold">{pagination.totalItems}</strong>건 중 <strong className="text-sky-700 font-bold">{pagination.startItem}-{pagination.endItem}</strong>건 표시</span>
+              </div>
+              <div className="flex items-center justify-end w-full sm:w-auto">
+                <nav className="inline-flex items-center gap-1 rounded-xl bg-slate-50/80 p-1 border border-slate-200/80 shadow-sm">
+                  <button type="button" disabled={pagination.currentPage <= 1} onClick={() => handlePageChange(1)} className="h-8 w-8 inline-flex items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-700 disabled:opacity-50 font-mono text-xs font-bold cursor-pointer">«</button>
+                  <button type="button" disabled={pagination.currentPage <= 1} onClick={() => handlePageChange(pagination.currentPage - 1)} className="h-8 w-8 inline-flex items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-700 disabled:opacity-50 font-mono text-xs font-bold cursor-pointer">‹</button>
+                  {Array.from({ length: pagination.totalPages }, (_, i) => i + 1).map((p) => (
+                    <button key={p} type="button" onClick={() => handlePageChange(p)} className={`h-8 min-w-[32px] px-2.5 inline-flex items-center justify-center rounded-lg text-xs font-bold cursor-pointer ${p === pagination.currentPage ? 'bg-[#0284C7] text-white' : 'text-slate-600 hover:bg-white'}`}>
+                      {p}
+                    </button>
+                  ))}
+                  <button type="button" disabled={pagination.currentPage >= pagination.totalPages} onClick={() => handlePageChange(pagination.currentPage + 1)} className="h-8 w-8 inline-flex items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-700 disabled:opacity-50 font-mono text-xs font-bold cursor-pointer">›</button>
+                  <button type="button" disabled={pagination.currentPage >= pagination.totalPages} onClick={() => handlePageChange(pagination.totalPages)} className="h-8 w-8 inline-flex items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-700 disabled:opacity-50 font-mono text-xs font-bold cursor-pointer">»</button>
+                </nav>
+              </div>
+            </div>
+          </section>
+        </div>
+      </main>
+
+      <footer className="h-[56px] flex-shrink-0 z-50 bg-white border-t border-slate-200 px-6 flex items-center justify-between text-xs text-slate-500">
+        <div className="flex items-center gap-3">
+          <img alt="쓸고닦고 푸터 로고" className="h-6 w-auto object-contain rounded" src="/storage/sseuldakgo/logo/Logo_쓸고딱고.jpg" />
+          <span className="font-medium text-slate-700">운영사 (주)공간다원</span>
+        </div>
+      </footer>
+      {toastMsg && (
+        <div className="fixed bottom-16 right-6 z-50 bg-slate-900/90 text-white text-xs font-semibold px-4 py-3 rounded-xl shadow-lg border border-slate-700">
+          {toastMsg}
+        </div>
+      )}
+    </div>
+  );
+}
 
 export default function WebClntCom010000({ onNavigate }) {
   // 1. 필수 상태 관리 (요구사항 명세 100% 반영)
@@ -9593,429 +9950,20 @@ export default function WebClntCom010000({ onNavigate }) {
         .bg-primary-fixed { background-color: #d5e3ff; }
         .text-on-primary-fixed { color: #001c3b; }
         .text-on-primary-fixed-variant { color: #1d477b; }
-        .bg-surface { background-color: #faf8ff; }
-        .bg-surface-container-lowest { background-color: #ffffff; }
-        .bg-surface-container-low { background-color: #f2f3ff; }
-        .bg-surface-container { background-color: #eaedff; }
-        .bg-surface-container-high { background-color: #e2e7ff; }
-        .hover\\:bg-surface-container-high:hover { background-color: #e2e7ff; }
-        .bg-surface-container-highest { background-color: #dae2fd; }
-        .bg-inverse-surface { background-color: #283044; }
-        .text-inverse-on-surface { color: #eef0ff; }
-        .text-surface-dim { color: #d2d9f4; }
-        .text-on-surface { color: #131b2e; }
-        .text-on-surface-variant { color: #43474f; }
-        .text-outline { color: #737780; }
-        .text-outline-variant { color: #c3c6d1; }
-        .bg-tertiary { background-color: #6b000b; }
-        .text-tertiary-fixed { color: #ffdad7; }
-        .bg-error { background-color: #ba1a1a; }
-        .text-error { color: #ba1a1a; }
-        .text-on-error { color: #ffffff; }
-        .px-margin { padding-left: 2rem; padding-right: 2rem; }
-        .px-space-md { padding-left: 1rem; padding-right: 1rem; }
-        .px-space-sm { padding-left: 0.5rem; padding-right: 0.5rem; }
-        .py-space-lg { padding-top: 1.5rem; padding-bottom: 1.5rem; }
-        .py-space-xl { padding-top: 2rem; padding-bottom: 2rem; }
-        .py-space-md { padding-top: 1rem; padding-bottom: 1rem; }
-        .py-space-sm { padding-top: 0.5rem; padding-bottom: 0.5rem; }
-        .pb-space-lg { padding-bottom: 1.5rem; }
-        .pt-space-md { padding-top: 1rem; }
-        .mt-space-sm { margin-top: 0.5rem; }
-        .gap-gutter { gap: 1.5rem; }
-        .gap-space-md { gap: 1rem; }
-        .gap-space-sm { gap: 0.5rem; }
-        .text-headline-lg { font-size: 32px; line-height: 42px; font-weight: 700; }
-        .text-headline-md { font-size: 22px; line-height: 30px; font-weight: 600; }
-        .text-headline-sm { font-size: 18px; line-height: 26px; font-weight: 600; }
-        .text-body-lg { font-size: 16px; line-height: 26px; font-weight: 500; }
-        .text-body-md { font-size: 14px; line-height: 22px; font-weight: 400; }
-        .text-body-sm { font-size: 13px; line-height: 20px; font-weight: 400; }
-        .text-label-lg { font-size: 15px; line-height: 20px; font-weight: 600; }
-        .text-label-md { font-size: 13px; line-height: 18px; font-weight: 600; }
-        .text-label-sm { font-size: 11px; line-height: 16px; font-weight: 600; }
-        .text-caption { font-size: 12px; line-height: 18px; font-weight: 400; }
       `}</style>
-
-      {/* ====================================================================
-          HEADER: 상단 고정 GNB (Height: 72px)
-      ==================================================================== */}
-      <header className="fixed top-0 left-0 w-full z-50 bg-surface-container-lowest/95 backdrop-blur-md shadow-[0_1px_8px_rgba(0,0,0,0.06)]">
-        <div className="h-[72px] max-w-[1200px] mx-auto px-margin flex items-center justify-between gap-space-md">
-          {/* Left: Brand Logo */}
-          <div className="flex items-center gap-4 shrink-0">
-            <a
-              className="flex items-center gap-2 group cursor-pointer"
-              data-path="home"
-              href="#home"
-              onClick={(e) => {
-                e.preventDefault();
-                setIsBrandLogoModalOpen(true);
-              }}
-            >
-              <img
-                src="/logo.png"
-                alt="쓸고닦고 로고"
-                className="w-14 h-14 rounded-full object-cover shadow-sm ring-2 ring-primary/20"
-              />
-            </a>
-          </div>
-
-          {/* Center: Navigation Tabs (이용자 vs 시공자 분기 GNB - '홈' 기능은 좌상단 로고 클릭으로 일원화) */}
-          <nav
-            className="hidden md:flex items-center gap-1 bg-surface-container-lowest p-1 rounded-full shadow-xs border border-outline-variant/30"
-            data-active-classes="bg-secondary-container text-on-secondary-container font-label-md"
-          >
-            <button
-              type="button"
-              className="px-3.5 py-1.5 rounded-full font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all cursor-pointer font-bold"
-              onClick={(e) => {
-                const role = userInfo?.USER_ROLE_CD || userInfo?.userRoleCd;
-                if (!userInfo || userInfo.isGuest) {
-                  handleNavClick(e, 'home');
-                } else if (role === 'S' || role === 'SERVICE') {
-                  handleNavClick(e, 'WEB-SRVC-COM-010000');
-                } else {
-                  handleNavClick(e, 'WEB-CLNT-COM-010200');
-                }
-              }}
-            >
-              홈
-            </button>
-            {userInfo?.USER_ROLE_CD === 'S' ? (
-              /* [시공사 GNB: 홈, 통합 시공·청약 공정 관리, 내 활동 내역, 내 정보, 고객센터] */
-              <>
-                <button
-                  type="button"
-                  className="px-3.5 py-1.5 rounded-full font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all cursor-pointer"
-                  onClick={() => {
-                    setActiveNavPath('WEB-SRVC-COM-010000');
-                    setTimeout(() => {
-                      const el = document.getElementById('section-quote-process');
-                      if (el) el.scrollIntoView({ behavior: 'smooth' });
-                    }, 100);
-                  }}
-                >
-                  통합 시공·청약 공정 관리
-                </button>
-                <button
-                  type="button"
-                  className="px-3.5 py-1.5 rounded-full font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all cursor-pointer"
-                  onClick={() => {
-                    setActiveNavPath('WEB-SRVC-COM-010000');
-                    setTimeout(() => {
-                      const el = document.getElementById('section-activity-history');
-                      if (el) el.scrollIntoView({ behavior: 'smooth' });
-                    }, 100);
-                  }}
-                >
-                  내 활동 내역
-                </button>
-                <button
-                  type="button"
-                  className={
-                    activeNavPath === 'WEB-SRVC-MYP-020100'
-                      ? 'px-3.5 py-1.5 rounded-full transition-all bg-secondary-container text-on-secondary-container font-label-md cursor-pointer font-bold'
-                      : 'px-3.5 py-1.5 rounded-full font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all cursor-pointer'
-                  }
-                  onClick={() => {
-                    setActiveNavPath('WEB-SRVC-MYP-020100');
-                    if (typeof onNavigate === 'function') onNavigate('WEB-SRVC-MYP-020100');
-                  }}
-                >
-                  내 정보 관리
-                </button>
-              </>
-            ) : (
-              /* [이용자 GNB: 3대 청소 용역 대분류, 이용 절차 4단계 워크플로우, 실시간 발주 현황, 쓸고닦고 전문 시공사 파트너 모집] */
-              <>
-                <button
-                  type="button"
-                  className="px-3.5 py-1.5 rounded-full font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all cursor-pointer"
-                  onClick={() => document.getElementById('section-core-services')?.scrollIntoView({ behavior: 'smooth' })}
-                >
-                  청소 용역 대분류
-                </button>
-                <button
-                  type="button"
-                  className="px-3.5 py-1.5 rounded-full font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all cursor-pointer"
-                  onClick={() => document.getElementById('section-how-it-works')?.scrollIntoView({ behavior: 'smooth' })}
-                >
-                  이용 절차 워크플로우
-                </button>
-                <button
-                  type="button"
-                  className="px-3.5 py-1.5 rounded-full font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all cursor-pointer"
-                  onClick={() => document.getElementById('section-live-matching')?.scrollIntoView({ behavior: 'smooth' })}
-                >
-                  실시간 발주 현황
-                </button>
-                <button
-                  type="button"
-                  className="px-3.5 py-1.5 rounded-full font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all cursor-pointer"
-                  onClick={() => setIsAboutModalOpen(true)}
-                >
-                  쓸고 딱고 란 ?
-                </button>
-              </>
-            )}
-
-            {/* 내 정보 관리 버튼 제거됨 */}
-            <div className="relative">
-
-              {/* 하위 드롭다운 레이어 (고객 C 전용) */}
-              {isMyMenuOpen && userInfo?.USER_ROLE_CD !== 'S' && (
-                <div className="absolute right-0 top-full mt-1 w-56 bg-white rounded-2xl shadow-xl border border-slate-200/80 py-2 z-[200] animate-in fade-in slide-in-from-top-1 duration-150">
-                  <div className="px-3.5 py-2 border-b border-slate-100 flex items-center justify-between text-xs">
-                    <span className="font-bold text-slate-800">
-                      {userInfo?.USER_ROLE_CD === 'S' ? '시공사 회원' : (userInfo?.isGuest ? '비회원' : '고객 회원')}
-                    </span>
-                    <span className="text-[10px] px-1.5 py-0.2 rounded font-mono font-bold bg-slate-100 text-slate-600">
-                      {userInfo?.isGuest ? 'GUEST' : (userInfo?.USER_ROLE_CD === 'S' ? 'PARTNER' : 'CLIENT')}
-                    </span>
-                  </div>
-
-                  {userInfo?.isGuest ? (
-                    <div className="p-3 text-center space-y-2">
-                      <p className="text-xs text-slate-500">로그인 후 내 정보를 이용하실 수 있습니다.</p>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setIsMyMenuOpen(false);
-                          setIsLoginModalOpen(true);
-                        }}
-                        className="w-full py-1.5 bg-primary text-white text-xs font-bold rounded-lg shadow-sm"
-                      >
-                        로그인하기
-                      </button>
-                    </div>
-                  ) : userInfo?.USER_ROLE_CD === 'S' ? (
-                    /* 2.2 시공사(S) 4대 메뉴 */
-                    <div className="py-1 text-xs">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setIsMyMenuOpen(false);
-                          setSubModalType('BIZ_REG');
-                        }}
-                        className="w-full px-4 py-2.5 text-left text-slate-700 hover:bg-slate-50 hover:text-primary flex items-center gap-2.5 transition-colors cursor-pointer font-medium"
-                      >
-                        <span className="material-symbols-outlined text-[18px] text-amber-600">badge</span>
-                        <span>사업자등록증 등록</span>
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setIsMyMenuOpen(false);
-                          setSubModalType('CHANGE_PHONE');
-                        }}
-                        className="w-full px-4 py-2.5 text-left text-slate-700 hover:bg-slate-50 hover:text-primary flex items-center gap-2.5 transition-colors cursor-pointer font-medium"
-                      >
-                        <span className="material-symbols-outlined text-[18px] text-slate-500">phonelink_setup</span>
-                        <span>전화번호 변경</span>
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setIsMyMenuOpen(false);
-                          setSubModalType('CHANGE_PWD');
-                        }}
-                        className="w-full px-4 py-2.5 text-left text-slate-700 hover:bg-slate-50 hover:text-primary flex items-center gap-2.5 transition-colors cursor-pointer font-medium"
-                      >
-                        <span className="material-symbols-outlined text-[18px] text-slate-500">lock_reset</span>
-                        <span>비밀번호 변경</span>
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setIsMyMenuOpen(false);
-                          setActiveNavPath('WEB-CLNT-MYP-010100');
-                        }}
-                        className="w-full px-4 py-2.5 text-left text-primary hover:bg-primary-fixed/30 flex items-center gap-2.5 transition-colors border-t border-slate-100 cursor-pointer font-bold bg-primary-fixed/10"
-                      >
-                        <span className="material-symbols-outlined text-[18px] text-primary">person</span>
-                        <span>내정보 관리 (프로필 및 통계)</span>
-                      </button>
-                    </div>
-                  ) : (
-                    /* 2.1 고객(C) 3대 메뉴 */
-                    <div className="py-1 text-xs">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setIsMyMenuOpen(false);
-                          setSubModalType('CHANGE_PHONE');
-                        }}
-                        className="w-full px-4 py-2.5 text-left text-slate-700 hover:bg-slate-50 hover:text-primary flex items-center gap-2.5 transition-colors cursor-pointer font-medium"
-                      >
-                        <span className="material-symbols-outlined text-[18px] text-slate-500">phonelink_setup</span>
-                        <span>전화번호 변경</span>
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setIsMyMenuOpen(false);
-                          setSubModalType('CHANGE_PWD');
-                        }}
-                        className="w-full px-4 py-2.5 text-left text-slate-700 hover:bg-slate-50 hover:text-primary flex items-center gap-2.5 transition-colors cursor-pointer font-medium"
-                      >
-                        <span className="material-symbols-outlined text-[18px] text-slate-500">lock_reset</span>
-                        <span>비밀번호 변경</span>
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setIsMyMenuOpen(false);
-                          setActiveNavPath('WEB-CLNT-MYP-010100');
-                        }}
-                        className="w-full px-4 py-2.5 text-left text-primary hover:bg-primary-fixed/30 flex items-center gap-2.5 transition-colors border-t border-slate-100 cursor-pointer font-bold bg-primary-fixed/10"
-                      >
-                        <span className="material-symbols-outlined text-[18px] text-primary">person</span>
-                        <span>내정보 관리 (프로필 및 통계)</span>
-                      </button>
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-
-            {/* 고객센터 */}
-            <button
-              type="button"
-              className="px-3.5 py-1.5 rounded-full font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all cursor-pointer"
-              onClick={() => {
-                alert('쓸고닦고 고객만족센터: 1588-7824 (평일 09:00~18:00 운영, 카카오톡 상담 채널 @쓸고닦고)');
-              }}
-            >
-              고객센터
-            </button>
+      <header className="fixed top-0 left-0 right-0 z-50 h-[72px] bg-white/95 backdrop-blur-md border-b border-outline-variant/50 px-margin-mobile lg:px-margin flex items-center justify-between">
+        <div className="flex items-center gap-6">
+          <img src="/storage/sseuldakgo/logo/Logo_쓸고딱고.jpg" alt="쓸고닦고 로고" className="h-10 w-auto object-contain rounded cursor-pointer" onClick={() => setIsBrandLogoModalOpen(true)} />
+          <nav className="hidden md:flex items-center gap-1">
+            <button type="button" onClick={() => handleOpenReqModal('REGULAR')} className="px-3 py-2 rounded-xl text-sm font-semibold text-on-surface-variant hover:text-primary hover:bg-surface-container-low transition-colors cursor-pointer">정기청소</button>
+            <button type="button" onClick={() => handleOpenReqModal('APPLIANCE')} className="px-3 py-2 rounded-xl text-sm font-semibold text-on-surface-variant hover:text-primary hover:bg-surface-container-low transition-colors cursor-pointer">계절가전 분해케어</button>
+            <button type="button" onClick={() => handleOpenReqModal('MOVEOUT')} className="px-3 py-2 rounded-xl text-sm font-semibold text-on-surface-variant hover:text-primary hover:bg-surface-container-low transition-colors cursor-pointer">입주·이사 청소</button>
+            <button type="button" onClick={() => document.getElementById('section-live-matching')?.scrollIntoView({ behavior: 'smooth' })} className="px-3 py-2 rounded-xl text-sm font-semibold text-on-surface-variant hover:text-primary hover:bg-surface-container-low transition-colors cursor-pointer">실시간 발주 현황</button>
+            <button type="button" onClick={() => setIsAboutModalOpen(true)} className="px-3 py-2 rounded-xl text-sm font-semibold text-primary hover:bg-primary-fixed/30 transition-colors cursor-pointer">쓸고 딱고 란 ?</button>
           </nav>
-
-          {/* Right: Auth / Profile Cluster */}
-          <div className="flex items-center gap-space-sm shrink-0">
-            {/* 알림(종) 버튼 및 오른쪽 수신 건수 배지 & 수신 목록 팝오버 (로그인/비로그인 공통 노출) */}
-            <div className="relative">
-              <button
-                aria-label="알림"
-                className={`flex items-center gap-1.5 px-2.5 py-1.5 h-9 rounded-xl transition-all border cursor-pointer ${
-                  isNotiOpen
-                    ? 'bg-blue-50 border-blue-400 text-[#003d9b] ring-2 ring-blue-100'
-                    : 'text-slate-700 hover:bg-slate-100 hover:text-slate-900 border-slate-200/80 bg-white'
-                } shadow-xs`}
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setIsNotiOpen(!isNotiOpen);
-                }}
-                title="알림 센터 열기 (수신 목록 확인)"
-              >
-                <span className="material-symbols-outlined text-[20px] text-slate-700">notifications</span>
-                {/* 벨 이모티콘 오른쪽에 수신된 메시지 건수 출력 */}
-                <span className={`px-1.5 py-0.5 rounded-full text-[11px] font-extrabold leading-none min-w-[18px] text-center shadow-xs ${
-                  unreadNotiCount > 0
-                    ? 'bg-red-600 text-white animate-pulse'
-                    : 'bg-slate-200 text-slate-600'
-                }`}>
-                  {unreadNotiCount > 99 ? '99+' : unreadNotiCount}
-                </span>
-              </button>
-
-              {/* 알림 센터 레이어 팝업 (벨 클릭 시 수신 목록 출력) */}
-              {isNotiOpen && (
-                <>
-                  <div 
-                    className="fixed inset-0 z-[190]" 
-                    onClick={() => setIsNotiOpen(false)} 
-                  />
-                  <div 
-                    className="absolute right-0 top-full mt-2 w-80 sm:w-96 bg-white rounded-2xl shadow-2xl border border-slate-200 z-[200] overflow-hidden animate-in fade-in slide-in-from-top-1 duration-150"
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    {/* 팝업 헤더 */}
-                    <div className="px-4 py-3 border-b border-slate-100 flex items-center justify-between bg-slate-50/70">
-                      <div className="flex items-center gap-2">
-                        <span className="font-extrabold text-sm text-slate-900">알림 센터</span>
-                        {!userInfo?.isGuest && userInfo?.USER_NO !== 'GUEST' && unreadNotiCount > 0 && (
-                          <span className="text-[11px] font-bold px-1.5 py-0.5 bg-red-100 text-red-600 rounded-full font-mono">
-                            {unreadNotiCount}건 미확인
-                          </span>
-                        )}
-                      </div>
-                      {!userInfo?.isGuest && userInfo?.USER_NO !== 'GUEST' && unreadNotiCount > 0 && (
-                        <button
-                          type="button"
-                          onClick={handleMarkAllNotiRead}
-                          className="text-xs text-primary font-bold hover:underline cursor-pointer"
-                        >
-                          모두 읽음
-                        </button>
-                      )}
-                    </div>
-
-                    {/* 알림 항목 목록 */}
-                    <div className="max-h-[380px] overflow-y-auto divide-y divide-slate-100">
-                      {notiList.length === 0 ? (
-                        <div className="py-12 text-center text-slate-400">
-                          <span className="material-symbols-outlined text-4xl mb-1 text-slate-300">notifications_paused</span>
-                          <p className="text-xs font-medium">수신된 알림 메시지가 없습니다.</p>
-                        </div>
-                      ) : (
-                        notiList.map((item) => {
-                          const isUnread = item.isRead === 'N';
-                          return (
-                            <div
-                              key={item.notiId}
-                              onClick={() => handleNotiClick(item)}
-                              className={`p-3.5 transition-colors cursor-pointer flex gap-3 items-start ${
-                                isUnread ? 'bg-blue-50/70 hover:bg-blue-100/60' : 'bg-white hover:bg-slate-50'
-                              }`}
-                            >
-                              <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 mt-0.5 ${
-                                isUnread ? 'bg-blue-500 text-white' : 'bg-slate-100 text-slate-400'
-                              }`}>
-                                <span className="material-symbols-outlined text-[17px]">
-                                  {item.notiType === 'NEW_ORDER' ? 'cleaning_services' : 'notifications'}
-                                </span>
-                              </div>
-                              <div className="flex-1 min-w-0 text-left">
-                                <div className="flex items-center justify-between gap-1 mb-0.5">
-                                  <h4 className={`text-xs truncate ${isUnread ? 'font-black text-slate-900' : 'font-medium text-slate-700'}`}>
-                                    {item.title}
-                                  </h4>
-                                  <span className="text-[10px] text-slate-400 font-mono shrink-0">
-                                    {item.regDt ? item.regDt.slice(5, 16) : ''}
-                                  </span>
-                                </div>
-                                <p className="text-[11px] text-slate-600 line-clamp-2 leading-relaxed whitespace-pre-line text-left">
-                                  {item.content}
-                                </p>
-                                <div className="flex items-center justify-between mt-1.5 pt-1 border-t border-slate-200/40">
-                                  <span className={`text-[9.5px] font-bold px-1.5 py-0.2 rounded ${
-                                    isUnread ? 'bg-blue-100 text-blue-700' : 'bg-slate-100 text-slate-500'
-                                  }`}>
-                                    {isUnread ? '미확인 알림' : '확인완료'}
-                                  </span>
-                                  <span className="text-[10.5px] text-primary font-bold flex items-center gap-0.5">
-                                    상세보기 <span className="material-symbols-outlined text-[13px]">arrow_forward</span>
-                                  </span>
-                                </div>
-                              </div>
-                            </div>
-                          );
-                        })
-                      )}
-                    </div>
-                  </div>
-                </>
-              )}
-            </div>
-
-            {!userInfo.isGuest ? (
+        </div>
+        <div className="flex items-center gap-6">
+          {!userInfo.isGuest ? (
               <div className="flex items-center gap-2">
                 <div className="flex items-center gap-space-sm pl-2">
                   <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center">
@@ -10090,7 +10038,6 @@ export default function WebClntCom010000({ onNavigate }) {
               </div>
             )}
           </div>
-        </div>
       </header>
       {isBrandLogoModalOpen && (
         <div
@@ -10207,7 +10154,20 @@ export default function WebClntCom010000({ onNavigate }) {
       {userInfo?.USER_ROLE_CD === 'S' && (activeNavPath === 'WEB-SRVC-COM-010000' || activeNavPath === 'home') ? (
         <WebSrvcCom010000 userInfo={userInfo} onNavigate={setActiveNavPath} />
       ) : userInfo?.USER_ROLE_CD === 'C' && activeNavPath === 'WEB-CLNT-COM-010200' ? (
-        <WebClntCom010200 userInfo={userInfo} onOpenReqModal={handleOpenReqModal} onNavigate={setActiveNavPath} />
+        <WebClntCom010200
+          userInfo={userInfo}
+          onOpenReqModal={handleOpenReqModal}
+          onNavigate={setActiveNavPath}
+          onLogout={() => {
+            try {
+              localStorage.removeItem('SSEULDAKGO_KEEP_LOGIN');
+              localStorage.removeItem('SSEULDAKGO_AUTH_USER');
+              sessionStorage.removeItem('SSEULDAKGO_AUTH_USER');
+            } catch (e) {}
+            setUserInfo({ isGuest: true, USER_NO: 'GUEST', USER_NM: '비회원', USER_ROLE_CD: 'GUEST' });
+            setActiveNavPath('home');
+          }}
+        />
       ) : userInfo?.USER_ROLE_CD === 'S' && activeNavPath === 'WEB-SRVC-MYP-020100' ? (
         <WebSrvcMyp020100 userInfo={userInfo} onBack={() => setActiveNavPath('WEB-SRVC-COM-010000')} />
       ) : (

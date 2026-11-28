@@ -17,6 +17,7 @@ export default function WebSrvcMyp020100({ userInfo, onBack }) {
   const [serviceCat, setServiceCat] = useState('ALL');
   const [keyword, setKeyword] = useState('');
   const [certs, setCerts] = useState([]);
+  const [cleanServiceTypes, setCleanServiceTypes] = useState([]);
   const [isOcrModalOpen, setIsOcrModalOpen] = useState(false);
   const [showEmptyBizModal, setShowEmptyBizModal] = useState(!bizNo || !bizName);
   const [certPage, setCertPage] = useState(1);
@@ -94,7 +95,7 @@ export default function WebSrvcMyp020100({ userInfo, onBack }) {
         </header>
 
         {/* 1. 사업자등록 및 국세청 진위확인 */}
-        <section className="bg-white rounded-2xl p-6 sm:p-7 border border-slate-200/90 shadow-sm flex flex-col gap-5">
+        <section className="bg-white rounded-2xl p-6 sm:p-7 border-2 border-blue-500 shadow-sm flex flex-col gap-5">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-100 gap-3">
             <div className="flex items-center gap-2.5">
               <div className="w-9 h-9 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600 border border-blue-100">
@@ -139,8 +140,43 @@ export default function WebSrvcMyp020100({ userInfo, onBack }) {
           </div>
         </section>
 
-        {/* 2. 표준 자격·수료 항목 검색 및 등록 */}
-        <section className="bg-white rounded-2xl p-6 sm:p-7 border border-slate-200/90 shadow-sm flex flex-col gap-5">
+        {/* 2. 청소 용역 구분 */}
+        <section className="bg-white rounded-2xl p-6 sm:p-7 border-2 border-blue-500 shadow-sm flex flex-col gap-5">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-100 gap-2">
+            <div className="flex items-center gap-2.5">
+              <div className="w-9 h-9 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600 border border-blue-100">
+                <span className="material-symbols-outlined text-[22px]">cleaning_services</span>
+              </div>
+              <div>
+                <h2 className="text-lg font-bold text-slate-900">2. 청소 용역 구분</h2>
+                <p className="text-xs text-slate-500">시공 가능한 청소 용역 분야를 선택하세요 (복수 선택 가능)</p>
+              </div>
+            </div>
+          </div>
+          <div className="flex flex-wrap items-center gap-6">
+            {['정기청소', '입주청소', '계절가전 청소'].map((item) => {
+              const checked = cleanServiceTypes.includes(item);
+              return (
+                <label key={item} className="inline-flex items-center gap-2.5 cursor-pointer select-none">
+                  <input
+                    type="checkbox"
+                    checked={checked}
+                    onChange={() =>
+                      setCleanServiceTypes((prev) =>
+                        prev.includes(item) ? prev.filter((v) => v !== item) : [...prev, item]
+                      )
+                    }
+                    className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
+                  />
+                  <span className="text-sm font-semibold text-slate-800">{item}</span>
+                </label>
+              );
+            })}
+          </div>
+        </section>
+
+        {/* 3. 표준 자격·수료 항목 검색 및 등록 */}
+        <section className="bg-white rounded-2xl p-6 sm:p-7 border-2 border-blue-500 shadow-sm flex flex-col gap-5">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-100 gap-2">
             <div className="flex items-center gap-2.5">
               <div className="w-9 h-9 rounded-xl bg-teal-50 flex items-center justify-center text-teal-700 border border-teal-100">
@@ -148,7 +184,7 @@ export default function WebSrvcMyp020100({ userInfo, onBack }) {
               </div>
               <div>
                 <div className="flex items-center gap-2">
-                  <h2 className="text-lg font-bold text-slate-900">2. 표준 자격·수료 항목 검색 및 등록</h2>
+                  <h2 className="text-lg font-bold text-slate-900">3. 표준 자격·수료 항목 검색 및 등록</h2>
 
                 </div>
                 <p className="text-xs text-slate-500">본사 심사 승인 시 고객 대시보드 및 상세 견적 프로필에 공식 인증 마크 부여</p>
