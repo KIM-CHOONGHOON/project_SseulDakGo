@@ -1126,8 +1126,8 @@ export default function WebClntReq010100Modal({
       const currentDays = Array.isArray(prev.cleanDaysConfig)
         ? [...prev.cleanDaysConfig]
         : typeof prev.cleanDaysConfig === 'string' && prev.cleanDaysConfig.trim()
-        ? prev.cleanDaysConfig.split(',').map((s) => s.trim()).filter(Boolean)
-        : [];
+          ? prev.cleanDaysConfig.split(',').map((s) => s.trim()).filter(Boolean)
+          : [];
       const freq = Number(prev.weekCleanFreq) || 1;
       const exists = currentDays.includes(dayVal);
       if (exists) {
@@ -1157,8 +1157,8 @@ export default function WebClntReq010100Modal({
       const currentDays = Array.isArray(prev.cleanDaysConfig)
         ? [...prev.cleanDaysConfig]
         : typeof prev.cleanDaysConfig === 'string' && prev.cleanDaysConfig.trim()
-        ? prev.cleanDaysConfig.split(',').map((s) => s.trim()).filter(Boolean)
-        : [];
+          ? prev.cleanDaysConfig.split(',').map((s) => s.trim()).filter(Boolean)
+          : [];
       let nextDays = currentDays;
       if (nextDays.length > freq) {
         nextDays = nextDays.slice(0, freq);
@@ -1185,7 +1185,7 @@ export default function WebClntReq010100Modal({
       const remainingSlots = 10 - photoFiles.length;
       if (remainingSlots <= 0) {
         alert('현장 사진은 최대 10장까지 등록할 수 있습니다.');
-        try { inputEl.value = ''; } catch {}
+        try { inputEl.value = ''; } catch { }
         return;
       }
       const selectedFiles = Array.from(inputEl.files).slice(0, remainingSlots);
@@ -1218,7 +1218,7 @@ export default function WebClntReq010100Modal({
 
       try {
         inputEl.value = '';
-      } catch {}
+      } catch { }
     } catch (globalErr) {
       console.error('handlePhotoAdd unexpected error:', globalErr);
     }
@@ -1474,8 +1474,8 @@ export default function WebClntReq010100Modal({
         activeTab === 'REGULAR'
           ? formData.cleanMidCdList.join(',')
           : activeTab === 'MOVEIN'
-          ? 'MOVEIN_FULL'
-          : [
+            ? 'MOVEIN_FULL'
+            : [
               (details.WALL_MOUNTED || []).length > 0 ? `AC_WALL:${(details.WALL_MOUNTED || []).length}` : null,
               (details.STAND || []).length > 0 ? `AC_STAND:${(details.STAND || []).length}` : null,
               (details.CEILING_SYS || []).length > 0 ? `AC_CEIL:${(details.CEILING_SYS || []).length}` : null,
@@ -1606,1036 +1606,1025 @@ export default function WebClntReq010100Modal({
         {/* Scrollable Form Container */}
         <div className="flex-1 overflow-y-auto overscroll-contain scroll-smooth focus:outline-none">
           <form className="divide-y-0" id="order-request-form" onSubmit={handleSubmit}>
-          {/* 2. 3-Tab Segmented Control (CLEAN_LARGE_CD) */}
-          <div className="px-8 pt-6 pb-2">
-            <div className="p-1 bg-surface-container rounded-xl grid grid-cols-3 gap-1">
-              {/* TAB 1: 정기청소 */}
-              <button
-                className={`tab-category-btn flex items-center justify-center gap-1.5 py-2.5 rounded-lg font-label-md text-label-md transition-all cursor-pointer ${
-                  activeTab === 'REGULAR'
-                    ? 'bg-secondary text-white shadow-sm font-bold'
-                    : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high/60'
-                }`}
-                data-large-tab="REGULAR"
-                onClick={() => {
-                  setActiveTab('REGULAR');
-                  setInteractedTabs((prev) => new Set([...prev, 'REGULAR']));
-                }}
-                type="button"
-              >
-                <span className={`material-symbols-outlined text-[18px] ${activeTab === 'REGULAR' ? 'text-white' : 'text-secondary'}`}>
-                  update
-                </span>
-                <span>정기청소</span>
-                <span className={`px-1.5 py-0.2 rounded-full font-label-sm text-label-sm ${
-                  activeTab === 'REGULAR'
-                    ? 'bg-white/20 text-white font-bold'
-                    : 'bg-secondary-fixed text-on-secondary-fixed-variant'
-                }`}>
-                  최소 90일
-                </span>
-              </button>
-
-              {/* TAB 2: 입주청소 */}
-              <button
-                className={`tab-category-btn flex items-center justify-center gap-1.5 py-2.5 rounded-lg font-label-md text-label-md transition-all cursor-pointer ${
-                  activeTab === 'MOVEIN'
-                    ? 'bg-secondary text-white shadow-sm font-bold'
-                    : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high/60'
-                }`}
-                data-large-tab="MOVEIN"
-                onClick={() => {
-                  setActiveTab('MOVEIN');
-                  setInteractedTabs((prev) => new Set([...prev, 'MOVEIN']));
-                }}
-                type="button"
-              >
-                <span className={`material-symbols-outlined text-[18px] ${activeTab === 'MOVEIN' ? 'text-white' : 'text-on-surface-variant'}`}>
-                  home_work
-                </span>
-                <span>입주/이사 청소</span>
-              </button>
-
-              {/* TAB 3: 계절가전청소 */}
-              <button
-                className={`tab-category-btn flex items-center justify-center gap-1.5 py-2.5 rounded-lg font-label-md text-label-md transition-all cursor-pointer ${
-                  activeTab === 'APPLIANCE'
-                    ? 'bg-secondary text-white shadow-sm font-bold'
-                    : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high/60'
-                }`}
-                data-large-tab="APPLIANCE"
-                onClick={() => {
-                  setActiveTab('APPLIANCE');
-                  setInteractedTabs((prev) => new Set([...prev, 'APPLIANCE']));
-                }}
-                type="button"
-              >
-                <span className={`material-symbols-outlined text-[18px] ${activeTab === 'APPLIANCE' ? 'text-white' : 'text-on-surface-variant'}`}>
-                  mode_fan
-                </span>
-                <span>계절 가전 청소</span>
-              </button>
-            </div>
-          </div>
-
-          {/* 3. 공통 의뢰 정보 입력 섹션 (Form Section 1) */}
-          <section className="px-8 py-4 space-y-4">
-            <div className="flex items-center gap-2 pb-1">
-              <span className="w-5 h-5 rounded-full bg-primary text-on-primary font-label-sm text-label-sm flex items-center justify-center font-bold">
-                1
-              </span>
-              <h3 className="font-label-lg text-label-lg text-on-surface font-bold tracking-tight">
-                기본 시공 현장 정보
-              </h3>
-            </div>
-
-            {/* Row 3: 시설 유형 / 희망 착수일 */}
-            {/* Row 3: 희망 착수일 & 현장 주차 여건 */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="flex flex-col text-left">
-                <label className="font-label-sm text-label-sm text-on-surface mb-1.5 font-semibold">
-                  희망 첫 방문/착수일 <span className="text-error">*</span>
-                </label>
-                <input
-                  className="h-11 rounded-xl bg-surface-container-lowest px-4 font-body-md text-body-md text-on-surface shadow-sm border border-slate-200 focus:outline-none focus:ring-2 focus:ring-secondary/40"
-                  name="HOPE_VISIT_DT"
-                  onChange={(e) => handleFieldChange('hopeVisitDt', e.target.value)}
-                  type="date"
-                  value={formData.hopeVisitDt}
-                />
-              </div>
-
-              <div className="bg-surface-container-low p-2.5 px-3.5 rounded-xl flex flex-col justify-center gap-1.5 text-left border border-slate-200/60">
-                <div className="flex items-center justify-between">
-                  <span className="font-label-sm text-label-sm text-on-surface font-semibold">현장 주차 여건</span>
-                  <span className="font-caption text-[11px] text-secondary">장비차량 탑재</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <label className="flex items-center gap-1.5 cursor-pointer font-label-sm text-label-sm text-on-surface">
-                    <input
-                      checked={formData.parkingAvailCd === 'FREE'}
-                      className="accent-secondary"
-                      name="PARKING_AVAIL_CD"
-                      onChange={() => handleFieldChange('parkingAvailCd', 'FREE')}
-                      type="radio"
-                      value="FREE"
-                    />
-                    <span>무료 주차</span>
-                  </label>
-                  <label className="flex items-center gap-1.5 cursor-pointer font-body-sm text-body-sm text-on-surface-variant">
-                    <input
-                      checked={formData.parkingAvailCd === 'PAID'}
-                      className="accent-secondary"
-                      name="PARKING_AVAIL_CD"
-                      onChange={() => handleFieldChange('parkingAvailCd', 'PAID')}
-                      type="radio"
-                      value="PAID"
-                    />
-                    <span>유료 주차</span>
-                  </label>
-                  <label className="flex items-center gap-1.5 cursor-pointer font-body-sm text-body-sm text-on-surface-variant">
-                    <input
-                      checked={formData.parkingAvailCd === 'UNKNOWN'}
-                      className="accent-secondary"
-                      name="PARKING_AVAIL_CD"
-                      onChange={() => handleFieldChange('parkingAvailCd', 'UNKNOWN')}
-                      type="radio"
-                      value="UNKNOWN"
-                    />
-                    <span>확인 필요</span>
-                  </label>
-                </div>
-              </div>
-            </div>
-
-            {/* Row 4: 현장 주소 with 네이버 주소 검색 연동 (탭별 독립 주소 관리) */}
-            <div className="flex flex-col text-left space-y-2">
-              <div className="flex items-center justify-between">
-                <label className="font-label-sm text-label-sm text-on-surface font-semibold flex items-center gap-1.5">
-                  <span>[{TAB_NAME_MAP[activeTab]}] 시공 현장 주소 <span className="text-error">*</span></span>
-                  <span className="px-1.5 py-0.2 rounded text-[10px] font-bold bg-[#03C75A]/15 text-[#008f3e]">
-                    네이버 주소 연동
-                  </span>
-                </label>
-                <span className="font-caption text-caption text-secondary flex items-center gap-0.5">
-                  <span className="material-symbols-outlined text-[14px]">my_location</span>
-                  {tabAddresses[activeTab]?.sidoNm || '경기도'} {tabAddresses[activeTab]?.sigunguNm || '고양시 일산동구'}
-                </span>
-              </div>
-              <div className="flex gap-2">
+            {/* 2. 3-Tab Segmented Control (CLEAN_LARGE_CD) */}
+            <div className="px-8 pt-6 pb-2">
+              <div className="p-1 bg-surface-container rounded-xl grid grid-cols-3 gap-1">
+                {/* TAB 1: 정기청소 */}
                 <button
-                  className="h-11 px-4 rounded-xl bg-[#03C75A] hover:bg-[#02b350] text-white font-label-md text-label-md shrink-0 transition-colors shadow-sm flex items-center gap-1.5 font-bold cursor-pointer"
-                  onClick={() => setIsAddrModalOpen(true)}
+                  className={`tab-category-btn flex items-center justify-center gap-1.5 py-2.5 rounded-lg font-label-md text-label-md transition-all cursor-pointer ${activeTab === 'REGULAR'
+                      ? 'bg-secondary text-white shadow-sm font-bold'
+                      : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high/60'
+                    }`}
+                  data-large-tab="REGULAR"
+                  onClick={() => {
+                    setActiveTab('REGULAR');
+                    setInteractedTabs((prev) => new Set([...prev, 'REGULAR']));
+                  }}
                   type="button"
                 >
-                  <span className="material-symbols-outlined text-[18px]">search</span>
-                  네이버 주소 검색
+                  <span className={`material-symbols-outlined text-[18px] ${activeTab === 'REGULAR' ? 'text-white' : 'text-secondary'}`}>
+                    update
+                  </span>
+                  <span>정기청소</span>
+                  <span className={`px-1.5 py-0.2 rounded-full font-label-sm text-label-sm ${activeTab === 'REGULAR'
+                      ? 'bg-white/20 text-white font-bold'
+                      : 'bg-secondary-fixed text-on-secondary-fixed-variant'
+                    }`}>
+                    최소 90일
+                  </span>
                 </button>
-                <input
-                  className="h-11 flex-1 rounded-xl bg-surface-container-low px-4 font-body-md text-body-md text-on-surface shadow-sm border border-slate-200"
-                  name="ADDR_TEXT"
-                  readOnly
-                  type="text"
-                  value={tabAddresses[activeTab]?.addrText || ''}
-                />
+
+                {/* TAB 2: 입주청소 */}
+                <button
+                  className={`tab-category-btn flex items-center justify-center gap-1.5 py-2.5 rounded-lg font-label-md text-label-md transition-all cursor-pointer ${activeTab === 'MOVEIN'
+                      ? 'bg-secondary text-white shadow-sm font-bold'
+                      : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high/60'
+                    }`}
+                  data-large-tab="MOVEIN"
+                  onClick={() => {
+                    setActiveTab('MOVEIN');
+                    setInteractedTabs((prev) => new Set([...prev, 'MOVEIN']));
+                  }}
+                  type="button"
+                >
+                  <span className={`material-symbols-outlined text-[18px] ${activeTab === 'MOVEIN' ? 'text-white' : 'text-on-surface-variant'}`}>
+                    home_work
+                  </span>
+                  <span>입주/이사 청소</span>
+                </button>
+
+                {/* TAB 3: 계절가전청소 */}
+                <button
+                  className={`tab-category-btn flex items-center justify-center gap-1.5 py-2.5 rounded-lg font-label-md text-label-md transition-all cursor-pointer ${activeTab === 'APPLIANCE'
+                      ? 'bg-secondary text-white shadow-sm font-bold'
+                      : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high/60'
+                    }`}
+                  data-large-tab="APPLIANCE"
+                  onClick={() => {
+                    setActiveTab('APPLIANCE');
+                    setInteractedTabs((prev) => new Set([...prev, 'APPLIANCE']));
+                  }}
+                  type="button"
+                >
+                  <span className={`material-symbols-outlined text-[18px] ${activeTab === 'APPLIANCE' ? 'text-white' : 'text-on-surface-variant'}`}>
+                    mode_fan
+                  </span>
+                  <span>계절 가전 청소</span>
+                </button>
               </div>
-              <input
-                className="h-11 rounded-xl bg-surface-container-lowest px-4 font-body-md text-body-md text-on-surface shadow-sm border border-slate-200 focus:outline-none focus:ring-2 focus:ring-secondary/40"
-                name="ADDR_DETAIL"
-                onChange={(e) => {
-                  const val = e.target.value;
-                  setTabAddresses((prev) => ({
-                    ...prev,
-                    [activeTab]: {
-                      ...prev[activeTab],
-                      addrDetail: val,
-                    },
-                  }));
-                }}
-                placeholder="상세주소 및 동/호수 입력 (각 탭별 독립 입력 가능)"
-                type="text"
-                value={tabAddresses[activeTab]?.addrDetail || ''}
-              />
             </div>
 
-            {/* Row 5: 정기 청소 전용 - 건물 종류 (위) & 정기 순회 대상 구역 (아래) */}
-            {activeTab === 'REGULAR' && (
-              <div className="space-y-3 pt-1">
-                {/* 정기 청소 건물 종류 (BLDG_TYPE) */}
+            {/* 3. 공통 의뢰 정보 입력 섹션 (Form Section 1) */}
+            <section className="px-8 py-4 space-y-4">
+              <div className="flex items-center gap-2 pb-1">
+                <span className="w-5 h-5 rounded-full bg-primary text-on-primary font-label-sm text-label-sm flex items-center justify-center font-bold">
+                  1
+                </span>
+                <h3 className="font-label-lg text-label-lg text-on-surface font-bold tracking-tight">
+                  기본 시공 현장 정보
+                </h3>
+              </div>
+
+              {/* Row 3: 시설 유형 / 희망 착수일 */}
+              {/* Row 3: 희망 착수일 & 현장 주차 여건 */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="flex flex-col text-left">
-                  <div className="flex items-center justify-between mb-1.5">
-                    <label className="font-label-sm text-label-sm text-on-surface font-semibold flex items-center gap-1">
-                      <span>정기 청소 건물 종류</span>
-                      <span className="text-error">*</span>
-                    </label>
-                    <span className="text-[10px] text-secondary font-mono bg-secondary/10 px-1.5 py-0.5 rounded">
-                      BLDG_TYPE
-                    </span>
-                  </div>
-                  <div className="relative">
-                    <select
-                      className="h-11 w-full appearance-none rounded-xl bg-surface-container-lowest px-4 pr-10 font-body-md text-body-md text-on-surface shadow-sm border border-slate-200 focus:outline-none focus:ring-2 focus:ring-secondary/40 font-medium"
-                      name="FACILITY_TYPE_CD"
-                      onChange={(e) => handleFieldChange('facilityTypeCd', e.target.value)}
-                      required
-                      value={formData.facilityTypeCd}
-                    >
-                      {COM_CODE_BLDG_TYPE.map((bldg) => (
-                        <option key={bldg.COM_CD} value={bldg.COM_CD}>
-                          {bldg.COM_NM}
-                        </option>
-                      ))}
-                    </select>
-                    <span className="material-symbols-outlined text-[20px] text-outline absolute right-3 top-3 pointer-events-none">
-                      expand_more
-                    </span>
-                  </div>
+                  <label className="font-label-sm text-label-sm text-on-surface mb-1.5 font-semibold">
+                    희망 첫 방문/착수일 <span className="text-error">*</span>
+                  </label>
+                  <input
+                    className="h-11 rounded-xl bg-surface-container-lowest px-4 font-body-md text-body-md text-on-surface shadow-sm border border-slate-200 focus:outline-none focus:ring-2 focus:ring-secondary/40"
+                    name="HOPE_VISIT_DT"
+                    onChange={(e) => handleFieldChange('hopeVisitDt', e.target.value)}
+                    type="date"
+                    value={formData.hopeVisitDt}
+                  />
                 </div>
 
-                {/* 정기 순회 대상 구역 (복수 선택 가능) (공통코드 23개 전체, 1줄 3개, 스크롤 가능) */}
-                <div className="flex flex-col text-left">
-                  <div className="flex items-center justify-between mb-1.5">
-                    <label className="font-label-sm text-label-sm text-on-surface font-semibold flex items-center gap-1">
-                      <span>정기 순회 대상 구역</span>
-                      <span className="text-secondary font-medium">(복수 선택 가능)</span>
-                    </label>
-                    <span className="text-[10px] text-secondary font-mono bg-secondary/10 px-1.5 py-0.5 rounded">
-                      CLEAN_LOC (23종)
-                    </span>
+                <div className="bg-surface-container-low p-2.5 px-3.5 rounded-xl flex flex-col justify-center gap-1.5 text-left border border-slate-200/60">
+                  <div className="flex items-center justify-between">
+                    <span className="font-label-sm text-label-sm text-on-surface font-semibold">현장 주차 여건</span>
+                    <span className="font-caption text-[11px] text-secondary">장비차량 탑재</span>
                   </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 max-h-[190px] overflow-y-auto p-2 bg-surface-container-low/40 rounded-xl border border-slate-200/70 shadow-inner">
-                    {COM_CODE_CLEAN_LOC.map((loc) => {
-                      const isChecked = formData.cleanMidCdList.includes(loc.COM_CD);
-                      return (
-                        <label
-                          key={loc.COM_CD}
-                          className={`flex items-center gap-2 p-2.5 rounded-xl cursor-pointer transition-all text-left ${
-                            isChecked
-                              ? 'bg-secondary-container/40 text-on-secondary-container font-semibold ring-1 ring-secondary/40 shadow-xs'
-                              : 'bg-surface-container-lowest text-on-surface hover:bg-surface-container border border-slate-200/40'
-                          }`}
-                        >
-                          <input
-                            checked={isChecked}
-                            className="w-4 h-4 accent-secondary rounded shrink-0"
-                            onChange={() => handleCleanMidToggle(loc.COM_CD)}
-                            type="checkbox"
-                          />
-                          <span className="text-[12px] truncate leading-tight font-medium">{loc.COM_NM}</span>
-                        </label>
-                      );
-                    })}
-                  </div>
-
-                  {/* SORT_ORD 99 (기타 구역) 선택 시 스크롤 영역 하단에 명칭 직접 입력 항목 노출 */}
-                  {(formData.cleanMidCdList.includes('ETC_LOC') || formData.cleanMidCdList.includes('MID_ETC')) && (
-                    <div className="mt-2 text-left">
+                  <div className="flex items-center gap-3">
+                    <label className="flex items-center gap-1.5 cursor-pointer font-label-sm text-label-sm text-on-surface">
                       <input
-                        className="w-full h-11 px-4 rounded-xl bg-surface-container-lowest font-body-sm text-body-sm text-on-surface border border-secondary/50 focus:outline-none focus:ring-2 focus:ring-secondary/40 placeholder:text-outline/70 shadow-sm"
-                        onChange={(e) => setCustomMidCdText(e.target.value)}
-                        placeholder="기타 순회 대상 구역 명칭을 직접 입력해 주세요 (예: 옥상 테라스, 지하 창고 등)"
-                        type="text"
-                        value={customMidCdText}
+                        checked={formData.parkingAvailCd === 'FREE'}
+                        className="accent-secondary"
+                        name="PARKING_AVAIL_CD"
+                        onChange={() => handleFieldChange('parkingAvailCd', 'FREE')}
+                        type="radio"
+                        value="FREE"
                       />
-                    </div>
-                  )}
+                      <span>무료 주차</span>
+                    </label>
+                    <label className="flex items-center gap-1.5 cursor-pointer font-body-sm text-body-sm text-on-surface-variant">
+                      <input
+                        checked={formData.parkingAvailCd === 'PAID'}
+                        className="accent-secondary"
+                        name="PARKING_AVAIL_CD"
+                        onChange={() => handleFieldChange('parkingAvailCd', 'PAID')}
+                        type="radio"
+                        value="PAID"
+                      />
+                      <span>유료 주차</span>
+                    </label>
+                    <label className="flex items-center gap-1.5 cursor-pointer font-body-sm text-body-sm text-on-surface-variant">
+                      <input
+                        checked={formData.parkingAvailCd === 'UNKNOWN'}
+                        className="accent-secondary"
+                        name="PARKING_AVAIL_CD"
+                        onChange={() => handleFieldChange('parkingAvailCd', 'UNKNOWN')}
+                        type="radio"
+                        value="UNKNOWN"
+                      />
+                      <span>확인 필요</span>
+                    </label>
+                  </div>
                 </div>
               </div>
-            )}
-          </section>
 
-          {/* 4. TAB별 특화 동적 입력 섹션 (Form Section 2) */}
-          <section className="px-8 py-5 bg-surface-container-low/70 my-2 space-y-4" id="dynamic-detail-section">
-            {activeTab === 'REGULAR' && (
-              <>
-                <div className="flex items-center justify-between pb-1">
-                  <div className="flex items-center gap-2">
-                    <span className="w-5 h-5 rounded-full bg-secondary text-on-secondary font-label-sm text-label-sm flex items-center justify-center font-bold">
-                      2
+              {/* Row 4: 현장 주소 with 네이버 주소 검색 연동 (탭별 독립 주소 관리) */}
+              <div className="flex flex-col text-left space-y-2">
+                <div className="flex items-center justify-between">
+                  <label className="font-label-sm text-label-sm text-on-surface font-semibold flex items-center gap-1.5">
+                    <span>[{TAB_NAME_MAP[activeTab]}] 시공 현장 주소 <span className="text-error">*</span></span>
+                    <span className="px-1.5 py-0.2 rounded text-[10px] font-bold bg-[#03C75A]/15 text-[#008f3e]">
+                      네이버 주소 연동
                     </span>
-                    <h3 className="font-label-lg text-label-lg text-on-surface font-bold tracking-tight">
-                      서비스 세부 조건 설정 (정기청소 특화)
-                    </h3>
-                  </div>
-                  <span className="px-2 py-0.5 rounded-full bg-secondary-fixed text-on-secondary-fixed-variant font-caption text-caption font-semibold">
-                    90일 전담 마스터 고정 배정
+                  </label>
+                  <span className="font-caption text-caption text-secondary flex items-center gap-0.5">
+                    <span className="material-symbols-outlined text-[14px]">my_location</span>
+                    {tabAddresses[activeTab]?.sidoNm || '경기도'} {tabAddresses[activeTab]?.sigunguNm || '고양시 일산동구'}
                   </span>
                 </div>
+                <div className="flex gap-2">
+                  <button
+                    className="h-11 px-4 rounded-xl bg-[#03C75A] hover:bg-[#02b350] text-white font-label-md text-label-md shrink-0 transition-colors shadow-sm flex items-center gap-1.5 font-bold cursor-pointer"
+                    onClick={() => setIsAddrModalOpen(true)}
+                    type="button"
+                  >
+                    <span className="material-symbols-outlined text-[18px]">search</span>
+                    네이버 주소 검색
+                  </button>
+                  <input
+                    className="h-11 flex-1 rounded-xl bg-surface-container-low px-4 font-body-md text-body-md text-on-surface shadow-sm border border-slate-200"
+                    name="ADDR_TEXT"
+                    readOnly
+                    type="text"
+                    value={tabAddresses[activeTab]?.addrText || ''}
+                  />
+                </div>
+                <input
+                  className="h-11 rounded-xl bg-surface-container-lowest px-4 font-body-md text-body-md text-on-surface shadow-sm border border-slate-200 focus:outline-none focus:ring-2 focus:ring-secondary/40"
+                  name="ADDR_DETAIL"
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    setTabAddresses((prev) => ({
+                      ...prev,
+                      [activeTab]: {
+                        ...prev[activeTab],
+                        addrDetail: val,
+                      },
+                    }));
+                  }}
+                  placeholder="상세주소 및 동/호수 입력 (각 탭별 독립 입력 가능)"
+                  type="text"
+                  value={tabAddresses[activeTab]?.addrDetail || ''}
+                />
+              </div>
 
-                {/* 기간 설정 및 보장제 공지 (년월/주차 선택 및 3개월 만기 자동 계산) */}
-                <div className="bg-surface-container-lowest p-4 rounded-xl shadow-sm space-y-3">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {/* 1. 용역 개시년월 및 주차 선택 */}
-                    <div className="flex flex-col text-left space-y-1.5">
-                      <label className="font-label-sm text-label-sm text-on-surface font-semibold flex items-center justify-between">
-                        <span>용역 개시년월 / 주차 <span className="text-error">*</span></span>
-                        <span className="font-caption text-caption text-secondary font-medium">개시 기준 시점</span>
+              {/* Row 5: 정기 청소 전용 - 건물 종류 (위) & 정기 순회 대상 구역 (아래) */}
+              {activeTab === 'REGULAR' && (
+                <div className="space-y-3 pt-1">
+                  {/* 정기 청소 건물 종류 (BLDG_TYPE) */}
+                  <div className="flex flex-col text-left">
+                    <div className="flex items-center justify-between mb-1.5">
+                      <label className="font-label-sm text-label-sm text-on-surface font-semibold flex items-center gap-1">
+                        <span>정기 청소 건물 종류</span>
+                        <span className="text-error">*</span>
                       </label>
-                      <div className="grid grid-cols-5 gap-2">
-                        <div className="col-span-3">
-                          <select
-                            className="w-full h-11 px-3 rounded-xl bg-surface-container-low font-body-sm text-body-sm text-on-surface border border-slate-200 focus:outline-none focus:ring-2 focus:ring-secondary/40 cursor-pointer"
-                            onChange={(e) => handleStartYmChange(e.target.value)}
-                            value={startYearMonth}
+                      <span className="text-[10px] text-secondary font-mono bg-secondary/10 px-1.5 py-0.5 rounded">
+                        BLDG_TYPE
+                      </span>
+                    </div>
+                    <div className="relative">
+                      <select
+                        className="h-11 w-full appearance-none rounded-xl bg-surface-container-lowest px-4 pr-10 font-body-md text-body-md text-on-surface shadow-sm border border-slate-200 focus:outline-none focus:ring-2 focus:ring-secondary/40 font-medium"
+                        name="FACILITY_TYPE_CD"
+                        onChange={(e) => handleFieldChange('facilityTypeCd', e.target.value)}
+                        required
+                        value={formData.facilityTypeCd}
+                      >
+                        {COM_CODE_BLDG_TYPE.map((bldg) => (
+                          <option key={bldg.COM_CD} value={bldg.COM_CD}>
+                            {bldg.COM_NM}
+                          </option>
+                        ))}
+                      </select>
+                      <span className="material-symbols-outlined text-[20px] text-outline absolute right-3 top-3 pointer-events-none">
+                        expand_more
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* 정기 순회 대상 구역 (복수 선택 가능) (공통코드 23개 전체, 1줄 3개, 스크롤 가능) */}
+                  <div className="flex flex-col text-left">
+                    <div className="flex items-center justify-between mb-1.5">
+                      <label className="font-label-sm text-label-sm text-on-surface font-semibold flex items-center gap-1">
+                        <span>정기 순회 대상 구역</span>
+                        <span className="text-secondary font-medium">(복수 선택 가능)</span>
+                      </label>
+                      <span className="text-[10px] text-secondary font-mono bg-secondary/10 px-1.5 py-0.5 rounded">
+                        CLEAN_LOC (23종)
+                      </span>
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 max-h-[190px] overflow-y-auto p-2 bg-surface-container-low/40 rounded-xl border border-slate-200/70 shadow-inner">
+                      {COM_CODE_CLEAN_LOC.map((loc) => {
+                        const isChecked = formData.cleanMidCdList.includes(loc.COM_CD);
+                        return (
+                          <label
+                            key={loc.COM_CD}
+                            className={`flex items-center gap-2 p-2.5 rounded-xl cursor-pointer transition-all text-left ${isChecked
+                                ? 'bg-secondary-container/40 text-on-secondary-container font-semibold ring-1 ring-secondary/40 shadow-xs'
+                                : 'bg-surface-container-lowest text-on-surface hover:bg-surface-container border border-slate-200/40'
+                              }`}
                           >
-                            {AVAILABLE_START_MONTHS.map((m) => (
-                              <option key={m.value} value={m.value}>
-                                {m.label}
-                              </option>
-                            ))}
-                          </select>
-                        </div>
-                        <div className="col-span-2">
-                          <select
-                            className="w-full h-11 px-3 rounded-xl bg-surface-container-low font-body-sm text-body-sm text-on-surface border border-slate-200 focus:outline-none focus:ring-2 focus:ring-secondary/40 cursor-pointer"
-                            onChange={(e) => setStartWeek(Number(e.target.value))}
-                            value={startWeek}
-                          >
-                            {(() => {
-                              const [yStr, mStr] = (startYearMonth || '2026-11').split('-');
-                              const weeks = getWeeksInMonth(parseInt(yStr, 10), parseInt(mStr, 10));
-                              return weeks.map((w) => (
-                                <option key={w.week} value={w.week}>
-                                  {w.shortLabel}
+                            <input
+                              checked={isChecked}
+                              className="w-4 h-4 accent-secondary rounded shrink-0"
+                              onChange={() => handleCleanMidToggle(loc.COM_CD)}
+                              type="checkbox"
+                            />
+                            <span className="text-[12px] truncate leading-tight font-medium">{loc.COM_NM}</span>
+                          </label>
+                        );
+                      })}
+                    </div>
+
+                    {/* SORT_ORD 99 (기타 구역) 선택 시 스크롤 영역 하단에 명칭 직접 입력 항목 노출 */}
+                    {(formData.cleanMidCdList.includes('ETC_LOC') || formData.cleanMidCdList.includes('MID_ETC')) && (
+                      <div className="mt-2 text-left">
+                        <input
+                          className="w-full h-11 px-4 rounded-xl bg-surface-container-lowest font-body-sm text-body-sm text-on-surface border border-secondary/50 focus:outline-none focus:ring-2 focus:ring-secondary/40 placeholder:text-outline/70 shadow-sm"
+                          onChange={(e) => setCustomMidCdText(e.target.value)}
+                          placeholder="기타 순회 대상 구역 명칭을 직접 입력해 주세요 (예: 옥상 테라스, 지하 창고 등)"
+                          type="text"
+                          value={customMidCdText}
+                        />
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+            </section>
+
+            {/* 4. TAB별 특화 동적 입력 섹션 (Form Section 2) */}
+            <section className="px-8 py-5 bg-surface-container-low/70 my-2 space-y-4" id="dynamic-detail-section">
+              {activeTab === 'REGULAR' && (
+                <>
+                  <div className="flex items-center justify-between pb-1">
+                    <div className="flex items-center gap-2">
+                      <span className="w-5 h-5 rounded-full bg-secondary text-on-secondary font-label-sm text-label-sm flex items-center justify-center font-bold">
+                        2
+                      </span>
+                      <h3 className="font-label-lg text-label-lg text-on-surface font-bold tracking-tight">
+                        서비스 세부 조건 설정 (정기청소 특화)
+                      </h3>
+                    </div>
+                    <span className="px-2 py-0.5 rounded-full bg-secondary-fixed text-on-secondary-fixed-variant font-caption text-caption font-semibold">
+                      90일 전담 마스터 고정 배정
+                    </span>
+                  </div>
+
+                  {/* 기간 설정 및 보장제 공지 (년월/주차 선택 및 3개월 만기 자동 계산) */}
+                  <div className="bg-surface-container-lowest p-4 rounded-xl shadow-sm space-y-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      {/* 1. 용역 개시년월 및 주차 선택 */}
+                      <div className="flex flex-col text-left space-y-1.5">
+                        <label className="font-label-sm text-label-sm text-on-surface font-semibold flex items-center justify-between">
+                          <span>용역 개시년월 / 주차 <span className="text-error">*</span></span>
+                          <span className="font-caption text-caption text-secondary font-medium">개시 기준 시점</span>
+                        </label>
+                        <div className="grid grid-cols-5 gap-2">
+                          <div className="col-span-3">
+                            <select
+                              className="w-full h-11 px-3 rounded-xl bg-surface-container-low font-body-sm text-body-sm text-on-surface border border-slate-200 focus:outline-none focus:ring-2 focus:ring-secondary/40 cursor-pointer"
+                              onChange={(e) => handleStartYmChange(e.target.value)}
+                              value={startYearMonth}
+                            >
+                              {AVAILABLE_START_MONTHS.map((m) => (
+                                <option key={m.value} value={m.value}>
+                                  {m.label}
                                 </option>
-                              ));
-                            })()}
-                          </select>
+                              ))}
+                            </select>
+                          </div>
+                          <div className="col-span-2">
+                            <select
+                              className="w-full h-11 px-3 rounded-xl bg-surface-container-low font-body-sm text-body-sm text-on-surface border border-slate-200 focus:outline-none focus:ring-2 focus:ring-secondary/40 cursor-pointer"
+                              onChange={(e) => setStartWeek(Number(e.target.value))}
+                              value={startWeek}
+                            >
+                              {(() => {
+                                const [yStr, mStr] = (startYearMonth || '2026-11').split('-');
+                                const weeks = getWeeksInMonth(parseInt(yStr, 10), parseInt(mStr, 10));
+                                return weeks.map((w) => (
+                                  <option key={w.week} value={w.week}>
+                                    {w.shortLabel}
+                                  </option>
+                                ));
+                              })()}
+                            </select>
+                          </div>
+                        </div>
+                        <div className="font-caption text-[11px] text-outline text-left">
+                          {(() => {
+                            const [yStr, mStr] = (startYearMonth || '2026-11').split('-');
+                            const weeks = getWeeksInMonth(parseInt(yStr, 10), parseInt(mStr, 10));
+                            const curWeek = weeks.find((w) => w.week === startWeek) || weeks[0];
+                            return curWeek ? `${mStr}월 ${curWeek.startDay}일 ~ ${mStr}월 ${curWeek.endDay}일 시작` : '';
+                          })()}
                         </div>
                       </div>
-                      <div className="font-caption text-[11px] text-outline text-left">
+
+                      {/* 2. 용역 만료년월 및 주차 (3개월 자동 계산, Read-only) */}
+                      <div className="flex flex-col text-left space-y-1.5">
+                        <div className="flex items-center justify-between">
+                          <label className="font-label-sm text-label-sm text-on-surface font-semibold">
+                            용역 만료일 (90일 만기)
+                          </label>
+                          <span className="px-2 py-0.5 rounded-full bg-primary-fixed text-on-primary-fixed font-caption text-[11px] font-bold">
+                            3개월 자동 계산
+                          </span>
+                        </div>
                         {(() => {
                           const [yStr, mStr] = (startYearMonth || '2026-11').split('-');
-                          const weeks = getWeeksInMonth(parseInt(yStr, 10), parseInt(mStr, 10));
-                          const curWeek = weeks.find((w) => w.week === startWeek) || weeks[0];
-                          return curWeek ? `${mStr}월 ${curWeek.startDay}일 ~ ${mStr}월 ${curWeek.endDay}일 시작` : '';
+                          const { endYear, endMonth, endWeek, endWeekInfo } = calcThreeMonthsLater(
+                            parseInt(yStr, 10),
+                            parseInt(mStr, 10),
+                            startWeek
+                          );
+                          return (
+                            <>
+                              <div className="h-11 rounded-xl bg-surface-container-low/70 px-4 flex items-center justify-between font-body-sm text-body-sm text-primary font-bold border border-slate-200 select-none">
+                                <span>{endYear}년 {String(endMonth).padStart(2, '0')}월 {endWeek}주차</span>
+                                <span className="font-caption text-caption text-outline font-normal">
+                                  (90일 만기 종료)
+                                </span>
+                              </div>
+                              <div className="font-caption text-[11px] text-outline text-left">
+                                {endMonth}월 {endWeekInfo.startDay}일 ~ {endMonth}월 {endWeekInfo.endDay}일 만기
+                              </div>
+                            </>
+                          );
                         })()}
                       </div>
                     </div>
 
-                    {/* 2. 용역 만료년월 및 주차 (3개월 자동 계산, Read-only) */}
-                    <div className="flex flex-col text-left space-y-1.5">
-                      <div className="flex items-center justify-between">
+                    <div className="flex items-start gap-2 p-3 bg-secondary-container/20 rounded-lg text-left">
+                      <span className="material-symbols-outlined text-[18px] text-secondary shrink-0 mt-0.5">
+                        verified_user
+                      </span>
+                      <p className="font-caption text-caption text-on-secondary-container">
+                        <strong className="font-semibold">최소 3개월(90일) 락 보장제:</strong> 정기 청소는 시공 파트너의 스케줄 고정과 지속적인 위생 퀄리티를 유지하기 위해 분기(90일) 단위로 의뢰되며, 개시 시점 기준 3개월 후가 자동 산출됩니다.
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* 방문 주기 및 요일 선택 */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="bg-surface-container-lowest p-3.5 rounded-xl shadow-sm text-left flex flex-col justify-between">
+                      <label className="font-label-sm text-label-sm text-on-surface mb-2 font-semibold">
+                        주간 방문 빈도
+                      </label>
+                      <div className="grid grid-cols-4 gap-1">
+                        {[1, 2, 3, 5].map((f) => (
+                          <button
+                            key={f}
+                            className={`py-2 rounded-lg font-label-sm text-label-sm transition-all ${formData.weekCleanFreq === f
+                                ? 'bg-primary text-on-primary font-bold shadow-sm'
+                                : 'bg-surface-container-low text-on-surface hover:bg-surface-container'
+                              }`}
+                            onClick={() => handleFreqChange(f)}
+                            type="button"
+                          >
+                            주 {f}회
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="bg-surface-container-lowest p-3.5 rounded-xl shadow-sm text-left flex flex-col justify-between">
+                      <div className="flex items-center justify-between mb-2">
                         <label className="font-label-sm text-label-sm text-on-surface font-semibold">
-                          용역 만료일 (90일 만기)
+                          방문 희망 요일
                         </label>
-                        <span className="px-2 py-0.5 rounded-full bg-primary-fixed text-on-primary-fixed font-caption text-[11px] font-bold">
-                          3개월 자동 계산
+                        <span className="font-caption text-caption text-secondary font-medium">
+                          {(Array.isArray(formData.cleanDaysConfig) ? formData.cleanDaysConfig.length : 0)} / {formData.weekCleanFreq}개 선택
                         </span>
                       </div>
-                      {(() => {
-                        const [yStr, mStr] = (startYearMonth || '2026-11').split('-');
-                        const { endYear, endMonth, endWeek, endWeekInfo } = calcThreeMonthsLater(
-                          parseInt(yStr, 10),
-                          parseInt(mStr, 10),
-                          startWeek
-                        );
-                        return (
-                          <>
-                            <div className="h-11 rounded-xl bg-surface-container-low/70 px-4 flex items-center justify-between font-body-sm text-body-sm text-primary font-bold border border-slate-200 select-none">
-                              <span>{endYear}년 {String(endMonth).padStart(2, '0')}월 {endWeek}주차</span>
-                              <span className="font-caption text-caption text-outline font-normal">
-                                (90일 만기 종료)
-                              </span>
-                            </div>
-                            <div className="font-caption text-[11px] text-outline text-left">
-                              {endMonth}월 {endWeekInfo.startDay}일 ~ {endMonth}월 {endWeekInfo.endDay}일 만기
-                            </div>
-                          </>
-                        );
-                      })()}
+                      <div className="grid grid-cols-7 gap-1">
+                        {[
+                          { code: 'MON', label: '월' },
+                          { code: 'TUE', label: '화' },
+                          { code: 'WED', label: '수' },
+                          { code: 'THU', label: '목' },
+                          { code: 'FRI', label: '금' },
+                          { code: 'SAT', label: '토' },
+                          { code: 'SUN', label: '일' },
+                        ].map((day) => {
+                          const safeDays = Array.isArray(formData.cleanDaysConfig)
+                            ? formData.cleanDaysConfig
+                            : [];
+                          const isDayChecked = safeDays.includes(day.code);
+                          return (
+                            <button
+                              key={day.code}
+                              type="button"
+                              onClick={() => handleCleanDayToggle(day.code)}
+                              className={`flex flex-col items-center justify-center py-2 rounded-lg font-label-sm text-label-sm cursor-pointer transition-all ${isDayChecked
+                                  ? 'bg-secondary text-on-secondary font-bold shadow-sm ring-1 ring-secondary'
+                                  : 'bg-surface-container-low text-on-surface-variant hover:bg-surface-container'
+                                }`}
+                            >
+                              <span>{day.label}</span>
+                            </button>
+                          );
+                        })}
+                      </div>
                     </div>
                   </div>
 
-                  <div className="flex items-start gap-2 p-3 bg-secondary-container/20 rounded-lg text-left">
-                    <span className="material-symbols-outlined text-[18px] text-secondary shrink-0 mt-0.5">
-                      verified_user
+                  {/* 공급면적 평수 */}
+                  <div className="flex items-center justify-between p-3 bg-surface-container-lowest rounded-xl shadow-sm text-left">
+                    <span className="font-label-sm text-label-sm text-on-surface font-semibold">
+                      건물 실평수 / 관리 면적 (선택)
                     </span>
-                    <p className="font-caption text-caption text-on-secondary-container">
-                      <strong className="font-semibold">최소 3개월(90일) 락 보장제:</strong> 정기 청소는 시공 파트너의 스케줄 고정과 지속적인 위생 퀄리티를 유지하기 위해 분기(90일) 단위로 의뢰되며, 개시 시점 기준 3개월 후가 자동 산출됩니다.
-                    </p>
-                  </div>
-                </div>
-
-                {/* 방문 주기 및 요일 선택 */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="bg-surface-container-lowest p-3.5 rounded-xl shadow-sm text-left flex flex-col justify-between">
-                    <label className="font-label-sm text-label-sm text-on-surface mb-2 font-semibold">
-                      주간 방문 빈도
-                    </label>
-                    <div className="grid grid-cols-4 gap-1">
-                      {[1, 2, 3, 5].map((f) => (
-                        <button
-                          key={f}
-                          className={`py-2 rounded-lg font-label-sm text-label-sm transition-all ${
-                            formData.weekCleanFreq === f
-                              ? 'bg-primary text-on-primary font-bold shadow-sm'
-                              : 'bg-surface-container-low text-on-surface hover:bg-surface-container'
-                          }`}
-                          onClick={() => handleFreqChange(f)}
-                          type="button"
-                        >
-                          주 {f}회
-                        </button>
-                      ))}
+                    <div className="flex items-center gap-2">
+                      <input
+                        className="w-20 h-9 rounded-lg bg-surface-container-low px-2 text-right font-label-md text-label-md font-mono text-on-surface"
+                        onChange={(e) => handleFieldChange('supplyPyeong', e.target.value)}
+                        type="number"
+                        value={formData.supplyPyeong}
+                      />
+                      <span className="font-body-sm text-body-sm text-on-surface-variant">평</span>
                     </div>
                   </div>
+                </>
+              )}
 
-                  <div className="bg-surface-container-lowest p-3.5 rounded-xl shadow-sm text-left flex flex-col justify-between">
-                    <div className="flex items-center justify-between mb-2">
-                      <label className="font-label-sm text-label-sm text-on-surface font-semibold">
-                        방문 희망 요일
+              {/* [TAB 2] 입주/이사 청소 특화 설정 */}
+              {activeTab === 'MOVEIN' && (
+                <>
+                  <div className="flex items-center justify-between pb-1 text-left">
+                    <div className="flex items-center gap-2">
+                      <span className="w-5 h-5 rounded-full bg-secondary text-on-secondary font-label-sm text-label-sm flex items-center justify-center font-bold">
+                        2
+                      </span>
+                      <h3 className="font-label-lg text-label-lg text-on-surface font-bold tracking-tight">
+                        입주/이사 청소 세부 조건 설정
+                      </h3>
+                    </div>
+                    <span className="px-2 py-0.5 rounded-full bg-secondary-fixed text-on-secondary-fixed-variant font-caption text-caption font-semibold">
+                      1회성 집중 풀케어
+                    </span>
+                  </div>
+
+                  <div className="bg-surface-container-lowest p-5 rounded-2xl shadow-sm space-y-4 text-left border border-slate-100">
+                    {/* 주거 형태 & 공급 평수 */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <label className="font-label-sm text-label-sm text-on-surface mb-1.5 font-semibold block">
+                          주거 건물 형태 <span className="text-error">*</span>
+                        </label>
+                        <select
+                          className="h-11 w-full rounded-xl bg-surface-container-low px-4 font-body-md text-body-md border border-slate-200 focus:outline-none focus:ring-2 focus:ring-secondary/40 font-medium"
+                          onChange={(e) => handleFieldChange('moveinBuildingType', e.target.value)}
+                          value={formData.moveinBuildingType || 'APT'}
+                        >
+                          <option value="APT">아파트 (공동주택)</option>
+                          <option value="OFFICETEL">오피스텔 / 도시형 생활주택</option>
+                          <option value="VILLA">빌라 / 다세대·연립</option>
+                          <option value="HOUSE">단독주택 / 전원주택</option>
+                          <option value="STUDIO">원룸 / 투룸</option>
+                        </select>
+                      </div>
+
+                      <div>
+                        <label className="font-label-sm text-label-sm text-on-surface mb-1.5 font-semibold block">
+                          공급 평수 (분양 평수 기준) <span className="text-error">*</span>
+                        </label>
+                        <div className="flex items-center gap-2">
+                          <input
+                            className="h-11 w-full rounded-xl bg-surface-container-low px-4 font-body-md text-body-md font-mono border border-slate-200 focus:outline-none focus:ring-2 focus:ring-secondary/40 text-right font-bold"
+                            onChange={(e) => handleFieldChange('moveinPyeong', e.target.value)}
+                            placeholder="34"
+                            type="number"
+                            value={formData.moveinPyeong}
+                          />
+                          <span className="font-body-md text-body-md text-on-surface-variant shrink-0">평</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* 방 개수, 욕실 개수, 베란다 확장 여부 */}
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
+                      <div>
+                        <label className="font-label-sm text-label-sm text-on-surface mb-1 font-semibold block">
+                          방 개수
+                        </label>
+                        <select
+                          className="h-10 w-full rounded-xl bg-surface-container-low px-3 font-body-sm text-body-sm border border-slate-200"
+                          onChange={(e) => handleFieldChange('moveinRoomCount', Number(e.target.value))}
+                          value={formData.moveinRoomCount || 3}
+                        >
+                          <option value={1}>원룸 (1개)</option>
+                          <option value={2}>투룸 (2개)</option>
+                          <option value={3}>쓰리룸 (3개)</option>
+                          <option value={4}>4룸</option>
+                          <option value={5}>5룸 이상</option>
+                        </select>
+                      </div>
+
+                      <div>
+                        <label className="font-label-sm text-label-sm text-on-surface mb-1 font-semibold block">
+                          욕실/화장실 개수
+                        </label>
+                        <select
+                          className="h-10 w-full rounded-xl bg-surface-container-low px-3 font-body-sm text-body-sm border border-slate-200"
+                          onChange={(e) => handleFieldChange('moveinBathCount', Number(e.target.value))}
+                          value={formData.moveinBathCount || 2}
+                        >
+                          <option value={1}>1개</option>
+                          <option value={2}>2개</option>
+                          <option value={3}>3개 이상</option>
+                        </select>
+                      </div>
+
+                      <div>
+                        <label className="font-label-sm text-label-sm text-on-surface mb-1 font-semibold block">
+                          발코니/베란다 확장
+                        </label>
+                        <select
+                          className="h-10 w-full rounded-xl bg-surface-container-low px-3 font-body-sm text-body-sm border border-slate-200"
+                          onChange={(e) => handleFieldChange('moveinBalconyExt', e.target.value)}
+                          value={formData.moveinBalconyExt || 'Y'}
+                        >
+                          <option value="Y">확장형</option>
+                          <option value="N">비확장형 (베란다 다수)</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    {/* 희망 작업 시간대 */}
+                    <div className="pt-1">
+                      <label className="font-label-sm text-label-sm text-on-surface mb-1.5 font-semibold block">
+                        희망 작업 시간대
                       </label>
-                      <span className="font-caption text-caption text-secondary font-medium">
-                        {(Array.isArray(formData.cleanDaysConfig) ? formData.cleanDaysConfig.length : 0)} / {formData.weekCleanFreq}개 선택
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                        {/* 시작시간 입력 */}
+                        <div
+                          className={`p-2.5 rounded-xl flex items-center justify-between gap-1.5 transition-all ${!formData.workTimeNegotiable
+                              ? 'bg-surface-container-lowest border border-slate-300 shadow-sm'
+                              : 'bg-surface-container-low/60 border border-slate-200 opacity-50'
+                            }`}
+                        >
+                          <span className="text-xs font-bold text-slate-700 shrink-0 pl-1">시작시간</span>
+                          <div className="flex items-center gap-1.5 justify-end">
+                            <select
+                              disabled={formData.workTimeNegotiable}
+                              value={formData.workStartTimeType || '오전'}
+                              onChange={(e) => handleFieldChange('workStartTimeType', e.target.value)}
+                              className="h-8 px-2 rounded-lg bg-surface-container-low text-xs font-semibold text-on-surface border border-slate-200 focus:outline-none focus:ring-1 focus:ring-primary cursor-pointer disabled:cursor-not-allowed"
+                            >
+                              <option value="오전">오전</option>
+                              <option value="오후">오후</option>
+                            </select>
+                            <input
+                              type="text"
+                              disabled={formData.workTimeNegotiable}
+                              placeholder="08:00"
+                              value={formData.workStartTime || '08:00'}
+                              onChange={(e) => handleFieldChange('workStartTime', e.target.value)}
+                              className="h-8 w-16 px-1 text-center rounded-lg bg-surface-container-low text-xs font-bold text-primary font-mono border border-slate-200 focus:outline-none focus:ring-1 focus:ring-primary disabled:cursor-not-allowed"
+                            />
+                          </div>
+                        </div>
+
+                        {/* 종료시간 입력 */}
+                        <div
+                          className={`p-2.5 rounded-xl flex items-center justify-between gap-1.5 transition-all ${!formData.workTimeNegotiable
+                              ? 'bg-surface-container-lowest border border-slate-300 shadow-sm'
+                              : 'bg-surface-container-low/60 border border-slate-200 opacity-50'
+                            }`}
+                        >
+                          <span className="text-xs font-bold text-slate-700 shrink-0 pl-1">종료시간</span>
+                          <div className="flex items-center gap-1.5 justify-end">
+                            <select
+                              disabled={formData.workTimeNegotiable}
+                              value={formData.workEndTimeType || '오후'}
+                              onChange={(e) => handleFieldChange('workEndTimeType', e.target.value)}
+                              className="h-8 px-2 rounded-lg bg-surface-container-low text-xs font-semibold text-on-surface border border-slate-200 focus:outline-none focus:ring-1 focus:ring-primary cursor-pointer disabled:cursor-not-allowed"
+                            >
+                              <option value="오전">오전</option>
+                              <option value="오후">오후</option>
+                            </select>
+                            <input
+                              type="text"
+                              disabled={formData.workTimeNegotiable}
+                              placeholder="05:00"
+                              value={formData.workEndTime || '05:00'}
+                              onChange={(e) => handleFieldChange('workEndTime', e.target.value)}
+                              className="h-8 w-16 px-1 text-center rounded-lg bg-surface-container-low text-xs font-bold text-primary font-mono border border-slate-200 focus:outline-none focus:ring-1 focus:ring-primary disabled:cursor-not-allowed"
+                            />
+                          </div>
+                        </div>
+
+                        {/* 시공사와 협의 가능 버튼 */}
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const nextNeg = !formData.workTimeNegotiable;
+                            setFormData((prev) => ({
+                              ...prev,
+                              workTimeNegotiable: nextNeg,
+                              moveinTimeSlot: nextNeg
+                                ? 'FLEXIBLE'
+                                : `${prev.workStartTimeType || '오전'} ${prev.workStartTime || '08:00'} ~ ${prev.workEndTimeType || '오후'} ${prev.workEndTime || '05:00'}`,
+                            }));
+                          }}
+                          className={`h-11 sm:h-auto rounded-xl font-label-sm text-label-sm font-semibold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${formData.workTimeNegotiable
+                              ? 'bg-primary text-on-primary font-bold shadow-sm'
+                              : 'bg-surface-container-low text-on-surface-variant hover:bg-surface-container border border-slate-200'
+                            }`}
+                        >
+                          <span className="material-symbols-outlined text-[18px]">
+                            {formData.workTimeNegotiable ? 'check_circle' : 'handshake'}
+                          </span>
+                          <span>시공사와 협의 가능</span>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </>
+              )}
+
+              {/* [TAB 3] 계절가전청소 특화 설정 (세로 9개 품목 4개 Row 높이 스크롤 박스 및 +클릭시 기기별 스펙 Row 추가) */}
+              {activeTab === 'APPLIANCE' && (
+                <>
+                  <div className="flex items-center justify-between pb-1 text-left">
+                    <div className="flex items-center gap-2">
+                      <span className="w-5 h-5 rounded-full bg-secondary text-on-secondary font-label-sm text-label-sm flex items-center justify-center font-bold">
+                        2
+                      </span>
+                      <h3 className="font-label-lg text-label-lg text-on-surface font-bold tracking-tight">
+                        계절가전청소 세부 조건 설정
+                      </h3>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <span className="px-2 py-0.5 rounded-full bg-secondary text-white font-caption text-caption font-bold">
+                        총 {APPLIANCE_CATALOG.reduce((acc, cur) => acc + ((formData.applianceDetails?.[cur.id] || []).length), 0)}대 선택됨
+                      </span>
+                      <span className="px-2 py-0.5 rounded-full bg-secondary-fixed text-on-secondary-fixed-variant font-caption text-caption font-semibold">
+                        완전분해 · 고압살균
                       </span>
                     </div>
-                    <div className="grid grid-cols-7 gap-1">
-                      {[
-                        { code: 'MON', label: '월' },
-                        { code: 'TUE', label: '화' },
-                        { code: 'WED', label: '수' },
-                        { code: 'THU', label: '목' },
-                        { code: 'FRI', label: '금' },
-                        { code: 'SAT', label: '토' },
-                        { code: 'SUN', label: '일' },
-                      ].map((day) => {
-                        const safeDays = Array.isArray(formData.cleanDaysConfig)
-                          ? formData.cleanDaysConfig
-                          : [];
-                        const isDayChecked = safeDays.includes(day.code);
-                        return (
-                          <button
-                            key={day.code}
-                            type="button"
-                            onClick={() => handleCleanDayToggle(day.code)}
-                            className={`flex flex-col items-center justify-center py-2 rounded-lg font-label-sm text-label-sm cursor-pointer transition-all ${
-                              isDayChecked
-                                ? 'bg-secondary text-on-secondary font-bold shadow-sm ring-1 ring-secondary'
-                                : 'bg-surface-container-low text-on-surface-variant hover:bg-surface-container'
+                  </div>
+
+                  {/* 4개 Row 기본 노출 + 위/아래 스크롤 관리 박스 (총 9개 품목) */}
+                  <div className="max-h-[390px] sm:max-h-[430px] overflow-y-auto overscroll-contain pr-1.5 space-y-2.5 p-2 bg-slate-50/80 rounded-2xl border border-slate-200/90 shadow-inner">
+                    {APPLIANCE_CATALOG.map((item) => {
+                      const instList = formData.applianceDetails?.[item.id] || [];
+                      const count = instList.length;
+
+                      return (
+                        <div
+                          key={item.id}
+                          className={`bg-surface-container-lowest p-3.5 rounded-xl border transition-all text-left ${count > 0 ? 'border-secondary/40 shadow-sm ring-1 ring-secondary/20' : 'border-slate-200/80 shadow-xs'
                             }`}
-                          >
-                            <span>{day.label}</span>
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </div>
-                </div>
-
-                {/* 공급면적 평수 */}
-                <div className="flex items-center justify-between p-3 bg-surface-container-lowest rounded-xl shadow-sm text-left">
-                  <span className="font-label-sm text-label-sm text-on-surface font-semibold">
-                    건물 실평수 / 관리 면적 (선택)
-                  </span>
-                  <div className="flex items-center gap-2">
-                    <input
-                      className="w-20 h-9 rounded-lg bg-surface-container-low px-2 text-right font-label-md text-label-md font-mono text-on-surface"
-                      onChange={(e) => handleFieldChange('supplyPyeong', e.target.value)}
-                      type="number"
-                      value={formData.supplyPyeong}
-                    />
-                    <span className="font-body-sm text-body-sm text-on-surface-variant">평</span>
-                  </div>
-                </div>
-              </>
-            )}
-
-            {/* [TAB 2] 입주/이사 청소 특화 설정 */}
-            {activeTab === 'MOVEIN' && (
-              <>
-                <div className="flex items-center justify-between pb-1 text-left">
-                  <div className="flex items-center gap-2">
-                    <span className="w-5 h-5 rounded-full bg-secondary text-on-secondary font-label-sm text-label-sm flex items-center justify-center font-bold">
-                      2
-                    </span>
-                    <h3 className="font-label-lg text-label-lg text-on-surface font-bold tracking-tight">
-                      입주/이사 청소 세부 조건 설정
-                    </h3>
-                  </div>
-                  <span className="px-2 py-0.5 rounded-full bg-secondary-fixed text-on-secondary-fixed-variant font-caption text-caption font-semibold">
-                    1회성 집중 풀케어
-                  </span>
-                </div>
-
-                <div className="bg-surface-container-lowest p-5 rounded-2xl shadow-sm space-y-4 text-left border border-slate-100">
-                  {/* 주거 형태 & 공급 평수 */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                      <label className="font-label-sm text-label-sm text-on-surface mb-1.5 font-semibold block">
-                        주거 건물 형태 <span className="text-error">*</span>
-                      </label>
-                      <select
-                        className="h-11 w-full rounded-xl bg-surface-container-low px-4 font-body-md text-body-md border border-slate-200 focus:outline-none focus:ring-2 focus:ring-secondary/40 font-medium"
-                        onChange={(e) => handleFieldChange('moveinBuildingType', e.target.value)}
-                        value={formData.moveinBuildingType || 'APT'}
-                      >
-                        <option value="APT">아파트 (공동주택)</option>
-                        <option value="OFFICETEL">오피스텔 / 도시형 생활주택</option>
-                        <option value="VILLA">빌라 / 다세대·연립</option>
-                        <option value="HOUSE">단독주택 / 전원주택</option>
-                        <option value="STUDIO">원룸 / 투룸</option>
-                      </select>
-                    </div>
-
-                    <div>
-                      <label className="font-label-sm text-label-sm text-on-surface mb-1.5 font-semibold block">
-                        공급 평수 (분양 평수 기준) <span className="text-error">*</span>
-                      </label>
-                      <div className="flex items-center gap-2">
-                        <input
-                          className="h-11 w-full rounded-xl bg-surface-container-low px-4 font-body-md text-body-md font-mono border border-slate-200 focus:outline-none focus:ring-2 focus:ring-secondary/40 text-right font-bold"
-                          onChange={(e) => handleFieldChange('moveinPyeong', e.target.value)}
-                          placeholder="34"
-                          type="number"
-                          value={formData.moveinPyeong}
-                        />
-                        <span className="font-body-md text-body-md text-on-surface-variant shrink-0">평</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* 방 개수, 욕실 개수, 베란다 확장 여부 */}
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
-                    <div>
-                      <label className="font-label-sm text-label-sm text-on-surface mb-1 font-semibold block">
-                        방 개수
-                      </label>
-                      <select
-                        className="h-10 w-full rounded-xl bg-surface-container-low px-3 font-body-sm text-body-sm border border-slate-200"
-                        onChange={(e) => handleFieldChange('moveinRoomCount', Number(e.target.value))}
-                        value={formData.moveinRoomCount || 3}
-                      >
-                        <option value={1}>원룸 (1개)</option>
-                        <option value={2}>투룸 (2개)</option>
-                        <option value={3}>쓰리룸 (3개)</option>
-                        <option value={4}>4룸</option>
-                        <option value={5}>5룸 이상</option>
-                      </select>
-                    </div>
-
-                    <div>
-                      <label className="font-label-sm text-label-sm text-on-surface mb-1 font-semibold block">
-                        욕실/화장실 개수
-                      </label>
-                      <select
-                        className="h-10 w-full rounded-xl bg-surface-container-low px-3 font-body-sm text-body-sm border border-slate-200"
-                        onChange={(e) => handleFieldChange('moveinBathCount', Number(e.target.value))}
-                        value={formData.moveinBathCount || 2}
-                      >
-                        <option value={1}>1개</option>
-                        <option value={2}>2개</option>
-                        <option value={3}>3개 이상</option>
-                      </select>
-                    </div>
-
-                    <div>
-                      <label className="font-label-sm text-label-sm text-on-surface mb-1 font-semibold block">
-                        발코니/베란다 확장
-                      </label>
-                      <select
-                        className="h-10 w-full rounded-xl bg-surface-container-low px-3 font-body-sm text-body-sm border border-slate-200"
-                        onChange={(e) => handleFieldChange('moveinBalconyExt', e.target.value)}
-                        value={formData.moveinBalconyExt || 'Y'}
-                      >
-                        <option value="Y">확장형</option>
-                        <option value="N">비확장형 (베란다 다수)</option>
-                      </select>
-                    </div>
-                  </div>
-
-                  {/* 희망 작업 시간대 */}
-                  <div className="pt-1">
-                    <label className="font-label-sm text-label-sm text-on-surface mb-1.5 font-semibold block">
-                      희망 작업 시간대
-                    </label>
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                      {/* 시작시간 입력 */}
-                      <div
-                        className={`p-2.5 rounded-xl flex items-center justify-between gap-1.5 transition-all ${
-                          !formData.workTimeNegotiable
-                            ? 'bg-surface-container-lowest border border-slate-300 shadow-sm'
-                            : 'bg-surface-container-low/60 border border-slate-200 opacity-50'
-                        }`}
-                      >
-                        <span className="text-xs font-bold text-slate-700 shrink-0 pl-1">시작시간</span>
-                        <div className="flex items-center gap-1.5 justify-end">
-                          <select
-                            disabled={formData.workTimeNegotiable}
-                            value={formData.workStartTimeType || '오전'}
-                            onChange={(e) => handleFieldChange('workStartTimeType', e.target.value)}
-                            className="h-8 px-2 rounded-lg bg-surface-container-low text-xs font-semibold text-on-surface border border-slate-200 focus:outline-none focus:ring-1 focus:ring-primary cursor-pointer disabled:cursor-not-allowed"
-                          >
-                            <option value="오전">오전</option>
-                            <option value="오후">오후</option>
-                          </select>
-                          <input
-                            type="text"
-                            disabled={formData.workTimeNegotiable}
-                            placeholder="08:00"
-                            value={formData.workStartTime || '08:00'}
-                            onChange={(e) => handleFieldChange('workStartTime', e.target.value)}
-                            className="h-8 w-16 px-1 text-center rounded-lg bg-surface-container-low text-xs font-bold text-primary font-mono border border-slate-200 focus:outline-none focus:ring-1 focus:ring-primary disabled:cursor-not-allowed"
-                          />
-                        </div>
-                      </div>
-
-                      {/* 종료시간 입력 */}
-                      <div
-                        className={`p-2.5 rounded-xl flex items-center justify-between gap-1.5 transition-all ${
-                          !formData.workTimeNegotiable
-                            ? 'bg-surface-container-lowest border border-slate-300 shadow-sm'
-                            : 'bg-surface-container-low/60 border border-slate-200 opacity-50'
-                        }`}
-                      >
-                        <span className="text-xs font-bold text-slate-700 shrink-0 pl-1">종료시간</span>
-                        <div className="flex items-center gap-1.5 justify-end">
-                          <select
-                            disabled={formData.workTimeNegotiable}
-                            value={formData.workEndTimeType || '오후'}
-                            onChange={(e) => handleFieldChange('workEndTimeType', e.target.value)}
-                            className="h-8 px-2 rounded-lg bg-surface-container-low text-xs font-semibold text-on-surface border border-slate-200 focus:outline-none focus:ring-1 focus:ring-primary cursor-pointer disabled:cursor-not-allowed"
-                          >
-                            <option value="오전">오전</option>
-                            <option value="오후">오후</option>
-                          </select>
-                          <input
-                            type="text"
-                            disabled={formData.workTimeNegotiable}
-                            placeholder="05:00"
-                            value={formData.workEndTime || '05:00'}
-                            onChange={(e) => handleFieldChange('workEndTime', e.target.value)}
-                            className="h-8 w-16 px-1 text-center rounded-lg bg-surface-container-low text-xs font-bold text-primary font-mono border border-slate-200 focus:outline-none focus:ring-1 focus:ring-primary disabled:cursor-not-allowed"
-                          />
-                        </div>
-                      </div>
-
-                      {/* 시공사와 협의 가능 버튼 */}
-                      <button
-                        type="button"
-                        onClick={() => {
-                          const nextNeg = !formData.workTimeNegotiable;
-                          setFormData((prev) => ({
-                            ...prev,
-                            workTimeNegotiable: nextNeg,
-                            moveinTimeSlot: nextNeg
-                              ? 'FLEXIBLE'
-                              : `${prev.workStartTimeType || '오전'} ${prev.workStartTime || '08:00'} ~ ${prev.workEndTimeType || '오후'} ${prev.workEndTime || '05:00'}`,
-                          }));
-                        }}
-                        className={`h-11 sm:h-auto rounded-xl font-label-sm text-label-sm font-semibold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
-                          formData.workTimeNegotiable
-                            ? 'bg-primary text-on-primary font-bold shadow-sm'
-                            : 'bg-surface-container-low text-on-surface-variant hover:bg-surface-container border border-slate-200'
-                        }`}
-                      >
-                        <span className="material-symbols-outlined text-[18px]">
-                          {formData.workTimeNegotiable ? 'check_circle' : 'handshake'}
-                        </span>
-                        <span>시공사와 협의 가능</span>
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </>
-            )}
-
-            {/* [TAB 3] 계절가전청소 특화 설정 (세로 9개 품목 4개 Row 높이 스크롤 박스 및 +클릭시 기기별 스펙 Row 추가) */}
-            {activeTab === 'APPLIANCE' && (
-              <>
-                <div className="flex items-center justify-between pb-1 text-left">
-                  <div className="flex items-center gap-2">
-                    <span className="w-5 h-5 rounded-full bg-secondary text-on-secondary font-label-sm text-label-sm flex items-center justify-center font-bold">
-                      2
-                    </span>
-                    <h3 className="font-label-lg text-label-lg text-on-surface font-bold tracking-tight">
-                      계절가전청소 세부 조건 설정
-                    </h3>
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <span className="px-2 py-0.5 rounded-full bg-secondary text-white font-caption text-caption font-bold">
-                      총 {APPLIANCE_CATALOG.reduce((acc, cur) => acc + ((formData.applianceDetails?.[cur.id] || []).length), 0)}대 선택됨
-                    </span>
-                    <span className="px-2 py-0.5 rounded-full bg-secondary-fixed text-on-secondary-fixed-variant font-caption text-caption font-semibold">
-                      완전분해 · 고압살균
-                    </span>
-                  </div>
-                </div>
-
-                {/* 4개 Row 기본 노출 + 위/아래 스크롤 관리 박스 (총 9개 품목) */}
-                <div className="max-h-[390px] sm:max-h-[430px] overflow-y-auto overscroll-contain pr-1.5 space-y-2.5 p-2 bg-slate-50/80 rounded-2xl border border-slate-200/90 shadow-inner">
-                  {APPLIANCE_CATALOG.map((item) => {
-                    const instList = formData.applianceDetails?.[item.id] || [];
-                    const count = instList.length;
-
-                    return (
-                      <div
-                        key={item.id}
-                        className={`bg-surface-container-lowest p-3.5 rounded-xl border transition-all text-left ${
-                          count > 0 ? 'border-secondary/40 shadow-sm ring-1 ring-secondary/20' : 'border-slate-200/80 shadow-xs'
-                        }`}
-                      >
-                        {/* 품목 헤더 행: 카테고리 + 제품명 + +,- 카운터 버튼 */}
-                        <div className="flex items-center justify-between gap-2">
-                          <div className="flex items-center gap-2.5 min-w-0">
-                            <span className="w-8 h-8 rounded-lg bg-surface-container-low flex items-center justify-center text-secondary shrink-0">
-                              <span className="material-symbols-outlined text-[20px]">{item.icon}</span>
-                            </span>
-                            <div className="flex flex-col min-w-0">
-                              <div className="flex items-center gap-1.5">
-                                <span className={`text-[10px] px-1.5 py-0.2 rounded border font-bold ${item.catColor}`}>
-                                  {item.category}
-                                </span>
-                                <span className="font-label-md text-label-md font-bold text-slate-900 truncate">
-                                  {item.name}
-                                </span>
-                              </div>
-                              <span className="text-[11px] text-slate-400 truncate mt-0.5">
-                                {item.subDesc}
+                        >
+                          {/* 품목 헤더 행: 카테고리 + 제품명 + +,- 카운터 버튼 */}
+                          <div className="flex items-center justify-between gap-2">
+                            <div className="flex items-center gap-2.5 min-w-0">
+                              <span className="w-8 h-8 rounded-lg bg-surface-container-low flex items-center justify-center text-secondary shrink-0">
+                                <span className="material-symbols-outlined text-[20px]">{item.icon}</span>
                               </span>
-                            </div>
-                          </div>
-
-                          {/* +,- 대수 컨트롤 버튼 */}
-                          <div className="flex items-center gap-2 shrink-0">
-                            <button
-                              type="button"
-                              onClick={() => handleApplianceRemove(item.id)}
-                              disabled={count === 0}
-                              className="w-8 h-8 rounded-lg bg-surface-container-low border border-slate-200 font-bold text-slate-700 hover:bg-slate-200 disabled:opacity-35 disabled:cursor-not-allowed flex items-center justify-center cursor-pointer transition-colors"
-                            >
-                              -
-                            </button>
-                            <span className={`w-8 text-center font-mono font-bold text-[14px] ${count > 0 ? 'text-secondary' : 'text-slate-400'}`}>
-                              {count}
-                            </span>
-                            <button
-                              type="button"
-                              onClick={() => handleApplianceAdd(item.id)}
-                              className="w-8 h-8 rounded-lg bg-secondary text-white font-bold hover:bg-secondary/90 flex items-center justify-center shadow-xs cursor-pointer transition-transform active:scale-95"
-                            >
-                              +
-                            </button>
-                          </div>
-                        </div>
-
-                        {/* + 클릭 시 동적으로 생성/추가되는 개별 기기별 세부 스펙 입력 행들 */}
-                        {count > 0 && (
-                          <div className="mt-3 pt-2.5 border-t border-slate-100 space-y-2">
-                            <div className="flex items-center justify-between text-[11px] font-semibold text-slate-500 px-1">
-                              <span>개별 기기 순번</span>
-                              <span>세부 규격 ({item.unit}) 입력</span>
-                            </div>
-
-                            {instList.map((inst, idx) => (
-                              <div
-                                key={inst.seq || idx}
-                                className="flex items-center justify-between bg-surface-container-low/70 px-3 py-1.5 rounded-lg border border-slate-200/60"
-                              >
+                              <div className="flex flex-col min-w-0">
                                 <div className="flex items-center gap-1.5">
-                                  <span className="w-5 h-5 rounded-full bg-secondary/15 text-secondary text-[11px] font-bold font-mono flex items-center justify-center">
-                                    {idx + 1}
+                                  <span className={`text-[10px] px-1.5 py-0.2 rounded border font-bold ${item.catColor}`}>
+                                    {item.category}
                                   </span>
-                                  <span className="text-xs font-bold text-slate-700">
-                                    {idx + 1}호기
+                                  <span className="font-label-md text-label-md font-bold text-slate-900 truncate">
+                                    {item.name}
                                   </span>
                                 </div>
+                                <span className="text-[11px] text-slate-400 truncate mt-0.5">
+                                  {item.subDesc}
+                                </span>
+                              </div>
+                            </div>
 
-                                {/* 스펙 입력 컨트롤 (평형, Kg, 리터, 개(구) 또는 매트리스 크기 목록 선택) */}
-                                {item.inputType === 'select' ? (
+                            {/* +,- 대수 컨트롤 버튼 */}
+                            <div className="flex items-center gap-2 shrink-0">
+                              <button
+                                type="button"
+                                onClick={() => handleApplianceRemove(item.id)}
+                                disabled={count === 0}
+                                className="w-8 h-8 rounded-lg bg-surface-container-low border border-slate-200 font-bold text-slate-700 hover:bg-slate-200 disabled:opacity-35 disabled:cursor-not-allowed flex items-center justify-center cursor-pointer transition-colors"
+                              >
+                                -
+                              </button>
+                              <span className={`w-8 text-center font-mono font-bold text-[14px] ${count > 0 ? 'text-secondary' : 'text-slate-400'}`}>
+                                {count}
+                              </span>
+                              <button
+                                type="button"
+                                onClick={() => handleApplianceAdd(item.id)}
+                                className="w-8 h-8 rounded-lg bg-secondary text-white font-bold hover:bg-secondary/90 flex items-center justify-center shadow-xs cursor-pointer transition-transform active:scale-95"
+                              >
+                                +
+                              </button>
+                            </div>
+                          </div>
+
+                          {/* + 클릭 시 동적으로 생성/추가되는 개별 기기별 세부 스펙 입력 행들 */}
+                          {count > 0 && (
+                            <div className="mt-3 pt-2.5 border-t border-slate-100 space-y-2">
+                              <div className="flex items-center justify-between text-[11px] font-semibold text-slate-500 px-1">
+                                <span>개별 기기 순번</span>
+                                <span>세부 규격 ({item.unit}) 입력</span>
+                              </div>
+
+                              {instList.map((inst, idx) => (
+                                <div
+                                  key={inst.seq || idx}
+                                  className="flex items-center justify-between bg-surface-container-low/70 px-3 py-1.5 rounded-lg border border-slate-200/60"
+                                >
                                   <div className="flex items-center gap-1.5">
-                                    <select
-                                      value={inst.spec || 'QUEEN'}
-                                      onChange={(e) => handleApplianceSpecChange(item.id, idx, e.target.value)}
-                                      className="h-8 px-2 text-xs font-semibold text-slate-800 bg-surface-container-lowest border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-secondary cursor-pointer"
-                                    >
-                                      {item.options.map((opt) => (
-                                        <option key={opt.val} value={opt.val}>
-                                          {opt.label}
-                                        </option>
-                                      ))}
-                                    </select>
-                                    {inst.spec === 'CUSTOM' && (
-                                      <input
-                                        type="text"
-                                        value={inst.customSize || ''}
-                                        onChange={(e) => handleApplianceSpecChange(item.id, idx, inst.spec, e.target.value)}
-                                        placeholder="규격 직접입력"
-                                        className="w-28 h-8 px-2 text-xs font-medium text-slate-800 bg-surface-container-lowest border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-secondary"
-                                      />
-                                    )}
-                                  </div>
-                                ) : (
-                                  <div className="flex items-center gap-1.5">
-                                    <input
-                                      type="number"
-                                      min={1}
-                                      value={inst.spec || ''}
-                                      onChange={(e) => handleApplianceSpecChange(item.id, idx, e.target.value)}
-                                      placeholder={item.placeholder}
-                                      className="w-24 h-8 px-2 text-center text-xs font-bold font-mono text-primary bg-surface-container-lowest border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-secondary"
-                                    />
-                                    <span className="text-xs font-bold text-slate-600 min-w-[28px]">
-                                      {item.unit}
+                                    <span className="w-5 h-5 rounded-full bg-secondary/15 text-secondary text-[11px] font-bold font-mono flex items-center justify-center">
+                                      {idx + 1}
+                                    </span>
+                                    <span className="text-xs font-bold text-slate-700">
+                                      {idx + 1}호기
                                     </span>
                                   </div>
-                                )}
-                              </div>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-              </>
-            )}
-          </section>
 
-          {/* 5. 금액 및 상세 정보 섹션 (Form Section 3) */}
-          <section className="px-8 py-4 space-y-4">
-            <div className="flex items-center gap-2 pb-1">
-              <span className="w-5 h-5 rounded-full bg-primary text-on-primary font-label-sm text-label-sm flex items-center justify-center font-bold">
-                3
-              </span>
-              <h3 className="font-label-lg text-label-lg text-on-surface font-bold tracking-tight">
-                발주 금액 및 현장 특이사항
-              </h3>
-            </div>
-
-            {/* 고객 확정 지정 총 용역 대금 */}
-            <div className="bg-surface-container-lowest p-5 rounded-2xl shadow-sm space-y-3 text-left border border-slate-100">
-              <div className="flex items-center justify-between">
-                <div>
-                  <label className="font-headline-sm text-headline-sm text-on-surface font-bold">
-                    고객 확정 지정 {activeTab === 'REGULAR' ? '월 ' : ''}용역 대금 <span className="text-error">*</span>
-                  </label>
-                  <p className="font-caption text-caption text-on-surface-variant mt-0.5">
-                    매월 시공사에 지급하는 금액(VAT 포함)을 작성합니다.
-                  </p>
-                </div>
-                <span className="px-2.5 py-1 rounded-full bg-error-container text-on-error-container font-label-sm text-label-sm font-semibold">
-                  현장 직불 계약 원칙
-                </span>
-              </div>
-              <div className="flex items-center gap-3">
-                <div className="relative flex-1">
-                  <input
-                    className="h-14 w-full rounded-xl bg-surface-container-low px-5 font-headline-md text-headline-md font-bold text-primary font-mono tracking-tight shadow-inner focus:outline-none focus:ring-2 focus:ring-secondary/40"
-                    onChange={(e) => handleFieldChange('proposedPrice', e.target.value)}
-                    type="text"
-                    value={formData.proposedPrice}
-                  />
-                  <span className="font-headline-sm text-headline-sm text-primary font-bold absolute right-4 top-3.5">
-                    원 {activeTab === 'REGULAR' ? '/ 월' : ''}
-                  </span>
-                </div>
-                {activeTab === 'REGULAR' && (
-                  <div className="flex flex-col justify-center items-end px-4 py-2 bg-surface-container rounded-xl min-w-[210px]">
-                    <span className="font-caption text-caption text-outline">90일(3개월) 총 계약액</span>
-                    <span className="font-headline-sm text-headline-sm text-secondary font-bold font-mono">
-                      ₩{new Intl.NumberFormat('ko-KR').format(getQuarterlyPrice())}
-                    </span>
+                                  {/* 스펙 입력 컨트롤 (평형, Kg, 리터, 개(구) 또는 매트리스 크기 목록 선택) */}
+                                  {item.inputType === 'select' ? (
+                                    <div className="flex items-center gap-1.5">
+                                      <select
+                                        value={inst.spec || 'QUEEN'}
+                                        onChange={(e) => handleApplianceSpecChange(item.id, idx, e.target.value)}
+                                        className="h-8 px-2 text-xs font-semibold text-slate-800 bg-surface-container-lowest border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-secondary cursor-pointer"
+                                      >
+                                        {item.options.map((opt) => (
+                                          <option key={opt.val} value={opt.val}>
+                                            {opt.label}
+                                          </option>
+                                        ))}
+                                      </select>
+                                      {inst.spec === 'CUSTOM' && (
+                                        <input
+                                          type="text"
+                                          value={inst.customSize || ''}
+                                          onChange={(e) => handleApplianceSpecChange(item.id, idx, inst.spec, e.target.value)}
+                                          placeholder="규격 직접입력"
+                                          className="w-28 h-8 px-2 text-xs font-medium text-slate-800 bg-surface-container-lowest border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-secondary"
+                                        />
+                                      )}
+                                    </div>
+                                  ) : (
+                                    <div className="flex items-center gap-1.5">
+                                      <input
+                                        type="number"
+                                        min={1}
+                                        value={inst.spec || ''}
+                                        onChange={(e) => handleApplianceSpecChange(item.id, idx, e.target.value)}
+                                        placeholder={item.placeholder}
+                                        className="w-24 h-8 px-2 text-center text-xs font-bold font-mono text-primary bg-surface-container-lowest border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-secondary"
+                                      />
+                                      <span className="text-xs font-bold text-slate-600 min-w-[28px]">
+                                        {item.unit}
+                                      </span>
+                                    </div>
+                                  )}
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
                   </div>
-                )}
-              </div>
-            </div>
+                </>
+              )}
+            </section>
 
-            {/* 추가 요청 사항 및 특이사항 */}
-            <div className="flex flex-col text-left space-y-1.5">
-              <div className="flex items-center justify-between">
-                <label className="font-label-sm text-label-sm text-on-surface font-semibold">
-                  추가 요청 사항 및 특이사항
-                </label>
-                <span className="font-caption text-caption text-outline">현장 전담 마스터 전달용</span>
-              </div>
-              <textarea
-                className="w-full rounded-xl bg-surface-container-lowest p-4 font-body-md text-body-md text-on-surface shadow-sm border border-slate-200 focus:outline-none focus:ring-2 focus:ring-secondary/40 resize-none placeholder:text-outline/60"
-                onChange={(e) => handleFieldChange('detailReqNote', e.target.value)}
-                placeholder="현장 특이사항, 방문 희망 시간대, 중점 관리 요청 구역을 적어주세요."
-                rows={3}
-                value={formData.detailReqNote}
-              />
-            </div>
-
-            {/* 현장 사진 첨부 (최대 10장) */}
-            <div className="flex flex-col text-left space-y-2">
-              <div className="flex items-center justify-between">
-                <label className="font-label-sm text-label-sm text-on-surface font-semibold flex items-center gap-1.5">
-                  <span>현장 사진 첨부</span>
-                  <span className="font-caption text-caption text-outline font-normal">(최대 10장)</span>
-                </label>
-                <span className="font-caption text-caption text-secondary font-bold">
-                  {photoFiles.length} / 10장 등록됨
+            {/* 5. 금액 및 상세 정보 섹션 (Form Section 3) */}
+            <section className="px-8 py-4 space-y-4">
+              <div className="flex items-center gap-2 pb-1">
+                <span className="w-5 h-5 rounded-full bg-primary text-on-primary font-label-sm text-label-sm flex items-center justify-center font-bold">
+                  3
                 </span>
+                <h3 className="font-label-lg text-label-lg text-on-surface font-bold tracking-tight">
+                  발주 금액 및 현장 특이사항
+                </h3>
               </div>
-              <div className="grid grid-cols-3 sm:grid-cols-5 gap-3">
-                {photoFiles.map((photo) => (
-                  <div
-                    key={photo.seq}
-                    className="relative group aspect-square rounded-xl overflow-hidden bg-surface-container shadow-sm flex flex-col justify-end p-2 border border-slate-200"
-                  >
-                    <img
-                      src={photo.url || photo.dataUrl}
-                      alt={photo.title || '현장 사진'}
-                      className="w-full h-full object-cover absolute inset-0 pointer-events-none"
-                      onError={(e) => { e.currentTarget.style.display = 'none'; }}
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-inverse-surface/80 via-transparent to-transparent pointer-events-none" />
-                    <span className="relative font-caption text-caption text-on-primary truncate text-[11px] pointer-events-none">
-                      {photo.title}
-                    </span>
-                    <button
-                      aria-label="삭제"
-                      className="absolute top-1.5 right-1.5 w-6 h-6 rounded-full bg-inverse-surface/70 hover:bg-error text-on-error flex items-center justify-center transition-colors cursor-pointer z-10"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handlePhotoDelete(photo.seq);
-                      }}
-                      type="button"
-                    >
-                      <span className="material-symbols-outlined text-[14px]">close</span>
-                    </button>
-                  </div>
-                ))}
 
-                {/* 실제 숨겨진 독립 File Input (useRef로 안전하게 트리거) */}
-                <input
-                  ref={fileInputRef}
-                  id="photo-file-upload-input"
-                  type="file"
-                  accept="image/*"
-                  multiple
-                  className="hidden"
-                  onChange={handlePhotoAdd}
-                  onClick={(e) => e.stopPropagation()}
-                />
-
-                {/* 추가 등록 버튼 */}
-                {photoFiles.length < 10 && (
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      if (fileInputRef.current) {
-                        fileInputRef.current.click();
-                      }
-                    }}
-                    className="aspect-square rounded-xl bg-surface-container-low hover:bg-surface-container text-on-surface-variant hover:text-secondary flex flex-col items-center justify-center gap-1 cursor-pointer transition-colors shadow-sm border border-dashed border-slate-300"
-                  >
-                    <span className="material-symbols-outlined text-[24px]">add_a_photo</span>
-                    <span className="font-label-sm text-label-sm font-semibold">+ 추가 등록</span>
-                    <span className="font-caption text-caption text-outline">{photoFiles.length} / 10</span>
-                  </button>
-                )}
-              </div>
-            </div>
-
-            {/* 플랫폼 정보 이용료 안내 카드 */}
-            <div className="p-4 rounded-xl bg-secondary-container/25 text-on-surface shadow-sm space-y-2 text-left border border-secondary/20">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <span className="w-7 h-7 rounded-lg bg-secondary text-on-secondary flex items-center justify-center">
-                    <span className="material-symbols-outlined text-[18px]">verified</span>
-                  </span>
+              {/* 고객 확정 지정 총 용역 대금 */}
+              <div className="bg-surface-container-lowest p-5 rounded-2xl shadow-sm space-y-3 text-left border border-slate-100">
+                <div className="flex items-center justify-between">
                   <div>
-                    <h4 className="font-label-md text-label-md text-primary font-bold">쓸고닦고 안심 매칭 보증료</h4>
-                    <p className="font-caption text-caption text-on-surface-variant">
-                      배차 성공 및 1:1 전담 마스터 확정 배정 시에만 부과
+                    <label className="font-headline-sm text-headline-sm text-on-surface font-bold">
+                      고객 확정 지정 {activeTab === 'REGULAR' ? '월 ' : ''}용역 대금 <span className="text-error">*</span>
+                    </label>
+                    <p className="font-caption text-caption text-on-surface-variant mt-0.5">
+                      매월 시공사에 지급하는 금액(VAT 포함)을 작성합니다.
                     </p>
                   </div>
+                  <span className="px-2.5 py-1 rounded-full bg-error-container text-on-error-container font-label-sm text-label-sm font-semibold">
+                    현장 직불 계약 원칙
+                  </span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="relative flex-1">
+                    <input
+                      className="h-14 w-full rounded-xl bg-surface-container-low px-5 font-headline-md text-headline-md font-bold text-primary font-mono tracking-tight shadow-inner focus:outline-none focus:ring-2 focus:ring-secondary/40"
+                      onChange={(e) => handleFieldChange('proposedPrice', e.target.value)}
+                      type="text"
+                      value={formData.proposedPrice}
+                    />
+                    <span className="font-headline-sm text-headline-sm text-primary font-bold absolute right-4 top-3.5">
+                      원 {activeTab === 'REGULAR' ? '/ 월' : ''}
+                    </span>
+                  </div>
+                  {activeTab === 'REGULAR' && (
+                    <div className="flex flex-col justify-center items-end px-4 py-2 bg-surface-container rounded-xl min-w-[210px]">
+                      <span className="font-caption text-caption text-outline">90일(3개월) 총 계약액</span>
+                      <span className="font-headline-sm text-headline-sm text-secondary font-bold font-mono">
+                        ₩{new Intl.NumberFormat('ko-KR').format(getQuarterlyPrice())}
+                      </span>
+                    </div>
+                  )}
                 </div>
               </div>
 
-              <div className="p-3 bg-error-container/30 rounded-lg text-on-error-container font-caption text-caption flex items-start gap-2">
-                <span className="material-symbols-outlined text-[16px] text-error shrink-0 mt-0.5">
-                  notification_important
-                </span>
-                <span>
-                  <strong>[현장 직불 공지]</strong> 인건비 및 용역비({formData.proposedPrice}원)는 시공 완료 후 사진 또는 검수후 시공자에게 직접 결제합니다. 플랫폼은 인건비 에스크로를 보유하지 않으므로 현장 검수 후 직접 정산하여 주시기 바랍니다.
-                </span>
+              {/* 추가 요청 사항 및 특이사항 */}
+              <div className="flex flex-col text-left space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <label className="font-label-sm text-label-sm text-on-surface font-semibold">
+                    추가 요청 사항 및 특이사항
+                  </label>
+                  <span className="font-caption text-caption text-outline">현장 전담 마스터 전달용</span>
+                </div>
+                <textarea
+                  className="w-full rounded-xl bg-surface-container-lowest p-4 font-body-md text-body-md text-on-surface shadow-sm border border-slate-200 focus:outline-none focus:ring-2 focus:ring-secondary/40 resize-none placeholder:text-outline/60"
+                  onChange={(e) => handleFieldChange('detailReqNote', e.target.value)}
+                  placeholder="현장 특이사항, 방문 희망 시간대, 중점 관리 요청 구역을 적어주세요."
+                  rows={3}
+                  value={formData.detailReqNote}
+                />
               </div>
+
+              {/* 현장 사진 첨부 (최대 10장) */}
+              <div className="flex flex-col text-left space-y-2">
+                <div className="flex items-center justify-between">
+                  <label className="font-label-sm text-label-sm text-on-surface font-semibold flex items-center gap-1.5">
+                    <span>현장 사진 첨부</span>
+                    <span className="font-caption text-caption text-outline font-normal">(최대 10장)</span>
+                  </label>
+                  <span className="font-caption text-caption text-secondary font-bold">
+                    {photoFiles.length} / 10장 등록됨
+                  </span>
+                </div>
+                <div className="grid grid-cols-3 sm:grid-cols-5 gap-3">
+                  {photoFiles.map((photo) => (
+                    <div
+                      key={photo.seq}
+                      className="relative group aspect-square rounded-xl overflow-hidden bg-surface-container shadow-sm flex flex-col justify-end p-2 border border-slate-200"
+                    >
+                      <img
+                        src={photo.url || photo.dataUrl}
+                        alt={photo.title || '현장 사진'}
+                        className="w-full h-full object-cover absolute inset-0 pointer-events-none"
+                        onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-inverse-surface/80 via-transparent to-transparent pointer-events-none" />
+                      <span className="relative font-caption text-caption text-on-primary truncate text-[11px] pointer-events-none">
+                        {photo.title}
+                      </span>
+                      <button
+                        aria-label="삭제"
+                        className="absolute top-1.5 right-1.5 w-6 h-6 rounded-full bg-inverse-surface/70 hover:bg-error text-on-error flex items-center justify-center transition-colors cursor-pointer z-10"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handlePhotoDelete(photo.seq);
+                        }}
+                        type="button"
+                      >
+                        <span className="material-symbols-outlined text-[14px]">close</span>
+                      </button>
+                    </div>
+                  ))}
+
+                  {/* 실제 숨겨진 독립 File Input (useRef로 안전하게 트리거) */}
+                  <input
+                    ref={fileInputRef}
+                    id="photo-file-upload-input"
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    className="hidden"
+                    onChange={handlePhotoAdd}
+                    onClick={(e) => e.stopPropagation()}
+                  />
+
+                  {/* 추가 등록 버튼 */}
+                  {photoFiles.length < 10 && (
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        if (fileInputRef.current) {
+                          fileInputRef.current.click();
+                        }
+                      }}
+                      className="aspect-square rounded-xl bg-surface-container-low hover:bg-surface-container text-on-surface-variant hover:text-secondary flex flex-col items-center justify-center gap-1 cursor-pointer transition-colors shadow-sm border border-dashed border-slate-300"
+                    >
+                      <span className="material-symbols-outlined text-[24px]">add_a_photo</span>
+                      <span className="font-label-sm text-label-sm font-semibold">+ 추가 등록</span>
+                      <span className="font-caption text-caption text-outline">{photoFiles.length} / 10</span>
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              {/* 플랫폼 정보 이용료 안내 카드 */}
+              <div className="p-4 rounded-xl bg-secondary-container/25 text-on-surface shadow-sm space-y-2 text-left border border-secondary/20">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="w-7 h-7 rounded-lg bg-secondary text-on-secondary flex items-center justify-center">
+                      <span className="material-symbols-outlined text-[18px]">verified</span>
+                    </span>
+                    <div>
+                      <h4 className="font-label-md text-label-md text-primary font-bold">쓸고닦고 안심 매칭 보증료</h4>
+                      <p className="font-caption text-caption text-on-surface-variant">
+                        배차 성공 및 1:1 전담 마스터 확정 배정 시에만 부과
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="p-3 bg-error-container/30 rounded-lg text-on-error-container font-caption text-caption flex items-start gap-2">
+                  <span className="material-symbols-outlined text-[16px] text-error shrink-0 mt-0.5">
+                    notification_important
+                  </span>
+                  <span>
+                    <strong>[현장 직불 공지]</strong> 인건비 및 용역비({formData.proposedPrice}원)는 시공 완료 후 사진 또는 검수후 시공자에게 직접 결제합니다. 플랫폼은 인건비 에스크로를 보유하지 않으므로 현장 검수 후 직접 정산하여 주시기 바랍니다.
+                  </span>
+                </div>
+              </div>
+              {/* 하단 여백 버퍼 (고정 하단바와 겹치지 않고 끝까지 스크롤되도록 충분한 여백 제공) */}
+              <div className="h-16" />
+            </section>
+          </form>
+        </div>
+
+        {/* 6. Modal Fixed Footer Action (스크롤 영역 밖 고정 하단바) */}
+        <footer className="shrink-0 bg-surface-container-lowest px-8 py-4 shadow-[0_-4px_16px_rgba(0,0,0,0.06)] flex items-center justify-between border-t border-slate-100 z-10">
+          <div className="flex items-center gap-2 text-left">
+            <span className="material-symbols-outlined text-[18px] text-secondary">cloud_done</span>
+            <div className="flex flex-col">
+              <span className="font-label-sm text-label-sm text-on-surface font-semibold">입력 내용 자동 임시저장</span>
+              <span className="font-caption text-caption text-outline">
+                비회원 작성 시 브라우저 LocalStorage에 안전하게 보관됩니다.
+              </span>
             </div>
-            {/* 하단 여백 버퍼 (고정 하단바와 겹치지 않고 끝까지 스크롤되도록 충분한 여백 제공) */}
-            <div className="h-16" />
-          </section>
-        </form>
+          </div>
+          <div className="flex items-center gap-3">
+            <button
+              className="h-12 px-6 rounded-xl text-on-surface-variant hover:text-on-surface hover:bg-surface-container font-label-md text-label-md transition-colors cursor-pointer"
+              onClick={onClose}
+              type="button"
+            >
+              취소
+            </button>
+            <button
+              form="order-request-form"
+              className="h-12 px-7 rounded-xl bg-secondary hover:bg-on-secondary-container text-on-secondary font-label-lg text-label-lg font-bold shadow-md shadow-secondary/20 flex items-center gap-2 transition-all active:scale-[0.98] disabled:opacity-60 cursor-pointer"
+              disabled={isSubmitting}
+              type="submit"
+            >
+              <span className="material-symbols-outlined text-[20px]">assignment_turned_in</span>
+              <span>{isSubmitting ? '발주 등록 중...' : '+ 청소 서비스 신청 등록'}</span>
+            </button>
+          </div>
+        </footer>
       </div>
 
-      {/* 6. Modal Fixed Footer Action (스크롤 영역 밖 고정 하단바) */}
-      <footer className="shrink-0 bg-surface-container-lowest px-8 py-4 shadow-[0_-4px_16px_rgba(0,0,0,0.06)] flex items-center justify-between border-t border-slate-100 z-10">
-        <div className="flex items-center gap-2 text-left">
-          <span className="material-symbols-outlined text-[18px] text-secondary">cloud_done</span>
-          <div className="flex flex-col">
-            <span className="font-label-sm text-label-sm text-on-surface font-semibold">입력 내용 자동 임시저장</span>
-            <span className="font-caption text-caption text-outline">
-              비회원 작성 시 브라우저 LocalStorage에 안전하게 보관됩니다.
-            </span>
-          </div>
-        </div>
-        <div className="flex items-center gap-3">
-          <button
-            className="h-12 px-6 rounded-xl text-on-surface-variant hover:text-on-surface hover:bg-surface-container font-label-md text-label-md transition-colors cursor-pointer"
-            onClick={onClose}
-            type="button"
-          >
-            취소
-          </button>
-          <button
-            form="order-request-form"
-            className="h-12 px-7 rounded-xl bg-secondary hover:bg-on-secondary-container text-on-secondary font-label-lg text-label-lg font-bold shadow-md shadow-secondary/20 flex items-center gap-2 transition-all active:scale-[0.98] disabled:opacity-60 cursor-pointer"
-            disabled={isSubmitting}
-            type="submit"
-          >
-            <span className="material-symbols-outlined text-[20px]">assignment_turned_in</span>
-            <span>{isSubmitting ? '발주 등록 중...' : '+ 청소 서비스 신청 등록'}</span>
-          </button>
-        </div>
-      </footer>
-    </div>
-
-    {/* 네이버 주소 검색 팝업 연동 (현재 활성 탭 주소 업데이트) */}
+      {/* 네이버 주소 검색 팝업 연동 (현재 활성 탭 주소 업데이트) */}
       <NaverAddressSearchModal
         isOpen={isAddrModalOpen}
         onClose={() => setIsAddrModalOpen(false)}
@@ -2995,7 +2984,7 @@ export function WebClntAth010100({
               doProcessLogin(parsed.profile);
             }
           }
-        } catch (e) {}
+        } catch (e) { }
       }, 300);
       setTimeout(() => clearInterval(checkStorage), 60000);
 
@@ -4133,11 +4122,10 @@ export function WebClntAth010200({
             <div className="grid grid-cols-2 gap-2 p-1 bg-surface-container rounded-xl">
               {/* 고객 회원 (C) */}
               <button
-                className={`h-11 rounded-lg flex items-center justify-center gap-2 font-label-lg text-label-lg transition-all ${
-                  role === 'C'
+                className={`h-11 rounded-lg flex items-center justify-center gap-2 font-label-lg text-label-lg transition-all ${role === 'C'
                     ? 'shadow-sm bg-secondary text-on-secondary font-bold'
                     : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high'
-                }`}
+                  }`}
                 data-field="USER_ROLE_CD"
                 data-role-value="C"
                 id="role-btn-client"
@@ -4149,11 +4137,10 @@ export function WebClntAth010200({
               </button>
               {/* 시공사 회원 (S) */}
               <button
-                className={`h-11 rounded-lg flex items-center justify-center gap-2 font-label-lg text-label-lg transition-all ${
-                  role === 'S'
+                className={`h-11 rounded-lg flex items-center justify-center gap-2 font-label-lg text-label-lg transition-all ${role === 'S'
                     ? 'shadow-sm bg-secondary text-on-secondary font-bold'
                     : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high'
-                }`}
+                  }`}
                 data-field="USER_ROLE_CD"
                 data-role-value="S"
                 id="role-btn-partner"
@@ -4206,9 +4193,8 @@ export function WebClntAth010200({
               <div className="grid grid-cols-3 gap-2.5 w-full">
                 {/* Kakao */}
                 <button
-                  className={`h-11 rounded-2xl bg-[#FEE500] hover:brightness-95 flex flex-col items-center justify-center transition-transform active:scale-95 shadow-sm group ${
-                    socialProvider === 'KAKAO' ? 'ring-2 ring-primary ring-offset-1' : ''
-                  }`}
+                  className={`h-11 rounded-2xl bg-[#FEE500] hover:brightness-95 flex flex-col items-center justify-center transition-transform active:scale-95 shadow-sm group ${socialProvider === 'KAKAO' ? 'ring-2 ring-primary ring-offset-1' : ''
+                    }`}
                   data-field="SOCIAL_PROVIDER"
                   data-val="KAKAO"
                   onClick={() => handleSocialSignup('KAKAO')}
@@ -4223,9 +4209,8 @@ export function WebClntAth010200({
 
                 {/* Naver */}
                 <button
-                  className={`h-11 rounded-2xl bg-[#03C75A] hover:brightness-95 flex flex-col items-center justify-center transition-transform active:scale-95 shadow-sm group ${
-                    socialProvider === 'NAVER' ? 'ring-2 ring-primary ring-offset-1' : ''
-                  }`}
+                  className={`h-11 rounded-2xl bg-[#03C75A] hover:brightness-95 flex flex-col items-center justify-center transition-transform active:scale-95 shadow-sm group ${socialProvider === 'NAVER' ? 'ring-2 ring-primary ring-offset-1' : ''
+                    }`}
                   data-field="SOCIAL_PROVIDER"
                   data-val="NAVER"
                   onClick={() => handleSocialSignup('NAVER')}
@@ -4240,9 +4225,8 @@ export function WebClntAth010200({
 
                 {/* Google */}
                 <button
-                  className={`h-11 rounded-2xl bg-surface-container-lowest border border-slate-300/80 hover:bg-surface-container-low flex flex-col items-center justify-center transition-transform active:scale-95 shadow-sm group ${
-                    socialProvider === 'GOOGLE' ? 'ring-2 ring-primary ring-offset-1' : ''
-                  }`}
+                  className={`h-11 rounded-2xl bg-surface-container-lowest border border-slate-300/80 hover:bg-surface-container-low flex flex-col items-center justify-center transition-transform active:scale-95 shadow-sm group ${socialProvider === 'GOOGLE' ? 'ring-2 ring-primary ring-offset-1' : ''
+                    }`}
                   data-field="SOCIAL_PROVIDER"
                   data-val="GOOGLE"
                   onClick={() => handleSocialSignup('GOOGLE')}
@@ -4422,7 +4406,7 @@ export function WebClntAth010200({
               </label>
               <span className="text-secondary font-label-sm text-label-sm font-semibold">알리고 SMS / 본인확인</span>
             </div>
-            
+
             {/* 전화번호 입력 & 발송 버튼 */}
             <div className="flex gap-2">
               <input
@@ -4444,11 +4428,10 @@ export function WebClntAth010200({
                 value={userTel}
               />
               <button
-                className={`h-12 px-4 rounded-xl font-label-md text-label-md transition-colors shrink-0 shadow-sm flex items-center gap-1 cursor-pointer ${
-                  isTelVerified
+                className={`h-12 px-4 rounded-xl font-label-md text-label-md transition-colors shrink-0 shadow-sm flex items-center gap-1 cursor-pointer ${isTelVerified
                     ? 'bg-emerald-50 text-emerald-700 border border-emerald-300'
                     : 'bg-surface-container-lowest border border-secondary/30 text-secondary hover:bg-secondary/10'
-                }`}
+                  }`}
                 onClick={handleSendSmsCode}
                 disabled={isSendingSms || isTelVerified}
                 type="button"
@@ -4650,9 +4633,8 @@ export function WebClntAth010200({
                     <label className="flex items-center gap-2 cursor-pointer">
                       <input
                         checked={terms.location.checked}
-                        className={`w-4 h-4 rounded text-secondary accent-secondary ${
-                          terms.location.scrolled ? 'cursor-pointer' : 'cursor-not-allowed opacity-40'
-                        }`}
+                        className={`w-4 h-4 rounded text-secondary accent-secondary ${terms.location.scrolled ? 'cursor-pointer' : 'cursor-not-allowed opacity-40'
+                          }`}
                         data-field="SCROLLED_TO_END_YN"
                         data-terms-cd="LOCATION"
                         data-terms-ver-seq="1"
@@ -4667,11 +4649,10 @@ export function WebClntAth010200({
                     </label>
                   </div>
                   <span
-                    className={`px-2 py-0.5 rounded-full font-label-sm text-label-sm flex items-center gap-1 font-semibold ${
-                      terms.location.scrolled
+                    className={`px-2 py-0.5 rounded-full font-label-sm text-label-sm flex items-center gap-1 font-semibold ${terms.location.scrolled
                         ? 'bg-secondary-fixed/50 text-on-secondary-fixed-variant'
                         : 'bg-surface-container-high text-on-surface-variant'
-                    }`}
+                      }`}
                     id="badge-terms-location"
                   >
                     <span className="material-symbols-outlined text-[13px]">
@@ -4706,9 +4687,8 @@ export function WebClntAth010200({
                     <label className="flex items-center gap-2 cursor-pointer">
                       <input
                         checked={terms.finance.checked}
-                        className={`w-4 h-4 rounded text-secondary accent-secondary ${
-                          terms.finance.scrolled ? 'cursor-pointer' : 'cursor-not-allowed opacity-40'
-                        }`}
+                        className={`w-4 h-4 rounded text-secondary accent-secondary ${terms.finance.scrolled ? 'cursor-pointer' : 'cursor-not-allowed opacity-40'
+                          }`}
                         data-field="SCROLLED_TO_END_YN"
                         data-terms-cd="FINANCE"
                         data-terms-ver-seq="1"
@@ -4723,11 +4703,10 @@ export function WebClntAth010200({
                     </label>
                   </div>
                   <span
-                    className={`px-2 py-0.5 rounded-full font-label-sm text-label-sm flex items-center gap-1 font-semibold ${
-                      terms.finance.scrolled
+                    className={`px-2 py-0.5 rounded-full font-label-sm text-label-sm flex items-center gap-1 font-semibold ${terms.finance.scrolled
                         ? 'bg-secondary-fixed/50 text-on-secondary-fixed-variant'
                         : 'bg-surface-container-high text-on-surface-variant'
-                    }`}
+                      }`}
                     id="badge-terms-finance"
                   >
                     <span className="material-symbols-outlined text-[13px]">
@@ -4847,7 +4826,7 @@ export function WebClntAth010200({
               <span>이미 계정이 있으신가요?</span>
               <button
                 className="text-primary font-semibold hover:underline cursor-pointer"
-                onClick={onOpenLogin || (() => {})}
+                onClick={onOpenLogin || (() => { })}
                 type="button"
               >
                 로그인하기 (WEB-CLNT-ATH-010100)
@@ -4965,7 +4944,7 @@ export function WebClntAth010200({
                   </div>
                 </div>
                 <h4 className="font-extrabold text-slate-900 text-sm leading-snug">
-                  <span className="text-[#003262]">쓸고닦고</span> 서비스 제공을 위한<br/>
+                  <span className="text-[#003262]">쓸고닦고</span> 서비스 제공을 위한<br />
                   개인정보 제3자 제공 동의
                 </h4>
                 <p className="text-[11px] text-slate-500">
@@ -5126,7 +5105,7 @@ export function WebClntAth010200({
                   </div>
                 </div>
                 <h4 className="font-extrabold text-slate-900 text-sm leading-snug">
-                  <span className="text-[#003262]">쓸고닦고</span> 서비스 제공을 위한<br/>
+                  <span className="text-[#003262]">쓸고닦고</span> 서비스 제공을 위한<br />
                   카카오 개인정보 제3자 제공 동의
                 </h4>
                 <p className="text-[11px] text-slate-500">
@@ -5388,8 +5367,8 @@ export function WebClntAth010200201({
   onOpenRequestModal
 }) {
   const isPartnerUser = Boolean(
-    userInfo?.userRoleCd === 'S' || 
-    userInfo?.USER_ROLE_CD === 'S' || 
+    userInfo?.userRoleCd === 'S' ||
+    userInfo?.USER_ROLE_CD === 'S' ||
     String(userInfo?.userNo || userInfo?.USER_NO || '').startsWith('S')
   );
   const defaultUserNo = isPartnerUser ? 'S20261100001' : 'C20261100001';
@@ -5616,22 +5595,20 @@ export function WebClntAth010200201({
           <button
             type="button"
             onClick={() => setActiveTab('welcome')}
-            className={`flex-1 py-2 font-label-md text-label-md font-semibold transition-colors border-b-2 ${
-              activeTab === 'welcome'
+            className={`flex-1 py-2 font-label-md text-label-md font-semibold transition-colors border-b-2 ${activeTab === 'welcome'
                 ? 'border-secondary text-secondary'
                 : 'border-transparent text-outline hover:text-on-surface'
-            }`}
+              }`}
           >
             회원정보
           </button>
           <button
             type="button"
             onClick={() => setActiveTab('terms')}
-            className={`flex-1 py-2 font-label-md text-label-md font-semibold transition-colors border-b-2 flex items-center justify-center gap-1 ${
-              activeTab === 'terms'
+            className={`flex-1 py-2 font-label-md text-label-md font-semibold transition-colors border-b-2 flex items-center justify-center gap-1 ${activeTab === 'terms'
                 ? 'border-secondary text-secondary'
                 : 'border-transparent text-outline hover:text-on-surface'
-            }`}
+              }`}
           >
             <span>약관동의내역</span>
             <span className="text-[11px] px-1.5 py-0.2 rounded-full bg-secondary/10 text-secondary">
@@ -5641,11 +5618,10 @@ export function WebClntAth010200201({
           <button
             type="button"
             onClick={() => setActiveTab('signature')}
-            className={`flex-1 py-2 font-label-md text-label-md font-semibold transition-colors border-b-2 ${
-              activeTab === 'signature'
+            className={`flex-1 py-2 font-label-md text-label-md font-semibold transition-colors border-b-2 ${activeTab === 'signature'
                 ? 'border-secondary text-secondary'
                 : 'border-transparent text-outline hover:text-on-surface'
-            }`}
+              }`}
           >
             전자서명 관리
           </button>
@@ -6317,11 +6293,10 @@ export function WebClntOrd010000({
                 {/* Filter Tabs */}
                 <div className="flex items-center gap-1.5 p-1 bg-surface-container-low rounded-xl overflow-x-auto" id="filterTabGroup">
                   <button
-                    className={`filter-tab px-4 py-2 rounded-lg font-label-md text-label-md font-semibold transition-all flex items-center gap-1.5 shrink-0 cursor-pointer ${
-                      currentFilter === 'ALL'
+                    className={`filter-tab px-4 py-2 rounded-lg font-label-md text-label-md font-semibold transition-all flex items-center gap-1.5 shrink-0 cursor-pointer ${currentFilter === 'ALL'
                         ? 'bg-surface-container-lowest text-primary shadow-sm'
                         : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container'
-                    }`}
+                      }`}
                     onClick={() => setCurrentFilter('ALL')}
                     type="button"
                   >
@@ -6332,11 +6307,10 @@ export function WebClntOrd010000({
                   </button>
 
                   <button
-                    className={`filter-tab px-3.5 py-2 rounded-lg font-label-md text-label-md font-semibold transition-all flex items-center gap-1.5 shrink-0 cursor-pointer ${
-                      currentFilter === 'BID_OPEN'
+                    className={`filter-tab px-3.5 py-2 rounded-lg font-label-md text-label-md font-semibold transition-all flex items-center gap-1.5 shrink-0 cursor-pointer ${currentFilter === 'BID_OPEN'
                         ? 'bg-surface-container-lowest text-primary shadow-sm'
                         : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container'
-                    }`}
+                      }`}
                     onClick={() => setCurrentFilter('BID_OPEN')}
                     type="button"
                   >
@@ -6347,11 +6321,10 @@ export function WebClntOrd010000({
                   </button>
 
                   <button
-                    className={`filter-tab px-3.5 py-2 rounded-lg font-label-md text-label-md font-semibold transition-all flex items-center gap-1.5 shrink-0 cursor-pointer ${
-                      currentFilter === 'CNTR_CONFIRMED'
+                    className={`filter-tab px-3.5 py-2 rounded-lg font-label-md text-label-md font-semibold transition-all flex items-center gap-1.5 shrink-0 cursor-pointer ${currentFilter === 'CNTR_CONFIRMED'
                         ? 'bg-surface-container-lowest text-primary shadow-sm'
                         : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container'
-                    }`}
+                      }`}
                     onClick={() => setCurrentFilter('CNTR_CONFIRMED')}
                     type="button"
                   >
@@ -6362,11 +6335,10 @@ export function WebClntOrd010000({
                   </button>
 
                   <button
-                    className={`filter-tab px-3.5 py-2 rounded-lg font-label-md text-label-md font-semibold transition-all flex items-center gap-1.5 shrink-0 cursor-pointer ${
-                      currentFilter === 'SVC_PROGRESS'
+                    className={`filter-tab px-3.5 py-2 rounded-lg font-label-md text-label-md font-semibold transition-all flex items-center gap-1.5 shrink-0 cursor-pointer ${currentFilter === 'SVC_PROGRESS'
                         ? 'bg-surface-container-lowest text-primary shadow-sm'
                         : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container'
-                    }`}
+                      }`}
                     onClick={() => setCurrentFilter('SVC_PROGRESS')}
                     type="button"
                   >
@@ -6377,11 +6349,10 @@ export function WebClntOrd010000({
                   </button>
 
                   <button
-                    className={`filter-tab px-3.5 py-2 rounded-lg font-label-md text-label-md font-semibold transition-all flex items-center gap-1.5 shrink-0 cursor-pointer ${
-                      currentFilter === 'SVC_COMPLETED'
+                    className={`filter-tab px-3.5 py-2 rounded-lg font-label-md text-label-md font-semibold transition-all flex items-center gap-1.5 shrink-0 cursor-pointer ${currentFilter === 'SVC_COMPLETED'
                         ? 'bg-surface-container-lowest text-primary shadow-sm'
                         : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container'
-                    }`}
+                      }`}
                     onClick={() => setCurrentFilter('SVC_COMPLETED')}
                     type="button"
                   >
@@ -6392,11 +6363,10 @@ export function WebClntOrd010000({
                   </button>
 
                   <button
-                    className={`filter-tab px-3.5 py-2 rounded-lg font-label-md text-label-md font-semibold transition-all flex items-center gap-1.5 shrink-0 cursor-pointer ${
-                      currentFilter === 'BID_EXPIRED'
+                    className={`filter-tab px-3.5 py-2 rounded-lg font-label-md text-label-md font-semibold transition-all flex items-center gap-1.5 shrink-0 cursor-pointer ${currentFilter === 'BID_EXPIRED'
                         ? 'bg-surface-container-lowest text-primary shadow-sm'
                         : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container'
-                    }`}
+                      }`}
                     onClick={() => setCurrentFilter('BID_EXPIRED')}
                     type="button"
                   >
@@ -6970,7 +6940,7 @@ function WebSrvcCom010100({ isOpen, userInfo, onClose, onSuccess }) {
           if (json.data.BIZ_REG_NO) setBizNo(json.data.BIZ_REG_NO);
         }
       })
-      .catch(() => {});
+      .catch(() => { });
     fetch(`/api/srvc/myp/020100?userNo=${encodeURIComponent(uNo)}`)
       .then((res) => res.json())
       .then((json) => {
@@ -6994,7 +6964,7 @@ function WebSrvcCom010100({ isOpen, userInfo, onClose, onSuccess }) {
           );
         }
       })
-      .catch(() => {});
+      .catch(() => { });
   }, [userInfo]);
 
   const showToast = (msg) => {
@@ -7011,7 +6981,7 @@ function WebSrvcCom010100({ isOpen, userInfo, onClose, onSuccess }) {
         if (!active || !data?.success) return;
         setCurrentLogoUrl(data.data?.currentLogoUrl || null);
       })
-      .catch(() => {});
+      .catch(() => { });
 
     const handleKeyDown = (e) => {
       if (e.key === 'Escape' && onClose) onClose();
@@ -7232,9 +7202,8 @@ function WebSrvcCom010100({ isOpen, userInfo, onClose, onSuccess }) {
                 setIsDragging(false);
                 processFile(e.dataTransfer.files?.[0]);
               }}
-              className={`border-2 border-dashed rounded-2xl p-6 text-center transition-all flex flex-col items-center justify-center gap-3 cursor-pointer ${
-                isDragging ? 'border-sky-500 bg-sky-100/40 scale-[1.01]' : 'border-sky-300 hover:border-sky-500 bg-sky-50/25'
-              }`}
+              className={`border-2 border-dashed rounded-2xl p-6 text-center transition-all flex flex-col items-center justify-center gap-3 cursor-pointer ${isDragging ? 'border-sky-500 bg-sky-100/40 scale-[1.01]' : 'border-sky-300 hover:border-sky-500 bg-sky-50/25'
+                }`}
             >
               <div className="w-12 h-12 rounded-2xl bg-sky-100 text-sky-600 flex items-center justify-center">
                 <span className="material-symbols-outlined text-3xl">add_photo_alternate</span>
@@ -7382,11 +7351,10 @@ function PaginationBar({ page, totalPages, onPageChange }) {
           key={p}
           type="button"
           onClick={() => onPageChange(p)}
-          className={`min-w-[32px] px-2.5 py-1.5 rounded-lg border text-label-sm font-bold transition cursor-pointer ${
-            p === safePage
+          className={`min-w-[32px] px-2.5 py-1.5 rounded-lg border text-label-sm font-bold transition cursor-pointer ${p === safePage
               ? 'bg-primary text-on-primary border-primary shadow-sm'
               : 'bg-surface-container-lowest text-on-surface border-slate-300 hover:bg-surface-container-low'
-          }`}
+            }`}
         >
           {p}
         </button>
@@ -7439,7 +7407,7 @@ function WebSrvcCom010100({ isOpen, userInfo, onClose, onSuccess }) {
         if (!active || !data?.success) return;
         setCurrentLogoUrl(data.data?.currentLogoUrl || null);
       })
-      .catch(() => {});
+      .catch(() => { });
 
     const handleKeyDown = (e) => {
       if (e.key === 'Escape' && onClose) onClose();
@@ -7660,9 +7628,8 @@ function WebSrvcCom010100({ isOpen, userInfo, onClose, onSuccess }) {
                 setIsDragging(false);
                 processFile(e.dataTransfer.files?.[0]);
               }}
-              className={`border-2 border-dashed rounded-2xl p-6 text-center transition-all flex flex-col items-center justify-center gap-3 cursor-pointer ${
-                isDragging ? 'border-sky-500 bg-sky-100/40 scale-[1.01]' : 'border-sky-300 hover:border-sky-500 bg-sky-50/25'
-              }`}
+              className={`border-2 border-dashed rounded-2xl p-6 text-center transition-all flex flex-col items-center justify-center gap-3 cursor-pointer ${isDragging ? 'border-sky-500 bg-sky-100/40 scale-[1.01]' : 'border-sky-300 hover:border-sky-500 bg-sky-50/25'
+                }`}
             >
               <div className="w-12 h-12 rounded-2xl bg-sky-100 text-sky-600 flex items-center justify-center">
                 <span className="material-symbols-outlined text-3xl">add_photo_alternate</span>
@@ -7810,11 +7777,10 @@ function PaginationBar({ page, totalPages, onPageChange }) {
           key={p}
           type="button"
           onClick={() => onPageChange(p)}
-          className={`min-w-[32px] px-2.5 py-1.5 rounded-lg border text-label-sm font-bold transition cursor-pointer ${
-            p === safePage
+          className={`min-w-[32px] px-2.5 py-1.5 rounded-lg border text-label-sm font-bold transition cursor-pointer ${p === safePage
               ? 'bg-primary text-on-primary border-primary shadow-sm'
               : 'bg-surface-container-lowest text-on-surface border-slate-300 hover:bg-surface-container-low'
-          }`}
+            }`}
         >
           {p}
         </button>
@@ -7836,7 +7802,7 @@ function PaginationBar({ page, totalPages, onPageChange }) {
  * 화면 ID: WEB-SRVC-COM-010000
  * 화면명: 시공사 파트너 메인 대시보드
  */
-function WebSrvcCom010000({ userInfo }) {
+function WebSrvcCom010000({ userInfo, onNavigate, onPartnerProfileLoaded }) {
   const partnerName = userInfo?.USER_NM || '클린마스터 김태호';
   const defaultRange = getCurrentMonthRange();
 
@@ -7890,14 +7856,42 @@ function WebSrvcCom010000({ userInfo }) {
           } else {
             setIsBizRestricted(false);
           }
-          if (Array.isArray(data.partnerSpecialties)) setPartnerSpecialties(data.partnerSpecialties);
-          if (Array.isArray(data.partnerCerts)) setPartnerCerts(data.partnerCerts);
+          if (Array.isArray(data.partnerSpecialties) && data.partnerSpecialties.length > 0) setPartnerSpecialties(data.partnerSpecialties);
+          if (Array.isArray(data.partnerCerts) && data.partnerCerts.length > 0) setPartnerCerts(data.partnerCerts);
           setTabCounts(data.tabCounts || { waitingBid: 0, waitingPayment: 0, waitingCleaning: 0 });
           setTabItems(data.tabData?.items || []);
           setTabTotalPages(data.tabData?.totalPages || 1);
           setActivityItems(data.activityData?.items || []);
           setActTotalPages(data.activityData?.totalPages || 1);
         }
+        try {
+          const uNo = userInfo?.USER_NO || 'S20261000001';
+          const mypRes = await fetch(`/api/srvc/myp/020100?userNo=${encodeURIComponent(uNo)}`);
+          const mypJson = await mypRes.json();
+          if (mypJson?.success) {
+            if (Array.isArray(mypJson.cleanServiceTypes) && mypJson.cleanServiceTypes.length > 0) {
+              setPartnerSpecialties(mypJson.cleanServiceTypes);
+            }
+            if (Array.isArray(mypJson.certs) && mypJson.certs.length > 0) {
+              setPartnerCerts(mypJson.certs.map((c) => c.CERT_NM || c.name).filter(Boolean));
+            }
+          }
+          const bizRes = await fetch(`/api/srvc/myp/020101?userNo=${encodeURIComponent(uNo)}`);
+          const bizJson = await bizRes.json();
+          if (bizJson?.success && bizJson.data) {
+            onPartnerProfileLoaded?.({
+              logoUrl: partnerLogoUrl || userInfo?.PROFILE_IMG_URL || null,
+              ceoNm: bizJson.data.CEO_NM || '',
+              compNm: bizJson.data.COMP_NM || data?.partnerCompNm || '',
+            });
+          } else {
+            onPartnerProfileLoaded?.({
+              logoUrl: partnerLogoUrl || userInfo?.PROFILE_IMG_URL || null,
+              ceoNm: '',
+              compNm: data?.partnerCompNm || '',
+            });
+          }
+        } catch { }
       } catch (err) {
         console.error('[WEB-SRVC-COM-010000] 대시보드 데이터 조회 실패:', err);
       }
@@ -7926,7 +7920,7 @@ function WebSrvcCom010000({ userInfo }) {
           setPartnerLogoUrl(d.data.currentLogoUrl);
         }
       })
-      .catch(() => {});
+      .catch(() => { });
   }, [userInfo]);
 
   const handleTabClick = (tabId) => {
@@ -8037,7 +8031,7 @@ function WebSrvcCom010000({ userInfo }) {
 
               <div className="flex flex-col gap-space-xs">
                 <div className="flex items-center gap-space-xs">
-                  <span className="font-label-sm text-label-sm uppercase tracking-wider text-secondary font-bold">WEB-SRVC-COM-010000 · PARTNER DASHBOARD</span>
+                  <span className="hidden" />
                   <span className="w-1.5 h-1.5 rounded-full bg-secondary" />
                   <span className="font-label-sm text-label-sm text-on-surface-variant font-medium">실시간 운영 모드</span>
                 </div>
@@ -8118,9 +8112,8 @@ function WebSrvcCom010000({ userInfo }) {
                     role="tab"
                     aria-selected={isActive}
                     onClick={() => handleTabClick(tab.id)}
-                    className={`flex items-center gap-1.5 px-4 py-2 rounded-lg font-title-md text-title-md font-bold shadow-sm transition-all duration-200 cursor-pointer ${
-                      isActive ? 'bg-[#eab308] text-slate-900 ring-2 ring-[#ca8a04]/40' : 'bg-[#003d9b] hover:bg-[#0052cc] text-white'
-                    }`}
+                    className={`flex items-center gap-1.5 px-4 py-2 rounded-lg font-title-md text-title-md font-bold shadow-sm transition-all duration-200 cursor-pointer ${isActive ? 'bg-[#eab308] text-slate-900 ring-2 ring-[#ca8a04]/40' : 'bg-[#003d9b] hover:bg-[#0052cc] text-white'
+                      }`}
                   >
                     <span className="material-symbols-outlined text-[18px]">{tab.icon}</span>
                     <span>{tab.label}</span>
@@ -8373,11 +8366,10 @@ function WebSrvcCom010000({ userInfo }) {
                           if (!act.hasReview) return;
                           showToast('[WEB-SRVC-COM-010300] 이용후기 답글쓰기 모달을 호출합니다.');
                         }}
-                        className={`font-title-md text-title-md font-bold px-space-lg py-2.5 rounded-lg border transition ${
-                          act.hasReview
+                        className={`font-title-md text-title-md font-bold px-space-lg py-2.5 rounded-lg border transition ${act.hasReview
                             ? 'bg-primary hover:bg-primary-container text-on-primary border-primary shadow-sm cursor-pointer'
                             : 'bg-surface-container text-on-surface-variant border-slate-300 opacity-40 cursor-not-allowed'
-                        }`}
+                          }`}
                       >
                         답글쓰기
                       </button>
@@ -8476,7 +8468,7 @@ function WebSrvcMyp020100({ userInfo, onBack }) {
           if (json.data.BIZ_REG_NO) setBizNo(json.data.BIZ_REG_NO);
         }
       })
-      .catch(() => {});
+      .catch(() => { });
     fetch(`/api/srvc/myp/020100?userNo=${encodeURIComponent(uNo)}`)
       .then((res) => res.json())
       .then((json) => {
@@ -8500,7 +8492,7 @@ function WebSrvcMyp020100({ userInfo, onBack }) {
           );
         }
       })
-      .catch(() => {});
+      .catch(() => { });
   }, [userInfo]);
 
   const showToast = (msg) => {
@@ -8513,259 +8505,260 @@ function WebSrvcMyp020100({ userInfo, onBack }) {
       <div className="max-w-5xl mx-auto p-4 sm:p-8 flex flex-col gap-6">
         {/* 상단 헤더 */}
         <header className="bg-white rounded-2xl p-6 sm:p-8 border border-slate-200/90 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-5 relative overflow-hidden">
-          <div className="absolute -right-10 -bottom-10 w-44 h-44 bg-blue-50/60 rounded-full blur-2xl pointer-events-none" />
-          <div className="relative z-10">
-            <div className="flex items-center gap-2 mb-1.5">
-              <span className="px-2.5 py-0.5 rounded-md bg-blue-50 text-blue-700 text-xs font-bold tracking-wide border border-blue-100">WEB-SRVC-MYP-020100</span>
-              <span className="text-xs text-slate-400 font-medium">통합 입점/자격 심사 관리</span>
-            </div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">사업자등록 및 자격증·수료증 등록</h1>
-            <p className="text-sm text-slate-500 mt-2 leading-relaxed max-w-2xl">
-              국세청 진위확인, 홈택스 PDF OCR 자동 파싱 및 표준 자격·수료 항목 검색/등록(최대 5건)을 원스톱으로 처리합니다.
-            </p>
-          </div>
-          <div className="flex flex-col sm:items-end gap-2 shrink-0 relative z-10">
-            <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 shadow-sm">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              인증 파트너 심사 연동
-            </span>
-            <span className="text-[11px] text-slate-400 font-medium">공공 데이터 API 실시간 연결됨</span>
-          </div>
-        </header>
-
-        {/* 1. 사업자등록 및 국세청 진위확인 */}
-        <section className="bg-white rounded-2xl p-6 sm:p-7 border-2 border-blue-500 shadow-sm flex flex-col gap-5">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-100 gap-3">
-            <div className="flex items-center gap-2.5">
-              <div className="w-9 h-9 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600 border border-blue-100">
-                <span className="material-symbols-outlined text-[22px]">badge</span>
+          <header className="bg-white rounded-2xl p-6 sm:p-8 border-2 border-blue-500 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-5 relative overflow-hidden">
+            <div className="absolute -right-10 -bottom-10 w-44 h-44 bg-blue-50/60 rounded-full blur-2xl pointer-events-none" />
+            <div className="relative z-10">
+              <div className="flex items-center gap-2 mb-1.5">
+                <span className="px-2.5 py-0.5 rounded-md bg-blue-50 text-blue-700 text-xs font-bold tracking-wide border border-blue-100">WEB-SRVC-MYP-020100</span>
+                <span className="text-xs text-slate-400 font-medium">통합 입점/자격 심사 관리</span>
               </div>
-              <div>
-                <h2 className="text-lg font-bold text-slate-900">1. 사업자등록 및 국세청 진위확인</h2>
-                <p className="text-xs text-slate-500">사업자 정보 입력 및 국세청 휴·폐업 및 진위확인 실시간 대조</p>
-              </div>
+              <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">사업자등록 및 자격증·수료증 등록</h1>
+              <p className="text-sm text-slate-500 mt-2 leading-relaxed max-w-2xl">
+                국세청 진위확인, 홈택스 PDF OCR 자동 파싱 및 표준 자격·수료 항목 검색/등록(최대 5건)을 원스톱으로 처리합니다.
+              </p>
             </div>
-            <button
-              type="button"
-              onClick={() => setIsOcrModalOpen(true)}
-              className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-xs font-bold text-slate-700 border border-slate-200 transition-colors cursor-pointer"
-            >
-              <span className="material-symbols-outlined text-base text-slate-600">document_scanner</span>
-              사업자 등록증 업로드
-            </button>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-            <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1.5">상호명 (법인명) <span className="text-rose-500">*</span></label>
-              <input type="text" value={bizName} onChange={(e) => setBizName(e.target.value)} className="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm font-medium text-slate-800 focus:bg-white focus:outline-none focus:border-blue-600" />
-            </div>
-            <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1.5">대표자 성명 <span className="text-rose-500">*</span></label>
-              <input type="text" value={ceoName} onChange={(e) => setCeoName(e.target.value)} className="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm font-medium text-slate-800 focus:bg-white focus:outline-none focus:border-blue-600" />
-            </div>
-            <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1.5">사업자등록번호 (10자리) <span className="text-rose-500">*</span></label>
-              <input type="text" value={bizNo} onChange={(e) => setBizNo(e.target.value)} className="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm font-medium text-slate-800 focus:bg-white focus:outline-none focus:border-blue-600" />
-            </div>
-          </div>
-
-          <div className="flex items-center justify-between p-3.5 bg-emerald-50/70 border border-emerald-200 rounded-xl text-xs text-emerald-800">
-            <div className="flex items-center gap-2">
-              <span className="material-symbols-outlined text-emerald-600 text-lg">verified</span>
-              <span><strong>국세청 전산 확인 완료:</strong> 정상 계속사업자 (일반과세자, 개업일: 2021-03-15)</span>
-            </div>
-            <span className="font-bold text-emerald-700 bg-white px-2 py-0.5 rounded border border-emerald-200">인증 유효</span>
-          </div>
-        </section>
-
-        {/* 2. 청소 용역 구분 */}
-        <section className="bg-white rounded-2xl p-6 sm:p-7 border-2 border-blue-500 shadow-sm flex flex-col gap-5">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-100 gap-2">
-            <div className="flex items-center gap-2.5">
-              <div className="w-9 h-9 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600 border border-blue-100">
-                <span className="material-symbols-outlined text-[22px]">cleaning_services</span>
-              </div>
-              <div>
-                <h2 className="text-lg font-bold text-slate-900">2. 청소 용역 구분</h2>
-                <p className="text-xs text-slate-500">시공 가능한 청소 용역 분야를 선택하세요 (복수 선택 가능)</p>
-              </div>
-            </div>
-          </div>
-          <div className="flex flex-wrap items-center gap-6">
-            {['정기청소', '입주청소', '계절가전 청소'].map((item) => {
-              const checked = cleanServiceTypes.includes(item);
-              return (
-                <label key={item} className="inline-flex items-center gap-2.5 cursor-pointer select-none">
-                  <input
-                    type="checkbox"
-                    checked={checked}
-                    onChange={() =>
-                      setCleanServiceTypes((prev) =>
-                        prev.includes(item) ? prev.filter((v) => v !== item) : [...prev, item]
-                      )
-                    }
-                    className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
-                  />
-                  <span className="text-sm font-semibold text-slate-800">{item}</span>
-                </label>
-              );
-            })}
-          </div>
-        </section>
-
-        {/* 3. 표준 자격·수료 항목 검색 및 등록 */}
-        <section className="bg-white rounded-2xl p-6 sm:p-7 border-2 border-blue-500 shadow-sm flex flex-col gap-5">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-100 gap-2">
-            <div className="flex items-center gap-2.5">
-              <div className="w-9 h-9 rounded-xl bg-teal-50 flex items-center justify-center text-teal-700 border border-teal-100">
-                <span className="material-symbols-outlined text-[22px]">verified_user</span>
-              </div>
-              <div>
-                <div className="flex items-center gap-2">
-                  <h2 className="text-lg font-bold text-slate-900">3. 표준 자격·수료 항목 검색 및 등록</h2>
-
-                </div>
-                <p className="text-xs text-slate-500">본사 심사 승인 시 고객 대시보드 및 상세 견적 프로필에 공식 인증 마크 부여</p>
-              </div>
-            </div>
-            <span className="text-xs font-semibold text-slate-500 flex items-center gap-1">
-              <span className="material-symbols-outlined text-sm text-slate-400">filter_list</span>
-
-            </span>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 bg-slate-50 p-4 rounded-xl border border-slate-200/80 text-sm">
-            <div>
-              <label className="block text-[11px] font-bold text-slate-500 mb-1">문서 구분 (CERT_DOC_TYPE)</label>
-              <select value={docType} onChange={(e) => setDocType(e.target.value)} className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs font-semibold text-slate-700">
-                <option value="ALL">전체 구분 (전체 문서)</option>
-                <option value="LICENSE">국가/민간 자격증</option>
-                <option value="COMPLETION">협회 수료증</option>
-                <option value="BUSINESS">위생관리용역업 신고증</option>
-              </select>
-            </div>
-            <div>
-              <label className="block text-[11px] font-bold text-slate-500 mb-1">서비스 전문 분야</label>
-              <select value={serviceCat} onChange={(e) => setServiceCat(e.target.value)} className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs font-semibold text-slate-700">
-                <option value="ALL">전체 분야 (주력 우선)</option>
-                <option value="MOVE_IN">입주·이사 청소</option>
-                <option value="APPLIANCE">계절가전 분해케어</option>
-                <option value="REGULAR">정기청소</option>
-              </select>
-            </div>
-            <div>
-              <label className="block text-[11px] font-bold text-slate-500 mb-1">자격·수료증 명칭</label>
-              <input type="text" value={keyword} onChange={(e) => setKeyword(e.target.value)} placeholder="예: 방역소독, 가전관리" className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-800" />
-            </div>
-            <div className="flex items-end">
-              <button type="button" onClick={() => showToast('표준 자격 항목 검색을 완료했습니다.')} className="w-full bg-[#0d9488] hover:bg-[#0f766e] text-white rounded-lg px-4 py-2 text-xs font-bold flex items-center justify-center gap-1.5 shadow-sm cursor-pointer">
-                <span className="material-symbols-outlined text-base">search</span>
-                항목 검색
-              </button>
-            </div>
-          </div>
-
-          {/* 등록 자격·수료증 목록 */}
-          <div className="bg-slate-50/80 rounded-xl p-4 border border-slate-200/70">
-            <div className="flex items-center justify-between text-xs mb-3 pb-2.5 border-b border-slate-200/60">
-              <div className="flex items-center gap-2">
-                <span className="font-bold text-slate-900 text-sm flex items-center gap-1.5">
-                  <span className="material-symbols-outlined text-teal-600 text-lg">verified</span>등록 자격·수료증
-                </span>
-                <span className="text-[11px] font-semibold text-teal-700 bg-teal-50 px-2 py-0.5 rounded-full border border-teal-200">({certs.length}건 등록됨)</span>
-              </div>
-              <span className="text-xs text-slate-500 font-medium">잔여 <strong className="text-blue-600 font-bold">{Math.max(0, 5 - certs.length)}건</strong> 추가 가능</span>
-            </div>
-            <div className="flex flex-col gap-2.5">
-              {pagedCerts.map((c) => (
-                <div key={c.id} className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 p-3 bg-white border border-slate-200/80 rounded-xl">
-                  <div className="flex flex-wrap items-center gap-2.5 text-xs">
-                    <span className={`inline-flex items-center justify-center w-6 h-6 rounded-lg border shrink-0 ${c.iconBg}`}>
-                      <span className="material-symbols-outlined text-sm">{c.icon}</span>
-                    </span>
-                    <span className="font-bold text-slate-900 text-sm">{c.name}</span>
-                    <span className={`px-2 py-0.5 rounded text-[11px] font-semibold border ${c.catCls}`}>{c.cat}</span>
-                    <span className="px-1.5 py-0.5 rounded bg-slate-100 text-slate-600 text-[10px] font-bold">{c.level}</span>
-                    <span className="text-slate-300">|</span>
-                    <span className="text-slate-500 text-[11px]">취득일: {c.date}</span>
-                    <span className="text-slate-300">|</span>
-                    <span className="text-slate-500 text-[11px]">발급기관: {c.org} ({c.certNo})</span>
-                    <span className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-semibold border ${c.statusCls}`}>
-                      <span className={`w-1 h-1 rounded-full ${c.dotCls}`} />{c.status}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-2 shrink-0">
-                    <button type="button" onClick={() => showToast(`${c.name} 증빙 사진을 확인합니다.`)} className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-slate-50 hover:bg-slate-100 border border-slate-200 text-xs font-semibold text-slate-700 cursor-pointer">
-                      <span className="material-symbols-outlined text-sm text-slate-500">image</span>자격증사진
-                    </button>
-                    <button type="button" onClick={() => setCerts((prev) => prev.filter((x) => x.id !== c.id))} className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-white hover:bg-rose-50 border border-slate-200 hover:border-rose-200 text-xs font-semibold text-slate-500 hover:text-rose-600 cursor-pointer">
-                      <span className="material-symbols-outlined text-sm">delete</span>삭제
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* 페이지네이션 (페이지당 최대 5건) */}
-            <div className="flex items-center justify-between pt-3 mt-3 border-t border-slate-200/70">
-              <span className="text-xs text-slate-500">
-                총 <strong className="text-slate-800">{certs.length}</strong>건 (페이지 {certPage}/{totalCertPages})
+            <div className="flex flex-col sm:items-end gap-2 shrink-0 relative z-10">
+              <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 shadow-sm">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                인증 파트너 심사 연동
               </span>
-              <nav aria-label="자격·수료증 목록 페이지 이동" className="inline-flex items-center gap-1 rounded-xl bg-white p-1 border border-slate-200 shadow-2xs">
-                <button type="button" disabled={certPage === 1} onClick={() => setCertPage(1)} title="맨앞페이지" className="h-7 px-2 inline-flex items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-700 disabled:text-slate-400 disabled:opacity-50 text-xs font-bold cursor-pointer">&lt;&lt;</button>
-                <button type="button" disabled={certPage === 1} onClick={() => setCertPage((p) => Math.max(1, p - 1))} title="전페이지" className="h-7 px-2 inline-flex items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-700 disabled:text-slate-400 disabled:opacity-50 text-xs font-bold cursor-pointer">&lt;</button>
-                {Array.from({ length: totalCertPages }, (_, i) => i + 1).map((p) => (
-                  <button key={p} type="button" onClick={() => setCertPage(p)} className={`h-7 min-w-[28px] px-2 inline-flex items-center justify-center rounded-lg text-xs font-bold cursor-pointer ${certPage === p ? 'bg-[#0284c7] text-white shadow-xs' : 'text-slate-600 hover:bg-slate-100'}`}>
-                    {p}
-                  </button>
-                ))}
-                <button type="button" disabled={certPage === totalCertPages} onClick={() => setCertPage((p) => Math.min(totalCertPages, p + 1))} title="다음페이지" className="h-7 px-2 inline-flex items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-700 disabled:text-slate-400 disabled:opacity-50 text-xs font-bold cursor-pointer">&gt;</button>
-                <button type="button" disabled={certPage === totalCertPages} onClick={() => setCertPage(totalCertPages)} title="맨뒤페이지" className="h-7 px-2 inline-flex items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-700 disabled:text-slate-400 disabled:opacity-50 text-xs font-bold cursor-pointer">&gt;&gt;</button>
-              </nav>
+              <span className="text-[11px] text-slate-400 font-medium">공공 데이터 API 실시간 연결됨</span>
             </div>
-          </div>
+          </header>
 
-          {/* 하단 저장 및 돌아가기 */}
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-4 border-t border-slate-100">
-            <p className="text-xs text-slate-400 flex items-center gap-1">
-              <span className="material-symbols-outlined text-sm text-slate-400">info</span>
-              등록된 정보는 플랫폼 본사 전문 검수팀에 의해 영업일 기준 24시간 이내 승인됩니다.
-            </p>
-            <div className="flex items-center gap-2.5 w-full sm:w-auto">
-              <button type="button" onClick={onBack} className="flex-1 sm:flex-none px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold cursor-pointer">
-                취소 및 돌아가기
-              </button>
+          {/* 1. 사업자등록 및 국세청 진위확인 */}
+          <section className="bg-white rounded-2xl p-6 sm:p-7 border-2 border-blue-500 shadow-sm flex flex-col gap-5">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-100 gap-3">
+              <div className="flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600 border border-blue-100">
+                  <span className="material-symbols-outlined text-[22px]">badge</span>
+                </div>
+                <div>
+                  <h2 className="text-lg font-bold text-slate-900">1. 사업자등록 및 국세청 진위확인</h2>
+                  <p className="text-xs text-slate-500">사업자 정보 입력 및 국세청 휴·폐업 및 진위확인 실시간 대조</p>
+                </div>
+              </div>
               <button
                 type="button"
-                onClick={async () => {
-                  try {
-                    const res = await fetch('/api/srvc/myp/020100', {
-                      method: 'PUT',
-                      headers: { 'Content-Type': 'application/json' },
-                      body: JSON.stringify({
-                        userNo: userInfo?.USER_NO || 'S20261100002',
-                        bizName,
-                        ceoName,
-                        bizNo,
-                        cleanServiceTypes,
-                        certs,
-                      }),
-                    });
-                    const json = await res.json();
-                    showToast(json?.message || '사업자 및 자격·수료 정보가 저장되었습니다.');
-                  } catch {
-                    showToast('저장 요청 중 오류가 발생했습니다.');
-                  }
-                }}
-                className="flex-1 sm:flex-none px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shadow-sm flex items-center justify-center gap-1.5 cursor-pointer"
+                onClick={() => setIsOcrModalOpen(true)}
+                className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-xs font-bold text-slate-700 border border-slate-200 transition-colors cursor-pointer"
               >
-                <span className="material-symbols-outlined text-base">save</span>
-                내 정보 저장
+                <span className="material-symbols-outlined text-base text-slate-600">document_scanner</span>
+                사업자 등록증 업로드
               </button>
             </div>
-          </div>
-        </section>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1.5">상호명 (법인명) <span className="text-rose-500">*</span></label>
+                <input type="text" value={bizName} onChange={(e) => setBizName(e.target.value)} className="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm font-medium text-slate-800 focus:bg-white focus:outline-none focus:border-blue-600" />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1.5">대표자 성명 <span className="text-rose-500">*</span></label>
+                <input type="text" value={ceoName} onChange={(e) => setCeoName(e.target.value)} className="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm font-medium text-slate-800 focus:bg-white focus:outline-none focus:border-blue-600" />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1.5">사업자등록번호 (10자리) <span className="text-rose-500">*</span></label>
+                <input type="text" value={bizNo} onChange={(e) => setBizNo(e.target.value)} className="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm font-medium text-slate-800 focus:bg-white focus:outline-none focus:border-blue-600" />
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between p-3.5 bg-emerald-50/70 border border-emerald-200 rounded-xl text-xs text-emerald-800">
+              <div className="flex items-center gap-2">
+                <span className="material-symbols-outlined text-emerald-600 text-lg">verified</span>
+                <span><strong>국세청 전산 확인 완료:</strong> 정상 계속사업자 (일반과세자, 개업일: 2021-03-15)</span>
+              </div>
+              <span className="font-bold text-emerald-700 bg-white px-2 py-0.5 rounded border border-emerald-200">인증 유효</span>
+            </div>
+          </section>
+
+          {/* 2. 청소 용역 구분 */}
+          <section className="bg-white rounded-2xl p-6 sm:p-7 border-2 border-blue-500 shadow-sm flex flex-col gap-5">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-100 gap-2">
+              <div className="flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600 border border-blue-100">
+                  <span className="material-symbols-outlined text-[22px]">cleaning_services</span>
+                </div>
+                <div>
+                  <h2 className="text-lg font-bold text-slate-900">2. 청소 용역 구분</h2>
+                  <p className="text-xs text-slate-500">시공 가능한 청소 용역 분야를 선택하세요 (복수 선택 가능)</p>
+                </div>
+              </div>
+            </div>
+            <div className="flex flex-wrap items-center gap-6">
+              {['정기청소', '입주청소', '계절가전 청소'].map((item) => {
+                const checked = cleanServiceTypes.includes(item);
+                return (
+                  <label key={item} className="inline-flex items-center gap-2.5 cursor-pointer select-none">
+                    <input
+                      type="checkbox"
+                      checked={checked}
+                      onChange={() =>
+                        setCleanServiceTypes((prev) =>
+                          prev.includes(item) ? prev.filter((v) => v !== item) : [...prev, item]
+                        )
+                      }
+                      className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
+                    />
+                    <span className="text-sm font-semibold text-slate-800">{item}</span>
+                  </label>
+                );
+              })}
+            </div>
+          </section>
+
+          {/* 3. 표준 자격·수료 항목 검색 및 등록 */}
+          <section className="bg-white rounded-2xl p-6 sm:p-7 border-2 border-blue-500 shadow-sm flex flex-col gap-5">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-100 gap-2">
+              <div className="flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-xl bg-teal-50 flex items-center justify-center text-teal-700 border border-teal-100">
+                  <span className="material-symbols-outlined text-[22px]">verified_user</span>
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <h2 className="text-lg font-bold text-slate-900">3. 표준 자격·수료 항목 검색 및 등록</h2>
+
+                  </div>
+                  <p className="text-xs text-slate-500">본사 심사 승인 시 고객 대시보드 및 상세 견적 프로필에 공식 인증 마크 부여</p>
+                </div>
+              </div>
+              <span className="text-xs font-semibold text-slate-500 flex items-center gap-1">
+                <span className="material-symbols-outlined text-sm text-slate-400">filter_list</span>
+
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 bg-slate-50 p-4 rounded-xl border border-slate-200/80 text-sm">
+              <div>
+                <label className="block text-[11px] font-bold text-slate-500 mb-1">문서 구분 (CERT_DOC_TYPE)</label>
+                <select value={docType} onChange={(e) => setDocType(e.target.value)} className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs font-semibold text-slate-700">
+                  <option value="ALL">전체 구분 (전체 문서)</option>
+                  <option value="LICENSE">국가/민간 자격증</option>
+                  <option value="COMPLETION">협회 수료증</option>
+                  <option value="BUSINESS">위생관리용역업 신고증</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-[11px] font-bold text-slate-500 mb-1">서비스 전문 분야</label>
+                <select value={serviceCat} onChange={(e) => setServiceCat(e.target.value)} className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs font-semibold text-slate-700">
+                  <option value="ALL">전체 분야 (주력 우선)</option>
+                  <option value="MOVE_IN">입주·이사 청소</option>
+                  <option value="APPLIANCE">계절가전 분해케어</option>
+                  <option value="REGULAR">정기청소</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-[11px] font-bold text-slate-500 mb-1">자격·수료증 명칭</label>
+                <input type="text" value={keyword} onChange={(e) => setKeyword(e.target.value)} placeholder="예: 방역소독, 가전관리" className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-800" />
+              </div>
+              <div className="flex items-end">
+                <button type="button" onClick={() => showToast('표준 자격 항목 검색을 완료했습니다.')} className="w-full bg-[#0d9488] hover:bg-[#0f766e] text-white rounded-lg px-4 py-2 text-xs font-bold flex items-center justify-center gap-1.5 shadow-sm cursor-pointer">
+                  <span className="material-symbols-outlined text-base">search</span>
+                  항목 검색
+                </button>
+              </div>
+            </div>
+
+            {/* 등록 자격·수료증 목록 */}
+            <div className="bg-slate-50/80 rounded-xl p-4 border border-slate-200/70">
+              <div className="flex items-center justify-between text-xs mb-3 pb-2.5 border-b border-slate-200/60">
+                <div className="flex items-center gap-2">
+                  <span className="font-bold text-slate-900 text-sm flex items-center gap-1.5">
+                    <span className="material-symbols-outlined text-teal-600 text-lg">verified</span>등록 자격·수료증
+                  </span>
+                  <span className="text-[11px] font-semibold text-teal-700 bg-teal-50 px-2 py-0.5 rounded-full border border-teal-200">({certs.length}건 등록됨)</span>
+                </div>
+                <span className="text-xs text-slate-500 font-medium">잔여 <strong className="text-blue-600 font-bold">{Math.max(0, 5 - certs.length)}건</strong> 추가 가능</span>
+              </div>
+              <div className="flex flex-col gap-2.5">
+                {pagedCerts.map((c) => (
+                  <div key={c.id} className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 p-3 bg-white border border-slate-200/80 rounded-xl">
+                    <div className="flex flex-wrap items-center gap-2.5 text-xs">
+                      <span className={`inline-flex items-center justify-center w-6 h-6 rounded-lg border shrink-0 ${c.iconBg}`}>
+                        <span className="material-symbols-outlined text-sm">{c.icon}</span>
+                      </span>
+                      <span className="font-bold text-slate-900 text-sm">{c.name}</span>
+                      <span className={`px-2 py-0.5 rounded text-[11px] font-semibold border ${c.catCls}`}>{c.cat}</span>
+                      <span className="px-1.5 py-0.5 rounded bg-slate-100 text-slate-600 text-[10px] font-bold">{c.level}</span>
+                      <span className="text-slate-300">|</span>
+                      <span className="text-slate-500 text-[11px]">취득일: {c.date}</span>
+                      <span className="text-slate-300">|</span>
+                      <span className="text-slate-500 text-[11px]">발급기관: {c.org} ({c.certNo})</span>
+                      <span className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-semibold border ${c.statusCls}`}>
+                        <span className={`w-1 h-1 rounded-full ${c.dotCls}`} />{c.status}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2 shrink-0">
+                      <button type="button" onClick={() => showToast(`${c.name} 증빙 사진을 확인합니다.`)} className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-slate-50 hover:bg-slate-100 border border-slate-200 text-xs font-semibold text-slate-700 cursor-pointer">
+                        <span className="material-symbols-outlined text-sm text-slate-500">image</span>자격증사진
+                      </button>
+                      <button type="button" onClick={() => setCerts((prev) => prev.filter((x) => x.id !== c.id))} className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-white hover:bg-rose-50 border border-slate-200 hover:border-rose-200 text-xs font-semibold text-slate-500 hover:text-rose-600 cursor-pointer">
+                        <span className="material-symbols-outlined text-sm">delete</span>삭제
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* 페이지네이션 (페이지당 최대 5건) */}
+              <div className="flex items-center justify-between pt-3 mt-3 border-t border-slate-200/70">
+                <span className="text-xs text-slate-500">
+                  총 <strong className="text-slate-800">{certs.length}</strong>건 (페이지 {certPage}/{totalCertPages})
+                </span>
+                <nav aria-label="자격·수료증 목록 페이지 이동" className="inline-flex items-center gap-1 rounded-xl bg-white p-1 border border-slate-200 shadow-2xs">
+                  <button type="button" disabled={certPage === 1} onClick={() => setCertPage(1)} title="맨앞페이지" className="h-7 px-2 inline-flex items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-700 disabled:text-slate-400 disabled:opacity-50 text-xs font-bold cursor-pointer">&lt;&lt;</button>
+                  <button type="button" disabled={certPage === 1} onClick={() => setCertPage((p) => Math.max(1, p - 1))} title="전페이지" className="h-7 px-2 inline-flex items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-700 disabled:text-slate-400 disabled:opacity-50 text-xs font-bold cursor-pointer">&lt;</button>
+                  {Array.from({ length: totalCertPages }, (_, i) => i + 1).map((p) => (
+                    <button key={p} type="button" onClick={() => setCertPage(p)} className={`h-7 min-w-[28px] px-2 inline-flex items-center justify-center rounded-lg text-xs font-bold cursor-pointer ${certPage === p ? 'bg-[#0284c7] text-white shadow-xs' : 'text-slate-600 hover:bg-slate-100'}`}>
+                      {p}
+                    </button>
+                  ))}
+                  <button type="button" disabled={certPage === totalCertPages} onClick={() => setCertPage((p) => Math.min(totalCertPages, p + 1))} title="다음페이지" className="h-7 px-2 inline-flex items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-700 disabled:text-slate-400 disabled:opacity-50 text-xs font-bold cursor-pointer">&gt;</button>
+                  <button type="button" disabled={certPage === totalCertPages} onClick={() => setCertPage(totalCertPages)} title="맨뒤페이지" className="h-7 px-2 inline-flex items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-700 disabled:text-slate-400 disabled:opacity-50 text-xs font-bold cursor-pointer">&gt;&gt;</button>
+                </nav>
+              </div>
+            </div>
+
+            {/* 하단 저장 및 돌아가기 */}
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-4 border-t border-slate-100">
+              <p className="text-xs text-slate-400 flex items-center gap-1">
+                <span className="material-symbols-outlined text-sm text-slate-400">info</span>
+                등록된 정보는 플랫폼 본사 전문 검수팀에 의해 영업일 기준 24시간 이내 승인됩니다.
+              </p>
+              <div className="flex items-center gap-2.5 w-full sm:w-auto">
+                <button type="button" onClick={onBack} className="flex-1 sm:flex-none px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold cursor-pointer">
+                  취소 및 돌아가기
+                </button>
+                <button
+                  type="button"
+                  onClick={async () => {
+                    try {
+                      const res = await fetch('/api/srvc/myp/020100', {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                          userNo: userInfo?.USER_NO || 'S20261100002',
+                          bizName,
+                          ceoName,
+                          bizNo,
+                          cleanServiceTypes,
+                          certs,
+                        }),
+                      });
+                      const json = await res.json();
+                      showToast(json?.message || '사업자 및 자격·수료 정보가 저장되었습니다.');
+                    } catch {
+                      showToast('저장 요청 중 오류가 발생했습니다.');
+                    }
+                  }}
+                  className="flex-1 sm:flex-none px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shadow-sm flex items-center justify-center gap-1.5 cursor-pointer"
+                >
+                  <span className="material-symbols-outlined text-base">save</span>
+                  내 정보 저장
+                </button>
+              </div>
+            </div>
+          </section>
       </div>
 
       {toastMsg && (
@@ -9126,6 +9119,300 @@ function WebSrvcMyp020101({ isOpen, onClose, onApplyData, userInfo, initialBizDa
 }
 
 
+function WebSrvcStt010000Modal({ isOpen, onClose, userInfo }) {
+  const getYmRange = (months) => {
+    const now = new Date();
+    const toYm = `${now.getFullYear()}.${String(now.getMonth() + 1).padStart(2, '0')}`;
+    const fromD = new Date(now.getFullYear(), now.getMonth() - (months - 1), 1);
+    const fromYm = `${fromD.getFullYear()}.${String(fromD.getMonth() + 1).padStart(2, '0')}`;
+    return { fromYm, toYm };
+  };
+  const initial = getYmRange(12);
+  const [dateFrom, setDateFrom] = useState(initial.fromYm);
+  const [dateTo, setDateTo] = useState(initial.toYm);
+  const [activePreset, setActivePreset] = useState(12);
+  const [summary, setSummary] = useState({ appliedCount: 0, appliedCleaningAmt: 0, cancelledCount: 0, cancelledCleaningAmt: 0 });
+  const [validation, setValidation] = useState({ type: 'info', text: `조회 기준일: ${initial.fromYm} ~ ${initial.toYm} (총 12개월) · 12개월 초과 입력 시 조회가 제한됩니다.` });
+
+  const fetchStats = useCallback(async (fromYm, toYm) => {
+    const fromParts = String(fromYm).trim().split('.');
+    const toParts = String(toYm).trim().split('.');
+    if (fromParts.length !== 2 || toParts.length !== 2) {
+      setValidation({ type: 'error', text: '조회 년월은 YYYY.MM 형식으로 입력해 주세요.' });
+      return;
+    }
+    const fromMonths = Number(fromParts[0]) * 12 + Number(fromParts[1]);
+    const toMonths = Number(toParts[0]) * 12 + Number(toParts[1]);
+    const diff = toMonths - fromMonths + 1;
+    if (Number.isNaN(diff) || diff < 1) {
+      setValidation({ type: 'error', text: '조회 시작월(From)은 종료월(To)보다 클 수 없습니다.' });
+      return;
+    }
+    if (diff > 12) {
+      setValidation({ type: 'error', text: `선택한 기간이 ${diff}개월입니다. 최대 1년(12개월) 범위 내에서만 조회할 수 있습니다.` });
+      return;
+    }
+    try {
+      const uNo = userInfo?.USER_NO || 'S20261100001';
+      const qs = new URLSearchParams({ userNo: uNo, dateFrom: fromYm, dateTo: toYm });
+      const res = await fetch(`/api/srvc/stt/010000?${qs.toString()}`);
+      const json = await res.json();
+      if (!res.ok || !json?.success) {
+        setValidation({ type: 'error', text: json?.message || '통계 조회 중 오류가 발생했습니다.' });
+        return;
+      }
+      const boxes = json.data?.summaryBoxes || {};
+      setSummary({
+        appliedCount: Number(boxes.appliedCount || 0),
+        appliedCleaningAmt: Number(boxes.appliedCleaningAmt || 0),
+        cancelledCount: Number(boxes.cancelledCount || 0),
+        cancelledCleaningAmt: Number(boxes.cancelledCleaningAmt || 0),
+      });
+      setValidation({ type: 'success', text: `조회 기준일: ${fromYm} ~ ${toYm} (총 ${diff}개월) · 정상 조회되었습니다.` });
+    } catch {
+      setValidation({ type: 'error', text: '통계 서버 연결 중 오류가 발생했습니다.' });
+    }
+  }, [userInfo?.USER_NO]);
+
+  useEffect(() => {
+    if (isOpen) fetchStats(dateFrom, dateTo);
+  }, [isOpen]);
+
+  if (!isOpen) return null;
+
+  const handlePreset = (months) => {
+    const { fromYm, toYm } = getYmRange(months);
+    setDateFrom(fromYm);
+    setDateTo(toYm);
+    setActivePreset(months);
+    fetchStats(fromYm, toYm);
+  };
+
+  return (
+    <div className="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm" onClick={onClose}>
+      <div className="w-full max-w-4xl bg-white rounded-2xl shadow-xl overflow-hidden flex flex-col max-h-[92vh]" onClick={(e) => e.stopPropagation()}>
+        <div className="px-6 py-5 bg-white flex items-start sm:items-center justify-between gap-4 border-b border-slate-100">
+          <div className="flex flex-col min-w-0">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="bg-blue-50 text-blue-700 text-xs font-bold px-2.5 py-0.5 rounded-md tracking-wider">WEB-SRVC-STT-010000</span>
+              <span className="text-xs font-semibold text-slate-500">시공사 파트너 통계</span>
+            </div>
+            <h2 className="text-xl font-bold text-slate-900 mt-1.5">기간별 청약·청소금액 통계 요약</h2>
+            <p className="text-xs text-slate-500 mt-0.5">조회 시작월(From)부터 종료월(To)까지 최대 1년(12개월) 범위 내의 청약 및 취소 실적을 합산하여 보여줍니다.</p>
+          </div>
+          <button type="button" onClick={onClose} aria-label="닫기" className="w-9 h-9 rounded-xl bg-slate-100 text-slate-600 hover:text-slate-900 hover:bg-slate-200 flex items-center justify-center shrink-0 cursor-pointer">
+            <span className="material-symbols-outlined text-[20px]">close</span>
+          </button>
+        </div>
+        <div className="p-6 bg-slate-50 flex flex-col gap-5 overflow-y-auto">
+          <div className="p-4 sm:p-5 bg-white rounded-xl shadow-sm border border-slate-200/80 flex flex-col gap-3.5">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <div className="flex items-center gap-1.5 text-slate-900">
+                <span className="material-symbols-outlined text-[18px] text-blue-600">calendar_month</span>
+                <span className="text-sm font-bold">조회 기간 설정 (월 단위)</span>
+              </div>
+              <span className="text-xs font-semibold text-blue-700 bg-blue-50 px-2.5 py-0.5 rounded-full">※ 최대 1년(12개월) 범위 내에서만 조회 가능</span>
+            </div>
+            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+              <div className="flex items-center gap-2">
+                <input type="text" maxLength={7} value={dateFrom} onChange={(e) => setDateFrom(e.target.value)} placeholder="YYYY.MM" className="w-28 sm:w-32 text-center text-sm font-semibold text-slate-900 bg-slate-100 rounded-xl px-3 py-2.5 tabular-nums" />
+                <span className="text-sm font-bold text-slate-400">~</span>
+                <input type="text" maxLength={7} value={dateTo} onChange={(e) => setDateTo(e.target.value)} placeholder="YYYY.MM" className="w-28 sm:w-32 text-center text-sm font-semibold text-slate-900 bg-slate-100 rounded-xl px-3 py-2.5 tabular-nums" />
+              </div>
+              <div className="inline-flex items-center gap-1.5 flex-wrap">
+                {[{ m: 1, label: '당월 (1개월)' }, { m: 3, label: '최근 3개월' }, { m: 6, label: '최근 6개월' }, { m: 12, label: '최근 1년 (12개월)' }].map((p) => (
+                  <button key={p.m} type="button" onClick={() => handlePreset(p.m)} className={`px-3 py-2 rounded-lg text-xs font-semibold cursor-pointer ${activePreset === p.m ? 'bg-blue-50 text-blue-700 border border-blue-200' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}>{p.label}</button>
+                ))}
+              </div>
+              <button type="button" onClick={() => { setActivePreset(0); fetchStats(dateFrom, dateTo); }} className="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold shadow-sm flex items-center justify-center gap-1.5 shrink-0 cursor-pointer">
+                <span className="material-symbols-outlined text-[18px]">search</span>
+                <span>통계 조회</span>
+              </button>
+            </div>
+            <div className={`text-xs flex items-center gap-1.5 ${validation.type === 'error' ? 'text-rose-600 font-semibold' : 'text-slate-600'}`}>
+              <span className={`material-symbols-outlined text-[15px] ${validation.type === 'error' ? 'text-rose-600' : validation.type === 'success' ? 'text-emerald-600' : 'text-blue-600'}`}>{validation.type === 'error' ? 'error' : validation.type === 'success' ? 'check_circle' : 'info'}</span>
+              <span>{validation.text}</span>
+            </div>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="rounded-2xl p-5 bg-white shadow-sm border border-slate-200/80 flex flex-col justify-between gap-4">
+              <div className="flex items-center justify-between gap-2"><span className="text-base font-bold text-slate-900">청약건수</span><span className="text-xs font-semibold bg-blue-50 text-blue-700 px-2.5 py-0.5 rounded-full">정상·진행 청약</span></div>
+              <div className="flex items-baseline"><span className="text-3xl font-extrabold text-blue-600 tabular-nums">{summary.appliedCount.toLocaleString()}</span><span className="text-base font-bold text-slate-500 ml-1">건</span></div>
+            </div>
+            <div className="rounded-2xl p-5 bg-white shadow-sm border border-slate-200/80 flex flex-col justify-between gap-4">
+              <div className="flex items-center justify-between gap-2"><span className="text-base font-bold text-slate-900">청소금액</span><span className="text-xs font-semibold bg-teal-50 text-teal-700 px-2.5 py-0.5 rounded-full">확정 지정가 합계</span></div>
+              <div className="flex items-baseline"><span className="text-3xl font-extrabold text-teal-700 tabular-nums">{summary.appliedCleaningAmt.toLocaleString()}</span><span className="text-base font-bold text-slate-500 ml-1">원</span></div>
+            </div>
+            <div className="rounded-2xl p-5 bg-white shadow-sm border border-slate-200/80 flex flex-col justify-between gap-4">
+              <div className="flex items-center justify-between gap-2"><span className="text-base font-bold text-slate-900">청약취소건수</span><span className="text-xs font-semibold bg-rose-50 text-rose-700 px-2.5 py-0.5 rounded-full">취소 처리 건</span></div>
+              <div className="flex items-baseline"><span className="text-3xl font-extrabold text-rose-600 tabular-nums">{summary.cancelledCount.toLocaleString()}</span><span className="text-base font-bold text-slate-500 ml-1">건</span></div>
+            </div>
+            <div className="rounded-2xl p-5 bg-white shadow-sm border border-slate-200/80 flex flex-col justify-between gap-4">
+              <div className="flex items-center justify-between gap-2"><span className="text-base font-bold text-slate-900">청약취소청소금액</span><span className="text-xs font-semibold bg-slate-100 text-slate-700 px-2.5 py-0.5 rounded-full">취소 건 용역가</span></div>
+              <div className="flex items-baseline"><span className="text-3xl font-extrabold text-slate-700 tabular-nums">{summary.cancelledCleaningAmt.toLocaleString()}</span><span className="text-base font-bold text-slate-500 ml-1">원</span></div>
+            </div>
+          </div>
+        </div>
+        <div className="px-6 py-4 bg-white border-t border-slate-100 flex items-center justify-end gap-2.5">
+          <button type="button" onClick={() => handlePreset(12)} className="px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-sm font-semibold text-slate-700 cursor-pointer">기간 초기화</button>
+          <button type="button" onClick={onClose} className="px-6 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-sm font-semibold text-white shadow-sm cursor-pointer">확인 (닫기)</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function WebClntCom010001Header({
+  userInfo,
+  onLogoClick,
+  onOpenReqModal,
+  onScrollLiveMatching,
+  onOpenAboutModal,
+  onOpenLoginModal,
+  onOpenSignupModal,
+  onLogout,
+}) {
+  return (
+    <header className="fixed top-0 left-0 right-0 z-50 h-[72px] bg-white/95 backdrop-blur-md border-b border-outline-variant/50 flex items-center">
+      <div className="max-w-[1440px] w-full mx-auto px-margin-mobile lg:px-margin flex items-center justify-between">
+        <div className="flex items-center gap-6">
+          <div className="w-12 h-12 rounded-full overflow-hidden shrink-0 cursor-pointer" onClick={onLogoClick}>
+            <img src="/storage/sseuldakgo/logo/Logo_쓸고딱고.jpg" alt="쓸고닦고 로고" className="w-full h-full object-cover scale-150" />
+          </div>
+          <nav className="hidden md:flex items-center gap-1">
+            <button type="button" onClick={() => onOpenReqModal?.('REGULAR')} className="px-3 py-2 rounded-xl text-sm font-semibold text-on-surface-variant hover:text-primary hover:bg-surface-container-low transition-colors cursor-pointer">정기청소</button>
+            <button type="button" onClick={() => onOpenReqModal?.('APPLIANCE')} className="px-3 py-2 rounded-xl text-sm font-semibold text-on-surface-variant hover:text-primary hover:bg-surface-container-low transition-colors cursor-pointer">계절가전 분해케어</button>
+            <button type="button" onClick={() => onOpenReqModal?.('MOVEOUT')} className="px-3 py-2 rounded-xl text-sm font-semibold text-on-surface-variant hover:text-primary hover:bg-surface-container-low transition-colors cursor-pointer">입주·이사 청소</button>
+            <button type="button" onClick={onScrollLiveMatching} className="px-3 py-2 rounded-xl text-sm font-semibold text-on-surface-variant hover:text-primary hover:bg-surface-container-low transition-colors cursor-pointer">실시간 발주 현황</button>
+            <button type="button" onClick={onOpenAboutModal} className="px-3 py-2 rounded-xl text-sm font-semibold text-primary hover:bg-primary-fixed/30 transition-colors cursor-pointer">쓸고 딱고 란 ?</button>
+          </nav>
+        </div>
+        <div className="flex items-center gap-3">
+          {!userInfo?.isGuest ? (
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-bold text-slate-800">{userInfo?.USER_NM}님</span>
+              <button type="button" onClick={onLogout} className="text-xs font-medium text-slate-500 hover:text-rose-600 px-2.5 py-1.5 rounded-lg hover:bg-rose-50 transition-colors cursor-pointer">로그아웃</button>
+            </div>
+          ) : (
+            <div className="flex items-center gap-2" id="auth-guest-cluster">
+              <a className="h-9 px-space-md inline-flex items-center justify-center rounded-xl font-label-md text-label-md text-primary hover:bg-primary-fixed/30 hover:text-on-primary-fixed-variant transition-colors cursor-pointer" data-path="customer-login" href="#customer-login" onClick={(e) => { e.preventDefault(); onOpenLoginModal?.(); }}>로그인</a>
+              <a className="h-9 px-space-md inline-flex items-center justify-center rounded-xl font-label-md text-label-md bg-primary text-on-primary hover:bg-primary-dim transition-colors shadow-sm cursor-pointer" data-path="customer-signup" href="#customer-signup" onClick={(e) => { e.preventDefault(); onOpenSignupModal?.(); }}>회원가입</a>
+            </div>
+          )}
+        </div>
+      </div>
+    </header>
+  );
+}
+
+function WebClntCom010201Header({
+  profile,
+  onNavigate,
+  onOpenReqModal,
+  onOpenOrderList,
+  onOpenInspection,
+  onOpenNotification,
+  onLogout,
+}) {
+  return (
+    <header className="h-[70px] flex-shrink-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-200 flex items-center sticky top-0">
+      <div className="max-w-[1440px] w-full mx-auto px-margin-mobile lg:px-margin flex items-center justify-between">
+        <div className="flex items-center gap-8">
+          <button type="button" onClick={() => onNavigate?.('home')} className="w-12 h-12 rounded-full overflow-hidden shrink-0 cursor-pointer">
+            <img alt="쓸고닦고 공식 로고" className="w-full h-full object-cover scale-150" src="/storage/sseuldakgo/logo/Logo_쓸고딱고.jpg" />
+          </button>
+          <nav className="hidden md:flex items-center gap-1">
+            <button type="button" onClick={() => onOpenReqModal?.('REGULAR')} className="px-4 py-2 rounded-xl text-sm font-semibold text-slate-600 hover:text-sky-600 hover:bg-slate-100 transition-all flex items-center gap-1.5 cursor-pointer">
+              <span className="material-symbols-outlined text-[18px]">post_add</span>
+              청소 용역 발주
+              <span className="text-[10px] bg-sky-100 text-sky-700 font-bold px-1.5 py-0.5 rounded">지정가</span>
+            </button>
+            <button type="button" onClick={onOpenOrderList} className="px-4 py-2 rounded-xl text-sm font-semibold text-slate-600 hover:text-sky-600 hover:bg-slate-100 transition-all flex items-center gap-1.5 cursor-pointer">
+              <span className="material-symbols-outlined text-[18px]">assignment</span>
+              청소 발주
+              <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
+            </button>
+            <button type="button" onClick={onOpenInspection} className="px-4 py-2 rounded-xl text-sm font-semibold text-slate-600 hover:text-sky-600 hover:bg-slate-100 transition-all flex items-center gap-1.5 cursor-pointer">
+              <span className="material-symbols-outlined text-[18px]">fact_check</span>
+              시공 검수
+            </button>
+            <button type="button" onClick={() => onNavigate?.('WEB-CLNT-MYP-010100')} className="px-4 py-2 rounded-xl text-sm font-semibold text-slate-600 hover:text-sky-600 hover:bg-slate-100 transition-all flex items-center gap-1.5 cursor-pointer">
+              <span className="material-symbols-outlined text-[18px]">person</span>
+              내 정보
+            </button>
+          </nav>
+        </div>
+        <div className="flex items-center gap-3">
+          <button type="button" onClick={onOpenNotification} className="relative p-2 text-slate-500 hover:text-sky-600 hover:bg-slate-100 rounded-xl transition-all cursor-pointer">
+            <span className="material-symbols-outlined text-[24px]">notifications</span>
+            {profile?.unreadNotiCnt > 0 && (
+              <span className="absolute top-1.5 right-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-rose-500 text-[10px] font-bold text-white shadow-sm ring-2 ring-white">
+                {profile.unreadNotiCnt}
+              </span>
+            )}
+          </button>
+          <div className="flex items-center gap-3 bg-slate-50 border border-slate-200/80 rounded-2xl p-1.5 pr-3">
+            <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-sky-600 to-teal-400 text-white flex items-center justify-center font-bold text-sm shadow-inner">
+              {(profile?.userNm || '김').slice(0, 1)}
+            </div>
+            <div className="flex flex-col text-left">
+              <div className="flex items-center gap-1.5">
+                <span className="text-xs font-bold text-slate-800">{profile?.userNm} 고객님</span>
+                <span className="text-[10px] bg-teal-100 text-teal-800 font-semibold px-1.5 py-0.2 rounded">{profile?.badgeLabel}</span>
+              </div>
+              <span className="text-[10px] text-slate-400">{profile?.roleLabel}</span>
+            </div>
+            <button type="button" onClick={onLogout} className="text-xs font-medium text-slate-400 hover:text-rose-600 px-2 py-1.5 rounded-lg hover:bg-rose-50 transition-all cursor-pointer">
+              로그아웃
+            </button>
+          </div>
+        </div>
+      </div>
+    </header>
+  );
+}
+
+function WebSrvcCom010002Header({
+  userInfo,
+  activeNavPath,
+  onNavigate,
+  unreadNotiCnt = 0,
+  onOpenNotification,
+  onLogout,
+}) {
+  return (
+    <header className="h-[70px] flex-shrink-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-200 flex items-center sticky top-0">
+      <div className="max-w-[1440px] w-full mx-auto px-margin-mobile lg:px-margin flex items-center justify-between">
+        <div className="flex items-center gap-6">
+          <button type="button" onClick={() => onNavigate?.('WEB-SRVC-COM-010000')} className="w-12 h-12 rounded-full overflow-hidden shrink-0 cursor-pointer">
+            <img alt="쓸고닦고 공식 로고" className="w-full h-full object-cover scale-150" src="/storage/sseuldakgo/logo/Logo_쓸고딱고.jpg" />
+          </button>
+          <nav className="hidden md:flex items-center gap-1">
+            <button type="button" onClick={() => onNavigate?.('WEB-SRVC-QOT-010000')} className={`px-3 py-2 rounded-xl text-sm font-semibold transition-colors cursor-pointer ${activeNavPath === 'WEB-SRVC-QOT-010000' ? 'bg-sky-50 text-sky-700' : 'text-slate-600 hover:text-sky-600 hover:bg-slate-100'}`}>청소·시공 청약</button>
+            <button type="button" onClick={() => onNavigate?.('WEB-SRVC-QOT-020000')} className={`px-3 py-2 rounded-xl text-sm font-semibold transition-colors cursor-pointer ${activeNavPath === 'WEB-SRVC-QOT-020000' ? 'bg-sky-50 text-sky-700' : 'text-slate-600 hover:text-sky-600 hover:bg-slate-100'}`}>내 청약 내역</button>
+            <button type="button" onClick={() => onNavigate?.('WEB-SRVC-JOB-020000')} className={`px-3 py-2 rounded-xl text-sm font-semibold transition-colors cursor-pointer ${activeNavPath === 'WEB-SRVC-JOB-020000' ? 'bg-sky-50 text-sky-700' : 'text-slate-600 hover:text-sky-600 hover:bg-slate-100'}`}>현장 시공 현황</button>
+            <button type="button" onClick={() => onNavigate?.('WEB-SRVC-PTN-010000')} className={`px-3 py-2 rounded-xl text-sm font-semibold transition-colors cursor-pointer ${activeNavPath === 'WEB-SRVC-PTN-010000' ? 'bg-sky-50 text-sky-700' : 'text-slate-600 hover:text-sky-600 hover:bg-slate-100'}`}>직원/팀구성</button>
+            <button type="button" onClick={() => onNavigate?.('WEB-SRVC-MYP-010100')} className={`px-3 py-2 rounded-xl text-sm font-semibold transition-colors cursor-pointer ${activeNavPath === 'WEB-SRVC-MYP-010100' ? 'bg-sky-50 text-sky-700' : 'text-slate-600 hover:text-sky-600 hover:bg-slate-100'}`}>내 정보</button>
+            <button type="button" onClick={() => onNavigate?.('WEB-SRVC-MYP-020100')} className={`px-3 py-2 rounded-xl text-sm font-semibold transition-colors cursor-pointer ${activeNavPath === 'WEB-SRVC-MYP-020100' ? 'bg-sky-50 text-sky-700' : 'text-slate-600 hover:text-sky-600 hover:bg-slate-100'}`}>사업자·자격증 관리</button>
+          </nav>
+        </div>
+        <div className="flex items-center gap-3">
+          <button type="button" onClick={onOpenNotification} className="relative p-2 text-slate-500 hover:text-sky-600 hover:bg-slate-100 rounded-xl transition-all cursor-pointer">
+            <span className="material-symbols-outlined text-[24px]">notifications</span>
+            {unreadNotiCnt > 0 && (
+              <span className="absolute top-1.5 right-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-rose-500 text-[10px] font-bold text-white shadow-sm ring-2 ring-white">{unreadNotiCnt}</span>
+            )}
+          </button>
+          <div className="flex items-center gap-2 bg-slate-50 border border-slate-200/80 rounded-2xl p-1.5 pr-3">
+            <span className="text-xs font-bold text-slate-800">{userInfo?.USER_NM || '파트너'}님</span>
+            <button type="button" onClick={onLogout} className="text-xs font-medium text-slate-400 hover:text-rose-600 px-2 py-1 rounded-lg hover:bg-rose-50 transition-all cursor-pointer">로그아웃</button>
+          </div>
+        </div>
+      </div>
+    </header>
+  );
+}
+
 function WebClntCom010200({ userInfo, onOpenReqModal, onNavigate, onLogout }) {
   const [dateFrom, setDateFrom] = useState('2025.11.20');
   const [dateTo, setDateTo] = useState('2026.11.20');
@@ -9228,58 +9515,15 @@ function WebClntCom010200({ userInfo, onOpenReqModal, onNavigate, onLogout }) {
 
   return (
     <div className="flex flex-col min-h-screen bg-slate-50 text-slate-900">
-      <header className="h-[70px] flex-shrink-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-200 px-6 flex items-center justify-between sticky top-0">
-        <div className="flex items-center gap-8">
-          <button type="button" onClick={() => onNavigate?.('home')} className="flex items-center gap-3 group cursor-pointer">
-            <img alt="쓸고닦고 공식 로고" className="h-10 w-auto object-contain rounded" src="/storage/sseuldakgo/logo/Logo_쓸고딱고.jpg" />
-          </button>
-          <nav className="hidden md:flex items-center gap-1">
-            <button type="button" onClick={() => onOpenReqModal?.('REGULAR')} className="px-4 py-2 rounded-xl text-sm font-semibold text-slate-600 hover:text-sky-600 hover:bg-slate-100 transition-all flex items-center gap-1.5 cursor-pointer">
-              <span className="material-symbols-outlined text-[18px]">post_add</span>
-              청소 용역 발주
-              <span className="text-[10px] bg-sky-100 text-sky-700 font-bold px-1.5 py-0.5 rounded">지정가</span>
-            </button>
-            <button type="button" onClick={() => showToast('내 청소 발주 관리 (WEB-CLNT-ORD-010000)')} className="px-4 py-2 rounded-xl text-sm font-semibold text-slate-600 hover:text-sky-600 hover:bg-slate-100 transition-all flex items-center gap-1.5 cursor-pointer">
-              <span className="material-symbols-outlined text-[18px]">assignment</span>
-              청소 발주
-              <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
-            </button>
-            <button type="button" onClick={() => showToast('시공 검수 (WEB-CLNT-JOB-010000)')} className="px-4 py-2 rounded-xl text-sm font-semibold text-slate-600 hover:text-sky-600 hover:bg-slate-100 transition-all flex items-center gap-1.5 cursor-pointer">
-              <span className="material-symbols-outlined text-[18px]">fact_check</span>
-              시공 검수
-            </button>
-            <button type="button" onClick={() => onNavigate?.('WEB-CLNT-MYP-010100')} className="px-4 py-2 rounded-xl text-sm font-semibold text-slate-600 hover:text-sky-600 hover:bg-slate-100 transition-all flex items-center gap-1.5 cursor-pointer">
-              <span className="material-symbols-outlined text-[18px]">person</span>
-              내 정보
-            </button>
-          </nav>
-        </div>
-        <div className="flex items-center gap-3">
-          <button type="button" onClick={() => showToast(`알림 센터: 읽지 않은 ${profile.unreadNotiCnt}건`)} className="relative p-2 text-slate-500 hover:text-sky-600 hover:bg-slate-100 rounded-xl transition-all cursor-pointer">
-            <span className="material-symbols-outlined text-[24px]">notifications</span>
-            {profile.unreadNotiCnt > 0 && (
-              <span className="absolute top-1.5 right-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-rose-500 text-[10px] font-bold text-white shadow-sm ring-2 ring-white">
-                {profile.unreadNotiCnt}
-              </span>
-            )}
-          </button>
-          <div className="flex items-center gap-3 bg-slate-50 border border-slate-200/80 rounded-2xl p-1.5 pr-3">
-            <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-sky-600 to-teal-400 text-white flex items-center justify-center font-bold text-sm shadow-inner">
-              {(profile.userNm || '김').slice(0, 1)}
-            </div>
-            <div className="flex flex-col text-left">
-              <div className="flex items-center gap-1.5">
-                <span className="text-xs font-bold text-slate-800">{profile.userNm} 고객님</span>
-                <span className="text-[10px] bg-teal-100 text-teal-800 font-semibold px-1.5 py-0.2 rounded">{profile.badgeLabel}</span>
-              </div>
-              <span className="text-[10px] text-slate-400">{profile.roleLabel}</span>
-            </div>
-            <button type="button" onClick={() => onLogout?.()} className="text-xs font-medium text-slate-400 hover:text-rose-600 px-2 py-1.5 rounded-lg hover:bg-rose-50 transition-all cursor-pointer">
-              로그아웃
-            </button>
-          </div>
-        </div>
-      </header>
+      <WebClntCom010201Header
+        profile={profile}
+        onNavigate={onNavigate}
+        onOpenReqModal={onOpenReqModal}
+        onOpenOrderList={() => showToast('내 청소 발주 관리 (WEB-CLNT-ORD-010000)')}
+        onOpenInspection={() => showToast('시공 검수 (WEB-CLNT-JOB-010000)')}
+        onOpenNotification={() => showToast(`알림 센터: 읽지 않은 ${profile.unreadNotiCnt}건`)}
+        onLogout={onLogout}
+      />
 
       <main className="flex-1 overflow-y-auto">
         <div className="max-w-[1440px] mx-auto px-6 flex flex-col py-5 gap-4">
@@ -9468,299 +9712,23 @@ export default function WebClntCom010000({ onNavigate }) {
               isGuest: false,
               ...parsed,
               USER_NO: userNo,
-              USER_NM: userNm || (userNo.startsWith('S') ? '시공사' : '고객'),
-              USER_ROLE_CD: parsed.USER_ROLE_CD || parsed.userRoleCd || (userNo.startsWith('S') ? 'S' : 'C')
+              USER_NM: userNm || '회원',
             };
           }
         }
       }
-    } catch (e) {
-      // ignore
-    }
-    return {
-      isGuest: true,
-      USER_NO: 'GUEST',
-      USER_NM: '비회원',
-      USER_ROLE_CD: 'GUEST',
-    };
+    } catch (e) { }
+    return { isGuest: true, USER_NO: 'GUEST', USER_NM: '비회원', USER_ROLE_CD: 'GUEST' };
   });
-  // 로그인 회원(이용자 C 및 시공사 S)인 경우 메인 기본 뷰를 '내정보 관리' (WEB-CLNT-MYP-010100)로 설정
-  const [activeNavPath, setActiveNavPath] = useState(() => {
-    try {
-      if (typeof window !== 'undefined') {
-        const keepLogin = localStorage.getItem('SSEULDAKGO_KEEP_LOGIN') === 'true' || localStorage.getItem('SSEULDAKGO_KEEP_LOGIN') === 'Y';
-        const savedAuth = keepLogin
-          ? localStorage.getItem('SSEULDAKGO_AUTH_USER')
-          : (sessionStorage.getItem('SSEULDAKGO_AUTH_USER') || localStorage.getItem('SSEULDAKGO_AUTH_USER'));
-        if (savedAuth) {
-          const parsed = JSON.parse(savedAuth);
-          if (parsed && parsed.USER_NO && parsed.USER_NO !== 'GUEST') {
-            return parsed.USER_ROLE_CD === 'S' || String(parsed.USER_NO).startsWith('S')
-              ? 'WEB-SRVC-MYP-010100'
-              : 'WEB-CLNT-MYP-010100';
-          }
-        }
-      }
-    } catch (e) {}
-    return 'home';
-  });
-  // 테마 상태 (light / dark)
-  const [isDark, setIsDark] = useState(() => {
-    try {
-      return typeof window !== 'undefined' && localStorage.getItem('SSEULDAKGO_THEME') === 'dark';
-    } catch {
-      return false;
-    }
-  });
-  useEffect(() => {
-    if (typeof document === 'undefined') return;
-    document.documentElement.classList.toggle('dark', isDark);
-    try {
-      localStorage.setItem('SSEULDAKGO_THEME', isDark ? 'dark' : 'light');
-    } catch {}
-  }, [isDark]);
 
-  // 내정보 드롭다운 및 서브 모달 상태
-  const [isMyMenuOpen, setIsMyMenuOpen] = useState(false);
-  const [subModalType, setSubModalType] = useState(null); // 'CHANGE_PHONE' | 'CHANGE_PWD' | 'BIZ_REG'
-
-  // [신규] 기본 알림 메시지 목록 (초기 수신 3건 보장)
-  const INITIAL_NOTI_LIST = [
-    {
-      notiId: 'NT20261100001',
-      notiType: 'NEW_ORDER',
-      title: '새로운 발주 요청 등록',
-      content: '경기 고양시 일산동구 에어컨 분해세척 (제안가: 180,000원) 청약이 가능합니다.',
-      targetUrl: '/preview_client/WEB-CLNT-ORD-010100.html?orderNo=ORD202611180001',
-      isRead: 'N',
-      regDt: '10분 전'
-    },
-    {
-      notiId: 'NT20261100002',
-      notiType: 'NEW_ORDER',
-      title: '신규 입주 청소 청약 공고',
-      content: '서울 강서구 마곡동 34평 아파트 입주청소 (제안가: 360,000원) 건이 접수되었습니다.',
-      targetUrl: '/preview_client/WEB-CLNT-ORD-010100.html?orderNo=ORD202611180002',
-      isRead: 'N',
-      regDt: '1시간 전'
-    },
-    {
-      notiId: 'NT20261100003',
-      notiType: 'MATCHING_CONFIRMED',
-      title: '시공사 서류 검증 승인 완료',
-      content: '제출하신 사업자등록증 및 자격증 원본 서류 심사가 승인 완료되었습니다.',
-      targetUrl: '/preview/myp_020100.html',
-      isRead: 'N',
-      regDt: '어제'
-    }
-  ];
-
-  // [신규] 푸시 알림 센터 상태 및 제어 (벨 클릭 시 수신 목록 출력)
+  const handleOrderCreated = (newOrder) => {
+    setFeedList((prev) => [newOrder, ...prev]);
+  };
+  const [activeNavPath, setActiveNavPath] = useState('home');
   const [isBrandLogoModalOpen, setIsBrandLogoModalOpen] = useState(false);
   const [isAboutModalOpen, setIsAboutModalOpen] = useState(false);
-  const [notiList, setNotiList] = useState([]);
-  const [unreadNotiCount, setUnreadNotiCount] = useState(0);
-  const [isNotiOpen, setIsNotiOpen] = useState(false);
-  const [activeNotiModal, setActiveNotiModal] = useState(null); // 알림 상세 모달
-  const [bidSubmitSuccessMsg, setBidSubmitSuccessMsg] = useState(''); // 청약 완료 메시지
-
-  // 알림 목록 및 미확인 건수 조회 (로그인 회원 전용)
-  const fetchNotifications = useCallback(async (targetUserNo = userInfo.USER_NO) => {
-    try {
-      const uNo = targetUserNo || userInfo.USER_NO;
-      if (!uNo || uNo === 'GUEST' || userInfo?.isGuest) {
-        setNotiList([]);
-        setUnreadNotiCount(0);
-        return;
-      }
-      const res = await fetch(`/api/common/notifications?userNo=${encodeURIComponent(uNo)}`);
-      const json = await res.json();
-      if (json && json.success) {
-        if (Array.isArray(json.list) && json.list.length > 0) {
-          setNotiList(json.list);
-          setUnreadNotiCount(typeof json.unreadCount === 'number' ? json.unreadCount : json.list.filter(n => n.isRead === 'N').length);
-        }
-      }
-    } catch (e) {
-      console.warn('Notification fetch fail (초기 알림 유지):', e);
-    }
-  }, [userInfo.USER_NO]);
-
-  // 주기적 알림 폴링 (10초) 및 회원 변경 시 갱신
-  useEffect(() => {
-    fetchNotifications();
-    const timer = setInterval(() => {
-      fetchNotifications();
-    }, 10000);
-    return () => clearInterval(timer);
-  }, [fetchNotifications]);
-
-  // 전체 알림 모두 읽음 처리
-  const handleMarkAllNotiRead = async () => {
-    try {
-      await fetch('/api/common/notifications/read-all', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userNo: userInfo.USER_NO || 'S20261100001' })
-      });
-      setNotiList((prev) => prev.map((n) => ({ ...n, isRead: 'Y' })));
-      setUnreadNotiCount(0);
-    } catch (e) {
-      console.warn('Mark all noti read fail:', e);
-      setNotiList((prev) => prev.map((n) => ({ ...n, isRead: 'Y' })));
-      setUnreadNotiCount(0);
-    }
-  };
-
-  // 단건 알림 클릭 핸들러 (읽음 처리 + 상세 모달 열기)
-  const handleNotiClick = async (item) => {
-    try {
-      if (item.isRead === 'N') {
-        fetch('/api/common/notifications/read', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ notiId: item.notiId, userNo: userInfo.USER_NO || 'S20261100001' })
-        }).catch(() => {});
-        setUnreadNotiCount((prev) => Math.max(0, prev - 1));
-        setNotiList((prev) => prev.map((n) => (n.notiId === item.notiId ? { ...n, isRead: 'Y' } : n)));
-      }
-      setIsNotiOpen(false);
-      setBidSubmitSuccessMsg('');
-      setActiveNotiModal(item);
-    } catch (e) {
-      console.warn('Noti item click fail:', e);
-      setIsNotiOpen(false);
-      setBidSubmitSuccessMsg('');
-      setActiveNotiModal(item);
-    }
-  };
-
-  // 2. 백엔드 API 호출 (POST /api/web/client/com_010000)
-  const fetchHomeData = useCallback(
-    async (targetRegion = regionInfo, targetUserNo = userInfo.USER_NO) => {
-      try {
-        const response = await fetch('/api/web/client/com_010000', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            userNo: targetUserNo || 'GUEST',
-            sidoCd: targetRegion.SIDO_CD || '41',
-            sigunguCd: targetRegion.SIGUNGU_CD || '41281',
-          }),
-        });
-
-        if (!response.ok) return;
-        const data = await response.json();
-
-        if (data && data.success) {
-          if (Array.isArray(data.feedList) && data.feedList.length > 0) {
-            setFeedList(data.feedList);
-          }
-          if (Array.isArray(data.categoryList) && data.categoryList.length > 0) {
-            setCategoryList(data.categoryList);
-          }
-          if (data.userInfo) {
-            // 현재 로그인된 유효 회원이 있는데 백엔드가 비회원을 반환하는 경우 덮어쓰기 방지
-            const isTargetGuest = Boolean(data.isGuest);
-            if (!isTargetGuest || userInfo.isGuest) {
-              setUserInfo({
-                isGuest: isTargetGuest,
-                USER_NO: data.userInfo.USER_NO || data.userInfo.userNo || 'GUEST',
-                USER_NM: data.userInfo.USER_NM || data.userInfo.userNm || '비회원',
-                USER_ROLE_CD: data.userInfo.USER_ROLE_CD || data.userInfo.userRoleCd || 'GUEST',
-              });
-            }
-          }
-        }
-      } catch {
-        // 로컬 오프라인 또는 프리뷰 단독 구동 시 초기 시드 데이터 유지
-      }
-    },
-    [regionInfo, userInfo.USER_NO]
-  );
-
-  // 컴포넌트 마운트 시 API 호출 및 10초 주기 실시간 폴링
-  useEffect(() => {
-    fetchHomeData(regionInfo, userInfo.USER_NO);
-
-    const intervalId = window.setInterval(() => {
-      fetchHomeData(regionInfo, userInfo.USER_NO);
-    }, 10000);
-
-    return () => window.clearInterval(intervalId);
-  }, [fetchHomeData, regionInfo, userInfo.USER_NO]);
-
-  // 비회원 청소 신청 임시 저장 후 로그인 모달 자동 오픈 전역 이벤트 수신
-  useEffect(() => {
-    const handleOpenLogin = () => {
-      setIsReqModalOpen(false);
-      setIsLoginModalOpen(true);
-    };
-    window.addEventListener('OPEN_LOGIN_MODAL', handleOpenLogin);
-    return () => window.removeEventListener('OPEN_LOGIN_MODAL', handleOpenLogin);
-  }, []);
-
-  // 3. 모달 오픈 핸들러 (카테고리 카드 및 하단 스티키 바 연동)
-  const openRequestModal = useCallback((cleanType = 'REGULAR') => {
-    setSelectedCategory(cleanType);
-    setIsReqModalOpen(true);
-  }, []);
-
-  // 지역 전환 시뮬레이션 (행정구역 칩 클릭 시)
-  const handleToggleRegion = () => {
-    const currentIndex = REGION_OPTIONS.findIndex(
-      (r) => r.SIGUNGU_CD === regionInfo.SIGUNGU_CD
-    );
-    const nextRegion = REGION_OPTIONS[(currentIndex + 1) % REGION_OPTIONS.length];
-    setRegionInfo(nextRegion);
-  };
-
-  // 네비게이션 이동 처리
-  const handleNavClick = (e, path) => {
-    if (e && e.preventDefault) e.preventDefault();
-
-    // [표준 규칙] 홈 버튼/로고 클릭 시
-    // - 로그아웃 상태: 표준 마켓플레이스 피드('home') 유지
-    // - 로그인 상태: 메인 기본 뷰가 자동으로 "내정보 관리" (WEB-CLNT-MYP-010100) 페이지로 랜딩
-    if (path === 'home') {
-      if (userInfo && !userInfo.isGuest && userInfo.USER_NO !== 'GUEST') {
-        setActiveNavPath('WEB-CLNT-MYP-010100');
-        if (typeof onNavigate === 'function') onNavigate('WEB-CLNT-MYP-010100');
-      } else {
-        setActiveNavPath('home');
-        if (typeof onNavigate === 'function') onNavigate('home');
-      }
-      return;
-    }
-
-    setActiveNavPath(path);
-    if (path === 'my-account') {
-      if (userInfo && !userInfo.isGuest) {
-        setWelcomeUserInfo({
-          userNo: userInfo.USER_NO,
-          userNm: userInfo.USER_NM,
-          userEmail: userInfo.USER_EMAIL || '',
-          userRoleCd: userInfo.USER_ROLE_CD || 'C',
-          signImgUrl: userInfo.SIGN_IMG_URL || null,
-        });
-        setIsWelcomeModalOpen(true);
-      } else {
-        alert('내정보 및 이용약관/서명 관리를 위해 먼저 로그인해 주세요.');
-        setIsCustomerLoginModalOpen(true);
-      }
-      return;
-    }
-    if (typeof onNavigate === 'function') {
-      onNavigate(path);
-    }
-  };
-
-  // 발주 모달에서 신규 발주 등록 시 피드 최상단에 즉시 추가
-  const handleOrderCreated = (newOrder) => {
-    setFeedList((prev) => [newOrder, ...prev.slice(0, 4)]);
-  };
+  const [activeNotiModal, setActiveNotiModal] = useState(null);
+  const [partnerHeaderProfile, setPartnerHeaderProfile] = useState({ logoUrl: null, ceoNm: '', compNm: '' });
 
   // 카테고리 코드 -> 공통코드 한글명 변환 헬퍼
   const getCategoryName = (cleanLargeCd, fallbackNm) => {
@@ -9951,25 +9919,32 @@ export default function WebClntCom010000({ onNavigate }) {
         .text-on-primary-fixed { color: #001c3b; }
         .text-on-primary-fixed-variant { color: #1d477b; }
       `}</style>
-      <header className="fixed top-0 left-0 right-0 z-50 h-[72px] bg-white/95 backdrop-blur-md border-b border-outline-variant/50 px-margin-mobile lg:px-margin flex items-center justify-between">
-        <div className="flex items-center gap-6">
-          <img src="/storage/sseuldakgo/logo/Logo_쓸고딱고.jpg" alt="쓸고닦고 로고" className="h-10 w-auto object-contain rounded cursor-pointer" onClick={() => setIsBrandLogoModalOpen(true)} />
-          <nav className="hidden md:flex items-center gap-1">
-            <button type="button" onClick={() => handleOpenReqModal('REGULAR')} className="px-3 py-2 rounded-xl text-sm font-semibold text-on-surface-variant hover:text-primary hover:bg-surface-container-low transition-colors cursor-pointer">정기청소</button>
-            <button type="button" onClick={() => handleOpenReqModal('APPLIANCE')} className="px-3 py-2 rounded-xl text-sm font-semibold text-on-surface-variant hover:text-primary hover:bg-surface-container-low transition-colors cursor-pointer">계절가전 분해케어</button>
-            <button type="button" onClick={() => handleOpenReqModal('MOVEOUT')} className="px-3 py-2 rounded-xl text-sm font-semibold text-on-surface-variant hover:text-primary hover:bg-surface-container-low transition-colors cursor-pointer">입주·이사 청소</button>
-            <button type="button" onClick={() => document.getElementById('section-live-matching')?.scrollIntoView({ behavior: 'smooth' })} className="px-3 py-2 rounded-xl text-sm font-semibold text-on-surface-variant hover:text-primary hover:bg-surface-container-low transition-colors cursor-pointer">실시간 발주 현황</button>
-            <button type="button" onClick={() => setIsAboutModalOpen(true)} className="px-3 py-2 rounded-xl text-sm font-semibold text-primary hover:bg-primary-fixed/30 transition-colors cursor-pointer">쓸고 딱고 란 ?</button>
-          </nav>
-        </div>
-        <div className="flex items-center gap-6">
-          {!userInfo.isGuest ? (
+      <header className="fixed top-0 left-0 right-0 z-50 h-[72px] bg-white/95 backdrop-blur-md border-b border-outline-variant/50 flex items-center">
+        <div className="max-w-[1440px] w-full mx-auto px-margin-mobile lg:px-margin flex items-center justify-between">
+          <div className="flex items-center gap-6">
+            <div className="w-12 h-12 rounded-full overflow-hidden shrink-0 cursor-pointer" onClick={() => setIsBrandLogoModalOpen(true)}>
+              <img src="/storage/sseuldakgo/logo/Logo_쓸고딱고.jpg" alt="쓸고닦고 로고" className="w-full h-full object-cover scale-150" />
+            </div>
+            <nav className="hidden md:flex items-center gap-1">
+              <button type="button" onClick={() => { setActiveNavPath('WEB-SRVC-COM-010000'); setTimeout(() => Array.from(document.querySelectorAll('h2,h3')).find((el) => el.textContent?.includes('통합 시공·청약 공정 관리'))?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 80); }} className="px-3 py-2 rounded-xl text-sm font-semibold text-on-surface-variant hover:text-primary hover:bg-surface-container-low transition-colors cursor-pointer">통합 시공·청약 공정 관리</button>
+              <button type="button" onClick={() => { setActiveNavPath('WEB-SRVC-COM-010000'); setTimeout(() => Array.from(document.querySelectorAll('h2,h3')).find((el) => el.textContent?.includes('내 활동 내역'))?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 80); }} className="px-3 py-2 rounded-xl text-sm font-semibold text-on-surface-variant hover:text-primary hover:bg-surface-container-low transition-colors cursor-pointer">내 활동 내역</button>
+              <button type="button" onClick={() => setActiveNavPath('WEB-SRVC-STT-010000')} className="px-3 py-2 rounded-xl text-sm font-semibold text-on-surface-variant hover:text-primary hover:bg-surface-container-low transition-colors cursor-pointer">내 활동 통계</button>
+              <button type="button" onClick={() => setActiveNavPath('WEB-SRVC-MYP-020100')} className="px-3 py-2 rounded-xl text-sm font-semibold text-on-surface-variant hover:text-primary hover:bg-surface-container-low transition-colors cursor-pointer">내 정보 관리</button>
+              <button type="button" onClick={() => setIsAboutModalOpen(true)} className="px-3 py-2 rounded-xl text-sm font-semibold text-primary hover:bg-primary-fixed/30 transition-colors cursor-pointer">쓸고 딱고 란 ?</button>
+            </nav>
+          </div>
+          <div className="flex items-center gap-6">
+            {!userInfo.isGuest ? (
               <div className="flex items-center gap-2">
                 <div className="flex items-center gap-space-sm pl-2">
-                  <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center">
-                    <span className="material-symbols-outlined text-on-primary text-[18px]">
-                      person
-                    </span>
+                  <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center overflow-hidden shrink-0">
+                    {userInfo.USER_ROLE_CD === 'S' && (partnerHeaderProfile.logoUrl || userInfo.PROFILE_IMG_URL) ? (
+                      <img src={partnerHeaderProfile.logoUrl || userInfo.PROFILE_IMG_URL} alt="시공사 로고" className="w-full h-full object-cover" />
+                    ) : (
+                      <span className="material-symbols-outlined text-on-primary text-[18px]">
+                        person
+                      </span>
+                    )}
                   </div>
                   <div className="flex flex-col leading-tight">
                     <div className="flex items-center gap-1">
@@ -9977,7 +9952,7 @@ export default function WebClntCom010000({ onNavigate }) {
                         className="font-label-md text-label-md text-on-surface"
                         data-field="USER_NM"
                       >
-                        {userInfo.USER_NM}님
+                        {userInfo.USER_ROLE_CD === 'S' && partnerHeaderProfile.ceoNm ? partnerHeaderProfile.ceoNm : userInfo.USER_NM}님
                       </span>
                       <span className="font-caption text-caption px-1.5 py-0.2 bg-secondary-fixed text-on-secondary-fixed-variant rounded font-semibold">
                         인증회원
@@ -9987,7 +9962,7 @@ export default function WebClntCom010000({ onNavigate }) {
                       className="font-caption text-caption text-outline font-mono"
                       data-field="USER_NO"
                     >
-                      {userInfo.USER_NO}
+                      {userInfo.USER_ROLE_CD === 'S' && partnerHeaderProfile.compNm ? partnerHeaderProfile.compNm : userInfo.USER_NO}
                     </span>
                   </div>
                   <button
@@ -9997,7 +9972,7 @@ export default function WebClntCom010000({ onNavigate }) {
                         localStorage.removeItem('SSEULDAKGO_KEEP_LOGIN');
                         localStorage.removeItem('SSEULDAKGO_AUTH_USER');
                         sessionStorage.removeItem('SSEULDAKGO_AUTH_USER');
-                      } catch (e) {}
+                      } catch (e) { }
                       setUserInfo({
                         isGuest: true,
                         USER_NO: 'GUEST',
@@ -10038,7 +10013,13 @@ export default function WebClntCom010000({ onNavigate }) {
               </div>
             )}
           </div>
+        </div>
       </header>
+      <WebSrvcStt010000Modal
+        isOpen={activeNavPath === 'WEB-SRVC-STT-010000'}
+        onClose={() => setActiveNavPath('WEB-SRVC-COM-010000')}
+        userInfo={userInfo}
+      />
       {isBrandLogoModalOpen && (
         <div
           className="fixed inset-0 z-[120] flex items-center justify-center bg-slate-950/70 backdrop-blur-sm p-4"
@@ -10152,7 +10133,7 @@ export default function WebClntCom010000({ onNavigate }) {
           MAIN CONTENT (고객 C: WEB-CLNT-COM-010000 / 시공사 S: WEB-SRVC-COM-010000)
       ==================================================================== */}
       {userInfo?.USER_ROLE_CD === 'S' && (activeNavPath === 'WEB-SRVC-COM-010000' || activeNavPath === 'home') ? (
-        <WebSrvcCom010000 userInfo={userInfo} onNavigate={setActiveNavPath} />
+        <WebSrvcCom010000 userInfo={userInfo} onNavigate={setActiveNavPath} onPartnerProfileLoaded={setPartnerHeaderProfile} />
       ) : userInfo?.USER_ROLE_CD === 'C' && activeNavPath === 'WEB-CLNT-COM-010200' ? (
         <WebClntCom010200
           userInfo={userInfo}
@@ -10163,7 +10144,7 @@ export default function WebClntCom010000({ onNavigate }) {
               localStorage.removeItem('SSEULDAKGO_KEEP_LOGIN');
               localStorage.removeItem('SSEULDAKGO_AUTH_USER');
               sessionStorage.removeItem('SSEULDAKGO_AUTH_USER');
-            } catch (e) {}
+            } catch (e) { }
             setUserInfo({ isGuest: true, USER_NO: 'GUEST', USER_NM: '비회원', USER_ROLE_CD: 'GUEST' });
             setActiveNavPath('home');
           }}
@@ -10171,202 +10152,202 @@ export default function WebClntCom010000({ onNavigate }) {
       ) : userInfo?.USER_ROLE_CD === 'S' && activeNavPath === 'WEB-SRVC-MYP-020100' ? (
         <WebSrvcMyp020100 userInfo={userInfo} onBack={() => setActiveNavPath('WEB-SRVC-COM-010000')} />
       ) : (
-      <main className="w-full pt-[72px] bg-surface flex-1 overflow-y-auto overflow-x-hidden">
-        <div className="max-w-[1440px] mx-auto px-margin-mobile lg:px-margin flex flex-col gap-0">
-          {/* Section 2: Hero Banner & Quick Order Button */}
-          <section className="relative py-12 lg:py-20">
-            <div className="absolute -top-10 -left-10 w-96 h-96 rounded-full bg-primary/5 blur-3xl pointer-events-none" />
-            <div className="absolute bottom-0 right-0 w-96 h-96 rounded-full bg-secondary/10 blur-3xl pointer-events-none" />
-            <div className="relative grid grid-cols-1 lg:grid-cols-12 gap-space-xl items-center">
-              <div className="lg:col-span-12 flex flex-col gap-space-lg min-w-0">
-                
-                <img src='/storage/sseuldakgo/page_main/20261126_v0.01/sseuldakgo_Banner_001.png' alt='쓸고닦고 메인 배너' className='w-full h-auto rounded-2xl object-contain shadow-sm' />
-              </div>
-              
-            </div>
-          </section>
+        <main className="w-full pt-[72px] bg-surface flex-1 overflow-y-auto overflow-x-hidden">
+          <div className="max-w-[1440px] mx-auto px-margin-mobile lg:px-margin flex flex-col gap-0">
+            {/* Section 2: Hero Banner & Quick Order Button */}
+            <section className="relative py-12 lg:py-20">
+              <div className="absolute -top-10 -left-10 w-96 h-96 rounded-full bg-primary/5 blur-3xl pointer-events-none" />
+              <div className="absolute bottom-0 right-0 w-96 h-96 rounded-full bg-secondary/10 blur-3xl pointer-events-none" />
+              <div className="relative grid grid-cols-1 lg:grid-cols-12 gap-space-xl items-center">
+                <div className="lg:col-span-12 flex flex-col gap-space-lg min-w-0">
 
-          {/* Section 3: 3대 청소 용역 대분류 */}
-          <section id="section-core-services" className="scroll-mt-20 py-8 flex flex-col gap-space-md border-t border-outline-variant/50">
-            <div className="flex flex-col md:flex-row md:items-end justify-between gap-space-md">
-              <div className="flex flex-col gap-space-2xs">
-                <span className="font-label-sm text-label-sm text-primary uppercase tracking-wider font-bold">01 / CORE SERVICES</span>
-                <h2 className="font-headline-xl text-headline-xl text-on-surface">3대 청소 용역 대분류</h2>
-              </div>
-              <p className="font-body-md text-body-md text-on-surface-variant max-w-md">
-                공간과 가전의 특성에 맞춘 표준화된 서비스 영역에서 원하는 확정가로 투명하게 발주하세요.
-              </p>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-space-lg">
-              <div className="bg-surface-container-lowest rounded-2xl shadow-sm hover:shadow-md transition-all overflow-hidden flex flex-col border border-outline-variant/60">
-                <img
-                  src="/storage/sseuldakgo/page_main/20261126_v0.01/regular_cleaning_service.jpg"
-                  alt="정기청소 (계단·건물관리)"
-                  className="w-full h-48 object-cover"
-                />
-                <div className="p-space-lg flex flex-col gap-space-sm justify-between flex-1">
-                  <div className="flex flex-col gap-space-xs">
-                    <div className="inline-flex items-center self-start px-space-sm py-0.5 rounded-full bg-secondary-container text-on-secondary-container font-label-sm text-label-sm font-semibold">
-                      최소 3개월 의무 계약
-                    </div>
-                    <h3 className="font-headline-md text-headline-md text-on-surface">정기청소 (계단·건물관리)</h3>
-                    <p className="font-body-md text-body-md text-on-surface-variant">
-                      빌라·상가 계단, 건물주위, 지하주차장 구역별 맞춤 관리 (안정적 관리를 위한 최소 3개월 의무 계약, 구역별 3개월 요금 직접 입력)
-                    </p>
-                  </div>
-                  <button type="button" onClick={() => handleOpenReqModal('REGULAR')} className="inline-flex items-center gap-space-2xs font-label-md text-label-md text-primary hover:text-sky-700 font-semibold pt-space-xs cursor-pointer">
-                    <span>정기청소 발주하기</span>
-                    <span className="material-symbols-outlined text-[16px]">chevron_right</span>
-                  </button>
+                  <img src='/storage/sseuldakgo/page_main/20261126_v0.01/sseuldakgo_Banner_001.png' alt='쓸고닦고 메인 배너' className='w-full h-auto rounded-2xl object-contain shadow-sm' />
                 </div>
-              </div>
-              <div className="bg-surface-container-lowest rounded-2xl shadow-sm hover:shadow-md transition-all overflow-hidden flex flex-col border border-outline-variant/60">
-                <img
-                  src="/storage/sseuldakgo/page_main/20261126_v0.01/appliances_care_service.jpg"
-                  alt="계절가전 분해케어"
-                  className="w-full h-48 object-cover"
-                />
-                <div className="p-space-lg flex flex-col gap-space-sm justify-between flex-1">
-                  <div className="flex flex-col gap-space-xs">
-                    <div className="inline-flex items-center self-start px-space-sm py-0.5 rounded-full bg-secondary-container text-on-secondary-container font-label-sm text-label-sm font-semibold">
-                      완전 분해 고압 살균
-                    </div>
-                    <h3 className="font-headline-md text-headline-md text-on-surface">계절가전 분해케어</h3>
-                    <p className="font-body-md text-body-md text-on-surface-variant">
-                      벽걸이·스탠드·시스템 에어컨, 드럼·통돌이 세탁기, 냉장고 완전 분해 고압 살균 세척 (품목·수량별 희망 요금 직접 입력)
-                    </p>
-                  </div>
-                  <button type="button" onClick={() => handleOpenReqModal('APPLIANCE')} className="inline-flex items-center gap-space-2xs font-label-md text-label-md text-primary hover:text-sky-700 font-semibold pt-space-xs cursor-pointer">
-                    <span>가전 분해케어 발주하기</span>
-                    <span className="material-symbols-outlined text-[16px]">chevron_right</span>
-                  </button>
-                </div>
-              </div>
-              <div className="bg-surface-container-lowest rounded-2xl shadow-sm hover:shadow-md transition-all overflow-hidden flex flex-col border border-outline-variant/60">
-                <img
-                  src="/storage/sseuldakgo/page_main/20261126_v0.01/move_in_cleaning_service.jpg"
-                  alt="입주·이사 청소"
-                  className="w-full h-48 object-cover"
-                />
-                <div className="p-space-lg flex flex-col gap-space-sm justify-between flex-1">
-                  <div className="flex flex-col gap-space-xs">
-                    <div className="inline-flex items-center self-start px-space-sm py-0.5 rounded-full bg-secondary-container text-on-secondary-container font-label-sm text-label-sm font-semibold">
-                      스팀·살균 대청소
-                    </div>
-                    <h3 className="font-headline-md text-headline-md text-on-surface">입주·이사 청소</h3>
-                    <p className="font-body-md text-body-md text-on-surface-variant">
-                      아파트, 오피스텔, 빌라, 사무실 입주 및 이사 전후 구석구석 스팀·살균 대청소 (건별 희망 요금 직접 입력)
-                    </p>
-                  </div>
-                  <button type="button" onClick={() => handleOpenReqModal('MOVEIN')} className="inline-flex items-center gap-space-2xs font-label-md text-label-md text-primary hover:text-sky-700 font-semibold pt-space-xs cursor-pointer">
-                    <span>입주·이사 청소 발주하기</span>
-                    <span className="material-symbols-outlined text-[16px]">chevron_right</span>
-                  </button>
-                </div>
-              </div>
-            </div>
-          </section>
 
-          {/* Section 5: 이용 절차 4단계 워크플로우 */}
-          <section id="section-how-it-works" className="scroll-mt-20 py-8 flex flex-col gap-space-md border-t border-outline-variant/50">
-            <div className="flex flex-col gap-space-2xs">
-              <span className="font-label-sm text-label-sm text-primary uppercase tracking-wider font-bold">02 / HOW IT WORKS</span>
-              <h2 className="font-headline-xl text-headline-xl text-on-surface">이용 절차 4단계 워크플로우</h2>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-space-md">
-              {[
-                { num: '01', icon: 'edit_document', title: '1단계. 희망 요금 결정 및 발주', desc: '지역, 일정, 세부 구역/기종과 고객이 원하는 용역 대금을 직접 결정해 발주 등록', color: 'text-primary', img: '/storage/sseuldakgo/page_main/20261126_v0.01/Web_main_workflow_01.png' },
-                { num: '02', icon: 'handshake', title: '2단계. 전문 시공사 단독 청약', desc: '검증된 파트너의 청약 접수 및 고객 확인 후 데이터 이용료 결제·계약 확정', color: 'text-primary', img: '/storage/sseuldakgo/page_main/20261126_v0.01/Web_main_workflow_02.png' },
-                { num: '03', icon: 'cleaning_services', title: '3단계. 안심번호 연결 및 전문 시공', desc: '개인정보 걱정 없는 안심번호 소통 및 표준 매뉴얼에 따른 꼼꼼한 전문 시공', color: 'text-secondary', img: '/storage/sseuldakgo/page_main/20261126_v0.01/Web_main_workflow_03.png' },
-                { num: '04', icon: 'task_alt', title: '4단계. 사진 검수 및 현장 직불 정산', desc: '시공 전·후 사진 확인 및 고객 최종 승인 후 파트너에게 용역 대금 100% 직접 지불', color: 'text-secondary', img: '/storage/sseuldakgo/page_main/20261126_v0.01/Web_main_workflow_04.png' },
-              ].map((s) => (
-                <div key={s.num} className="bg-surface-container-lowest rounded-xl shadow-sm overflow-hidden flex flex-col border border-outline-variant/60">
+              </div>
+            </section>
+
+            {/* Section 3: 3대 청소 용역 대분류 */}
+            <section id="section-core-services" className="scroll-mt-20 py-8 flex flex-col gap-space-md border-t border-outline-variant/50">
+              <div className="flex flex-col md:flex-row md:items-end justify-between gap-space-md">
+                <div className="flex flex-col gap-space-2xs">
+                  <span className="font-label-sm text-label-sm text-primary uppercase tracking-wider font-bold">01 / CORE SERVICES</span>
+                  <h2 className="font-headline-xl text-headline-xl text-on-surface">3대 청소 용역 대분류</h2>
+                </div>
+                <p className="font-body-md text-body-md text-on-surface-variant max-w-md">
+                  공간과 가전의 특성에 맞춘 표준화된 서비스 영역에서 원하는 확정가로 투명하게 발주하세요.
+                </p>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-space-lg">
+                <div className="bg-surface-container-lowest rounded-2xl shadow-sm hover:shadow-md transition-all overflow-hidden flex flex-col border border-outline-variant/60">
                   <img
-                    src={s.img}
-                    alt={s.title}
-                    className="w-full h-40 object-cover"
+                    src="/storage/sseuldakgo/page_main/20261126_v0.01/regular_cleaning_service.jpg"
+                    alt="정기청소 (계단·건물관리)"
+                    className="w-full h-48 object-cover"
                   />
-                  <div className="p-space-md flex flex-col gap-space-sm flex-1">
-                    <div className="flex items-center justify-between">
-                      <span className={`font-metric-num-lg text-metric-num-lg font-bold ${s.color}`}>{s.num}</span>
-                      <span className={`material-symbols-outlined text-[24px] ${s.color}`}>{s.icon}</span>
-                    </div>
+                  <div className="p-space-lg flex flex-col gap-space-sm justify-between flex-1">
                     <div className="flex flex-col gap-space-xs">
-                      <h3 className="font-title-md text-title-md text-on-surface font-bold">{s.title}</h3>
-                      <p className="font-body-md text-body-md text-on-surface-variant">{s.desc}</p>
+                      <div className="inline-flex items-center self-start px-space-sm py-0.5 rounded-full bg-secondary-container text-on-secondary-container font-label-sm text-label-sm font-semibold">
+                        최소 3개월 의무 계약
+                      </div>
+                      <h3 className="font-headline-md text-headline-md text-on-surface">정기청소 (계단·건물관리)</h3>
+                      <p className="font-body-md text-body-md text-on-surface-variant">
+                        빌라·상가 계단, 건물주위, 지하주차장 구역별 맞춤 관리 (안정적 관리를 위한 최소 3개월 의무 계약, 구역별 3개월 요금 직접 입력)
+                      </p>
                     </div>
+                    <button type="button" onClick={() => handleOpenReqModal('REGULAR')} className="inline-flex items-center gap-space-2xs font-label-md text-label-md text-primary hover:text-sky-700 font-semibold pt-space-xs cursor-pointer">
+                      <span>정기청소 발주하기</span>
+                      <span className="material-symbols-outlined text-[16px]">chevron_right</span>
+                    </button>
                   </div>
                 </div>
-              ))}
-            </div>
-          </section>
-
-          {/* Section 6: 실시간 발주 현황 */}
-          <section id="section-live-matching" className="scroll-mt-20 py-8 flex flex-col gap-space-md border-t border-outline-variant/50">
-            <div className="flex flex-col gap-space-2xs">
-              <span className="font-label-sm text-label-sm text-secondary uppercase tracking-wider font-bold">03 / LIVE MATCHING STATUS</span>
-              <h2 className="font-headline-xl text-headline-xl text-on-surface">실시간 발주 현황</h2>
-            </div>
-            <div className="bg-surface-container-lowest rounded-2xl shadow-sm p-space-md flex flex-col gap-space-sm border border-outline-variant/60 w-full">
-              <div className="flex flex-wrap items-center justify-between gap-space-xs">
-                <div className="flex items-center gap-space-xs">
-                  <span className="w-2.5 h-2.5 rounded-full bg-secondary animate-pulse" />
-                  <h3 className="font-headline-sm text-headline-sm text-on-surface font-bold">실시간 발주·매칭 현황</h3>
+                <div className="bg-surface-container-lowest rounded-2xl shadow-sm hover:shadow-md transition-all overflow-hidden flex flex-col border border-outline-variant/60">
+                  <img
+                    src="/storage/sseuldakgo/page_main/20261126_v0.01/appliances_care_service.jpg"
+                    alt="계절가전 분해케어"
+                    className="w-full h-48 object-cover"
+                  />
+                  <div className="p-space-lg flex flex-col gap-space-sm justify-between flex-1">
+                    <div className="flex flex-col gap-space-xs">
+                      <div className="inline-flex items-center self-start px-space-sm py-0.5 rounded-full bg-secondary-container text-on-secondary-container font-label-sm text-label-sm font-semibold">
+                        완전 분해 고압 살균
+                      </div>
+                      <h3 className="font-headline-md text-headline-md text-on-surface">계절가전 분해케어</h3>
+                      <p className="font-body-md text-body-md text-on-surface-variant">
+                        벽걸이·스탠드·시스템 에어컨, 드럼·통돌이 세탁기, 냉장고 완전 분해 고압 살균 세척 (품목·수량별 희망 요금 직접 입력)
+                      </p>
+                    </div>
+                    <button type="button" onClick={() => handleOpenReqModal('APPLIANCE')} className="inline-flex items-center gap-space-2xs font-label-md text-label-md text-primary hover:text-sky-700 font-semibold pt-space-xs cursor-pointer">
+                      <span>가전 분해케어 발주하기</span>
+                      <span className="material-symbols-outlined text-[16px]">chevron_right</span>
+                    </button>
+                  </div>
                 </div>
-                <div className="flex items-center gap-space-xs">
-                  <label className="font-label-sm text-label-sm text-on-surface-variant whitespace-nowrap">정렬순서 :</label>
-                  <select
-                    value={liveFeedFilter}
-                    onChange={(e) => { setLiveFeedFilter(e.target.value); setLiveFeedPage(1); }}
-                    className="px-2.5 py-1 rounded-lg border border-outline-variant bg-surface-container-lowest font-label-sm text-label-sm text-on-surface focus:outline-none focus:ring-1 focus:ring-primary cursor-pointer"
-                  >
-                    <option value="ALL">전체</option>
-                    <option value="BID_OPEN">청소요청</option>
-                    <option value="BID_APPLIED">청소청약</option>
-                  </select>
+                <div className="bg-surface-container-lowest rounded-2xl shadow-sm hover:shadow-md transition-all overflow-hidden flex flex-col border border-outline-variant/60">
+                  <img
+                    src="/storage/sseuldakgo/page_main/20261126_v0.01/move_in_cleaning_service.jpg"
+                    alt="입주·이사 청소"
+                    className="w-full h-48 object-cover"
+                  />
+                  <div className="p-space-lg flex flex-col gap-space-sm justify-between flex-1">
+                    <div className="flex flex-col gap-space-xs">
+                      <div className="inline-flex items-center self-start px-space-sm py-0.5 rounded-full bg-secondary-container text-on-secondary-container font-label-sm text-label-sm font-semibold">
+                        스팀·살균 대청소
+                      </div>
+                      <h3 className="font-headline-md text-headline-md text-on-surface">입주·이사 청소</h3>
+                      <p className="font-body-md text-body-md text-on-surface-variant">
+                        아파트, 오피스텔, 빌라, 사무실 입주 및 이사 전후 구석구석 스팀·살균 대청소 (건별 희망 요금 직접 입력)
+                      </p>
+                    </div>
+                    <button type="button" onClick={() => handleOpenReqModal('MOVEIN')} className="inline-flex items-center gap-space-2xs font-label-md text-label-md text-primary hover:text-sky-700 font-semibold pt-space-xs cursor-pointer">
+                      <span>입주·이사 청소 발주하기</span>
+                      <span className="material-symbols-outlined text-[16px]">chevron_right</span>
+                    </button>
+                  </div>
                 </div>
               </div>
-              {(() => {
-                const filteredFeed = (feedList || []).filter((ord) => {
-                  if (liveFeedFilter === 'BID_OPEN') return ord.ORDER_STATUS === 'BID_OPEN' || ord.ORDER_STATUS === '청소요청';
-                  if (liveFeedFilter === 'BID_APPLIED') return ord.ORDER_STATUS !== 'BID_OPEN' && ord.ORDER_STATUS !== '청소요청';
-                  return true;
-                });
-                const totalPages = Math.max(1, Math.ceil(filteredFeed.length / 10));
-                const safePage = Math.min(liveFeedPage, totalPages);
-                const pagedFeed = filteredFeed.slice((safePage - 1) * 10, safePage * 10);
-                return (
-                  <>
-                    <div className="flex flex-col gap-space-xs min-h-[680px]">
-                      {pagedFeed.length > 0 ? pagedFeed.map((ord, idx) => (
-                        <div key={ord.ORDER_NO || idx} className="p-space-xs rounded-xl bg-surface-container-low flex flex-col sm:flex-row sm:items-center justify-between gap-space-xs border border-outline-variant/40">
-                          <div className="flex flex-col gap-space-2xs min-w-0">
-                            <span className="font-label-md text-label-md text-on-surface truncate font-semibold">{ord.ADDR_TEXT}</span>
-                            <span className="font-body-sm text-body-sm text-primary font-bold">고객 지정가 {Number(ord.PROPOSED_PRICE || 0).toLocaleString()}원</span>
-                          </div>
-                          <span className="self-start sm:self-center px-space-sm py-space-2xs rounded-full bg-primary-fixed text-on-primary-fixed font-label-sm text-label-sm whitespace-nowrap font-semibold">
-                            {ord.ORDER_STATUS === 'BID_OPEN' ? '청소요청' : (ord.ORDER_STATUS_LABEL || ord.ORDER_STATUS || '청소청약')}
-                          </span>
-                        </div>
-                      )) : (
-                        <div className="flex-1 flex items-center justify-center font-body-sm text-body-sm text-on-surface-variant">
-                          조회된 실시간 발주·매칭 현황이 없습니다.
-                        </div>
-                      )}
-                    </div>
-                    <div className="flex justify-end pt-space-xs">
-                      <PaginationBar page={safePage} totalPages={totalPages} onPageChange={(p) => setLiveFeedPage(p)} />
-                    </div>
-                  </>
-                );
-              })()}
-            </div>
-          </section>
+            </section>
 
-          {/* Section 7: Partner Recruitment & App Download */}
-          
-        </div>
-      </main>
+            {/* Section 5: 이용 절차 4단계 워크플로우 */}
+            <section id="section-how-it-works" className="scroll-mt-20 py-8 flex flex-col gap-space-md border-t border-outline-variant/50">
+              <div className="flex flex-col gap-space-2xs">
+                <span className="font-label-sm text-label-sm text-primary uppercase tracking-wider font-bold">02 / HOW IT WORKS</span>
+                <h2 className="font-headline-xl text-headline-xl text-on-surface">이용 절차 4단계 워크플로우</h2>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-space-md">
+                {[
+                  { num: '01', icon: 'edit_document', title: '1단계. 희망 요금 결정 및 발주', desc: '지역, 일정, 세부 구역/기종과 고객이 원하는 용역 대금을 직접 결정해 발주 등록', color: 'text-primary', img: '/storage/sseuldakgo/page_main/20261126_v0.01/Web_main_workflow_01.png' },
+                  { num: '02', icon: 'handshake', title: '2단계. 전문 시공사 단독 청약', desc: '검증된 파트너의 청약 접수 및 고객 확인 후 데이터 이용료 결제·계약 확정', color: 'text-primary', img: '/storage/sseuldakgo/page_main/20261126_v0.01/Web_main_workflow_02.png' },
+                  { num: '03', icon: 'cleaning_services', title: '3단계. 안심번호 연결 및 전문 시공', desc: '개인정보 걱정 없는 안심번호 소통 및 표준 매뉴얼에 따른 꼼꼼한 전문 시공', color: 'text-secondary', img: '/storage/sseuldakgo/page_main/20261126_v0.01/Web_main_workflow_03.png' },
+                  { num: '04', icon: 'task_alt', title: '4단계. 사진 검수 및 현장 직불 정산', desc: '시공 전·후 사진 확인 및 고객 최종 승인 후 파트너에게 용역 대금 100% 직접 지불', color: 'text-secondary', img: '/storage/sseuldakgo/page_main/20261126_v0.01/Web_main_workflow_04.png' },
+                ].map((s) => (
+                  <div key={s.num} className="bg-surface-container-lowest rounded-xl shadow-sm overflow-hidden flex flex-col border border-outline-variant/60">
+                    <img
+                      src={s.img}
+                      alt={s.title}
+                      className="w-full h-40 object-cover"
+                    />
+                    <div className="p-space-md flex flex-col gap-space-sm flex-1">
+                      <div className="flex items-center justify-between">
+                        <span className={`font-metric-num-lg text-metric-num-lg font-bold ${s.color}`}>{s.num}</span>
+                        <span className={`material-symbols-outlined text-[24px] ${s.color}`}>{s.icon}</span>
+                      </div>
+                      <div className="flex flex-col gap-space-xs">
+                        <h3 className="font-title-md text-title-md text-on-surface font-bold">{s.title}</h3>
+                        <p className="font-body-md text-body-md text-on-surface-variant">{s.desc}</p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </section>
+
+            {/* Section 6: 실시간 발주 현황 */}
+            <section id="section-live-matching" className="scroll-mt-20 py-8 flex flex-col gap-space-md border-t border-outline-variant/50">
+              <div className="flex flex-col gap-space-2xs">
+                <span className="font-label-sm text-label-sm text-secondary uppercase tracking-wider font-bold">03 / LIVE MATCHING STATUS</span>
+                <h2 className="font-headline-xl text-headline-xl text-on-surface">실시간 발주 현황</h2>
+              </div>
+              <div className="bg-surface-container-lowest rounded-2xl shadow-sm p-space-md flex flex-col gap-space-sm border border-outline-variant/60 w-full">
+                <div className="flex flex-wrap items-center justify-between gap-space-xs">
+                  <div className="flex items-center gap-space-xs">
+                    <span className="w-2.5 h-2.5 rounded-full bg-secondary animate-pulse" />
+                    <h3 className="font-headline-sm text-headline-sm text-on-surface font-bold">실시간 발주·매칭 현황</h3>
+                  </div>
+                  <div className="flex items-center gap-space-xs">
+                    <label className="font-label-sm text-label-sm text-on-surface-variant whitespace-nowrap">정렬순서 :</label>
+                    <select
+                      value={liveFeedFilter}
+                      onChange={(e) => { setLiveFeedFilter(e.target.value); setLiveFeedPage(1); }}
+                      className="px-2.5 py-1 rounded-lg border border-outline-variant bg-surface-container-lowest font-label-sm text-label-sm text-on-surface focus:outline-none focus:ring-1 focus:ring-primary cursor-pointer"
+                    >
+                      <option value="ALL">전체</option>
+                      <option value="BID_OPEN">청소요청</option>
+                      <option value="BID_APPLIED">청소청약</option>
+                    </select>
+                  </div>
+                </div>
+                {(() => {
+                  const filteredFeed = (feedList || []).filter((ord) => {
+                    if (liveFeedFilter === 'BID_OPEN') return ord.ORDER_STATUS === 'BID_OPEN' || ord.ORDER_STATUS === '청소요청';
+                    if (liveFeedFilter === 'BID_APPLIED') return ord.ORDER_STATUS !== 'BID_OPEN' && ord.ORDER_STATUS !== '청소요청';
+                    return true;
+                  });
+                  const totalPages = Math.max(1, Math.ceil(filteredFeed.length / 10));
+                  const safePage = Math.min(liveFeedPage, totalPages);
+                  const pagedFeed = filteredFeed.slice((safePage - 1) * 10, safePage * 10);
+                  return (
+                    <>
+                      <div className="flex flex-col gap-space-xs min-h-[680px]">
+                        {pagedFeed.length > 0 ? pagedFeed.map((ord, idx) => (
+                          <div key={ord.ORDER_NO || idx} className="p-space-xs rounded-xl bg-surface-container-low flex flex-col sm:flex-row sm:items-center justify-between gap-space-xs border border-outline-variant/40">
+                            <div className="flex flex-col gap-space-2xs min-w-0">
+                              <span className="font-label-md text-label-md text-on-surface truncate font-semibold">{ord.ADDR_TEXT}</span>
+                              <span className="font-body-sm text-body-sm text-primary font-bold">고객 지정가 {Number(ord.PROPOSED_PRICE || 0).toLocaleString()}원</span>
+                            </div>
+                            <span className="self-start sm:self-center px-space-sm py-space-2xs rounded-full bg-primary-fixed text-on-primary-fixed font-label-sm text-label-sm whitespace-nowrap font-semibold">
+                              {ord.ORDER_STATUS === 'BID_OPEN' ? '청소요청' : (ord.ORDER_STATUS_LABEL || ord.ORDER_STATUS || '청소청약')}
+                            </span>
+                          </div>
+                        )) : (
+                          <div className="flex-1 flex items-center justify-center font-body-sm text-body-sm text-on-surface-variant">
+                            조회된 실시간 발주·매칭 현황이 없습니다.
+                          </div>
+                        )}
+                      </div>
+                      <div className="flex justify-end pt-space-xs">
+                        <PaginationBar page={safePage} totalPages={totalPages} onPageChange={(p) => setLiveFeedPage(p)} />
+                      </div>
+                    </>
+                  );
+                })()}
+              </div>
+            </section>
+
+            {/* Section 7: Partner Recruitment & App Download */}
+
+          </div>
+        </main>
       )}
 
       {/* ====================================================================
@@ -10484,11 +10465,11 @@ export default function WebClntCom010000({ onNavigate }) {
           알림 상세 안내 및 청약 접수 모달 (activeNotiModal)
       ============================================================== */}
       {activeNotiModal && (
-        <div 
+        <div
           className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-[300] flex items-center justify-center p-4 overflow-y-auto"
           onClick={() => setActiveNotiModal(null)}
         >
-          <div 
+          <div
             className="relative w-full max-w-lg bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden animate-in fade-in zoom-in-95 duration-200"
             onClick={(e) => e.stopPropagation()}
           >
@@ -10877,7 +10858,7 @@ export function WebClntPay010100({
     >
       {/* MODAL CONTAINER (max-w-[540px]) */}
       <div className="max-w-[540px] w-full max-h-[92vh] flex flex-col bg-surface-container-lowest rounded-2xl shadow-2xl overflow-hidden my-auto border border-slate-200/60 animate-in zoom-in-95">
-        
+
         {/* 1. MODAL HEADER (Sticky Top) */}
         <header className="p-6 bg-surface-container-lowest sticky top-0 z-20 flex items-start justify-between border-b border-slate-100 shadow-sm">
           <div className="flex flex-col">
@@ -10904,7 +10885,7 @@ export function WebClntPay010100({
 
         {/* 2. MODAL INNER BODY (Scrollable, p-6 space-y-5) */}
         <div className="p-6 overflow-y-auto space-y-5">
-          
+
           {/* 오류 알림 배너 */}
           {alertError && (
             <div className="p-3.5 bg-error-container text-on-error-container rounded-xl flex items-start gap-2 text-xs animate-in fade-in">
@@ -11022,11 +11003,10 @@ export function WebClntPay010100({
                           setSelectedCats([...selectedCats, catKey]);
                         }
                       }}
-                      className={`px-2.5 py-1 rounded-lg font-caption text-caption font-semibold flex items-center gap-1 transition-all cursor-pointer ${
-                        isChecked
+                      className={`px-2.5 py-1 rounded-lg font-caption text-caption font-semibold flex items-center gap-1 transition-all cursor-pointer ${isChecked
                           ? 'bg-secondary text-on-secondary shadow-xs'
                           : 'bg-surface-container text-on-surface-variant hover:bg-surface-container-high'
-                      }`}
+                        }`}
                     >
                       <span className="material-symbols-outlined text-[14px]">
                         {isChecked ? 'check_circle' : 'add_circle'}
@@ -11084,12 +11064,11 @@ export function WebClntPay010100({
               결제 수단 선택
             </label>
             <div aria-label="결제 수단" className="grid grid-cols-2 gap-2.5" role="radiogroup">
-              
+
               {/* Option 1: Credit Card */}
               <label
-                className={`payment-method-card cursor-pointer p-3 rounded-xl bg-surface-container-lowest shadow-sm flex items-center gap-2.5 transition-all relative overflow-hidden border ${
-                  payMethod === 'CARD' ? 'border-secondary ring-1 ring-secondary bg-secondary-container/20' : 'border-slate-200/80 hover:bg-surface-container-low'
-                }`}
+                className={`payment-method-card cursor-pointer p-3 rounded-xl bg-surface-container-lowest shadow-sm flex items-center gap-2.5 transition-all relative overflow-hidden border ${payMethod === 'CARD' ? 'border-secondary ring-1 ring-secondary bg-secondary-container/20' : 'border-slate-200/80 hover:bg-surface-container-low'
+                  }`}
                 data-method="CARD"
               >
                 <input
@@ -11111,9 +11090,8 @@ export function WebClntPay010100({
 
               {/* Option 2: Kakao Pay */}
               <label
-                className={`payment-method-card cursor-pointer p-3 rounded-xl bg-surface-container-lowest shadow-sm flex items-center gap-2.5 transition-all relative overflow-hidden border ${
-                  payMethod === 'KAKAOPAY' ? 'border-secondary ring-1 ring-secondary bg-secondary-container/20' : 'border-slate-200/80 hover:bg-surface-container-low'
-                }`}
+                className={`payment-method-card cursor-pointer p-3 rounded-xl bg-surface-container-lowest shadow-sm flex items-center gap-2.5 transition-all relative overflow-hidden border ${payMethod === 'KAKAOPAY' ? 'border-secondary ring-1 ring-secondary bg-secondary-container/20' : 'border-slate-200/80 hover:bg-surface-container-low'
+                  }`}
                 data-method="KAKAOPAY"
               >
                 <input
@@ -11135,9 +11113,8 @@ export function WebClntPay010100({
 
               {/* Option 3: Naver Pay */}
               <label
-                className={`payment-method-card cursor-pointer p-3 rounded-xl bg-surface-container-lowest shadow-sm flex items-center gap-2.5 transition-all relative overflow-hidden border ${
-                  payMethod === 'NAVERPAY' ? 'border-secondary ring-1 ring-secondary bg-secondary-container/20' : 'border-slate-200/80 hover:bg-surface-container-low'
-                }`}
+                className={`payment-method-card cursor-pointer p-3 rounded-xl bg-surface-container-lowest shadow-sm flex items-center gap-2.5 transition-all relative overflow-hidden border ${payMethod === 'NAVERPAY' ? 'border-secondary ring-1 ring-secondary bg-secondary-container/20' : 'border-slate-200/80 hover:bg-surface-container-low'
+                  }`}
                 data-method="NAVERPAY"
               >
                 <input
@@ -11159,9 +11136,8 @@ export function WebClntPay010100({
 
               {/* Option 4: Toss Pay */}
               <label
-                className={`payment-method-card cursor-pointer p-3 rounded-xl bg-surface-container-lowest shadow-sm flex items-center gap-2.5 transition-all relative overflow-hidden border ${
-                  payMethod === 'TOSSPAY' ? 'border-secondary ring-1 ring-secondary bg-secondary-container/20' : 'border-slate-200/80 hover:bg-surface-container-low'
-                }`}
+                className={`payment-method-card cursor-pointer p-3 rounded-xl bg-surface-container-lowest shadow-sm flex items-center gap-2.5 transition-all relative overflow-hidden border ${payMethod === 'TOSSPAY' ? 'border-secondary ring-1 ring-secondary bg-secondary-container/20' : 'border-slate-200/80 hover:bg-surface-container-low'
+                  }`}
                 data-method="TOSSPAY"
               >
                 <input
@@ -11197,7 +11173,7 @@ export function WebClntPay010100({
               </button>
             </div>
             <div className="space-y-2.5">
-              
+
               {/* Agree 1: Exclusive Matching */}
               <label className="flex items-start gap-2.5 p-3 rounded-xl bg-surface-container-low cursor-pointer hover:bg-surface-container transition-colors border border-slate-200/50">
                 <input
@@ -11805,33 +11781,30 @@ export function WebClntOrd010100({
                   {/* Sorting Segmented Buttons */}
                   <div className="inline-flex p-1 bg-surface-container-low rounded-xl shrink-0 border border-slate-200/50" role="tablist">
                     <button
-                      className={`sort-tab-btn px-3 py-1.5 rounded-lg font-label-sm text-label-sm transition-all cursor-pointer ${
-                        sortType === 'recommend'
+                      className={`sort-tab-btn px-3 py-1.5 rounded-lg font-label-sm text-label-sm transition-all cursor-pointer ${sortType === 'recommend'
                           ? 'active bg-surface-container-lowest shadow-xs text-primary font-bold'
                           : 'text-on-surface-variant hover:text-on-surface'
-                      }`}
+                        }`}
                       onClick={() => setSortType('recommend')}
                       type="button"
                     >
                       추천순
                     </button>
                     <button
-                      className={`sort-tab-btn px-3 py-1.5 rounded-lg font-label-sm text-label-sm transition-all cursor-pointer ${
-                        sortType === 'fast'
+                      className={`sort-tab-btn px-3 py-1.5 rounded-lg font-label-sm text-label-sm transition-all cursor-pointer ${sortType === 'fast'
                           ? 'active bg-surface-container-lowest shadow-xs text-primary font-bold'
                           : 'text-on-surface-variant hover:text-on-surface'
-                      }`}
+                        }`}
                       onClick={() => setSortType('fast')}
                       type="button"
                     >
                       빠른시공순
                     </button>
                     <button
-                      className={`sort-tab-btn px-3 py-1.5 rounded-lg font-label-sm text-label-sm transition-all cursor-pointer ${
-                        sortType === 'latest'
+                      className={`sort-tab-btn px-3 py-1.5 rounded-lg font-label-sm text-label-sm transition-all cursor-pointer ${sortType === 'latest'
                           ? 'active bg-surface-container-lowest shadow-xs text-primary font-bold'
                           : 'text-on-surface-variant hover:text-on-surface'
-                      }`}
+                        }`}
                       onClick={() => setSortType('latest')}
                       type="button"
                     >
@@ -11857,9 +11830,8 @@ export function WebClntOrd010100({
 
                     return (
                       <article
-                        className={`relative bg-surface-container-lowest rounded-2xl p-space-lg shadow-sm hover:shadow-md transition-all flex flex-col gap-space-md overflow-hidden border border-slate-200/80 ${
-                          isTopRecommend ? 'ring-2 ring-secondary/40 shadow-md' : ''
-                        }`}
+                        className={`relative bg-surface-container-lowest rounded-2xl p-space-lg shadow-sm hover:shadow-md transition-all flex flex-col gap-space-md overflow-hidden border border-slate-200/80 ${isTopRecommend ? 'ring-2 ring-secondary/40 shadow-md' : ''
+                          }`}
                         data-apply-no={apply.applyNo}
                         key={apply.applyNo}
                       >
@@ -12244,7 +12216,7 @@ export function WebClntJob010100({
       ==================================================================== */}
       <header className="fixed top-0 left-0 right-0 z-40 bg-surface-container-lowest/95 backdrop-blur-md shadow-[0_1px_8px_rgba(0,0,0,0.04)] border-b border-slate-200/60">
         <div className="h-[72px] max-w-[1200px] mx-auto px-margin flex items-center justify-between gap-space-md">
-          
+
           {/* Logo & Area Selector */}
           <div className="flex items-center gap-space-md shrink-0">
             <button

@@ -3,6 +3,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { processWebClntCom010000 } from '../SseulDakGo_Web/Client/backend/api_WEB_CLNT_COM_010000/route.js';
 import { processWebClntCom010200 } from '../SseulDakGo_Web/Client/backend/api_WEB_CLNT_COM_010200/route.js';
+import { processWebSrvcStt010000 } from '../SseulDakGo_Web/Service/backend/api_WEB_SRVC_STT_010000/route.js';
 import { processWebClntReq010100 } from '../SseulDakGo_Web/Client/backend/api_WEB_CLNT_REQ_010100/route.js';
 import { processWebClntReq010101 } from '../SseulDakGo_Web/Client/backend/api_WEB_CLNT_REQ_010101/route.js';
 import { processWebClntAth010200100 } from '../SseulDakGo_Web/Client/backend/api_WEB_CLNT_ATH_010100/route.js';
@@ -502,6 +503,20 @@ app.post('/api/web/client/search_address', async (req, res) => {
     });
   }
 });
+app.get('/api/srvc/stt/010000', async (req, res) => {
+  try {
+    const { status, body } = await processWebSrvcStt010000(req.query || {});
+    return res.status(status).json(body);
+  } catch (error) {
+    console.error('❌ API Error (/api/srvc/stt/010000):', error);
+    return res.status(500).json({
+      success: false,
+      screenId: 'WEB-SRVC-STT-010000',
+      message: error?.message || '통계 조회 중 오류가 발생했습니다.',
+    });
+  }
+});
+
 app.get('/api/clnt/com/010200', async (req, res) => {
   try {
     const { status, body } = await processWebClntCom010200(req.query || {});
@@ -1086,7 +1101,7 @@ app.get('/api/srvc/myp/020100', async (req, res) => {
       if (rawTypes) {
         cleanServiceTypes = String(rawTypes).split(',').map((s) => s.trim()).filter(Boolean);
       }
-    } catch {}
+    } catch { }
     return res.status(200).json({ success: true, certs: rows || [], cleanServiceTypes });
   } catch (err) {
     console.error('[GET /api/srvc/myp/020100] 오류:', err);
@@ -1099,39 +1114,33 @@ app.put('/api/srvc/myp/020100', async (req, res) => {
     const { userNo, bizName, ceoName, bizNo, cleanServiceTypes, certs } = req.body || {};
     if (!userNo) return res.status(400).json({ success: false, message: 'userNo가 필요합니다.' });
     const cleanTypesStr = Array.isArray(cleanServiceTypes) ? cleanServiceTypes.join(',') : '';
+    await executeQuery(`ALTER TABLE TB_PARTNER_BIZ ADD COLUMN CLEAN_SERVICE_TYPES VARCHAR(255) NULL`).catch(() => { });
     await executeQuery(
       `INSERT INTO TB_PARTNER_BIZ (USER_NO, BIZ_NM, CEO_NM, BIZ_REG_NO, CLEAN_SERVICE_TYPES, REG_DT, MOD_DT)
        VALUES (?, ?, ?, ?, ?, NOW(), NOW())
        ON DUPLICATE KEY UPDATE BIZ_NM = VALUES(BIZ_NM), CEO_NM = VALUES(CEO_NM), BIZ_REG_NO = VALUES(BIZ_REG_NO), CLEAN_SERVICE_TYPES = VALUES(CLEAN_SERVICE_TYPES), MOD_DT = NOW()`,
       [userNo, bizName || '', ceoName || '', bizNo || '', cleanTypesStr]
-    ).catch(async () => {
-      await executeQuery(
-        `INSERT INTO TB_PARTNER_BIZ (USER_NO, BIZ_NM, CEO_NM, BIZ_REG_NO, REG_DT, MOD_DT)
-         VALUES (?, ?, ?, ?, NOW(), NOW())
-         ON DUPLICATE KEY UPDATE BIZ_NM = VALUES(BIZ_NM), CEO_NM = VALUES(CEO_NM), BIZ_REG_NO = VALUES(BIZ_REG_NO), MOD_DT = NOW()`,
-        [userNo, bizName || '', ceoName || '', bizNo || '']
-      ).catch(() => {});
-    });
-    if (Array.isArray(certs)) {
-      await executeQuery(`DELETE FROM TB_SERVICE_CERT WHERE USER_NO = ?`, [userNo]).catch(() => {});
-      await executeQuery(`DELETE FROM TB_PARTNER_CERT WHERE USER_NO = ?`, [userNo]).catch(() => {});
-      for (const c of certs.slice(0, 50)) {
-        await executeQuery(
-          `INSERT INTO TB_SERVICE_CERT (USER_NO, CERT_NM, ISSUER_ORG, SERVICE_CAT, CERT_LEVEL, ISSUE_DT, CERT_NO, VERIFY_STAT_CD, REG_DT)
+    );
+if (Array.isArray(certs)) {
+  await executeQuery(`DELETE FROM TB_SERVICE_CERT WHERE USER_NO = ?`, [userNo]).catch(() => { });
+  await executeQuery(`DELETE FROM TB_PARTNER_CERT WHERE USER_NO = ?`, [userNo]).catch(() => { });
+  for (const c of certs.slice(0, 50)) {
+    await executeQuery(
+      `INSERT INTO TB_SERVICE_CERT (USER_NO, CERT_NM, ISSUER_ORG, SERVICE_CAT, CERT_LEVEL, ISSUE_DT, CERT_NO, VERIFY_STAT_CD, REG_DT)
            VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())`,
-          [userNo, c.name || '', c.org || '', c.cat || '', c.level || '', c.date ? String(c.date).replace(/\./g, '-') : null, c.certNo || '', c.status || '심사대기']
-        ).catch(() => {});
-        await executeQuery(
-          `INSERT INTO TB_PARTNER_CERT (USER_NO, CERT_NM, ISSU_ORG_NM, ACQ_DT, CERT_NO, STAT_CD, REG_DT)
+      [userNo, c.name || '', c.org || '', c.cat || '', c.level || '', c.date ? String(c.date).replace(/\./g, '-') : null, c.certNo || '', c.status || '심사대기']
+    ).catch(() => { });
+    await executeQuery(
+      `INSERT INTO TB_PARTNER_CERT (USER_NO, CERT_NM, ISSU_ORG_NM, ACQ_DT, CERT_NO, STAT_CD, REG_DT)
            VALUES (?, ?, ?, ?, ?, ?, NOW())`,
-          [userNo, c.name || '', c.org || '', c.date || '', c.certNo || '', c.status || '심사대기']
-        ).catch(() => {});
-      }
-    }
-    return res.json({ success: true, message: '사업자, 청소 용역 구분 및 자격·수료 정보가 DB에 저장되었습니다.' });
-  } catch (error) {
-    return res.status(500).json({ success: false, message: error?.message || '저장 오류' });
+      [userNo, c.name || '', c.org || '', c.date || '', c.certNo || '', c.status || '심사대기']
+    ).catch(() => { });
   }
+}
+return res.json({ success: true, message: '사업자, 청소 용역 구분 및 자격·수료 정보가 DB에 저장되었습니다.' });
+  } catch (error) {
+  return res.status(500).json({ success: false, message: error?.message || '저장 오류' });
+}
 });
 
 app.all('/api/srvc/myp/020101', async (req, res) => {
@@ -1658,7 +1667,7 @@ app.get('/api/srvc/com/010000', async (req, res) => {
             LIMIT 12`,
           [userNo]
         );
-      } catch (_) {}
+      } catch (_) { }
     }
 
     const partnerSpecialties = Array.from(
@@ -1683,7 +1692,7 @@ app.get('/api/srvc/com/010000', async (req, res) => {
             isBizRestricted = true;
           }
         }
-      } catch (_) {}
+      } catch (_) { }
     }
 
     return res.status(200).json({
