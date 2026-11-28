@@ -352,7 +352,7 @@ export default function WebSrvcCom010100({ isOpen, userInfo, onClose, onSuccess 
               className="px-5 py-2.5 rounded-xl bg-[#0284C7] hover:bg-[#0369A1] text-white text-xs font-extrabold shadow-sm flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
             >
               <span className="material-symbols-outlined text-[17px]">check_circle</span>
-              <span>{isSubmitting ? '저장 중...' : '대표 로고 이미지 저장하기'}</span>
+              <span>{isSubmitting ? '저장 중...' : '대표 로고 저장하기'}</span>
             </button>
           </div>
         </footer>

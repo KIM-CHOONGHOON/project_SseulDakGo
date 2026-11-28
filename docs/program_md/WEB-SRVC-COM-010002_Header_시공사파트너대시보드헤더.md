@@ -31,3 +31,9 @@
 - **2026-11-28 (시공사 대시보드 섹션 스크롤 연동, 전문분야·자격증 DB 조회 보완, PARTNER DASHBOARD 배지 삭제)**
   - `SseulDakGo_Web/Client/frontend/WEB-CLNT-COM-010000/index.jsx`: `"통합 시공·청약 공정 관리"` 및 `"내 활동 내역"` 클릭 시 `WEB-SRVC-COM-010000` 전환 후 해당 섹션으로 스크롤 이동, `"WEB-SRVC-COM-010000 · PARTNER DASHBOARD"` 문구 삭제, `/api/srvc/myp/020100` 연동을 통해 `청소 전문 분야` 및 `보유 자격 및 수료` 조회 출력 보완.
 - **2026-11-28 (우측 상단 시공사 프로필 사진, 대표자성명, 회사명 연동)**: `WebSrvcCom010000`에서 조회된 `logoUrl`, `ceoNm`, `compNm`을 `onPartnerProfileLoaded`로 전달받아 우측 상단 헤더에 동일 로고 사진, 대표자성명(`인증회원`), 회사명을 출력하도록 수정.
+- **2026-11-28 (새로고침 시 역할별 화면 유지 및 청소 전문 분야 색상 구분)**
+  - `WEB-CLNT-COM-010000/index.jsx`: `activeNavPath` 초기값을 로그인 역할(`S` → `WEB-SRVC-COM-010000`, `C` → `WEB-CLNT-COM-010200`)로 설정하여 `CTRL+SHIFT+R` 새로고침 시에도 해당 화면이 유지되도록 수정.
+  - `WebSrvcCom010000`: `TB_SERVICE_DOC`의 `REGULAR_YN`(정기청소: 옅은 노랑), `MOVEOUT_YN`(입주청소: 옅은 하늘), `APPLIANCE_YN`(계절가전 청소: 옅은 붉은색) 배지 색상 적용.
+- **2026-11-28 (홈 버튼 추가 및 시공사 로고 사진 동기화)**
+  - `WEB-SRVC-COM-010002`: `"통합 시공·청약 공정 관리"` 왼쪽에 옅은 푸른색 바탕(`bg-sky-50 text-sky-700`)의 `"홈"` 버튼 추가.
+  - `WebSrvcCom010000`: `/api/srvc/com/010100`에서 로고 URL을 조회해 `"로고변경"` 버튼 위 사진과 우측 상단 프로필 사진이 동일하게 표시되도록 수정.

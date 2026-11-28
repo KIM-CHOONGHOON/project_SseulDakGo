@@ -49,3 +49,8 @@
 - **2026-11-28 (TB_PARTNER_BIZ.CLEAN_SERVICE_TYPES 컬럼 자동 보장 및 상단 헤더 박스 파랑색 외곽선 적용)**
   - `preview/server.js`: `PUT /api/srvc/myp/020100` 실행 전 `TB_PARTNER_BIZ`에 `CLEAN_SERVICE_TYPES` 컬럼이 없을 경우 자동 추가(`ALTER TABLE ... ADD COLUMN`)하도록 보완하여 실제 DB 저장 누락 해결.
   - `WEB-SRVC-MYP-020100`: 상단 `"사업자등록 및 자격증·수료증 등록"` 박스 외곽선을 파랑색(`border-2 border-blue-500`)으로 변경.
+- **2026-11-28 (TB_SERVICE_DOC 청소 용역 구분 Y/N 컬럼 연동)**
+  - `WEB-SRVC-MYP-020100`: `"내 정보 저장"` 요청 시 `REGULAR_YN`, `MOVEOUT_YN`, `APPLIANCE_YN` 파라미터를 함께 전송하도록 수정.
+  - `preview/server.js`: `PUT /api/srvc/myp/020100`에서 `TB_SERVICE_DOC`에 `CLEAN_SERVICE_TYPES`, `REGULAR_YN`, `MOVEOUT_YN`, `APPLIANCE_YN`을 `INSERT/UPDATE`하고, `GET /api/srvc/myp/020100`에서 `TB_SERVICE_DOC` 기준으로 조회하도록 수정.
+- **2026-11-28 (WEB-SRVC-MYP-020100 중복 `<header>` 제거 및 세로 스택 레이아웃 복구)**: 중복 중첩된 `<header>` 태그를 제거하여 카드가 원래대로 세로 스택(각 카드 내부 가로 입력)으로 정상 출력되도록 수정.
+- **2026-11-28 (저장 안내 토스트 위치 변경)**: `"내 정보 저장"` 버튼 세로 방향 바로 위(`bottom-full right-0 mb-2.5`)에 안내 문구가 출력되도록 수정.

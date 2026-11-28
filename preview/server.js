@@ -1093,13 +1093,18 @@ app.get('/api/srvc/myp/020100', async (req, res) => {
     }
     let cleanServiceTypes = [];
     try {
-      const bizRows = await executeQuery(
-        `SELECT CLEAN_SERVICE_TYPES FROM TB_PARTNER_BIZ WHERE USER_NO = ? LIMIT 1`,
+      const docRows = await executeQuery(
+        `SELECT CLEAN_SERVICE_TYPES, REGULAR_YN, MOVEOUT_YN, APPLIANCE_YN FROM TB_SERVICE_DOC WHERE USER_NO = ? LIMIT 1`,
         [userNo]
       );
-      const rawTypes = bizRows?.[0]?.CLEAN_SERVICE_TYPES || '';
-      if (rawTypes) {
-        cleanServiceTypes = String(rawTypes).split(',').map((s) => s.trim()).filter(Boolean);
+      if (docRows && docRows.length > 0) {
+        const d = docRows[0];
+        if (d.REGULAR_YN === 'Y') cleanServiceTypes.push('정기청소');
+        if (d.MOVEOUT_YN === 'Y') cleanServiceTypes.push('입주청소');
+        if (d.APPLIANCE_YN === 'Y') cleanServiceTypes.push('계절가전 청소');
+        if (cleanServiceTypes.length === 0 && d.CLEAN_SERVICE_TYPES) {
+          cleanServiceTypes = String(d.CLEAN_SERVICE_TYPES).split(',').map((s) => s.trim()).filter(Boolean);
+        }
       }
     } catch { }
     return res.status(200).json({ success: true, certs: rows || [], cleanServiceTypes });
@@ -1111,15 +1116,17 @@ app.get('/api/srvc/myp/020100', async (req, res) => {
 
 app.put('/api/srvc/myp/020100', async (req, res) => {
   try {
-    const { userNo, bizName, ceoName, bizNo, cleanServiceTypes, certs } = req.body || {};
+    const { userNo, bizName, ceoName, bizNo, cleanServiceTypes, REGULAR_YN, MOVEOUT_YN, APPLIANCE_YN, certs } = req.body || {};
     if (!userNo) return res.status(400).json({ success: false, message: 'userNo가 필요합니다.' });
     const cleanTypesStr = Array.isArray(cleanServiceTypes) ? cleanServiceTypes.join(',') : '';
-    await executeQuery(`ALTER TABLE TB_PARTNER_BIZ ADD COLUMN CLEAN_SERVICE_TYPES VARCHAR(255) NULL`).catch(() => { });
+    const regularYn = REGULAR_YN === 'Y' || (Array.isArray(cleanServiceTypes) && cleanServiceTypes.includes('정기청소')) ? 'Y' : 'N';
+    const moveoutYn = MOVEOUT_YN === 'Y' || (Array.isArray(cleanServiceTypes) && cleanServiceTypes.includes('입주청소')) ? 'Y' : 'N';
+    const applianceYn = APPLIANCE_YN === 'Y' || (Array.isArray(cleanServiceTypes) && cleanServiceTypes.includes('계절가전 청소')) ? 'Y' : 'N';
     await executeQuery(
-      `INSERT INTO TB_PARTNER_BIZ (USER_NO, BIZ_NM, CEO_NM, BIZ_REG_NO, CLEAN_SERVICE_TYPES, REG_DT, MOD_DT)
-       VALUES (?, ?, ?, ?, ?, NOW(), NOW())
-       ON DUPLICATE KEY UPDATE BIZ_NM = VALUES(BIZ_NM), CEO_NM = VALUES(CEO_NM), BIZ_REG_NO = VALUES(BIZ_REG_NO), CLEAN_SERVICE_TYPES = VALUES(CLEAN_SERVICE_TYPES), MOD_DT = NOW()`,
-      [userNo, bizName || '', ceoName || '', bizNo || '', cleanTypesStr]
+      `INSERT INTO TB_SERVICE_DOC (USER_NO, COMP_NM, CEO_NM, BIZ_REG_NO, CLEAN_SERVICE_TYPES, REGULAR_YN, MOVEOUT_YN, APPLIANCE_YN, REG_DT, MOD_DT)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())
+       ON DUPLICATE KEY UPDATE COMP_NM = VALUES(COMP_NM), CEO_NM = VALUES(CEO_NM), BIZ_REG_NO = VALUES(BIZ_REG_NO), CLEAN_SERVICE_TYPES = VALUES(CLEAN_SERVICE_TYPES), REGULAR_YN = VALUES(REGULAR_YN), MOVEOUT_YN = VALUES(MOVEOUT_YN), APPLIANCE_YN = VALUES(APPLIANCE_YN), MOD_DT = NOW()`,
+      [userNo, bizName || '', ceoName || '', bizNo || '', cleanTypesStr, regularYn, moveoutYn, applianceYn]
     );
 if (Array.isArray(certs)) {
   await executeQuery(`DELETE FROM TB_SERVICE_CERT WHERE USER_NO = ?`, [userNo]).catch(() => { });

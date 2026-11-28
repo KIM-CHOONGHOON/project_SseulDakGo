@@ -7301,7 +7301,7 @@ function WebSrvcCom010100({ isOpen, userInfo, onClose, onSuccess }) {
               className="px-5 py-2.5 rounded-xl bg-[#0284C7] hover:bg-[#0369A1] text-white text-xs font-extrabold shadow-sm flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
             >
               <span className="material-symbols-outlined text-[17px]">check_circle</span>
-              <span>{isSubmitting ? '저장 중...' : '대표 로고 이미지 저장하기'}</span>
+              <span>{isSubmitting ? '저장 중...' : '대표 로고 저장하기'}</span>
             </button>
           </div>
         </footer>
@@ -7727,7 +7727,7 @@ function WebSrvcCom010100({ isOpen, userInfo, onClose, onSuccess }) {
               className="px-5 py-2.5 rounded-xl bg-[#0284C7] hover:bg-[#0369A1] text-white text-xs font-extrabold shadow-sm flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
             >
               <span className="material-symbols-outlined text-[17px]">check_circle</span>
-              <span>{isSubmitting ? '저장 중...' : '대표 로고 이미지 저장하기'}</span>
+              <span>{isSubmitting ? '저장 중...' : '대표 로고 저장하기'}</span>
             </button>
           </div>
         </footer>
@@ -7876,17 +7876,23 @@ function WebSrvcCom010000({ userInfo, onNavigate, onPartnerProfileLoaded }) {
               setPartnerCerts(mypJson.certs.map((c) => c.CERT_NM || c.name).filter(Boolean));
             }
           }
-          const bizRes = await fetch(`/api/srvc/myp/020101?userNo=${encodeURIComponent(uNo)}`);
+          const [bizRes, logoRes] = await Promise.all([
+            fetch(`/api/srvc/myp/020101?userNo=${encodeURIComponent(uNo)}`),
+            fetch(`/api/srvc/com/010100?userNo=${encodeURIComponent(uNo)}`).catch(() => null),
+          ]);
           const bizJson = await bizRes.json();
+          const logoJson = logoRes ? await logoRes.json().catch(() => null) : null;
+          const resolvedLogo = logoJson?.logoUrl || partnerLogoUrl || userInfo?.PROFILE_IMG_URL || null;
+          if (resolvedLogo) setPartnerLogoUrl(resolvedLogo);
           if (bizJson?.success && bizJson.data) {
             onPartnerProfileLoaded?.({
-              logoUrl: partnerLogoUrl || userInfo?.PROFILE_IMG_URL || null,
+              logoUrl: resolvedLogo,
               ceoNm: bizJson.data.CEO_NM || '',
               compNm: bizJson.data.COMP_NM || data?.partnerCompNm || '',
             });
           } else {
             onPartnerProfileLoaded?.({
-              logoUrl: partnerLogoUrl || userInfo?.PROFILE_IMG_URL || null,
+              logoUrl: resolvedLogo,
               ceoNm: '',
               compNm: data?.partnerCompNm || '',
             });
@@ -8050,9 +8056,16 @@ function WebSrvcCom010000({ userInfo, onNavigate, onPartnerProfileLoaded }) {
                 {partnerSpecialties.length === 0 ? (
                   <span className="px-2 py-0.5 rounded-full bg-surface-container-low border border-slate-200 text-on-surface-variant font-label-sm text-label-sm">등록된 청소 전문 분야가 없습니다.</span>
                 ) : (
-                  partnerSpecialties.map((sp, idx) => (
-                    <span key={idx} className="px-2 py-0.5 rounded-full bg-surface-container-low border border-slate-200 text-on-surface font-label-sm text-label-sm font-medium">{sp}</span>
-                  ))
+                  partnerSpecialties.map((sp, idx) => {
+                    const cls = sp.includes('정기')
+                      ? 'bg-amber-50 text-amber-800 border-amber-200'
+                      : sp.includes('입주')
+                      ? 'bg-sky-50 text-sky-800 border-sky-200'
+                      : 'bg-rose-50 text-rose-800 border-rose-200';
+                    return (
+                      <span key={idx} className={`px-2.5 py-0.5 rounded-full border font-label-sm text-label-sm font-semibold ${cls}`}>{sp}</span>
+                    );
+                  })
                 )}
               </div>
               <div className="flex items-start gap-2">
@@ -8504,8 +8517,7 @@ function WebSrvcMyp020100({ userInfo, onBack }) {
     <main className="w-full pt-[72px] bg-[#f7f9fb] text-slate-800 flex-1 overflow-y-auto overflow-x-hidden">
       <div className="max-w-5xl mx-auto p-4 sm:p-8 flex flex-col gap-6">
         {/* 상단 헤더 */}
-        <header className="bg-white rounded-2xl p-6 sm:p-8 border border-slate-200/90 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-5 relative overflow-hidden">
-          <header className="bg-white rounded-2xl p-6 sm:p-8 border-2 border-blue-500 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-5 relative overflow-hidden">
+        <header className="bg-white rounded-2xl p-6 sm:p-8 border-2 border-blue-500 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-5 relative overflow-hidden">
             <div className="absolute -right-10 -bottom-10 w-44 h-44 bg-blue-50/60 rounded-full blur-2xl pointer-events-none" />
             <div className="relative z-10">
               <div className="flex items-center gap-2 mb-1.5">
@@ -8729,33 +8741,41 @@ function WebSrvcMyp020100({ userInfo, onBack }) {
                 <button type="button" onClick={onBack} className="flex-1 sm:flex-none px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold cursor-pointer">
                   취소 및 돌아가기
                 </button>
-                <button
-                  type="button"
-                  onClick={async () => {
-                    try {
-                      const res = await fetch('/api/srvc/myp/020100', {
-                        method: 'PUT',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                          userNo: userInfo?.USER_NO || 'S20261100002',
-                          bizName,
-                          ceoName,
-                          bizNo,
-                          cleanServiceTypes,
-                          certs,
-                        }),
-                      });
-                      const json = await res.json();
-                      showToast(json?.message || '사업자 및 자격·수료 정보가 저장되었습니다.');
-                    } catch {
-                      showToast('저장 요청 중 오류가 발생했습니다.');
-                    }
-                  }}
-                  className="flex-1 sm:flex-none px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shadow-sm flex items-center justify-center gap-1.5 cursor-pointer"
-                >
-                  <span className="material-symbols-outlined text-base">save</span>
-                  내 정보 저장
-                </button>
+                <div className="relative flex-1 sm:flex-none">
+                  {toastMsg && (
+                    <div className="absolute bottom-full right-0 mb-2.5 whitespace-nowrap z-50 bg-slate-900 text-white px-4 py-2.5 rounded-xl shadow-lg flex items-center gap-2 text-xs font-bold border border-slate-700">
+                      <span className="material-symbols-outlined text-emerald-400 text-base">check_circle</span>
+                      {toastMsg}
+                    </div>
+                  )}
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      try {
+                        const res = await fetch('/api/srvc/myp/020100', {
+                          method: 'PUT',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({
+                            userNo: userInfo?.USER_NO || 'S20261100002',
+                            bizName,
+                            ceoName,
+                            bizNo,
+                            cleanServiceTypes,
+                            certs,
+                          }),
+                        });
+                        const json = await res.json();
+                        showToast(json?.message || '사업자 및 자격·수료 정보가 저장되었습니다.');
+                      } catch {
+                        showToast('저장 요청 중 오류가 발생했습니다.');
+                      }
+                    }}
+                    className="w-full px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shadow-sm flex items-center justify-center gap-1.5 cursor-pointer"
+                  >
+                    <span className="material-symbols-outlined text-base">save</span>
+                    내 정보 저장
+                  </button>
+                </div>
               </div>
             </div>
           </section>
@@ -9388,6 +9408,7 @@ function WebSrvcCom010002Header({
             <img alt="쓸고닦고 공식 로고" className="w-full h-full object-cover scale-150" src="/storage/sseuldakgo/logo/Logo_쓸고딱고.jpg" />
           </button>
           <nav className="hidden md:flex items-center gap-1">
+            <button type="button" onClick={() => onNavigate?.('WEB-SRVC-COM-010000')} className="px-3 py-2 rounded-xl text-sm font-semibold bg-sky-50 text-sky-700 hover:bg-sky-100 transition-colors cursor-pointer">홈</button>
             <button type="button" onClick={() => onNavigate?.('WEB-SRVC-QOT-010000')} className={`px-3 py-2 rounded-xl text-sm font-semibold transition-colors cursor-pointer ${activeNavPath === 'WEB-SRVC-QOT-010000' ? 'bg-sky-50 text-sky-700' : 'text-slate-600 hover:text-sky-600 hover:bg-slate-100'}`}>청소·시공 청약</button>
             <button type="button" onClick={() => onNavigate?.('WEB-SRVC-QOT-020000')} className={`px-3 py-2 rounded-xl text-sm font-semibold transition-colors cursor-pointer ${activeNavPath === 'WEB-SRVC-QOT-020000' ? 'bg-sky-50 text-sky-700' : 'text-slate-600 hover:text-sky-600 hover:bg-slate-100'}`}>내 청약 내역</button>
             <button type="button" onClick={() => onNavigate?.('WEB-SRVC-JOB-020000')} className={`px-3 py-2 rounded-xl text-sm font-semibold transition-colors cursor-pointer ${activeNavPath === 'WEB-SRVC-JOB-020000' ? 'bg-sky-50 text-sky-700' : 'text-slate-600 hover:text-sky-600 hover:bg-slate-100'}`}>현장 시공 현황</button>
@@ -9724,7 +9745,11 @@ export default function WebClntCom010000({ onNavigate }) {
   const handleOrderCreated = (newOrder) => {
     setFeedList((prev) => [newOrder, ...prev]);
   };
-  const [activeNavPath, setActiveNavPath] = useState('home');
+  const [activeNavPath, setActiveNavPath] = useState(() => {
+    if (!userInfo?.isGuest && userInfo?.USER_ROLE_CD === 'S') return 'WEB-SRVC-COM-010000';
+    if (!userInfo?.isGuest && userInfo?.USER_ROLE_CD === 'C') return 'WEB-CLNT-COM-010200';
+    return 'home';
+  });
   const [isBrandLogoModalOpen, setIsBrandLogoModalOpen] = useState(false);
   const [isAboutModalOpen, setIsAboutModalOpen] = useState(false);
   const [activeNotiModal, setActiveNotiModal] = useState(null);
@@ -9926,6 +9951,9 @@ export default function WebClntCom010000({ onNavigate }) {
               <img src="/storage/sseuldakgo/logo/Logo_쓸고딱고.jpg" alt="쓸고닦고 로고" className="w-full h-full object-cover scale-150" />
             </div>
             <nav className="hidden md:flex items-center gap-1">
+              {userInfo?.USER_ROLE_CD === 'S' && (
+                <button type="button" onClick={() => setActiveNavPath('WEB-SRVC-COM-010000')} className="px-3 py-2 rounded-xl text-sm font-semibold bg-sky-50 text-sky-700 hover:bg-sky-100 transition-colors cursor-pointer">홈</button>
+              )}
               <button type="button" onClick={() => { setActiveNavPath('WEB-SRVC-COM-010000'); setTimeout(() => Array.from(document.querySelectorAll('h2,h3')).find((el) => el.textContent?.includes('통합 시공·청약 공정 관리'))?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 80); }} className="px-3 py-2 rounded-xl text-sm font-semibold text-on-surface-variant hover:text-primary hover:bg-surface-container-low transition-colors cursor-pointer">통합 시공·청약 공정 관리</button>
               <button type="button" onClick={() => { setActiveNavPath('WEB-SRVC-COM-010000'); setTimeout(() => Array.from(document.querySelectorAll('h2,h3')).find((el) => el.textContent?.includes('내 활동 내역'))?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 80); }} className="px-3 py-2 rounded-xl text-sm font-semibold text-on-surface-variant hover:text-primary hover:bg-surface-container-low transition-colors cursor-pointer">내 활동 내역</button>
               <button type="button" onClick={() => setActiveNavPath('WEB-SRVC-STT-010000')} className="px-3 py-2 rounded-xl text-sm font-semibold text-on-surface-variant hover:text-primary hover:bg-surface-container-low transition-colors cursor-pointer">내 활동 통계</button>

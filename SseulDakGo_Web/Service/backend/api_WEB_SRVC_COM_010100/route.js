@@ -24,10 +24,8 @@ function buildStoredFileName(userNo, ext) {
 export async function handleGetPartnerLogo(userNo) {
   const rows = await executeQuery(
     `SELECT U.USER_NO, U.USER_ROLE_CD, U.USER_STAT_CD, U.USER_NM AS COMPANY_NM, U.PROFILE_IMG_URL,
-            D.LOGO_ORIG_FILE_NM, D.LOGO_STORED_FILE_NM, D.LOGO_FILE_SIZE, D.LOGO_EXT,
-            DATE_FORMAT(COALESCE(D.MOD_DT, U.MOD_DT), '%Y-%m-%d %H:%i:%s') AS updatedAt
+            DATE_FORMAT(U.MOD_DT, '%Y-%m-%d %H:%i:%s') AS updatedAt
        FROM TB_USER U
-       LEFT JOIN TB_SERVICE_DOC D ON U.USER_NO = D.USER_NO
       WHERE U.USER_NO = ?
       LIMIT 1`,
     [userNo]
@@ -40,13 +38,14 @@ export async function handleGetPartnerLogo(userNo) {
     status: 200,
     body: {
       success: true,
+      logoUrl: u.PROFILE_IMG_URL || null,
       data: {
         userNo: u.USER_NO,
         companyNm: u.COMPANY_NM || '(주)클린파트너스',
         currentLogoUrl: u.PROFILE_IMG_URL || null,
-        origFileName: u.LOGO_ORIG_FILE_NM || null,
-        storedFileName: u.LOGO_STORED_FILE_NM || null,
-        fileSize: u.LOGO_FILE_SIZE || null,
+        origFileName: null,
+        storedFileName: null,
+        fileSize: null,
         updatedAt: u.updatedAt || null,
       },
     },
